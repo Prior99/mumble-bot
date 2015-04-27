@@ -1,0 +1,15 @@
+{
+  "name": "mumble-bot",
+  "version": "0.0.0",
+  "description": "A bot for mumble.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.cronosx.de/prior/mumble-bot"
+  },
+  "author": "",
+  "license": "GPL"
+}
