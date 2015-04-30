@@ -5,7 +5,18 @@ var FS = require("fs");
 
 var options = require("./config");
 
-ESpeak.initialize();
+ESpeak.initialize({
+	lang : "de",
+	gender : "female",
+	age : 50,
+	variant: 0
+});
+ESpeak.setProperties({
+	range : 30,
+	pitch: 90
+});
+console.log(ESpeak.getVoice());
+console.log(ESpeak.getProperties());
 
 var connection;
 var inputStreamMumble;
@@ -23,7 +34,7 @@ function startup(_connection) {
 }
 
 setInterval(function() {
-	ESpeak.speak("Lorem Ipsum Dolor Sit Amet!");
+	ESpeak.speak("Hallo Welt ich esse gerne Käse!");
 }, 2000);
 
 ESpeak.onVoice(function(wav, samples, samplerate) {
