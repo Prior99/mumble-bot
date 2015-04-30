@@ -11,5 +11,9 @@
     "url": "https://git.cronosx.de/prior/mumble-bot"
   },
   "author": "",
-  "license": "GPL"
+  "license": "GPL",
+  "dependencies": {
+    "mumble": "0.0.3",
+    "node-espeak": "^0.1.0"
+  }
 }
