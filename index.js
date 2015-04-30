@@ -23,7 +23,7 @@ function startup(_connection) {
 
 ESpeak.initialize();
 ESpeak.onVoice(function(wav, samples, samplerate) {
-	connection.inputStream().write(Samplerate.resample(wav, samplerate, 48000, 1, samples));
+	connection.inputStream().write(Samplerate.resample(wav, samplerate, 48000, 2, samples));
 	console.log("Samples: " + samples);
 	console.log("Samplerate: " + samplerate);
 });
