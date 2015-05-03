@@ -10,5 +10,6 @@
 		"fifo" : "path/to/fifo",
 		"port" : 6601,
 		"host" : "localhost"
-	}
+	},
+	"hotword" : "okay %name%"
 }
