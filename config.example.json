@@ -1,7 +1,8 @@
 {
 	"url" : "example.org",
 	"name" : "bob",
-	"mumbleOptions" : {
-
-	}
+	"key" : "./bob.key",
+	"cert" : "./bob.cert",
+	"channel" : "Root",
+	"afkChannel" : "Bot AFK"
 }

@@ -1,0 +1,12 @@
+#JSGF V1.0;
+
+grammar commands;
+
+<hotword> = okay jenny;
+<stopmusic> = pause;
+<playmusic> = play;
+<leave> = get out;
+
+<command> = <stopmusic> | <playmusic> | <leave>;
+
+public <commands> = <hotword> <command>;

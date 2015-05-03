@@ -13,7 +13,8 @@
   "author": "",
   "license": "GPL",
   "dependencies": {
-    "mumble": "0.0.3",
-    "node-espeak": "^0.1.1"
+    "mumble": "0.0.6",
+    "node-espeak": "^0.1.1",
+    "winston": "^1.0.0"
   }
 }
