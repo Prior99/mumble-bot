@@ -25,6 +25,19 @@ Bot.prototype.join = function(cname) {
 
 Bot.prototype.say = function(text) {
 	return this.voiceOutput.say(text);
+};
+
+Bot.prototype.findUsers = function(namePart) {
+	namePart = namePart.toLowerCase();
+	var users = this.mumble.users();
+	var found = [];
+	for(var key in users) {
+		var user = users[key];
+		if(user.name.toLowerCase().indexOf(namePart) !== -1) {
+			found.push(user);
+		}
+	}
+	return found;
 }
 
 module.exports = Bot;

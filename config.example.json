@@ -4,5 +4,6 @@
 	"key" : "./bob.key",
 	"cert" : "./bob.cert",
 	"channel" : "Root",
-	"afkChannel" : "Bot AFK"
+	"afkChannel" : "Bot AFK",
+	"kickChannel" : "Kicked"
 }

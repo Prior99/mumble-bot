@@ -6,7 +6,9 @@ grammar commands;
 <stopmusic> = pause;
 <playmusic> = play;
 <leave> = get out;
+<kickmerlin> = kick merlin;
+<kickeveryone> = kick everyone;
 
-<command> = <stopmusic> | <playmusic> | <leave>;
+<command> = <stopmusic> | <playmusic> | <leave> | <kickmerlin> | <kickeveryone>;
 
 public <commands> = <hotword> <command>;

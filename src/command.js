@@ -40,4 +40,30 @@ Command.prototype.commands["get out"] = function() {
 	}.bind(this), 1000);
 };
 
+Command.prototype.commands["kick merlin"] = function() {
+	var merlins = this.bot.findUsers("Moerrrlin");
+	if(merlins.length === 0) {
+		this.bot.say("Hmmm. I can not find him. Maybe he is hiding?");
+	}
+	else {
+		this.bot.say("Merlin get the fuck out.");
+		setTimeout(function() {
+			merlins[0].moveToChannel(this.bot.options.kickChannel);
+		}.bind(this), 2000);
+	}
+};
+
+Command.prototype.commands["kick everyone"] = function() {
+	this.bot.say("Get the fuck out.");
+	var channel = this.bot.mumble.user.channel;
+	setTimeout(function() {
+		for(var key in channel.users) {
+			var user = channel.users[key];
+			if(user !== this.bot.mumble.user) {
+				user.moveToChannel(this.bot.options.kickChannel);
+			}
+		}
+	}.bind(this), 1000);
+};
+
 module.exports = Command;
