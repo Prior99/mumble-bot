@@ -10,7 +10,6 @@ var EventEmitter = require("events").EventEmitter;
  */
 var TIMEOUT_THRESHOLD = 100;
 var THRESHOLD = -8000;
-var HOT_WORD = "okay jenny";
 var SAMPLERATE = 16000;
 /*
  * Polyfills
@@ -73,7 +72,7 @@ VoiceInput.prototype._speakingStopped = function() {
 	console.log("speaking stopped");
 	this.speaking = false;
 	this.sphinx.stop();
-	if(this.hypothesis !== null && this.hypothesis.startsWith(HOT_WORD) && this.score > THRESHOLD) {
+	if(this.hypothesis !== null && this.hypothesis.startsWith(this.bot.hotword) && this.score > THRESHOLD) {
 		this._dispatch();
 	}
 };

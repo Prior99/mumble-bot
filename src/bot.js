@@ -6,18 +6,18 @@ var Command = require("./command");
 var VoiceOutput = require("./voice_output");
 var Music = require("./music");
 var MPDControl = require("./mpdcontrol");
+var Winston = require('winston');
+var FS = require('fs');
 /*
  * Code
  */
 var Bot = function(mumble, options) {
 	this.options = options;
+	this.hotword = options.hotword.replace("%name%", options.name);
+	Winston.info("Hotword is '" + this.hotword + "'");
 	this.mumble = mumble;
 	this.command = new Command(this);
-	this.voiceInput = new VoiceInput(this);
 	this.voiceOutput = new VoiceOutput(this);
-	this.voiceInput.on('input', function(text, score) {
-		this.command.process(text);
-	}.bind(this));
 	if(options.mpd) {
 		this.music = new Music(this);
 		this.mpd = new MPDControl(this);
@@ -31,6 +31,39 @@ var Bot = function(mumble, options) {
 			this.join(this.options.afkChannel);
 		}.bind(this));
 	}.bind(this));
+
+	//Must be run after all commands were registered
+	this._generateGrammar();
+	this.voiceInput = new VoiceInput(this);
+	this.voiceInput.on('input', function(text, score) {
+		this.command.process(text);
+	}.bind(this));
+};
+
+Bot.prototype._generateGrammar = function() {
+	var grammar = "#JSGF V1.0;\n";
+	grammar += "\n";
+	grammar += "/*\n";
+	grammar += " * This is an automatic generated file. Do not edit.\n";
+	grammar += " * Changes will be overwritten on next start of bot.\n";
+	grammar += " */\n";
+	grammar += "\n";
+	grammar += "grammar commands;\n";
+	grammar += "\n";
+	grammar += "<hotword> = " + this.hotword + ";\n";
+	grammar += "\n";
+	var commandLine = "<command> =";
+	for(var key in this.command.commands) {
+		Winston.info("Command: '" + key + "'");
+		var tag = "_" + key.replace(" ", "").toLowerCase();
+		grammar += "<" + tag + "> = " + key + ";\n"
+		commandLine += " <" + tag + "> |";
+	}
+	grammar += "\n";
+	grammar += commandLine.substring(0, commandLine.length - 2) + ";\n";
+	grammar += "\n";
+	grammar += "public <commands> = <hotword> <command>;";
+	FS.writeFileSync("commands.gram", grammar);
 };
 
 Bot.prototype.newCommand = function(commandName, method) {

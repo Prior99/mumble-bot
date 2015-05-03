@@ -4,7 +4,6 @@
 /*
  * Defines
  */
-var HOT_WORD = "okay jenny";
 /*
  * Code
  */
@@ -14,7 +13,7 @@ var Command = function(bot) {
 };
 
 Command.prototype.process = function(text) {
-	text = text.substring(HOT_WORD.length + 1, text.length);
+	text = text.substring(this.bot.hotword.length + 1, text.length);
 	var found = false;
 	for(var key in this.commands) {
 		if(key === text.substring(0, key.length)) {
