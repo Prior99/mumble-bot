@@ -32,6 +32,10 @@ var Bot = function(mumble, options) {
 		}.bind(this));
 	}.bind(this));
 
+	this.newCommand("", function() {
+		this.say("What do you want?");
+	}.bind(this));
+
 	//Must be run after all commands were registered
 	this._generateGrammar();
 	this.voiceInput = new VoiceInput(this);
@@ -54,6 +58,9 @@ Bot.prototype._generateGrammar = function() {
 	grammar += "\n";
 	var commandLine = "<command> =";
 	for(var key in this.command.commands) {
+		if(key === "") {
+			continue;
+		}
 		Winston.info("Command: '" + key + "'");
 		var tag = "_" + key.replace(" ", "").toLowerCase();
 		grammar += "<" + tag + "> = " + key.toLowerCase() + ";\n"
