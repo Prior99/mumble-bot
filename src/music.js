@@ -7,5 +7,7 @@ var FS = require('fs');
  */
 var Music = function(bot) {
 	this.fifo = FS.createReadStream(bot.options.mpd.fifo);
-	this.fifo.pipe(bot.outputStream());
+	this.fifo.pipe(bot.mumble.inputStream());
 };
+
+module.exports = Music;
