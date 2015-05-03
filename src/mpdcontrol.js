@@ -15,19 +15,17 @@ var MPDControl = function(bot) {
 	});
 	this.ready = false;
 	this.playing = true;
-	this.volume = 50;
 	this.mpd.on('ready', function() {
 		this.ready = true;
 		this.mpd.sendCommand("play");
-		this.mpd.sendCommand("volume " + this.volume);
 	}.bind(this));
 	if(bot.options.mpd) {
 		bot.newCommand("music pause", this.pause.bind(this));
-		bot.newCommand("music volume up", this.volumeUp.bind(this));
+		/*bot.newCommand("music volume up", this.volumeUp.bind(this));
 		bot.newCommand("music volume down", this.volumeDown.bind(this));
 		bot.newCommand("music volume max", this.volumeMax.bind(this));
 		bot.newCommand("music volume min", this.volumeMin.bind(this));
-		bot.newCommand("music volume normal", this.volumeNormal.bind(this));
+		bot.newCommand("music volume normal", this.volumeNormal.bind(this));*/
 		bot.newCommand("music resume", this.play.bind(this));
 	}
 };
@@ -68,34 +66,32 @@ MPDControl.prototype.volumeChange = function(vol, relative) {
 		return;
 	}
 	if(relative) {
-		this.volume += vol;
+		this.bot.music.volume += vol;
 	}
 	else {
-		this.volume = vol;
+		this.bot.music.volume = vol;
 	}
-	this.mpd.sendCommand("volume -100");
-	this.mpd.sendCommand("volume +" +  this.volume);
 	this.bot.say(this.volume + " percent");
 };
 
 MPDControl.prototype.volumeDown = function() {
-	this.volumeChange(-10, true);
+	this.volumeChange(-.1, true);
 };
 
 MPDControl.prototype.volumeUp = function() {
-	this.volumeChange(10, true);
+	this.volumeChange(.1, true);
 };
 
 MPDControl.prototype.volumeMax = function() {
-	this.volumeChange(100, false);
+	this.volumeChange(1, false);
 };
 
 MPDControl.prototype.volumeMin = function() {
-	this.volumeChange(10, false);
+	this.volumeChange(.1, false);
 };
 
 MPDControl.prototype.volumeNormal = function() {
-	this.volumeChange(50, false);
+	this.volumeChange(.5, false);
 };
 
 module.exports = MPDControl;
