@@ -37,7 +37,7 @@ function isSilence(buffer) {
 
 var VoiceInput = function(bot) {
 	this.bot = bot;
-	this.sphinx = new PocketSphinx({samprate: SAMPLERATE}, this._onHypothesis.bind(this));
+	this.sphinx = new PocketSphinx({samprate: SAMPLERATE, logfn : "sphinx.log"}, this._onHypothesis.bind(this));
 	this.timeout = undefined;
 	this.speaking = false;
 	this.hypothesis = "";
