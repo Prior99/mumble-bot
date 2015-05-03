@@ -66,4 +66,12 @@ Command.prototype.commands["kick everyone"] = function() {
 	}.bind(this), 1000);
 };
 
+Command.prototype.commands["tell us a story"] = function() {
+	this.bot.say("One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin.");
+};
+
+Command.prototype.commands["change gender"] = function() {
+	this.bot.voiceOutput.changeGender();
+};
+
 module.exports = Command;

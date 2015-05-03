@@ -8,7 +8,9 @@ grammar commands;
 <leave> = get out;
 <kickmerlin> = kick merlin;
 <kickeveryone> = kick everyone;
+<lorem> = tell us a story;
+<changegender> = change gender;
 
-<command> = <stopmusic> | <playmusic> | <leave> | <kickmerlin> | <kickeveryone>;
+<command> = <stopmusic> | <playmusic> | <leave> | <kickmerlin> | <kickeveryone> | <lorem> | <changegender>;
 
 public <commands> = <hotword> <command>;
