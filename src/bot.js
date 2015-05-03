@@ -50,13 +50,13 @@ Bot.prototype._generateGrammar = function() {
 	grammar += "\n";
 	grammar += "grammar commands;\n";
 	grammar += "\n";
-	grammar += "<hotword> = " + this.hotword + ";\n";
+	grammar += "<hotword> = " + this.hotword.toLowerCase() + ";\n";
 	grammar += "\n";
 	var commandLine = "<command> =";
 	for(var key in this.command.commands) {
 		Winston.info("Command: '" + key + "'");
 		var tag = "_" + key.replace(" ", "").toLowerCase();
-		grammar += "<" + tag + "> = " + key + ";\n"
+		grammar += "<" + tag + "> = " + key.toLowerCase() + ";\n"
 		commandLine += " <" + tag + "> |";
 	}
 	grammar += "\n";
