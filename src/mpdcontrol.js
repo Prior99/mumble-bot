@@ -15,28 +15,21 @@ var MPDControl = function(bot) {
 	});
 	this.ready = false;
 	this.playing = true;
+	this.volume = 50;
 	this.mpd.on('ready', function() {
 		this.ready = true;
 		this.mpd.sendCommand("play");
+		this.mpd.sendCommand("volume " + this.volume);
 	}.bind(this));
-
-	bot.newCommand("music pause", function() {
-		if(bot.options.mpd) {
-			this.pause();
-		}
-		else {
-			bot.sayError("I was not configured to play back music.");
-		}
-	}.bind(this));
-
-	bot.newCommand("music resume", function() {
-		if(bot.options.mpd) {
-			this.play();
-		}
-		else {
-			bot.sayError("I was not configured to play back music.");
-		}
-	}.bind(this));
+	if(bot.options.mpd) {
+		bot.newCommand("music pause", this.pause.bind(this));
+		bot.newCommand("music volume up", this.volumeUp.bind(this));
+		bot.newCommand("music volume down", this.volumeDown.bind(this));
+		bot.newCommand("music volume max", this.volumeMax.bind(this));
+		bot.newCommand("music volume min", this.volumeMin.bind(this));
+		bot.newCommand("music volume normal", this.volumeNormal.bind(this));
+		bot.newCommand("music resume", this.play.bind(this));
+	}
 };
 
 MPDControl.prototype.play = function() {
@@ -67,6 +60,42 @@ MPDControl.prototype.pause = function() {
 	this.mpd.sendCommand("pause");
 	this.bot.say("Music paused.");
 	this.playing = false;
+};
+
+MPDControl.prototype.volumeChange = function(vol, relative) {
+	if(!this.ready) {
+		this.bot.sayError("Musicplayback is not ready.");
+		return;
+	}
+	if(relative) {
+		this.volume += vol;
+	}
+	else {
+		this.volume = vol;
+	}
+	this.mpd.sendCommand("volume -100");
+	this.mpd.sendCommand("volume +" +  this.volume);
+	this.bot.say(this.volume + " percent");
+};
+
+MPDControl.prototype.volumeDown = function() {
+	this.volumeChange(-10, true);
+};
+
+MPDControl.prototype.volumeUp = function() {
+	this.volumeChange(10, true);
+};
+
+MPDControl.prototype.volumeMax = function() {
+	this.volumeChange(100, false);
+};
+
+MPDControl.prototype.volumeMin = function() {
+	this.volumeChange(10, false);
+};
+
+MPDControl.prototype.volumeNormal = function() {
+	this.volumeChange(50, false);
 };
 
 module.exports = MPDControl;
