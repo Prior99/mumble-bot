@@ -4,6 +4,7 @@
 var VoiceInput = require("./voice_input");
 var Command = require("./command");
 var VoiceOutput = require("./voice_output");
+var Music = require("./music");
 /*
  * Code
  */
@@ -16,6 +17,9 @@ var Bot = function(mumble, options) {
 	this.voiceInput.on('input', function(text, score) {
 		this.command.process(text);
 	}.bind(this));
+	if(options.mpd) {
+		this.music = new Music(this);
+	}
 };
 
 Bot.prototype.join = function(cname) {

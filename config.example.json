@@ -5,5 +5,8 @@
 	"cert" : "./bob.cert",
 	"channel" : "Root",
 	"afkChannel" : "Bot AFK",
-	"kickChannel" : "Kicked"
+	"kickChannel" : "Kicked",
+	"mpd" : {
+		"fifo" : "path/to/fifo"
+	}
 }
