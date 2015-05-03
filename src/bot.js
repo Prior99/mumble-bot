@@ -11,7 +11,7 @@ var Bot = function(mumble, options) {
 	this.options = options;
 	this.mumble = mumble;
 	this.voiceInput = new VoiceInput(this);
-	this.voiceOutput = new VoiceOutput(mumble);
+	this.voiceOutput = new VoiceOutput(this);
 	this.command = new Command(this);
 	this.voiceInput.on('input', function(text, score) {
 		this.command.process(text);

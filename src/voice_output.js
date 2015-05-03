@@ -9,12 +9,12 @@ var EventEmitter = require("events").EventEmitter;
 /*
  * Code
  */
-var VoiceOutput = function(mumble) {
-	this._inputStream = mumble.inputStream();
+var VoiceOutput = function(bot) {
+	this._inputStream = bot.mumble.inputStream();
 	ESpeak.initialize({
 		lang : "en",
 		gender : "female"
-	});
+	}, undefined, bot.options.espeakData);
 	ESpeak.setProperties({
 		range : 30,
 		pitch: 60,
