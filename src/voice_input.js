@@ -62,14 +62,12 @@ this.timeout = setTimeout(this._speakingStopped.bind(this), TIMEOUT_THRESHOLD);
 };
 
 VoiceInput.prototype._speakingStarted = function() {
-	console.log("speaking started");
 	this._initTimeout();
 	this.speaking = true;
 	this.sphinx.start();
 };
 
 VoiceInput.prototype._speakingStopped = function() {
-	console.log("speaking stopped");
 	this.speaking = false;
 	this.sphinx.stop();
 	if(this.hypothesis !== null && this.hypothesis.startsWith(this.bot.hotword) && this.score > THRESHOLD) {

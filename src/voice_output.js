@@ -20,7 +20,6 @@ var VoiceOutput = function(bot) {
 		rate : 130,
 		gap: 1.5
 	}, bot.options.espeakData);
-	console.log(ESpeak.getVoice());
 	ESpeak.onVoice(this._onESpeakVoice.bind(this));
 
 	this.bot.newCommand("change gender", function() {
@@ -53,7 +52,6 @@ VoiceOutput.prototype._onESpeakVoice = function(wav, samples, samplerate) {
 		this.speakWait = 200;
 	}
 	this.speakWait += sec * 1000;
-	console.log("Speak for additional " + sec + "s. Overall: " + (this.speakWait / 1000) + "s");
 	this.speakStopTimeout = setTimeout(function() {
 		this.speakWait = 0;
 		this.emit('speak-stop');
