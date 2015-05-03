@@ -5,6 +5,7 @@ var VoiceInput = require("./voice_input");
 var Command = require("./command");
 var VoiceOutput = require("./voice_output");
 var Music = require("./music");
+var MPDControl = require("./mpdcontrol");
 /*
  * Code
  */
@@ -19,6 +20,7 @@ var Bot = function(mumble, options) {
 	}.bind(this));
 	if(options.mpd) {
 		this.music = new Music(this);
+		this.mpd = new MPDControl(this);
 	}
 };
 
@@ -29,6 +31,10 @@ Bot.prototype.join = function(cname) {
 
 Bot.prototype.say = function(text) {
 	return this.voiceOutput.say(text);
+};
+
+Bot.prototype.sayError = function(text) {
+	return this.voiceOutput.say("Exception:    " + text);
 };
 
 Bot.prototype.findUsers = function(namePart) {

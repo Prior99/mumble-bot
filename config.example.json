@@ -7,6 +7,8 @@
 	"afkChannel" : "Bot AFK",
 	"kickChannel" : "Kicked",
 	"mpd" : {
-		"fifo" : "path/to/fifo"
+		"fifo" : "path/to/fifo",
+		"port" : 6601,
+		"host" : "localhost"
 	}
 }

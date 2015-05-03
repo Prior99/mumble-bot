@@ -27,7 +27,7 @@ Command.prototype.process = function(text) {
 		}
 	}
 	if(!found) {
-		this.bot.say("Unknown command: " + text);
+		this.bot.sayError("Unknown command: " + text);
 	}
 };
 
@@ -64,6 +64,24 @@ Command.prototype.commands["kick everyone"] = function() {
 			}
 		}
 	}.bind(this), 1000);
+};
+
+Command.prototype.commands["music stop"] = function() {
+	if(this.bot.options.mpd) {
+		this.bot.mpd.pause();
+	}
+	else {
+		this.bot.sayError("I was not configured to play back music.");
+	}
+};
+
+Command.prototype.commands["music start"] = function() {
+	if(this.bot.options.mpd) {
+		this.bot.mpd.play();
+	}
+	else {
+		this.bot.sayError("I was not configured to play back music.");
+	}
 };
 
 Command.prototype.commands["tell us a story"] = function() {
