@@ -19,6 +19,24 @@ var MPDControl = function(bot) {
 		this.ready = true;
 		this.mpd.sendCommand("play");
 	}.bind(this));
+
+	bot.newCommand("music pause", function() {
+		if(bot.options.mpd) {
+			this.pause();
+		}
+		else {
+			bot.sayError("I was not configured to play back music.");
+		}
+	}.bind(this));
+
+	bot.newCommand("music resume", function() {
+		if(bot.options.mpd) {
+			this.play();
+		}
+		else {
+			bot.sayError("I was not configured to play back music.");
+		}
+	}.bind(this));
 };
 
 MPDControl.prototype.play = function() {

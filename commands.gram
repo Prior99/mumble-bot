@@ -3,8 +3,8 @@
 grammar commands;
 
 <hotword> = okay jenny;
-<stopmusic> = music stop;
-<playmusic> = music start;
+<stopmusic> = music pause;
+<playmusic> = music resume;
 <leave> = get out;
 <kickmerlin> = kick merlin;
 <kickeveryone> = kick everyone;

@@ -12,9 +12,9 @@ var MPDControl = require("./mpdcontrol");
 var Bot = function(mumble, options) {
 	this.options = options;
 	this.mumble = mumble;
+	this.command = new Command(this);
 	this.voiceInput = new VoiceInput(this);
 	this.voiceOutput = new VoiceOutput(this);
-	this.command = new Command(this);
 	this.voiceInput.on('input', function(text, score) {
 		this.command.process(text);
 	}.bind(this));
@@ -22,6 +22,19 @@ var Bot = function(mumble, options) {
 		this.music = new Music(this);
 		this.mpd = new MPDControl(this);
 	}
+	require('./fun')(this);
+	require('./diagnostic')(this);
+
+	this.newCommand("get out", function() {
+		this.say("But    I love you");
+		this.voiceOutput.once('speak-stop', function() {
+			this.join(this.options.afkChannel);
+		}.bind(this));
+	}.bind(this));
+};
+
+Bot.prototype.newCommand = function(commandName, method) {
+	this.command.newCommand(commandName, method);
 };
 
 Bot.prototype.join = function(cname) {

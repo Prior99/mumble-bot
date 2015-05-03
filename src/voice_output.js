@@ -22,6 +22,10 @@ var VoiceOutput = function(bot) {
 	}, bot.options.espeakData);
 	console.log(ESpeak.getVoice());
 	ESpeak.onVoice(this._onESpeakVoice.bind(this));
+
+	this.bot.newCommand("change gender", function() {
+		this.bot.voiceOutput.changeGender();
+	}.bind(this));
 };
 
 Util.inherits(VoiceOutput, EventEmitter);
