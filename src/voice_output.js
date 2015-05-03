@@ -2,7 +2,7 @@
  * Imports
  */
 var ESpeak = require("node-espeak");
-var Samplerate = require("samplerate");
+var Samplerate = require("node-samplerate");
 var Util = require("util");
 var EventEmitter = require("events").EventEmitter;
 
