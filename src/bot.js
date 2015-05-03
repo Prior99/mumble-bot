@@ -13,7 +13,7 @@ var FS = require('fs');
  */
 var Bot = function(mumble, options) {
 	this.options = options;
-	this.hotword = options.hotword.replace("%name%", options.name);
+	this.hotword = options.hotword.replace("%name%", options.name).toLowerCase();
 	Winston.info("Hotword is '" + this.hotword + "'");
 	this.mumble = mumble;
 	this.command = new Command(this);
