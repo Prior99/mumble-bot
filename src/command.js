@@ -10,6 +10,20 @@
 var Command = function(bot) {
 	this.bot = bot;
 	this.commands = [];
+	this.newCommand("help", function() {
+		var help = "Help! You will have to call me by my hot word. My hot word is '" + bot.hotword + "'. To get a list of all commands I know, say: '" + bot.hotword + " commands'";
+		bot.say(help);
+	});
+	this.newCommand("commands", function() {
+		var commandsSay = "I know the following commands ";
+		var commandsWrite = "I know the following commands:<br>";
+		for(var key in this.commands) {
+			commandsSay += key + ",";
+			commandsWrite += "  * " + key + "<br>";
+		}
+		bot.say(commandsSay + ". I also wrote this list to the channels chat.");
+		bot.mumble.user.channel.sendMessage(commandsWrite.substring(0, commandsWrite.length - 4));
+	});
 };
 
 Command.prototype.process = function(text) {
