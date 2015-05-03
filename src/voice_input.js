@@ -41,7 +41,7 @@ var VoiceInput = function(bot) {
 	this.sphinx = new PocketSphinx({samprate: SAMPLERATE}, this._onHypothesis.bind(this));
 	this.timeout = undefined;
 	this.speaking = false;
-	this.hypothesis = undefined;
+	this.hypothesis = "";
 	this.score = -10000;
 	this.sphinx.addGrammarSearch('commands', 'commands.gram');
 	this.sphinx.search = 'commands';
