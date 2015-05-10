@@ -44,6 +44,10 @@ var Bot = function(mumble, options) {
 	}.bind(this));
 };
 
+Bot.prototype.playSound = function(filename, user, cb) {
+	this.voiceOutput.playSound(filename, user, cb);
+};
+
 Bot.prototype._generateGrammar = function() {
 	var grammar = "#JSGF V1.0;\n";
 	grammar += "\n";

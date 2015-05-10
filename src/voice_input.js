@@ -35,62 +35,106 @@ function isSilence(buffer) {
 	return flag;
 }
 
+
 var VoiceInput = function(bot) {
 	this.bot = bot;
-	this.sphinx = new PocketSphinx({samprate: SAMPLERATE, logfn : "sphinx.log"}, this._onHypothesis.bind(this));
-	this.timeout = undefined;
-	this.speaking = false;
-	this.hypothesis = "";
-	this.score = -10000;
-	this.sphinx.addGrammarSearch('commands', 'commands.gram');
-	this.sphinx.search = 'commands';
-	this.bot.mumble.outputStream().on('data', this._speech.bind(this));
+	this.users = {};
+	var users = bot.mumble.users();
+	for(var u in users) {
+		this._addUser(users[u]);
+	}
 };
 
 Util.inherits(VoiceInput, EventEmitter);
 
-VoiceInput.prototype._onHypothesis = function(err, hypothesis, score) {
+VoiceInput.prototype._addUser = function(user) {
+	var wrapper = {
+		user: user,
+		hypothesis: "",
+		score: -10000,
+		speaking: false
+		//timeout
+	};
+	var sphinx = new PocketSphinx({samprate: SAMPLERATE, logfn : "sphinx.log"}, function(err, hypothesis, score) {
+		this._onHypothesis(err, hypothesis, score, wrapper)
+	}.bind(this));
+	sphinx.addGrammarSearch('commands', 'commands.gram');
+	sphinx.search = 'commands';
+	wrapper.sphinx = sphinx;
+	this.users[user.id] = wrapper;
+	user.outputStream(true).on('data', function(chunk) {
+		if(!isSilence(chunk)) {
+			this._speech(wrapper, chunk);
+		}
+	}.bind(this));
+};
+
+VoiceInput.prototype._onHypothesis = function(err, hypothesis, score, user) {
 	if(err) {
 		throw err;
 	}
-	this.hypothesis = hypothesis;
-	this.score = score;
+	user.hypothesis = hypothesis;
+	user.score = score;
 };
 
-VoiceInput.prototype._initTimeout = function() {
-this.timeout = setTimeout(this._speakingStopped.bind(this), TIMEOUT_THRESHOLD);
+VoiceInput.prototype._initTimeout = function(user) {
+	user.timeout = setTimeout(function() {
+		this._speakingStopped(user);
+	}.bind(this), TIMEOUT_THRESHOLD);
 };
 
-VoiceInput.prototype._speakingStarted = function() {
-	this._initTimeout();
-	this.speaking = true;
-	this.sphinx.start();
+VoiceInput.prototype._speakingStarted = function(user) {
+	this._initTimeout(user);
+	user.speaking = true;
+	user.sphinx.start();
+		console.log("Started");
+	this.bot.playSound("sounds/recognition_started.wav", user.user);
+	this.occupiedBy = user;
 };
 
-VoiceInput.prototype._speakingStopped = function() {
-	this.speaking = false;
-	this.sphinx.stop();
-	if(this.hypothesis !== null && this.hypothesis.startsWith(this.bot.hotword) && this.score > THRESHOLD) {
-		this._dispatch();
+VoiceInput.prototype._speakingStopped = function(user) {
+	user.speaking = false;
+	user.sphinx.stop();
+	user.ignore = true;
+		console.log("Stopped");
+	if(user.hypothesis !== null && user.hypothesis.startsWith(this.bot.hotword) && user.score > THRESHOLD) {
+		this._dispatch(user);
+	}
+	else {
+		this.bot.playSound("sounds/recognition_failure.wav", user.user, function() {
+			user.ignore = false;
+			this.occupiedBy = undefined;
+		}.bind(this));
 	}
 };
 
-VoiceInput.prototype._dispatch = function() {
-	this.emit('input', this.hypothesis, this.score);
+VoiceInput.prototype._dispatch = function(user) {
+	this.bot.playSound("sounds/recognition_success.wav", user.user, function() {
+		user.ignore = false;
+		this.occupiedBy = undefined;
+		this.emit('input', user.hypothesis, user.score, user.user);
+	}.bind(this));
 };
 
-VoiceInput.prototype._speech = function(chunk) {
-	var silence = isSilence(chunk);
-	if(!silence) {
-		if(!this.speaking) {
-			this._speakingStarted();
+VoiceInput.prototype._speech = function(user, chunk) {
+	if(this.occupiedBy && this.occupiedBy !== user) {
+		if(!user.lastAlert || user.lastAlert === 0 || Date.now() - user.lastAlert > 4000) {
+			user.lastAlert = Date.now();
+			this.bot.playSound("sounds/recognition_ignored.wav", user.user);
 		}
-		else {
-			clearTimeout(this.timeout);
-			this._initTimeout();
-			chunk = Samplerate.resample(chunk, 48000, SAMPLERATE, 1);
-			this.sphinx.writeSync(chunk);
-		}
+		return;
+	}
+	if(user.ignore || this.bot.voiceOutput.speaking) {
+		return;
+	}
+	if(!user.speaking) {
+		this._speakingStarted(user);
+	}
+	else {
+		clearTimeout(user.timeout);
+		this._initTimeout(user);
+		chunk = Samplerate.resample(chunk, 48000, SAMPLERATE, 1);
+		user.sphinx.writeSync(chunk);
 	}
 };
 
