@@ -17,6 +17,7 @@
     "mumble": "0.0.6",
     "node-espeak": "^0.1.1",
     "node-samplerate": "^0.1.2",
-    "winston": "^1.0.0"
+    "winston": "^1.0.0",
+    "express": "^4.12.3"
   }
 }
