@@ -11,5 +11,8 @@
 		"port" : 6601,
 		"host" : "localhost"
 	},
+	"website" : {
+		"port" : 23278
+	},
 	"hotword" : "okay %name%"
 }

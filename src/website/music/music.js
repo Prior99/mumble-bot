@@ -8,10 +8,10 @@ var Express = require('express');
  * Code
  */
 
-var RouteMusic = express.router();
+var RouteMusic = Express.Router();
 
 RouteMusic.get('/', function() {
 	res.send("Music homepage.");
 });
 
-module.exports = WebsiteMusic;
+module.exports = RouteMusic;

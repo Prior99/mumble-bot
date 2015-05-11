@@ -5,6 +5,7 @@ var PocketSphinx = require("pocketsphinx");
 var Samplerate = require("node-samplerate");
 var Util = require("util");
 var EventEmitter = require("events").EventEmitter;
+var Winston = require('winston');
 /*
  * Defines
  */
@@ -43,6 +44,7 @@ var VoiceInput = function(bot) {
 	for(var u in users) {
 		this._addUser(users[u]);
 	}
+	Winston.info("Module started: Voice input");
 };
 
 Util.inherits(VoiceInput, EventEmitter);

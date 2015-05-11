@@ -7,6 +7,7 @@ var VoiceOutput = require("./voice_output");
 var Music = require("./music");
 var MPDControl = require("./mpdcontrol");
 var Winston = require('winston');
+var Website = require('./website/website');
 var FS = require('fs');
 /*
  * Code
@@ -35,7 +36,7 @@ var Bot = function(mumble, options) {
 	this.newCommand("", function() {
 		this.say("Was willst du?");
 	}.bind(this));
-
+	this.website = new Website(this);
 	//Must be run after all commands were registered
 	this._generateGrammar();
 	this.voiceInput = new VoiceInput(this);

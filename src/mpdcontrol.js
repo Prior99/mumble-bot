@@ -2,6 +2,7 @@
  * Imports
  */
 var MPD = require('node-mpd');
+var Winston = require('winston');
 
 /*
  * Code
@@ -27,6 +28,7 @@ var MPDControl = function(bot) {
 		bot.newCommand("music volume normal", this.volumeNormal.bind(this));*/
 		bot.newCommand("music resume", this.play.bind(this));
 	}
+	Winston.info("Module started: MPD control");
 };
 
 MPDControl.prototype.play = function() {

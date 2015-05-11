@@ -6,6 +6,7 @@ var Samplerate = require("node-samplerate");
 var Util = require("util");
 var FS = require("fs");
 var EventEmitter = require("events").EventEmitter;
+var Winston = require('winston');
 
 /*
  * Code
@@ -26,6 +27,7 @@ var VoiceOutput = function(bot) {
 	this.bot.newCommand("change gender", function() {
 		this.bot.voiceOutput.changeGender();
 	}.bind(this));
+	Winston.info("Module started: Voice output");
 };
 
 Util.inherits(VoiceOutput, EventEmitter);

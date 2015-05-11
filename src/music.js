@@ -2,6 +2,7 @@
  * Imports
  */
 var FS = require('fs');
+var Winston = require('winston');
 /*
  * Code
  */
@@ -16,6 +17,7 @@ var Music = function(bot) {
 			this.inputStream.write(chunk);
 		}
 	}.bind(this));
+	Winston.info("Module started: Music");
 };
 
 function scaleVolume(buffer, volume) {

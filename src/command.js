@@ -1,6 +1,7 @@
 /*
  * Imports
  */
+var Winston = require('winston');
 /*
  * Defines
  */
@@ -24,6 +25,7 @@ var Command = function(bot) {
 		bot.say(commandsSay + ". I also wrote this list to the channels chat.");
 		bot.mumble.user.channel.sendMessage(commandsWrite.substring(0, commandsWrite.length - 4));
 	});
+	Winston.info("Module started: Command");
 };
 
 Command.prototype.process = function(text) {
