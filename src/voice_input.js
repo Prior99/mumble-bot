@@ -64,6 +64,7 @@ VoiceInput.prototype._addUser = function(user) {
 	this.users[user.id] = wrapper;
 	user.outputStream(true).on('data', function(chunk) {
 		if(!isSilence(chunk)) {
+			console.log("VOICE FROM: " + user.name);
 			this._speech(wrapper, chunk);
 		}
 	}.bind(this));
@@ -112,11 +113,15 @@ VoiceInput.prototype._dispatch = function(user) {
 	this.bot.playSound("sounds/recognition_success.wav", user.user, function() {
 		user.ignore = false;
 		this.occupiedBy = undefined;
-		this.emit('input', user.hypothesis, user.score, user.user);
+		var hypothesis = user.hypothesis;
+		user.hypothesis = undefined;
+		this.emit('input', hypothesis, user.score, user.user);
 	}.bind(this));
 };
 
 VoiceInput.prototype._speech = function(user, chunk) {
+	console.log("HYPO:" + user.hypothesis);
+	console.log("CHUNK:", chunk);
 	if(this.occupiedBy && this.occupiedBy !== user) {
 		if(!user.lastAlert || user.lastAlert === 0 || Date.now() - user.lastAlert > 4000) {
 			user.lastAlert = Date.now();

@@ -69,5 +69,5 @@ function startup(connection) {
 	var bot = new Bot(connection, options);
 	Winston.info("Joining channel: " + options.channel);
 	bot.join(options.channel);
-	bot.say("Greetings!");
+	bot.say("Ich grüße euch!");
 }

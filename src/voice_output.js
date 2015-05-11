@@ -15,7 +15,7 @@ var VoiceOutput = function(bot) {
 	this.bot = bot;
 	this._inputStream = bot.mumble.inputStream();
 	ESpeak.initialize({
-		lang : "en",
+		lang : "de",
 		gender : this.gender
 	}, {
 		rate : 130,
@@ -33,22 +33,26 @@ Util.inherits(VoiceOutput, EventEmitter);
 
 VoiceOutput.prototype.playSound = function(filename, user, cb) {
 	FS.readFile(filename, function(err, data) {
+		this.bot.music.mute();
 		if(err) {
 			throw err;
 		}
-		if(cb) {
-			var time = (data.length / 44100) * 1000 + 200;
-			setTimeout(cb, time);
-		}
+		var time = (data.length / 44100) * 1000 + 200;
+		setTimeout(function() {
+			this.bot.music.unmute();
+			if(cb) {
+				cb();
+			}
+		}.bind(this), time);
 		var stream;
-		if(user) {
+		/*if(user) {
 			stream = user.inputStream();
 		}
-		else {
+		else {*/
 			stream = this.bot.mumble.inputStream();
-		}
+		//}
 		stream.write(Samplerate.resample(data, 44100, 48000, 2));
-	});
+	}.bind(this));
 };
 
 VoiceOutput.prototype.changeGender = function() {
@@ -59,7 +63,7 @@ VoiceOutput.prototype.changeGender = function() {
 		this.gender = "male";
 	}
 	ESpeak.setGender(this.gender);
-	this.say("Do you like me more when I speak with a " + this.gender + " voice?");
+	this.say("Wird diese Stimme bevorzugt?");
 };
 
 VoiceOutput.prototype._onESpeakVoice = function(wav, samples, samplerate) {
@@ -85,13 +89,16 @@ VoiceOutput.prototype._onESpeakVoice = function(wav, samples, samplerate) {
 	}.bind(this), this.speakWait);
 };
 
-VoiceOutput.prototype.say = function(text) {
+VoiceOutput.prototype.say = function(text, cb) {
 	if(this.bot.music && !this.bot.music.muted) {
 		this.bot.music.mute();
 		ESpeak.speak(text);
 		this.once('speak-stop', function() {
 			this.bot.music.unmute();
 		}.bind(this));
+		if(cb) {
+			this.once('speak-stop', cb);
+		}
 	}
 	else {
 		ESpeak.speak(text);

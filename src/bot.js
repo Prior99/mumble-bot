@@ -26,14 +26,14 @@ var Bot = function(mumble, options) {
 	require('./diagnostic')(this);
 
 	this.newCommand("get out", function() {
-		this.say("But    I love you");
+		this.say("Aber ich liebe dich");
 		this.voiceOutput.once('speak-stop', function() {
 			this.join(this.options.afkChannel);
 		}.bind(this));
 	}.bind(this));
 
 	this.newCommand("", function() {
-		this.say("What do you want?");
+		this.say("Was willst du?");
 	}.bind(this));
 
 	//Must be run after all commands were registered
@@ -86,12 +86,12 @@ Bot.prototype.join = function(cname) {
 	channel.join();
 };
 
-Bot.prototype.say = function(text) {
-	return this.voiceOutput.say(text);
+Bot.prototype.say = function(text, cb) {
+	return this.voiceOutput.say(text, cb);
 };
 
 Bot.prototype.sayError = function(text) {
-	return this.voiceOutput.say("Exception:    " + text);
+	return this.voiceOutput.say("Fehler:    " + text);
 };
 
 Bot.prototype.findUsers = function(namePart) {

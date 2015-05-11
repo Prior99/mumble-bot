@@ -1,7 +1,7 @@
 /*
  * Imports
  */
-var MPD = require('mpd');
+var MPD = require('node-mpd');
 
 /*
  * Code
@@ -9,15 +9,14 @@ var MPD = require('mpd');
 
 var MPDControl = function(bot) {
 	this.bot = bot;
-	this.mpd = MPD.connect({
+	this.mpd = new MPD({
 		port : bot.options.mpd.port,
 		host : bot.options.mpd.host
 	});
+	this.mpd.connect();
 	this.ready = false;
-	this.playing = true;
 	this.mpd.on('ready', function() {
 		this.ready = true;
-		this.mpd.sendCommand("play");
 	}.bind(this));
 	if(bot.options.mpd) {
 		bot.newCommand("music pause", this.pause.bind(this));
@@ -32,66 +31,38 @@ var MPDControl = function(bot) {
 
 MPDControl.prototype.play = function() {
 	if(!this.ready) {
-		this.bot.sayError("Musicplayback is not ready.");
+		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
 		return;
 	}
-	if(this.playing) {
-		this.bot.sayError("User is an idiot. Music is already playing.");
-		return;
-	}
-	this.bot.say("Wanna hear some motherfucking music mates?");
+	this.bot.say("Musikwiedergabe fortgesetzt.");
 	this.bot.voiceOutput.once("speak-stop", function() {
-		this.mpd.sendCommand("play");
+	this.mpd.play();
+		if(this.mpd.status.playlistlength == 0) {
+			this.addRandomTrack(function() {
+				this.mpd.play();
+			}.bind(this));
+		}
 	}.bind(this));
 	this.playing = true;
 };
 
 MPDControl.prototype.pause = function() {
 	if(!this.ready) {
-		this.bot.sayError("Musicplayback is not ready.");
+		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
 		return;
 	}
-	if(!this.playing) {
-		this.bot.sayError("User is an idiot. Music is already stopped.");
-		return;
-	}
-	this.mpd.sendCommand("pause");
-	this.bot.say("Music paused.");
+	this.mpd.pause();
+	this.bot.say("Musikwiedergabe angehalten.");
 	this.playing = false;
 };
 
-MPDControl.prototype.volumeChange = function(vol, relative) {
-	if(!this.ready) {
-		this.bot.sayError("Musicplayback is not ready.");
-		return;
-	}
-	if(relative) {
-		this.bot.music.volume += vol;
-	}
-	else {
-		this.bot.music.volume = vol;
-	}
-	this.bot.say(this.volume + " percent");
-};
-
-MPDControl.prototype.volumeDown = function() {
-	this.volumeChange(-.1, true);
-};
-
-MPDControl.prototype.volumeUp = function() {
-	this.volumeChange(.1, true);
-};
-
-MPDControl.prototype.volumeMax = function() {
-	this.volumeChange(1, false);
-};
-
-MPDControl.prototype.volumeMin = function() {
-	this.volumeChange(.1, false);
-};
-
-MPDControl.prototype.volumeNormal = function() {
-	this.volumeChange(.5, false);
+MPDControl.prototype.addRandomTrack = function(cb) {
+	this.bot.say("Ein zufälliger Song wird der Wiedergabeliste hinzugefügt.", function() {
+		this.mpd.listall(function(songs) {
+			var song = songs[parseInt(songs.length * Math.random())];
+			this.mpd.add(song, cb);
+		}.bind(this));
+	}.bind(this));
 };
 
 module.exports = MPDControl;
