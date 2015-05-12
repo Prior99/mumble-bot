@@ -25,9 +25,5 @@ module.exports = function(bot) {
 	router.use('/upload', viewUpload(bot));
 	router.use('/songs', viewSongs(bot));
 
-	router.get('/', function(req, res) {
-		res.render('music/music');
-	});
-
 	return router;
 };
