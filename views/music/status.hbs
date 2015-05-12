@@ -1,0 +1,51 @@
+<h1>Mumble Music Bot</h1>
+
+<table class="table table-striped">
+	<tbody id="infotable">
+		{{#if progressing}}
+		<tr>
+			<td>Total time:</td>
+			<td><span class="glyphicon glyphicon-time" aria-hidden="true"></span> {{status.total}}</td>
+		</tr>
+		<tr>
+			<td>Elapsed:</td>
+			<td><span class="glyphicon glyphicon-time" aria-hidden="true"></span> {{status.elapsed}}</td>
+		</tr>
+		{{else}}
+			<tr>
+				<td>Total time:</td>
+				<td><span class="glyphicon glyphicon-time" aria-hidden="true"></span> --:--</td>
+			</tr>
+			<tr>
+				<td>Elapsed:</td>
+				<td><span class="glyphicon glyphicon-time" aria-hidden="true"></span> --:--</td>
+			</tr>
+		{{/if}}
+		{{#if playing}}
+			<tr>
+				<td>Currently Playing:</td>
+				<td><span class="glyphicon glyphicon-headphones" aria-hidden="true"></span> {{status.song}}</td>
+			</tr>
+		{{else}}
+			<tr>
+				<td>Currently Playing:</td>
+				<td>Nothing</td>
+			</tr>
+		{{/if}}
+		{{#if hasSong}}
+		<tr>
+			<td>Status:</td>
+			<td><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Playing</td>
+		</tr>
+		{{else}}
+		<tr>
+			<td>Status:</td>
+			<td><span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Paused</td>
+		</tr>
+		{{/if}}
+		<tr>
+			<td>Songs in Playlist:</td>
+			<td>{{status.playlistlength}}</td>
+		</tr>
+	</tbody>
+</table>

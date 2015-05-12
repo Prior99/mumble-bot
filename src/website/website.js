@@ -29,11 +29,15 @@ var Website = function(bot) {
 	}));
 	this.app.set('view engine', '.hbs');
 	this.bot = bot;
+	this.app.use(function(req, res, next) {
+		res.locals.bot = bot;
+		next();
+	});
 	this.app.use('/', Express.static('public/'));
 	this.app.use('/bootstrap', Express.static('node_modules/bootstrap/dist/'));
 	this.app.use('/jquery', Express.static('node_modules/jquery/dist/'));
-	this.app.use('/music', routeMusic);
-	this.app.get('/', viewHome);
+	this.app.use('/music', routeMusic(bot));
+	this.app.get('/', viewHome(bot));
 	var port = this.bot.options.website.port;
 	this.app.listen(port);
 	Winston.info("Module started: Website, listening on port " + port);
