@@ -1,0 +1,18 @@
+<h1>Playlist</h1>
+<p>This is the current playlist of the music bot. You can add new songs to the playlist from <a href="?action=songs">here</a>.</p>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Song</th>
+		</tr>
+	</thead>
+	<tbody id="playlist">
+		{{#each playlist}}
+			<tr>
+				<td>{{@key}}</td>
+				<td>{{this.artist}} - {{this.title}}</td>
+			</tr>
+		{{/each}}
+	</tbody>
+</table>
