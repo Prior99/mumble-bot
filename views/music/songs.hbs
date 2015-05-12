@@ -1,0 +1,18 @@
+<h1>Songs</h1>
+<p>This is a list of all songs the music bot currently knows.</p>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Song</th>
+		</tr>
+	</thead>
+	<tbody id="songs">
+		{{#each songs}}
+			<tr>
+				<td>{{this.artist}} - {{this.title}}</td>
+				<td><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></td>
+				<td><a class="btn btn-xs btn-success disabled">Add</a></td>
+			</tr>
+		{{/each}}
+	</tbody>
+</table>
