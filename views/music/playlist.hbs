@@ -8,11 +8,16 @@
 		</tr>
 	</thead>
 	<tbody id="playlist">
-		{{#each playlist}}
-			<tr>
-				<td>{{@key}}</td>
-				<td>{{this.artist}} - {{this.title}}</td>
-			</tr>
-		{{/each}}
 	</tbody>
 </table>
+<script>
+$.getJSON("/api/music/playlist", function(data) {
+	for(var i in data) {
+		var song = data[i];
+		var line = $("<tr></tr>")
+			.append("<td>"+i+"<td>")
+			.append("<td>"+song.artist+" - "+song.title+"<td>");
+		$("#playlist").append(line);
+	}
+});
+</script>

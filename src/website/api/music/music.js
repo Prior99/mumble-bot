@@ -12,6 +12,9 @@ var viewAdd = require('./add');
 var viewStatus = require('./status');
 var viewPlaylist = require('./playlist');
 var viewSongs = require('./songs');
+var viewNext = require('./next');
+var viewPlay = require('./play');
+var viewPause = require('./pause');
 
 /*
  * Code
@@ -24,6 +27,9 @@ module.exports = function(bot) {
 		router.use('/status', viewStatus(bot));
 		router.use('/playlist', viewPlaylist(bot));
 		router.use('/songs', viewSongs(bot));
+		router.use('/next', viewNext(bot));
+		router.use('/play', viewPlay(bot));
+		router.use('/pause', viewPause(bot));
 
 	return router;
 };

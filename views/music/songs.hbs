@@ -7,12 +7,26 @@
 		</tr>
 	</thead>
 	<tbody id="songs">
-		{{#each songs}}
-			<tr>
-				<td>{{this.artist}} - {{this.title}}</td>
-				<td><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></td>
-				<td><a class="btn btn-xs btn-success disabled">Add</a></td>
-			</tr>
-		{{/each}}
+
 	</tbody>
 </table>
+<script>
+
+$.getJSON("/api/music/songs", function(songs) {
+	songs.sort();
+	for(var i in songs) {
+		(function(song) {
+			var add = $('<a class="btn btn-xs btn-success">Add</a>').click(function() {
+				$.getJSON("/api/music/add?artist=" + song.artist + "&title=" + song.title, function() {
+					//reloadSongs();
+				});
+			});
+			var line = $("<tr></tr>").append("<td>" + song.artist + " - " + song.title + "<td>");
+			line.append($('<td><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></td>'));
+			line.append($("<td></td>").append(add));
+			$("#songs").append(line);
+		})(songs[i]);
+	}
+});
+
+</script>

@@ -1,10 +1,7 @@
 var bot;
 
 function render(req, res) {
-	var songs = bot.mpd.mpd.songs;
-	res.render('music/songs', {
-		songs: songs
-	});
+	res.render('music/songs');
 }
 
 module.exports = function(b) {
