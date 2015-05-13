@@ -8,6 +8,8 @@ var Express = require('express');
  * Views
  */
 
+var viewTree = require('./channeltree');
+
 /*
  * Routes
  */
@@ -22,6 +24,7 @@ module.exports = function(bot) {
 	var router = Express.Router();
 
 	router.use('/music', routeMusic(bot));
+	router.use('/tree', viewTree(bot));
 
 	return router;
 };

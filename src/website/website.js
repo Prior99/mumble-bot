@@ -25,6 +25,16 @@ var routeApi = require('./api/api');
 var pages = [{
 	url : "music/",
 	name : "Music"
+},
+{
+	url : "/",
+	name : "Overview"
+}];
+
+var subpages = [{
+	url : "tree",
+	name : "Channels",
+	icon : ""
 }];
 
 var Website = function(bot) {
@@ -38,6 +48,7 @@ var Website = function(bot) {
 	this.app.use(function(req, res, next) {
 		res.locals.bot = bot;
 		res.locals.pages = pages;
+		res.locals.subpages = subpages;
 		next();
 	});
 	this.app.use('/', Express.static('public/'));
@@ -46,6 +57,7 @@ var Website = function(bot) {
 	this.app.use('/music', routeMusic(bot));
 	this.app.use('/api', routeApi(bot));
 	this.app.get('/', viewDefault("home"));
+	this.app.get('/tree', viewDefault("channeltree"));
 	var port = this.bot.options.website.port;
 	this.app.listen(port);
 	Winston.info("Module started: Website, listening on port " + port);
