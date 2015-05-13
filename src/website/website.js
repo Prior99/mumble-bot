@@ -10,7 +10,7 @@ var Winston = require('winston');
  * Views
  */
 
-var viewHome = require('./home');
+var viewDefault = require('./default');
 
 /*
  * Routes
@@ -45,7 +45,7 @@ var Website = function(bot) {
 	this.app.use('/jquery', Express.static('node_modules/jquery/dist/'));
 	this.app.use('/music', routeMusic(bot));
 	this.app.use('/api', routeApi(bot));
-	this.app.get('/', viewHome(bot));
+	this.app.get('/', viewDefault("home"));
 	var port = this.bot.options.website.port;
 	this.app.listen(port);
 	Winston.info("Module started: Website, listening on port " + port);

@@ -13,6 +13,7 @@ var viewSongs = require('./songs');
 var viewStatus = require('./status');
 var viewUpload = require('./upload');
 var viewHome = require('./home');
+var viewDefault = require('../default');
 
 /*
  * Code
@@ -41,11 +42,11 @@ module.exports = function(bot) {
 		res.locals.subpages = pages;
 		next();
 	});
-	router.use('/playlist', viewPlaylist(bot));
-	router.use('/status', viewStatus(bot));
-	router.use('/upload', viewUpload(bot));
-	router.use('/songs', viewSongs(bot));
-	router.get('/', viewHome(bot));
+	router.use('/playlist', viewDefault("music/playlist"));
+	router.use('/status', viewDefault("music/status"));
+	router.use('/upload', viewDefault("music/upload"));
+	router.use('/songs', viewDefault("music/songs"));
+	router.get('/', viewDefault("music/home"));
 
 	return router;
 };
