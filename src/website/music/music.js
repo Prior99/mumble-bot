@@ -8,11 +8,6 @@ var Express = require('express');
  * Views
  */
 
-var viewPlaylist = require('./playlist');
-var viewSongs = require('./songs');
-var viewStatus = require('./status');
-var viewUpload = require('./upload');
-var viewHome = require('./home');
 var viewDefault = require('../default');
 
 /*
