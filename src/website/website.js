@@ -22,6 +22,11 @@ var routeApi = require('./api/api');
  * Code
  */
 
+var pages = [{
+	url : "music/",
+	name : "Music"
+}];
+
 var Website = function(bot) {
 	this.app = Express();
 	this.app.engine('.hbs', ExpHbs({
@@ -32,6 +37,7 @@ var Website = function(bot) {
 	this.bot = bot;
 	this.app.use(function(req, res, next) {
 		res.locals.bot = bot;
+		res.locals.pages = pages;
 		next();
 	});
 	this.app.use('/', Express.static('public/'));

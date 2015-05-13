@@ -13,34 +13,21 @@
 	<link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	<link href="/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
 	<link href="/css/template.css" rel="stylesheet">
+	<link href="/css/sidebar.css" rel="stylesheet">
 	<script src="/jquery/jquery.min.js"></script>
 	<script src="/bootstrap/js/bootstrap.min.js"></script>
 </head>
 <body>
-	<nav class="navbar navbar-inverse navbar-fixed-top">
-		<div class="container">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="/">{{bot.options.name}}</a>
+	{{> navigation}}
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-sm-3 col-md-2 sidebar">
+				{{> subnavigation}}
 			</div>
-			<div id="navbar" class="collapse navbar-collapse">
-				<ul class="nav navbar-nav">
-					<li><a href="/music/songs">Songs</a></li>
-					<li><a href="/music/playlist">Playlist</a></li>
-					<li><a href="/music/status">Status</a></li>
-					<li><a href="/music/upload">Upload</a></li>
-				</ul>
+			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+				{{{body}}}
 			</div>
-	  </div>
-	</nav>
-
-	<div class="container">
-		{{{body}}}
+		</div>
 	</div>
 </body>
 </html>
