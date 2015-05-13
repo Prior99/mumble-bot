@@ -6,3 +6,4 @@ build/
 *.csr
 commands.gram
 *.log
+tmp

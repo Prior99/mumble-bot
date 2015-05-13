@@ -9,10 +9,12 @@
 	"mpd" : {
 		"fifo" : "path/to/fifo",
 		"port" : 6601,
-		"host" : "localhost"
+		"host" : "localhost",
+		"directory" : "path/to/music"
 	},
 	"website" : {
-		"port" : 23278
+		"port" : 23278,
+		"tmp" : "tmp/"
 	},
 	"hotword" : "okay %name%"
 }
