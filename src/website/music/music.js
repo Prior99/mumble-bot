@@ -14,21 +14,21 @@ var viewDefault = require('../default');
  * Code
  */
 var pages = [{
-	url : "/music/playlist/",
-	name : "Playlist",
-	icon : "sort-amount-desc"
-}, {
 	url : "/music/status/",
 	name : "Status",
 	icon : "headphones"
 }, {
-	url : "/music/upload/",
-	name : "Upload",
-	icon : "upload"
+	url : "/music/playlist/",
+	name : "Playlist",
+	icon : "sort-amount-desc"
 }, {
 	url : "/music/songs/",
 	name : "Songs",
 	icon : "music"
+}, {
+	url : "/music/upload/",
+	name : "Upload",
+	icon : "upload"
 }, {
 	url : "/music/youtube/",
 	name : "Youtube",
