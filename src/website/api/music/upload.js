@@ -32,7 +32,7 @@ var Upload = function(bot, router, req, res) {
 
 Upload.prototype.updateComplete = function(err, file, metadata) {
 	if(err) {
-		console.log(err);
+		Winston.error(err);
 		this.status[file.originalname] = {
 			okay : false,
 			reason: "internal_error"

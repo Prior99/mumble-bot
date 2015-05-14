@@ -16,6 +16,7 @@ var viewNext = require('./next');
 var viewPlay = require('./play');
 var viewPause = require('./pause');
 var viewUpload = require('./upload');
+var viewYoutube = require('./youtube');
 
 /*
  * Code
@@ -32,6 +33,7 @@ module.exports = function(bot) {
 		router.use('/play', viewPlay(bot));
 		router.use('/pause', viewPause(bot));
 		router.use('/upload', viewUpload(bot, router));
+		router.use('/youtube', viewYoutube(bot, router));
 
 	return router;
 };

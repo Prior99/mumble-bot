@@ -29,6 +29,10 @@ var pages = [{
 	url : "/music/songs/",
 	name : "Songs",
 	icon : "music"
+}, {
+	url : "/music/youtube/",
+	name : "Youtube",
+	icon : "youtube-square"
 }];
 
 module.exports = function(bot) {
@@ -41,6 +45,7 @@ module.exports = function(bot) {
 	router.use('/status', viewDefault("music/status"));
 	router.use('/upload', viewDefault("music/upload"));
 	router.use('/songs', viewDefault("music/songs"));
+	router.use('/youtube', viewDefault("music/youtube"));
 	router.get('/', viewDefault("music/home"));
 
 	return router;

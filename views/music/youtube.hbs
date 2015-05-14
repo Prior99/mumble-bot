@@ -1,0 +1,97 @@
+<h1>Youtube Extractor</h1>
+<p>Please enter the URL you want to extract the song from in the following form:</p>
+<form class="form-horizontal">
+	<div class="form-group">
+		<label for="url" class="col-sm-2 control-label">URL</label>
+		<div class="col-sm-10">
+			<div class="input-group">
+				<span class="input-group-addon" id="basic-addon1">http://</span>
+				<input type="text" class="form-control" placeholder="https://www.youtube.com/watch?v=lOL_LUwRn7U" id="url">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="format" class="col-sm-2 control-label">Title Format</label>
+		<div class="col-sm-10">
+			<div class="input-group">
+				<span class="input-group-addon" id="basic-addon1">Format</span>
+				<input type="text" class="form-control" value="%(artist)s - %(title)s" id="format">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button class="btn btn-default" type="button" id="go">Extract!</button>
+			</div>
+	</div>
+</form>
+<script>
+	function downloadFinished(response) {
+
+	}
+
+	function addElem(link) {
+		var elem = $("<tr><td>" + link + "</td><td><i class=\"fa fa-cog fa-spin\"></i></td><td></td><td></td></tr>").appendTo("#vids");
+		return elem;
+	}
+
+	function startDownload(url, format) {
+		var link = "<a href=\""+ url + "\">" + url + "</a>"
+		var elem = addElem(link);
+		$.getJSON("/api/music/youtube?url=" + encodeURI(url) + "&format=" + encodeURI(format), function(response) {
+			downloadFinished(response);
+			if(response.okay) {
+				elem.html("<td>" + link + "</td><td><i class=\"fa fa-check\"></i></td><td>" + response.artist + "</td><td>" + response.title + "</td>");
+			}
+			else {
+				elem.html("<td>" + link + "</td><td><i class=\"fa fa-remove\"></i></td><td></td><td></td>");
+			}
+		});
+	}
+
+	$("#go").click(function() {
+		var url = $("#url").val();
+		var format = $("#format").val();
+		startDownload(url, format);
+	});
+</script>
+<h2>Results</h2>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>URL</th>
+			<th>Status</th>
+			<th>Artist</th>
+			<th>Title</th>
+		</tr>
+	</thead>
+	<tbody id="vids">
+	</tbody>
+</table>
+
+<h2>Explanation</h2>
+<p>Enter the URL to a youtube vide containing music here and the bot will automagically extract the audio and add it to the library of known songs.
+	Please add a format in which to parse the metadata from the title of the video in order to have the bot extract the correct title and author.</p>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Expression</th>
+			<th>Meaning</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>%(artist)s</td>
+			<td>Name of the artist</td>
+		</tr>
+		<tr>
+			<td>%(title)s</td>
+			<td>Title of the song</td>
+		</tr>
+		<tr>
+			<td>%(album)s</td>
+			<td>Name of the album</td>
+		</tr>
+	</tbody>
+</table>
+<p>Example: <code>%(artist)s - %(title)s</code></p>

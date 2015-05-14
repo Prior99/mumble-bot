@@ -24,6 +24,7 @@
     "musicmetadata": "^1.0.1",
     "node-espeak": "^0.1.1",
     "node-samplerate": "^0.1.2",
-    "winston": "^1.0.0"
+    "winston": "^1.0.0",
+    "youtube-dl": "^1.10.5"
   }
 }
