@@ -1,15 +1,20 @@
-<nav class="navbar navbar-inverse navbar-fixed-top">
-	<div class="container">
-		<div class="navbar-header">
+<nav class="navbar navbar-inverse no-margin">
+		<div class="navbar-header fixed-brand">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-			<span class="sr-only">Toggle navigation</span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="/">{{bot.options.name}}</a>
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="navbar" id="menutoggle">
+				<span class="sr-only">Toggle sidebar</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#"><i class="fa fa-bullhorn fa-4"></i> {{bot.options.name}}</a>
 		</div>
-		<div id="navbar" class="collapse navbar-collapse">
+		<div class="collapse navbar-collapse" id="navbar">
 			<ul class="nav navbar-nav">
 				{{#each pages}}
 					<li><a href="{{this.url}}">{{this.name}}</a></li>

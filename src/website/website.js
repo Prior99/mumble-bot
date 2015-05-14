@@ -23,7 +23,7 @@ var routeApi = require('./api/api');
  */
 
 var pages = [{
-	url : "music/",
+	url : "/music/",
 	name : "Music"
 },
 {
@@ -34,7 +34,7 @@ var pages = [{
 var subpages = [{
 	url : "tree",
 	name : "Channels",
-	icon : ""
+	icon : "sitemap"
 }];
 
 var Website = function(bot) {
@@ -54,6 +54,7 @@ var Website = function(bot) {
 	this.app.use('/', Express.static('public/'));
 	this.app.use('/bootstrap', Express.static('node_modules/bootstrap/dist/'));
 	this.app.use('/jquery', Express.static('node_modules/jquery/dist/'));
+	this.app.use('/fontawesome', Express.static('node_modules/font-awesome/'));
 	this.app.use('/music', routeMusic(bot));
 	this.app.use('/api', routeApi(bot));
 	this.app.get('/', viewDefault("home"));

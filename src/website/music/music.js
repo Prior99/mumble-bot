@@ -16,7 +16,7 @@ var viewDefault = require('../default');
 var pages = [{
 	url : "/music/playlist/",
 	name : "Playlist",
-	icon : "list"
+	icon : "sort-amount-desc"
 }, {
 	url : "/music/status/",
 	name : "Status",
@@ -24,11 +24,11 @@ var pages = [{
 }, {
 	url : "/music/upload/",
 	name : "Upload",
-	icon : "open"
+	icon : "upload"
 }, {
 	url : "/music/songs/",
 	name : "Songs",
-	icon : "play"
+	icon : "music"
 }];
 
 module.exports = function(bot) {

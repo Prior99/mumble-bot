@@ -1,5 +1,7 @@
-<ul class="nav nav-sidebar">
+<ul class="nav sidebar-nav nav-pills nav-stacked" id="menu">
 	{{#each subpages}}
-		<li><a href="{{this.url}}"><span class="glyphicon glyphicon-{{this.icon}}" aria-hidden="true"></span> {{this.name}}</a></li>
+		<li>
+			<a href="{{this.url}}"><span class="fa-stack fa-lg pull-left"><i class="fa fa-{{this.icon}} fa-stack-1x "></i></span>{{this.name}}</a>
+		</li>
 	{{/each}}
 </ul>

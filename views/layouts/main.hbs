@@ -12,20 +12,25 @@
 
 	<link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	<link href="/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-	<link href="/css/template.css" rel="stylesheet">
 	<link href="/css/sidebar.css" rel="stylesheet">
+	<link href="/fontawesome/css/font-awesome.min.css" rel="stylesheet">
 	<script src="/jquery/jquery.min.js"></script>
 	<script src="/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/js/sidebar.js"></script>
 </head>
 <body>
 	{{> navigation}}
-	<div class="container-fluid">
-		<div class="row">
-			<div class="col-sm-3 col-md-2 sidebar">
-				{{> subnavigation}}
-			</div>
-			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-				{{{body}}}
+	<div id="wrapper">
+		<div id="sidebar-wrapper">
+			{{> subnavigation}}
+		</div>
+		<div id="page-content-wrapper">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-lg-12">
+						{{{body}}}
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
