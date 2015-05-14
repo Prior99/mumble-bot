@@ -20,13 +20,13 @@ var MPDControl = function(bot) {
 		this.ready = true;
 	}.bind(this));
 	if(bot.options.mpd) {
-		bot.newCommand("music pause", this.pause.bind(this));
-		/*bot.newCommand("music volume up", this.volumeUp.bind(this));
-		bot.newCommand("music volume down", this.volumeDown.bind(this));
-		bot.newCommand("music volume max", this.volumeMax.bind(this));
-		bot.newCommand("music volume min", this.volumeMin.bind(this));
-		bot.newCommand("music volume normal", this.volumeNormal.bind(this));*/
-		bot.newCommand("music resume", this.play.bind(this));
+		bot.newCommand("pause", this.pause.bind(this));
+		bot.newCommand("volume up", this.volumeUp.bind(this));
+		bot.newCommand("volume down", this.volumeDown.bind(this));
+		bot.newCommand("volume max", this.volumeMax.bind(this));
+		bot.newCommand("volume min", this.volumeMin.bind(this));
+		bot.newCommand("volume normal", this.volumeNormal.bind(this));
+		bot.newCommand("play", this.play.bind(this));
 	}
 	Winston.info("Module started: MPD control");
 };
@@ -58,12 +58,40 @@ MPDControl.prototype.pause = function() {
 	this.playing = false;
 };
 
+MPDControl.prototype.volumeNormal = function() {
+	this.setVolume(50);
+};
+
+MPDControl.prototype.volumeMin = function() {
+	this.setVolume(25);
+};
+
+MPDControl.prototype.volumeMax = function() {
+	this.setVolume(100);
+};
+
+MPDControl.prototype.volumeUp = function() {
+	this.setVolume(this.mpd.status.volume*100 + 10);
+};
+
+MPDControl.prototype.volumeDown = function() {
+	this.setVolume(this.mpd.status.volume*100 - 10);
+};
+
+MPDControl.prototype.setVolume = function(vol) {
+	this.bot.say("Lautstärke " + vol + "%", function() {
+		this.mpd.volume(vol, function(err) {
+			if(err) {
+				Winston.error(err);
+			}
+		});
+	}.bind(this));
+};
+
 MPDControl.prototype.addRandomTrack = function(cb) {
-	this.bot.say("Ein zufälliger Song wird der Wiedergabeliste hinzugefügt.", function() {
-		this.mpd.listall(function(songs) {
-			var song = songs[parseInt(songs.length * Math.random())];
-			this.mpd.add(song, cb);
-		}.bind(this));
+	this.bot.say("Zufälliger Song wird hinzugefügt.", function() {
+		var song = this.mpd.songs[parseInt(this.mpd.songs.length * Math.random())];
+		this.mpd.add(song.file, cb);
 	}.bind(this));
 };
 

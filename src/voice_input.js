@@ -116,7 +116,7 @@ VoiceInput.prototype._dispatch = function(user) {
 		user.ignore = false;
 		this.occupiedBy = undefined;
 		var hypothesis = user.hypothesis;
-		user.hypothesis = undefined;
+		user.hypothesis = "";
 		this.emit('input', hypothesis, user.score, user.user);
 	}.bind(this));
 };
