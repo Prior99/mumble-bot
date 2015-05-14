@@ -5,6 +5,7 @@
 var Express = require('express');
 var ExpHbs  = require('express-handlebars');
 var Winston = require('winston');
+var Less = require('less-middleware');
 
 /*
  * Views
@@ -51,6 +52,7 @@ var Website = function(bot) {
 		res.locals.subpages = subpages;
 		next();
 	});
+	this.app.use(Less('public/'));
 	this.app.use('/', Express.static('public/'));
 	this.app.use('/bootstrap', Express.static('node_modules/bootstrap/dist/'));
 	this.app.use('/jquery', Express.static('node_modules/jquery/dist/'));

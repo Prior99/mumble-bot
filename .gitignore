@@ -7,3 +7,4 @@ build/
 commands.gram
 *.log
 tmp
+public/css/*.css
