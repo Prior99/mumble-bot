@@ -25,6 +25,10 @@
 	transition: all 0.5s ease;
 }
 
+#menutoggle {
+background: #AAA;
+}
+
 #sidebar-wrapper ul li a {
 	padding-left: 0px;
 	-webkit-transition: padding-left 0.5s ease;
