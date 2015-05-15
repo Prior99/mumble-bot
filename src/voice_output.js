@@ -34,6 +34,10 @@ Util.inherits(VoiceOutput, EventEmitter);
 
 
 VoiceOutput.prototype.playSound = function(filename, user, cb) {
+	if(typeof user === "function" && cb === undefined) {
+		cb = user;
+		user = undefined;
+	}
 	FS.readFile(filename, function(err, data) {
 		this.bot.music.mute();
 		if(err) {
@@ -47,12 +51,12 @@ VoiceOutput.prototype.playSound = function(filename, user, cb) {
 			}
 		}.bind(this), time);
 		var stream;
-		/*if(user) {
+		if(user) {
 			stream = user.inputStream();
 		}
-		else {*/
+		else {
 			stream = this.bot.mumble.inputStream();
-		//}
+		}
 		stream.write(Samplerate.resample(data, 44100, 48000, 2));
 	}.bind(this));
 };

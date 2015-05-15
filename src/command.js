@@ -12,17 +12,17 @@ var Command = function(bot) {
 	this.bot = bot;
 	this.commands = [];
 	this.newCommand("help", function() {
-		var help = "Help! You will have to call me by my hot word. My hot word is '" + bot.hotword + "'. To get a list of all commands I know, say: '" + bot.hotword + " commands'";
+		var help = "Hilfe. Du musst mich mit meinem hot Word ansprechen. Mein hot Word ist: '" + bot.hotword + "'. Um eine Liste aller Kommandos zu erhalten, sag: '" + bot.hotword + " commands'";
 		bot.say(help);
 	});
 	this.newCommand("commands", function() {
-		var commandsSay = "I know the following commands ";
-		var commandsWrite = "I know the following commands:<br>";
+		var commandsSay = "Ich kenne die folgenden Kommandos ";
+		var commandsWrite = "Ich kenne die folgenden Kommandos:<br>";
 		for(var key in this.commands) {
 			commandsSay += key + ",";
 			commandsWrite += "  * " + key + "<br>";
 		}
-		bot.say(commandsSay + ". I also wrote this list to the channels chat.");
+		bot.say(commandsSay + ". Ich habe diese Liste auch in den Chat geschrieben.");
 		bot.mumble.user.channel.sendMessage(commandsWrite.substring(0, commandsWrite.length - 4));
 	});
 	Winston.info("Module started: Command");
@@ -44,7 +44,7 @@ Command.prototype.process = function(text) {
 		}
 	}
 	if(!found) {
-		this.bot.sayError("Unknown command: " + text);
+		this.bot.playSound("sounds/recognition_failure.wav");
 	}
 };
 

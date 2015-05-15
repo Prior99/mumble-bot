@@ -1,7 +1,7 @@
 /*
  * Imports
  */
-var VoiceInput = require("./voice_input");
+var VoiceInput = require("./input/input");
 var Command = require("./command");
 var VoiceOutput = require("./voice_output");
 var Music = require("./music");
@@ -33,14 +33,11 @@ var Bot = function(mumble, options) {
 		}.bind(this));
 	}.bind(this));
 
-	this.newCommand("", function() {
-		this.say("Was willst du?");
-	}.bind(this));
 	this.website = new Website(this);
 	//Must be run after all commands were registered
 	this._generateGrammar();
 	this.voiceInput = new VoiceInput(this);
-	this.voiceInput.on('input', function(text, score) {
+	this.voiceInput.on('input', function(text, user) {
 		this.command.process(text);
 	}.bind(this));
 };
