@@ -1,9 +1,9 @@
 /*
  * Imports
  */
-var VoiceInput = require("./input/input");
+var Input = require("./input/input");
 var Command = require("./command");
-var VoiceOutput = require("./voice_output");
+var Output = require("./output/output");
 var Music = require("./music");
 var MPDControl = require("./mpdcontrol");
 var Winston = require('winston');
@@ -14,36 +14,47 @@ var FS = require('fs');
  */
 var Bot = function(mumble, options) {
 	this.options = options;
+		this.mumble = mumble;
+
 	this.hotword = options.hotword.replace("%name%", options.name).toLowerCase();
 	Winston.info("Hotword is '" + this.hotword + "'");
-	this.mumble = mumble;
+
 	this.command = new Command(this);
-	this.voiceOutput = new VoiceOutput(this);
+	this.output = new Output(this);
+
 	if(options.mpd) {
 		this.music = new Music(this);
+		this.output.on("start", this.music.mute.bind(this.music));
+		this.output.on("stop", this.music.unmute.bind(this.music));
 		this.mpd = new MPDControl(this);
 	}
+
 	require('./fun')(this);
 	require('./diagnostic')(this);
 
 	this.newCommand("get out", function() {
 		this.say("Aber ich liebe dich");
-		this.voiceOutput.once('speak-stop', function() {
+		this.output.once('speak-stop', function() {
 			this.join(this.options.afkChannel);
 		}.bind(this));
 	}.bind(this));
 
 	this.website = new Website(this);
+
 	//Must be run after all commands were registered
 	this._generateGrammar();
-	this.voiceInput = new VoiceInput(this);
-	this.voiceInput.on('input', function(text, user) {
+	this.input = new Input(this);
+	this.input.on('input', function(text, user) {
 		this.command.process(text);
 	}.bind(this));
 };
 
+Bot.prototype.busy = function() {
+	return this.output.busy || this.input.busy;
+};
+
 Bot.prototype.playSound = function(filename, user, cb) {
-	this.voiceOutput.playSound(filename, user, cb);
+	this.output.playSound(filename, user, cb);
 };
 
 Bot.prototype._generateGrammar = function() {
@@ -85,11 +96,11 @@ Bot.prototype.join = function(cname) {
 };
 
 Bot.prototype.say = function(text, cb) {
-	return this.voiceOutput.say(text, cb);
+	return this.output.say(text, cb);
 };
 
 Bot.prototype.sayError = function(text) {
-	return this.voiceOutput.say("Fehler:    " + text);
+	return this.output.say("Fehler:    " + text);
 };
 
 Bot.prototype.findUsers = function(namePart) {

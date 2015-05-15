@@ -50,7 +50,7 @@ VoiceInput.prototype._addUser = function(user) {
 	var localUser = new User(user, this.bot.hotword);
 	this.users[user.id] = localUser;
 	user.outputStream(true).on('data', function(chunk) {
-		if(!this.busy) {
+		if(!this.bot.busy()) {
 			this._setActiveUser(user);
 		}
 		if(this.busy && this.activeUser == user) {
@@ -67,6 +67,7 @@ VoiceInput.prototype._addUser = function(user) {
 		if(this.busy && this.activeUser == user) {
 			this.bot.playSound("sounds/recognition_success.wav", function() {
 				Winston.info("Recognition succeeded for user " + user.name);
+				this._setInactive();
 				this._dispatch(command, user);
 			}.bind(this));
 		}

@@ -37,14 +37,12 @@ MPDControl.prototype.play = function() {
 		return;
 	}
 	this.bot.say("Musikwiedergabe fortgesetzt.");
-	this.bot.voiceOutput.once("speak-stop", function() {
 	this.mpd.play();
-		if(this.mpd.status.playlistlength == 0) {
-			this.addRandomTrack(function() {
-				this.mpd.play();
-			}.bind(this));
-		}
-	}.bind(this));
+	if(this.mpd.status.playlistlength == 0) {
+		this.addRandomTrack(function() {
+			this.mpd.play();
+		}.bind(this));
+	}
 	this.playing = true;
 };
 
