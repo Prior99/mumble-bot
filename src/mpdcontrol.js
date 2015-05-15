@@ -21,6 +21,7 @@ var MPDControl = function(bot) {
 	}.bind(this));
 	if(bot.options.mpd) {
 		bot.newCommand("pause", this.pause.bind(this));
+		bot.newCommand("next", this.next.bind(this));
 		bot.newCommand("volume up", this.volumeUp.bind(this));
 		bot.newCommand("volume down", this.volumeDown.bind(this));
 		bot.newCommand("volume max", this.volumeMax.bind(this));
@@ -31,29 +32,46 @@ var MPDControl = function(bot) {
 	Winston.info("Module started: MPD control");
 };
 
-MPDControl.prototype.play = function() {
+MPDControl.prototype.play = function(cb) {
 	if(!this.ready) {
 		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
 		return;
 	}
 	this.bot.say("Musikwiedergabe fortgesetzt.");
-	this.mpd.play();
 	if(this.mpd.status.playlistlength == 0) {
 		this.addRandomTrack(function() {
-			this.mpd.play();
+			this.mpd.play(cb);
 		}.bind(this));
 	}
-	this.playing = true;
+	else {
+		this.mpd.play(cb);
+	}
 };
 
-MPDControl.prototype.pause = function() {
+MPDControl.prototype.pause = function(cb) {
 	if(!this.ready) {
 		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
 		return;
 	}
-	this.mpd.pause();
+	this.mpd.pause(cb);
 	this.bot.say("Musikwiedergabe angehalten.");
-	this.playing = false;
+};
+
+MPDControl.prototype.next = function(cb) {
+	if(!this.ready) {
+		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
+		return;
+	}
+	this.bot.say("Nächster Song.");
+	if(this.mpd.status.playlistlength <= 1) {
+		this.addRandomTrack(function() {
+			this.mpd.next(cb);
+			this.mpd.play();
+		}.bind(this));
+	}
+	else {
+		this.mpd.next(cb);
+	}
 };
 
 MPDControl.prototype.volumeNormal = function() {

@@ -20,6 +20,10 @@ var VoiceInput = function(bot) {
 	Winston.info("Module started: Voice input");
 	this.busy = false;
 	this.activeUser = null;
+	this.stats = {
+		total : 0,
+		succeeded : 0
+	}
 };
 
 Util.inherits(VoiceInput, EventEmitter);
@@ -59,12 +63,15 @@ VoiceInput.prototype._addUser = function(user) {
 	}.bind(this));
 	localUser.on('failure', function() {
 		if(this.busy && this.activeUser == user) {
+			this.stats.total ++;
 			this.bot.playSound("sounds/recognition_failure.wav", this._setInactive.bind(this));
-			Winston.info("Recognition failed for user " + user.name);
+			Winston.info("Recognition failed for user " + user.name + parseInt((this.stats.succeeded / this.stats.total) * 100) + "% of all " + this.stats.total + " querys succeed.");
 		}
 	}.bind(this));
 	localUser.on('success', function(command) {
 		if(this.busy && this.activeUser == user) {
+			this.stats.total++;
+			this.stats.succeeded++;
 			this.bot.playSound("sounds/recognition_success.wav", function() {
 				Winston.info("Recognition succeeded for user " + user.name);
 				this._setInactive();

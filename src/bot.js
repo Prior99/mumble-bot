@@ -32,13 +32,6 @@ var Bot = function(mumble, options) {
 	require('./fun')(this);
 	require('./diagnostic')(this);
 
-	this.newCommand("get out", function() {
-		this.say("Aber ich liebe dich");
-		this.output.once('speak-stop', function() {
-			this.join(this.options.afkChannel);
-		}.bind(this));
-	}.bind(this));
-
 	this.website = new Website(this);
 
 	//Must be run after all commands were registered

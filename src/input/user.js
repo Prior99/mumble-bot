@@ -14,8 +14,8 @@ var EventEmitter = require("events").EventEmitter;
 
 var TIMEOUT_THRESHOLD = 100;
 var HOT_WORD_THRESHOLD = -2000;
-var THRESHOLD = -6000;
-var SAMPLERATE = 16000;
+var THRESHOLD = -8000;
+var SAMPLERATE = 24000;
 
 /*
  * Polyfills
