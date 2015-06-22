@@ -89,7 +89,7 @@ VoiceInput.prototype._addUser = function(user) {
 
 VoiceInput.prototype._removeUser = function(user) {
 	Winston.info("Input stopped for user " + user.name);
-	delete this._users[user.id];
+	delete this.users[user.id];
 };
 
 
