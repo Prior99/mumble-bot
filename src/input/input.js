@@ -66,7 +66,7 @@ VoiceInput.prototype._addUser = function(user) {
 			this.stats.total ++;
 			this.bot.stopPipingUser();
 			this.bot.playSound("sounds/recognition_failure.wav", this._setInactive.bind(this));
-			Winston.info("Recognition failed for user " + user.name + parseInt((this.stats.succeeded / this.stats.total) * 100) + "% of all " + this.stats.total + " querys succeed.");
+			Winston.info("Recognition failed for user " + user.name + ". " + parseInt((this.stats.succeeded / this.stats.total) * 100) + "% of all " + this.stats.total + " querys succeed.");
 		}
 	}.bind(this));
 	localUser.on('success', function(command) {

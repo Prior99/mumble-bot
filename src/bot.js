@@ -53,6 +53,7 @@ Bot.prototype.playSound = function(filename, cb) {
 };
 
 Bot.prototype.startPipingUser = function(user) {
+	console.log("Piping started.");
 	this._pipeUserEvent = function(chunk) {
 		this._inputStream.write(chunk);
 	}.bind(this);
@@ -61,6 +62,7 @@ Bot.prototype.startPipingUser = function(user) {
 };
 
 Bot.prototype.stopPipingUser = function() {
+	console.log("Piping stopped.");
 	this._pipeUser.removeListener('data', this._pipeUserEvent);
 };
 
