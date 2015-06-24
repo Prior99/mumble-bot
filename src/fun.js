@@ -1,5 +1,5 @@
 var Request = require("request");
-var Merlin = require("./moerrrlin.json");
+var Merlin = require("../moerrrlin.json");
 
 module.exports = function(bot) {
 
