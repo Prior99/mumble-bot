@@ -1,3 +1,5 @@
+var Request = require("request");
+
 module.exports = function(bot) {
 
 	bot.newCommand("kick merlin", function() {
@@ -11,6 +13,22 @@ module.exports = function(bot) {
 				merlins[0].moveToChannel(bot.options.kickChannel);
 			});
 		}
+	});
+
+	bot.newCommand("teach", function() {
+		var url = "https://de.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&generator=random&grnnamespace=0";
+		Request({
+			url: url,
+			json: true
+		}, function (error, response, body) {
+			if(!error && response.statusCode === 200) {
+				for(var i in body.query.pages) {
+					var elem = body.query.pages[i];
+					bot.say("Heute lernen wir etwas über: \"" + elem.title + "\": " + elem.extract + ".");
+					return;
+				}
+			}
+		});
 	});
 
 	bot.newCommand("kick everyone", function() {
