@@ -31,6 +31,20 @@ module.exports = function(bot) {
 		});
 	});
 
+	bot.newCommand("quote", function() {
+		var number = parseInt(Math.random() * 4740)
+		var url = "http://www.zitate-aphorismen.de/rest/quote/" + number;
+		Request({
+			url: url,
+			json: true
+		}, function (error, response, body) {
+			if(!error && response.statusCode === 200) {
+				var quote = body.quote[number];
+				bot.say(quote.author + " hat gesagt: " + quote.quote);
+			}
+		});
+	});
+
 	bot.newCommand("kick everyone", function() {
 		bot.say("Get the fuck out.");
 		var channel = bot.mumble.user.channel;
