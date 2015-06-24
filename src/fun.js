@@ -7,7 +7,7 @@ module.exports = function(bot) {
 		}
 		else {
 			bot.say("Merlin get the fuck out.");
-			bot.voiceOutput.once('speak-stop', function() {
+			bot.output.once('speak-stop', function() {
 				merlins[0].moveToChannel(bot.options.kickChannel);
 			});
 		}
@@ -16,7 +16,7 @@ module.exports = function(bot) {
 	bot.newCommand("kick everyone", function() {
 		bot.say("Get the fuck out.");
 		var channel = bot.mumble.user.channel;
-		bot.voiceOutput.once('speak-stop', function() {
+		bot.output.once('speak-stop', function() {
 			for(var key in channel.users) {
 				var user = channel.users[key];
 				if(user !== bot.mumble.user) {
