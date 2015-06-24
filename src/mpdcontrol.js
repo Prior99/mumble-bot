@@ -46,7 +46,7 @@ MPDControl.prototype.play = function(cb) {
 		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
 		return;
 	}
-	this.bot.say("Musikwiedergabe fortgesetzt.");
+	this.bot.say("Play.");
 	if(this.mpd.status.playlistlength == 0) {
 		this.addRandomTrack(function() {
 			this.mpd.play(cb);
@@ -64,7 +64,7 @@ MPDControl.prototype.pause = function(cb) {
 		return;
 	}
 	this.mpd.pause(cb);
-	this.bot.say("Musikwiedergabe angehalten.");
+	this.bot.say("Pause.");
 };
 
 MPDControl.prototype.next = function(cb) {
@@ -115,7 +115,7 @@ MPDControl.prototype.setVolume = function(vol) {
 };
 
 MPDControl.prototype.addRandomTrack = function(cb) {
-	this.bot.say("Zufälliger Song wird hinzugefügt.", function() {
+	this.bot.say("Zufälliger Song.", function() {
 		var song = this.mpd.songs[parseInt(this.mpd.songs.length * Math.random())];
 		this.mpd.add(song.file, cb);
 	}.bind(this));
