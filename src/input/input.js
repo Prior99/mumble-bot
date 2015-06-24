@@ -64,6 +64,7 @@ VoiceInput.prototype._addUser = function(user) {
 	localUser.on('failure', function() {
 		if(this.busy && this.activeUser == user) {
 			this.stats.total ++;
+			this.bot.stopPipingUser();
 			this.bot.playSound("sounds/recognition_failure.wav", this._setInactive.bind(this));
 			Winston.info("Recognition failed for user " + user.name + parseInt((this.stats.succeeded / this.stats.total) * 100) + "% of all " + this.stats.total + " querys succeed.");
 		}
@@ -76,13 +77,16 @@ VoiceInput.prototype._addUser = function(user) {
 				Winston.info("Recognition succeeded for user " + user.name);
 				this._setInactive();
 				this._dispatch(command, user);
+				this.bot.stopPipingUser();
 			}.bind(this));
 		}
 	}.bind(this));
 	localUser.on('started', function() {
 		if(this.busy && this.activeUser == user) {
 			Winston.info("Recognition started for user " + user.name);
-			this.bot.playSound("sounds/recognition_started.wav");
+			this.bot.playSound("sounds/recognition_started.wav", function() {
+				this.bot.startPipingUser(user);
+			}.bind(this));
 		}
 	}.bind(this));
 };

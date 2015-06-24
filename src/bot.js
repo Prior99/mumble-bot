@@ -32,6 +32,8 @@ var Bot = function(mumble, options) {
 	require('./fun')(this);
 	require('./diagnostic')(this);
 
+	this._inputStream = mumble.inputStream();
+
 	this.website = new Website(this);
 
 	//Must be run after all commands were registered
@@ -46,8 +48,20 @@ Bot.prototype.busy = function() {
 	return this.output.busy || this.input.busy;
 };
 
-Bot.prototype.playSound = function(filename, user, cb) {
-	this.output.playSound(filename, user, cb);
+Bot.prototype.playSound = function(filename, cb) {
+	this.output.playSound(filename, cb);
+};
+
+Bot.prototype.startPipingUser = function(user) {
+	this._pipeUserEvent = function(chunk) {
+		this._inputStream.write(chunk);
+	}.bind(this);
+	this._pipeUser = user;
+	user.outputStream(true).on('data', this._pipeUserEvent);
+};
+
+Bot.prototype.stopPipingUser = function() {
+	this._pipeUser.removeListener('data', this._pipeUserEvent);
 };
 
 Bot.prototype._generateGrammar = function() {
