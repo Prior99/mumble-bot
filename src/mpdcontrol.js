@@ -10,6 +10,7 @@ var Winston = require('winston');
 
 var MPDControl = function(bot) {
 	this.bot = bot;
+	this.playing = false;
 	this.mpd = new MPD({
 		port : bot.options.mpd.port,
 		host : bot.options.mpd.host
@@ -18,6 +19,13 @@ var MPDControl = function(bot) {
 	this.ready = false;
 	this.mpd.on('ready', function() {
 		this.ready = true;
+	}.bind(this));
+	this.mpd.on('update', function() {
+		if(this.mpd.status.state !== "play" && playing) {
+			this.addRandomTrack(function() {
+				this.play();
+			}.bind(this));
+		}
 	}.bind(this));
 	if(bot.options.mpd) {
 		bot.newCommand("pause", this.pause.bind(this));
@@ -33,6 +41,7 @@ var MPDControl = function(bot) {
 };
 
 MPDControl.prototype.play = function(cb) {
+	this.playing = true;
 	if(!this.ready) {
 		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
 		return;
@@ -49,6 +58,7 @@ MPDControl.prototype.play = function(cb) {
 };
 
 MPDControl.prototype.pause = function(cb) {
+	this.playing = false;
 	if(!this.ready) {
 		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
 		return;
