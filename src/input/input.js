@@ -73,11 +73,11 @@ VoiceInput.prototype._addUser = function(user) {
 		if(this.busy && this.activeUser == user) {
 			this.stats.total++;
 			this.stats.succeeded++;
+			this.bot.stopPipingUser();
 			this.bot.playSound("sounds/recognition_success.wav", function() {
 				Winston.info("Recognition succeeded for user " + user.name);
 				this._setInactive();
 				this._dispatch(command, user);
-				this.bot.stopPipingUser();
 			}.bind(this));
 		}
 	}.bind(this));
