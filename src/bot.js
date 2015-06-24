@@ -57,13 +57,14 @@ Bot.prototype.startPipingUser = function(user) {
 	this._pipeUserEvent = function(chunk) {
 		this._inputStream.write(chunk);
 	}.bind(this);
-	this._pipeUser = user;
-	user.outputStream(true).on('data', this._pipeUserEvent);
+	this._pipeUserStream = user.outputStream(true);
+	this._pipeUserStream.on('data', this._pipeUserEvent);
 };
 
 Bot.prototype.stopPipingUser = function() {
-	console.log("Piping stopped.");
-	this._pipeUser.removeListener('data', this._pipeUserEvent);
+	this._pipeUserStream.removeListener('data', this._pipeUserEvent);
+	this._pipeUserStream = undefined;
+	this._pipeUserEvent = undefined;
 };
 
 Bot.prototype._generateGrammar = function() {
