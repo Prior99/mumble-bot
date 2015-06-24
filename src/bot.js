@@ -43,7 +43,7 @@ var Bot = function(mumble, options) {
 		this.command.process(text);
 	}.bind(this));
 	this.mumble.on("message", function(message, user, scope) {
-		this.command.process(message);
+		this.command.process("okay jenny " + message);
 	}.bind(this));
 };
 
