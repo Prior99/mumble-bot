@@ -46,7 +46,7 @@ module.exports = function(bot) {
 		});
 	});
 
-	bot.newCommand("merlin", function() {
+	bot.newCommand("speak", function() {
 		var quote = Merlin[Math.floor(Math.random() * Merlin.length)];
 		bot.say("Merlin hat gesagt: " + quote);
 	});
