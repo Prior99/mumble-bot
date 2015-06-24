@@ -1,4 +1,5 @@
 var Request = require("request");
+var Merlin = require("./moerrrlin.json");
 
 module.exports = function(bot) {
 
@@ -43,6 +44,11 @@ module.exports = function(bot) {
 				bot.say(quote.author + " hat gesagt: " + quote.quote);
 			}
 		});
+	});
+
+	bot.newCommand("merlin", function() {
+		var quote = Merlin[Math.floor(Math.random() * Merlin.length)];
+		bot.say("Merlin hat gesagt: " + quote);
 	});
 
 	bot.newCommand("kick everyone", function() {
