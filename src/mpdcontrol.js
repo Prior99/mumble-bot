@@ -21,7 +21,7 @@ var MPDControl = function(bot) {
 		this.ready = true;
 	}.bind(this));
 	this.mpd.on('update', function() {
-		if(this.mpd.status.state !== "play" && playing) {
+		if(this.mpd.status.state !== "play" && this.playing) {
 			this.addRandomTrack(function() {
 				this.play();
 			}.bind(this));
