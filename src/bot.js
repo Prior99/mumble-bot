@@ -53,7 +53,6 @@ Bot.prototype.playSound = function(filename, cb) {
 };
 
 Bot.prototype.startPipingUser = function(user) {
-	console.log("Piping started.");
 	this._pipeUserEvent = function(chunk) {
 		this._inputStream.write(chunk);
 	}.bind(this);
