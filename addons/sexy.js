@@ -1,6 +1,11 @@
 
 var MULTIPLICATOR_PROXIMITY = 0.1;
 
+function rd(arr) {
+	var r = Math.random();
+	return arr[parseInt(r*arr.length)];
+}
+
 function instrument(strings, words) {
 	var regex = /\{\{(.*?)\}\}/;
 	var res;
