@@ -29,22 +29,39 @@ var Bot = function(mumble, options) {
 		this.mpd = new MPDControl(this);
 	}
 
-	require('./fun')(this);
-	require('./diagnostic')(this);
-
 	this._inputStream = mumble.inputStream();
 
 	this.website = new Website(this);
 
-	//Must be run after all commands were registered
-	this._generateGrammar();
-	this.input = new Input(this);
-	this.input.on('input', function(text, user) {
-		this.command.process(text);
-	}.bind(this));
 	this.mumble.on("message", function(message, user, scope) {
 		this.command.process("okay jenny " + message);
 	}.bind(this));
+
+	this._loadAddons("addons/", function() {
+		//Must be run after all commands were registered
+		this._generateGrammar();
+		this.input = new Input(this);
+		this.input.on('input', function(text, user) {
+			this.command.process(text);
+		}.bind(this));
+	}.bind(this));
+};
+
+Bot.prototype._loadAddons = function(dir, callback) {
+	FS.readdirSync(dir, function(err, files) {
+		if(err) {
+			Winston.console.error("Error loading addons!");
+			throw err;
+		}
+		else {
+			for(var i in files) {
+				var filename = dir + "/" + files[i];
+				require(filename)(this);
+				Winston.info("Loaded addon " + filename + ".");
+			}
+		}
+		callback();
+	});
 };
 
 Bot.prototype.busy = function() {
