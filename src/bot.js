@@ -48,7 +48,7 @@ var Bot = function(mumble, options) {
 };
 
 Bot.prototype._loadAddons = function(dir, callback) {
-	FS.readdirSync(dir, function(err, files) {
+	FS.readdir(dir, function(err, files) {
 		if(err) {
 			Winston.console.error("Error loading addons!");
 			throw err;
