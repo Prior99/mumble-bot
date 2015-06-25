@@ -8,6 +8,7 @@ var Music = require("./music");
 var MPDControl = require("./mpdcontrol");
 var Winston = require('winston');
 var Website = require('./website/website');
+var Readline = require("readline");
 var FS = require('fs');
 /*
  * Code
@@ -33,9 +34,8 @@ var Bot = function(mumble, options) {
 
 	this.website = new Website(this);
 
-	this.mumble.on("message", function(message, user, scope) {
-		this.command.process("okay jenny " + message);
-	}.bind(this));
+	this._initChatInput();
+	this._initPromptInput();
 
 	this._loadAddons("addons/", function() {
 		//Must be run after all commands were registered
@@ -45,6 +45,22 @@ var Bot = function(mumble, options) {
 			this.command.process(text);
 		}.bind(this));
 	}.bind(this));
+};
+
+Bot.prototype._initPromptInput = function() {
+	this._rlStdin = Readline.createInterface({
+                input: process.stdin,
+                output: process.stdout
+        });
+	this._rlStdin.on('line', function(line) {
+		this.command.process("okay jenny " + line);
+	}.bind(this));
+};
+
+Bot.prototype._initChatInput = function() {
+	this.mumble.on("message", function(message, user, scope) {
+                this.command.process("okay jenny " + message);
+        }.bind(this));
 };
 
 Bot.prototype._loadAddons = function(dir, callback) {
