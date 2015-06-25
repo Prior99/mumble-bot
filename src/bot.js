@@ -56,12 +56,12 @@ Bot.prototype._loadAddons = function(dir, callback) {
 		else {
 			for(var i in files) {
 				var filename = dir + "/" + files[i];
-				require(filename)(this);
+				require("../" + filename)(this);
 				Winston.info("Loaded addon " + filename + ".");
 			}
 		}
 		callback();
-	});
+	}.bind(this));
 };
 
 Bot.prototype.busy = function() {
