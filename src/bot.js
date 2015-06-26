@@ -9,13 +9,14 @@ var MPDControl = require("./mpdcontrol");
 var Winston = require('winston');
 var Website = require('./website/website');
 var Readline = require("readline");
+var Database = require("./database");
 var FS = require('fs');
 /*
  * Code
  */
 var Bot = function(mumble, options) {
 	this.options = options;
-		this.mumble = mumble;
+	this.mumble = mumble;
 
 	this.hotword = options.hotword.replace("%name%", options.name).toLowerCase();
 	Winston.info("Hotword is '" + this.hotword + "'");
@@ -37,14 +38,25 @@ var Bot = function(mumble, options) {
 	this._initChatInput();
 	this._initPromptInput();
 
-	this._loadAddons("addons/", function() {
-		//Must be run after all commands were registered
-		this._generateGrammar();
-		this.input = new Input(this);
-		this.input.on('input', function(text, user) {
-			this.command.process(text);
-		}.bind(this));
+	this._startDatabase(options.database, function(err) {
+		if(err) {
+			throw err;
+		}
+		else {
+			this._loadAddons("addons/", function() {
+				//Must be run after all commands were registered
+				this._generateGrammar();
+				this.input = new Input(this);
+				this.input.on('input', function(text, user) {
+					this.command.process(text);
+				}.bind(this));
+			}.bind(this));
+		}
 	}.bind(this));
+};
+
+Bot.prototype._startDatabase = function(options, callback) {
+	this.database = new Database(options, callback);
 };
 
 Bot.prototype._initPromptInput = function() {
