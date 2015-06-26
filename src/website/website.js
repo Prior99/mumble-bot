@@ -31,16 +31,17 @@ var pages = [{
 {
 	url : "/",
 	name : "Overview"
-},
-{
-	url : "/quotes/",
-	name : "Quotes"
 }];
 
 var subpages = [{
 	url : "tree",
 	name : "Channels",
 	icon : "sitemap"
+},
+{
+        url : "/quotes/",
+        name : "Quotes",
+	icon : "quote-right"
 }];
 
 var Website = function(bot) {
