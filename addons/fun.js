@@ -48,8 +48,14 @@ module.exports = function(bot) {
 	});
 
 	bot.newCommand("speak", function() {
-		var quote = Merlin[Math.floor(Math.random() * Merlin.length)];
-		bot.say("Merlin hat gesagt: " + quote);
+		bot.database.getRandomQuote(function(err, quote) {
+			if(err) {
+				Winston.error("Error fetching random quote: " + err);
+			}
+			else {
+				bot.say(quote.author + " hat gesagt: " + quote.quote);
+			}
+		});
 	});
 
 	bot.newCommand("kick everyone", function() {

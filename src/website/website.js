@@ -12,6 +12,7 @@ var Less = require('less-middleware');
  */
 
 var viewDefault = require('./default');
+var viewQuotes = require('./quotes');
 
 /*
  * Routes
@@ -30,6 +31,10 @@ var pages = [{
 {
 	url : "/",
 	name : "Overview"
+},
+{
+	url : "/quotes /",
+	name : "Quotes"
 }];
 
 var subpages = [{
@@ -61,6 +66,7 @@ var Website = function(bot) {
 	this.app.use('/api', routeApi(bot));
 	this.app.get('/', viewDefault("home"));
 	this.app.get('/tree', viewDefault("channeltree"));
+	this.app.use('/quotes', viewQuotes(this));
 	var port = this.bot.options.website.port;
 	this.app.listen(port);
 	Winston.info("Module started: Website, listening on port " + port);

@@ -9,6 +9,7 @@ var Express = require('express');
  */
 
 var viewTree = require('./channeltree');
+var enterQuote = require('./quotes');
 
 /*
  * Routes
@@ -25,6 +26,7 @@ module.exports = function(bot) {
 
 	router.use('/music', routeMusic(bot));
 	router.use('/tree', viewTree(bot));
+	router.use('/enterQuote', enterQuote(bot));
 
 	return router;
 };

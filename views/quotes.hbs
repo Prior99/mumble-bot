@@ -1,0 +1,65 @@
+<h1>Quote</h1>
+<p>Currently <b>{{quoteAmount}}</b> quotes in the database.</p>
+<h2>Submit Quote</h2>
+<p>Please enter the quote and the author in the following form:</p>
+<form class="form-horizontal">
+	<div class="form-group">
+		<label for="url" class="col-sm-2 control-label">Quote</label>
+		<div class="col-sm-10">
+			<div class="input-group">
+				<input type="text" class="form-control" placeholder="Your quote goes here." id="quote">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="format" class="col-sm-2 control-label">Author</label>
+		<div class="col-sm-10">
+			<div class="input-group">
+				<input type="text" class="form-control" value="Merlin" id="author">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button class="btn btn-default" type="button" id="submit">Submit</button>
+			</div>
+	</div>
+</form>
+<h2>Results</h2>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Quote</th>
+			<th>Author</th>
+			<th>Status</th>
+		</tr>
+	</thead>
+	<tbody id="results">
+	</tbody>
+</table>
+<script>
+function addElem(quote, author) {
+	var elem = $("<tr><td>" + quote + "</td><td>" + author + "</td><td><i class=\"fa fa-cog fa-spin\"></i></td></tr>").appendTo("#results");
+	return elem;
+}
+
+function startQuote(quote, author) {
+	var link = "<a href=\""+ url + "\">" + url + "</a>"
+	var elem = addElem(link);
+	$.getJSON("/api/enterQuote?quote=" + encodeURI(quote) + "&author=" + encodeURI(author), function(response) {
+		quoteFinished(response);
+		if(response.okay) {
+			elem.html("<td>" + quote + "</td><td>" + author + "</td><td><i class=\"fa fa-check\"></i></td>");
+		}
+		else {
+			elem.html("<td>" + quote + "</td><td>" + author + "</td><td><i class=\"fa fa-remove\"></i></td>");
+		}
+	});
+}
+
+$("#go").click(function() {
+	var quote = $("#quote").val();
+	var author = $("#author").val();
+	startQuote(quote, author);
+});
+</script>
