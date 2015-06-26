@@ -33,7 +33,7 @@ var pages = [{
 	name : "Overview"
 },
 {
-	url : "/quotes /",
+	url : "/quotes/",
 	name : "Quotes"
 }];
 
