@@ -1,17 +1,17 @@
-function enterQuote(author, quote, bot) {
-	bot.database.enterQuote(author, quote, function(err, id) {
+function enterQuote(author, quote, bot, res) {
+	bot.database.addQuote(author, quote, function(err, id) {
 		if(err) {
 			Winston.error("Error occured when entering quote into database: " + err);
-			return {
+			res.send(JSON.stringify({
 				okay : false,
 				reason : "internal_error"
-			};
+			}));
 		}
 		else {
-			return {
+			res.send(JSON.stringify({
 				okay : true,
 				id : id
-			};
+			}));
 		}
 	});
 }
@@ -19,7 +19,7 @@ function enterQuote(author, quote, bot) {
 module.exports = function(bot) {
 	return function(req, res) {
 		if(req.query.author && req.query.quote) {
-			res.send(JSON.stringify(enterQuote(req.query.author, req.query.quote, bot)));
+			enterQuote(req.query.author, req.query.quote, bot, res)
 		}
 		else {
 			res.send(JSON.stringify({
