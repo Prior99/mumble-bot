@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS Quotes (
+	id              INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	author			VARCHAR(128) NOT NULL,
+	quote			TEXT,
+	submitted		DATETIME
+);

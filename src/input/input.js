@@ -64,14 +64,16 @@ VoiceInput.prototype._addUser = function(user) {
 	localUser.on('failure', function() {
 		if(this.busy && this.activeUser == user) {
 			this.stats.total ++;
+			this.bot.stopPipingUser();
 			this.bot.playSound("sounds/recognition_failure.wav", this._setInactive.bind(this));
-			Winston.info("Recognition failed for user " + user.name + parseInt((this.stats.succeeded / this.stats.total) * 100) + "% of all " + this.stats.total + " querys succeed.");
+			Winston.info("Recognition failed for user " + user.name + ". " + parseInt((this.stats.succeeded / this.stats.total) * 100) + "% of all " + this.stats.total + " querys succeed.");
 		}
 	}.bind(this));
 	localUser.on('success', function(command) {
 		if(this.busy && this.activeUser == user) {
 			this.stats.total++;
 			this.stats.succeeded++;
+			this.bot.stopPipingUser();
 			this.bot.playSound("sounds/recognition_success.wav", function() {
 				Winston.info("Recognition succeeded for user " + user.name);
 				this._setInactive();
@@ -82,7 +84,9 @@ VoiceInput.prototype._addUser = function(user) {
 	localUser.on('started', function() {
 		if(this.busy && this.activeUser == user) {
 			Winston.info("Recognition started for user " + user.name);
-			this.bot.playSound("sounds/recognition_started.wav");
+			this.bot.playSound("sounds/recognition_started.wav", function() {
+				this.bot.startPipingUser(user);
+			}.bind(this));
 		}
 	}.bind(this));
 };

@@ -6,6 +6,7 @@ var ESpeak = require("node-espeak");
 var Samplerate = require("node-samplerate");
 var Util = require("util");
 var EventEmitter = require("events").EventEmitter;
+var Winston = require("winston");
 
 /*
  * Code
@@ -93,6 +94,7 @@ Speech.prototype.next = function() {
 	if(!this.speaking && this.queue.length !== 0) {
 		this.current = this.queue.shift();
 		ESpeak.speak(this.current.text);
+		Winston.info("Speaking:\"" + this.current.text + "\"");
 	}
 };
 

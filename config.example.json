@@ -16,5 +16,11 @@
 		"port" : 23278,
 		"tmp" : "tmp/"
 	},
-	"hotword" : "okay %name%"
+	"hotword" : "okay %name%",
+	"database" : {
+		"host" : "localhost",
+		"user" : "bot",
+		"database" : "bot",
+		"password" : "super_secret_password"
+	}
 }

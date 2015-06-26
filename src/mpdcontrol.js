@@ -10,6 +10,7 @@ var Winston = require('winston');
 
 var MPDControl = function(bot) {
 	this.bot = bot;
+	this.playing = false;
 	this.mpd = new MPD({
 		port : bot.options.mpd.port,
 		host : bot.options.mpd.host
@@ -18,6 +19,13 @@ var MPDControl = function(bot) {
 	this.ready = false;
 	this.mpd.on('ready', function() {
 		this.ready = true;
+	}.bind(this));
+	this.mpd.on('update', function() {
+		if(this.mpd.status.state !== "play" && this.playing) {
+			this.addRandomTrack(function() {
+				this.play();
+			}.bind(this));
+		}
 	}.bind(this));
 	if(bot.options.mpd) {
 		bot.newCommand("pause", this.pause.bind(this));
@@ -33,11 +41,12 @@ var MPDControl = function(bot) {
 };
 
 MPDControl.prototype.play = function(cb) {
+	this.playing = true;
 	if(!this.ready) {
 		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
 		return;
 	}
-	this.bot.say("Musikwiedergabe fortgesetzt.");
+	this.bot.say("Play.");
 	if(this.mpd.status.playlistlength == 0) {
 		this.addRandomTrack(function() {
 			this.mpd.play(cb);
@@ -49,12 +58,13 @@ MPDControl.prototype.play = function(cb) {
 };
 
 MPDControl.prototype.pause = function(cb) {
+	this.playing = false;
 	if(!this.ready) {
 		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
 		return;
 	}
 	this.mpd.pause(cb);
-	this.bot.say("Musikwiedergabe angehalten.");
+	this.bot.say("Pause.");
 };
 
 MPDControl.prototype.next = function(cb) {
@@ -105,7 +115,7 @@ MPDControl.prototype.setVolume = function(vol) {
 };
 
 MPDControl.prototype.addRandomTrack = function(cb) {
-	this.bot.say("Zufälliger Song wird hinzugefügt.", function() {
+	this.bot.say("Zufälliger Song.", function() {
 		var song = this.mpd.songs[parseInt(this.mpd.songs.length * Math.random())];
 		this.mpd.add(song.file, cb);
 	}.bind(this));
