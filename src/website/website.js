@@ -31,16 +31,17 @@ var pages = [{
 {
 	url : "/",
 	name : "Overview"
-},
-{
-	url : "/quotes /",
-	name : "Quotes"
 }];
 
 var subpages = [{
 	url : "tree",
 	name : "Channels",
 	icon : "sitemap"
+},
+{
+        url : "/quotes/",
+        name : "Quotes",
+	icon : "quote-right"
 }];
 
 var Website = function(bot) {
@@ -66,7 +67,7 @@ var Website = function(bot) {
 	this.app.use('/api', routeApi(bot));
 	this.app.get('/', viewDefault("home"));
 	this.app.get('/tree', viewDefault("channeltree"));
-	this.app.use('/quotes', viewQuotes(this));
+	this.app.use('/quotes', viewQuotes(bot));
 	var port = this.bot.options.website.port;
 	this.app.listen(port);
 	Winston.info("Module started: Website, listening on port " + port);
