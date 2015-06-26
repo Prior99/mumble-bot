@@ -44,8 +44,7 @@ function addElem(quote, author) {
 }
 
 function startQuote(quote, author) {
-	var link = "<a href=\""+ url + "\">" + url + "</a>"
-	var elem = addElem(link);
+	var elem = addElem(quote, author);
 	$.getJSON("/api/enterQuote?quote=" + encodeURI(quote) + "&author=" + encodeURI(author), function(response) {
 		quoteFinished(response);
 		if(response.okay) {
@@ -57,7 +56,7 @@ function startQuote(quote, author) {
 	});
 }
 
-$("#go").click(function() {
+$("#submit").click(function() {
 	var quote = $("#quote").val();
 	var author = $("#author").val();
 	startQuote(quote, author);
