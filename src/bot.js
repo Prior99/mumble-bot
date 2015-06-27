@@ -8,13 +8,15 @@ var Music = require("./music");
 var MPDControl = require("./mpdcontrol");
 var Winston = require('winston');
 var Website = require('./website/website');
+var Readline = require("readline");
+var Database = require("./database");
 var FS = require('fs');
 /*
  * Code
  */
 var Bot = function(mumble, options) {
 	this.options = options;
-		this.mumble = mumble;
+	this.mumble = mumble;
 
 	this.hotword = options.hotword.replace("%name%", options.name).toLowerCase();
 	Winston.info("Hotword is '" + this.hotword + "'");
@@ -29,16 +31,64 @@ var Bot = function(mumble, options) {
 		this.mpd = new MPDControl(this);
 	}
 
-	require('./fun')(this);
-	require('./diagnostic')(this);
+	this._inputStream = mumble.inputStream();
 
 	this.website = new Website(this);
 
-	//Must be run after all commands were registered
-	this._generateGrammar();
-	this.input = new Input(this);
-	this.input.on('input', function(text, user) {
-		this.command.process(text);
+	this._initChatInput();
+	this._initPromptInput();
+
+	this._startDatabase(options.database, function(err) {
+		if(err) {
+			throw err;
+		}
+		else {
+			this._loadAddons("addons/", function() {
+				//Must be run after all commands were registered
+				this._generateGrammar();
+				this.input = new Input(this);
+				this.input.on('input', function(text, user) {
+					this.command.process(text);
+				}.bind(this));
+			}.bind(this));
+		}
+	}.bind(this));
+};
+
+Bot.prototype._startDatabase = function(options, callback) {
+	this.database = new Database(options, callback);
+};
+
+Bot.prototype._initPromptInput = function() {
+	this._rlStdin = Readline.createInterface({
+                input: process.stdin,
+                output: process.stdout
+        });
+	this._rlStdin.on('line', function(line) {
+		this.command.process("okay jenny " + line);
+	}.bind(this));
+};
+
+Bot.prototype._initChatInput = function() {
+	this.mumble.on("message", function(message, user, scope) {
+                this.command.process("okay jenny " + message);
+        }.bind(this));
+};
+
+Bot.prototype._loadAddons = function(dir, callback) {
+	FS.readdir(dir, function(err, files) {
+		if(err) {
+			Winston.console.error("Error loading addons!");
+			throw err;
+		}
+		else {
+			for(var i in files) {
+				var filename = dir + "/" + files[i];
+				require("../" + filename)(this);
+				Winston.info("Loaded addon " + filename + ".");
+			}
+		}
+		callback();
 	}.bind(this));
 };
 
@@ -46,8 +96,26 @@ Bot.prototype.busy = function() {
 	return this.output.busy || this.input.busy;
 };
 
-Bot.prototype.playSound = function(filename, user, cb) {
-	this.output.playSound(filename, user, cb);
+Bot.prototype.playSound = function(filename, cb) {
+	this.output.playSound(filename, cb);
+};
+
+Bot.prototype.startPipingUser = function(user) {
+	//console.log("Piping started");
+	this.music.mute();
+	this._pipeUserEvent = function(chunk) {
+		this._inputStream.write(chunk);
+	}.bind(this);
+	this._pipeUserStream = user.outputStream(true);
+	this._pipeUserStream.on('data', this._pipeUserEvent);
+};
+
+Bot.prototype.stopPipingUser = function() {
+	//console.log("Piping stopped");
+	this.music.unmute();
+	this._pipeUserStream.removeListener('data', this._pipeUserEvent);
+	this._pipeUserStream = undefined;
+	this._pipeUserEvent = undefined;
 };
 
 Bot.prototype._generateGrammar = function() {

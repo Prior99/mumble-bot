@@ -24,7 +24,7 @@ Sound.prototype._play = function(filename) {
 			Winston.error(err);
 			return;
 		}
-		var playTimeoutDuration = (data.length / 44100) * 1000 + 100;
+		var playTimeoutDuration = (data.length / 44100) * 1000;
 		this.stream.write(Samplerate.resample(data, 44100, 48000, 1));
 		this.timeout = setTimeout(this._playbackStopped.bind(this), playTimeoutDuration);
 	}.bind(this));
