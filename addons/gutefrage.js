@@ -55,13 +55,32 @@ Gutefrage.prototype._loadArticle = function(url, callback) {
 };
 
 Gutefrage.prototype._loadArticleHTML = function($, callback) {
-	var title = this._entities.decode($("h1.Question-title").html().trim());
-	var text = this._entities.decode($("div.Question-body").find("div.formatted-text").find("p").html());
-	callback(title, text);
+	var title = $("h1.Question-title").html();
+	var text = $("div.Question-body").find("div.formatted-text").find("p").html();
+	if(title && text) {
+		title = this._entities.decode($("h1.Question-title").html().trim());
+		text = this._entities.decode($("div.Question-body").find("div.formatted-text").find("p").html());
+		callback(null, title, text);
+	}
+	else {
+		callback(new Error("Unable to parse question"));
+	}
 };
 
-var gf = new Gutefrage(["gesundheit", "ernaehrung"]);
-gf.loadRandomNewQuestion(function(title, text) {
-	console.log("Title: " + title);
-	console.log("Text: " + text);
-});
+module.exports = function(bot) {
+	var gf = new Gutefrage(["sex", "schwangerschaft", "computer", "abnehmen", "liebeskummer", "pickel", "maedchen", "geschlecht", "geschlechtsverkehr", "pubertaet", "mode", "hilfe", "jungs"]);
+	bot.newCommand("question", function() {
+		var callback = function(err, title, text) {
+			if(err) {
+				gf.loadRandomNewQuestion(callback);
+			}
+			else {
+				bot.say(title + " " + text);
+				console.log("Title: " + title);
+				console.log("Text: " + text);
+			}
+		}
+		gf.loadRandomNewQuestion(callback);
+		bot.say("Bitte warten.");
+	});
+};
