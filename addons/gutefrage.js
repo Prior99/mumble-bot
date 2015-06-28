@@ -76,8 +76,6 @@ module.exports = function(bot) {
 			}
 			else {
 				bot.say(title + " " + text);
-				console.log("Title: " + title);
-				console.log("Text: " + text);
 			}
 		}
 		gf.loadRandomNewQuestion(callback);
