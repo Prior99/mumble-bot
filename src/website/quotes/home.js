@@ -10,7 +10,7 @@ module.exports = function(bot) {
 			else {
 				res.locals.quoteAmount = count;
 			}
-			res.render("quotes");
+			res.render("quotes/home");
 		});
 	}
 };

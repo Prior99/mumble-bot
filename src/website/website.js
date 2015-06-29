@@ -12,13 +12,13 @@ var Less = require('less-middleware');
  */
 
 var viewDefault = require('./default');
-var viewQuotes = require('./quotes');
 
 /*
  * Routes
  */
 var routeMusic = require('./music/music');
 var routeApi = require('./api/api');
+var routeQuotes = require('./quotes/quotes');
 
 /*
  * Code
@@ -31,17 +31,16 @@ var pages = [{
 {
 	url : "/",
 	name : "Overview"
+},
+{
+	url : "/quotes/",
+	name : "Quotes"
 }];
 
 var subpages = [{
 	url : "tree",
 	name : "Channels",
 	icon : "sitemap"
-},
-{
-        url : "/quotes/",
-        name : "Quotes",
-	icon : "quote-right"
 }];
 
 var Website = function(bot) {
@@ -65,9 +64,9 @@ var Website = function(bot) {
 	this.app.use('/fontawesome', Express.static('node_modules/font-awesome/'));
 	this.app.use('/music', routeMusic(bot));
 	this.app.use('/api', routeApi(bot));
-	this.app.get('/', viewDefault("home"));
+	this.app.use('/quotes', routeQuotes(bot));
 	this.app.get('/tree', viewDefault("channeltree"));
-	this.app.use('/quotes', viewQuotes(bot));
+	this.app.get('/', viewDefault("home"));
 	var port = this.bot.options.website.port;
 	this.app.listen(port);
 	Winston.info("Module started: Website, listening on port " + port);
