@@ -10,6 +10,7 @@ var Winston = require('winston');
 var Website = require('./website/website');
 var Readline = require("readline");
 var Database = require("./database");
+var Quotes = require("./quotes");
 var FS = require('fs');
 /*
  * Code
@@ -30,6 +31,8 @@ var Bot = function(mumble, options) {
 		this.output.on("stop", this.music.unmute.bind(this.music));
 		this.mpd = new MPDControl(this);
 	}
+
+	this.quotes = new Quotes(this);
 
 	this._inputStream = mumble.inputStream();
 

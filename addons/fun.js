@@ -45,17 +45,6 @@ module.exports = function(bot) {
 		});
 	});
 
-	bot.newCommand("speak", function() {
-		bot.database.getRandomQuote(function(err, quote) {
-			if(err) {
-				Winston.error("Error fetching random quote: " + err);
-			}
-			else {
-				bot.say(quote.author + " hat gesagt: " + quote.quote);
-			}
-		});
-	});
-
 	bot.newCommand("kick everyone", function() {
 		bot.say("Get the fuck out.");
 		var channel = bot.mumble.user.channel;

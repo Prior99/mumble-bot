@@ -11,14 +11,23 @@ var Express = require('express');
 var viewDefault = require('../default');
 var viewAddQuote = require("./add");
 var viewQuoteHome = require("./home");
+var viewListQuotes = require("./list");
 
 /*
  * Code
  */
 var pages = [{
+	url : "/quotes/",
+	name : "Info",
+	icon : "info"
+},{
 	url : "/quotes/add/",
 	name : "Add Quote",
 	icon : "quote-right"
+}, {
+	url : "/quotes/list/",
+	name : "List Quotes",
+	icon : "database"
 }];
 
 module.exports = function(bot) {
@@ -28,6 +37,7 @@ module.exports = function(bot) {
 		next();
 	});
 	router.get('/add', viewAddQuote(bot));
+	router.get('/list', viewListQuotes(bot));
 	router.get('/', viewQuoteHome(bot));
 
 	return router;

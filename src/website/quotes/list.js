@@ -2,15 +2,15 @@ var Winston = require("winston");
 
 module.exports = function(bot) {
 	return function(req, res) {
-		bot.quotes.count(function(err, count) {
+		bot.quotes.list(function(err, list) {
 			if(err) {
 				Winston.error("Error fetching amount of quotes: " + err);
-				res.locals.quoteAmount = 0;
+				res.locals.quotes = [];
 			}
 			else {
-				res.locals.quoteAmount = count;
+				res.locals.quotes = list;
 			}
-			res.render("quotes/add");
+			res.render("quotes/list");
 		});
 	}
 };

@@ -47,7 +47,12 @@ var Website = function(bot) {
 	this.app = Express();
 	this.app.engine('.hbs', ExpHbs({
 		defaultLayout : 'main',
-		extname: '.hbs'
+		extname: '.hbs',
+		helpers : {
+			"formatDate" : function(date) {
+				return date.toLocaleDateString();
+			}
+		}
 	}));
 	this.app.set('view engine', '.hbs');
 	this.bot = bot;

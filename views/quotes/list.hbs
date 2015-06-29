@@ -1,0 +1,30 @@
+<h1>Quotes</h1>
+<p>Currently <b>{{quotes.length}}</b> quotes in the database.</p>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<td>Author</td>
+			<td>Quote</td>
+			<td>Submitted</td>
+			<td>Used</td>
+			<td></td>
+		</tr>
+	</thead>
+	<tbody>
+	{{#each quotes}}
+		<tr>
+			<td>{{author}}</td>
+			<td>{{quote}}</td>
+			<td>{{{formatDate submitted}}}</td>
+			<td>{{used}}</td>
+			<td><td><a quoteId="{{id}}"class="quote-btn btn btn-xs btn-success"><span class="fa fa-comment" aria-hidden="true"></span></a></td></td>
+		</tr>
+	{{/each}}
+	</tbody
+</table>
+
+<script>
+	$("a.quote-btn").click(function() {
+		$.ajax("/api/quotes/speak?id=" + $(this).attr("quoteId"));
+	});
+</script>

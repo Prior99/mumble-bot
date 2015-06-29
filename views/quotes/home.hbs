@@ -1,2 +1,11 @@
 <h1>Quote</h1>
+<br>
 <p>Currently <b>{{quoteAmount}}</b> quotes in the database.</p>
+<p>You can <a href="/quotes/add/">add your own quotes</a>, fetch <a href="/quotes/list/">a list of all quotes</a> and/or play them back.</p>
+<br>
+<a class="btn btn-ld btn-default" id="speak"><span class="fa fa-comment" aria-hidden="true"></span> Speak Random Quote</a>
+<script>
+$("#speak").click(function() {
+	$.ajax("/api/quotes/speak");
+});
+</script>

@@ -34,7 +34,7 @@ $.getJSON("/api/music/songs", function(songs) {
 	});
 	for(var i in songs) {
 		(function(song) {
-			var add = $('<a class="btn btn-xs btn-success">Add</a>').click(function() {
+			var add = $('<a class="btn btn-xs btn-success"><span class="fa fa-plus" aria-hidden="true"></span></a>').click(function() {
 				$.getJSON("/api/music/add?artist=" + song.artist + "&title=" + song.title, function() {
 					//reloadSongs();
 				});
