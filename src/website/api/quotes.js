@@ -1,5 +1,5 @@
 function enterQuote(author, quote, bot, res) {
-	bot.database.addQuote(author, quote, function(err, id) {
+	bot.database.addQuote(quote, author, function(err, id) {
 		if(err) {
 			Winston.error("Error occured when entering quote into database: " + err);
 			res.send(JSON.stringify({

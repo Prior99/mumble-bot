@@ -68,7 +68,7 @@ Gutefrage.prototype._loadArticleHTML = function($, callback) {
 };
 
 module.exports = function(bot) {
-	var gf = new Gutefrage(["sex", "schwangerschaft", "computer", "abnehmen", "liebeskummer", "pickel", "maedchen", "geschlecht", "geschlechtsverkehr", "pubertaet", "mode", "hilfe", "jungs"]);
+	var gf = new Gutefrage(["sex", "schwangerschaft", "abnehmen", "pickel", "maedchen", "geschlecht", "geschlechtsverkehr", "pubertaet", "mode", "hilfe", "jungs"]);
 	bot.newCommand("question", function() {
 		var callback = function(err, title, text) {
 			if(err) {
@@ -76,8 +76,6 @@ module.exports = function(bot) {
 			}
 			else {
 				bot.say(title + " " + text);
-				console.log("Title: " + title);
-				console.log("Text: " + text);
 			}
 		}
 		gf.loadRandomNewQuestion(callback);
