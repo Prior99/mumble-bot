@@ -29,6 +29,7 @@ module.exports = function(bot) {
 				}
 			}
 		});
+		bot.say("Bitte warten.");
 	});
 
 	bot.newCommand("quote", function() {
@@ -43,6 +44,7 @@ module.exports = function(bot) {
 				bot.say(quote.author + " hat gesagt: " + quote.quote);
 			}
 		});
+		bot.say("Bitte warten.");
 	});
 
 	bot.newCommand("kick everyone", function() {

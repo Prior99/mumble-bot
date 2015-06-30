@@ -9,29 +9,20 @@ var MPDControl = require("./mpdcontrol");
 var Winston = require('winston');
 var Website = require('./website/website');
 var Readline = require("readline");
-var Database = require("./database");
 var Quotes = require("./quotes");
 var FS = require('fs');
 /*
  * Code
  */
-var Bot = function(mumble, options) {
+var Bot = function(mumble, options, database) {
 	this.options = options;
 	this.mumble = mumble;
+	this.database = database;
 
 	this.hotword = options.hotword.replace("%name%", options.name).toLowerCase();
 	Winston.info("Hotword is '" + this.hotword + "'");
 
 	this.command = new Command(this);
-	this.output = new Output(this);
-
-	if(options.mpd) {
-		this.music = new Music(this);
-		this.output.on("start", this.music.mute.bind(this.music));
-		this.output.on("stop", this.music.unmute.bind(this.music));
-		this.mpd = new MPDControl(this);
-	}
-
 	this.quotes = new Quotes(this);
 
 	this._inputStream = mumble.inputStream();
@@ -41,41 +32,40 @@ var Bot = function(mumble, options) {
 	this._initChatInput();
 	this._initPromptInput();
 
-	this._startDatabase(options.database, function(err) {
-		if(err) {
-			throw err;
-		}
-		else {
-			this._loadAddons("addons/", function() {
-				//Must be run after all commands were registered
-				this._generateGrammar();
-				this.input = new Input(this);
-				this.input.on('input', function(text, user) {
-					this.command.process(text);
-				}.bind(this));
-			}.bind(this));
-		}
-	}.bind(this));
-};
+	this.output = new Output(this);
 
-Bot.prototype._startDatabase = function(options, callback) {
-	this.database = new Database(options, callback);
+	if(options.mpd) {
+		this.music = new Music(this);
+		this.output.on("start", this.music.mute.bind(this.music));
+		this.output.on("stop", this.music.unmute.bind(this.music));
+		this.mpd = new MPDControl(this);
+	}
+
+	this._loadAddons("addons/", function() {
+		//Must be run after all commands were registered
+		this._generateGrammar();
+		this.input = new Input(this);
+		this.input.on('input', function(text, user) {
+			text = text.substring(this.bot.hotword.length + 1, text.length);
+			this.command.process(text);
+		}.bind(this));
+	}.bind(this));
 };
 
 Bot.prototype._initPromptInput = function() {
 	this._rlStdin = Readline.createInterface({
-                input: process.stdin,
-                output: process.stdout
-        });
+        input: process.stdin,
+        output: process.stdout
+    });
 	this._rlStdin.on('line', function(line) {
-		this.command.process("okay jenny " + line);
+		this.command.process(line);
 	}.bind(this));
 };
 
 Bot.prototype._initChatInput = function() {
 	this.mumble.on("message", function(message, user, scope) {
-                this.command.process("okay jenny " + message);
-        }.bind(this));
+        this.command.process(message);
+    }.bind(this));
 };
 
 Bot.prototype._loadAddons = function(dir, callback) {

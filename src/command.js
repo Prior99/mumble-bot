@@ -29,7 +29,6 @@ var Command = function(bot) {
 };
 
 Command.prototype.process = function(text) {
-	text = text.substring(this.bot.hotword.length + 1, text.length);
 	var found = false;
 	for(var key in this.commands) {
 		if(key === text.substring(0, key.length)) {

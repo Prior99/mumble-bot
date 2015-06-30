@@ -5,6 +5,7 @@ var Mumble = require("mumble");
 var Bot = require("./src/bot.js");
 var Winston = require('winston');
 var FS = require('fs');
+var Database = require("./src/database");
 /*
  * Winston
  */
@@ -65,9 +66,20 @@ Mumble.connect("mumble://" + options.url, mumbleOptions, function(err, connectio
 	}
 });
 
+function databaseStarted(err, connection, database) {
+	if(err) {
+		throw err;
+	}
+	else {
+		var bot = new Bot(connection, options, database);
+		Winston.info("Joining channel: " + options.channel);
+		bot.join(options.channel);
+		bot.say("Ich grüße euch!");
+	}
+}
+
 function startup(connection) {
-	var bot = new Bot(connection, options);
-	Winston.info("Joining channel: " + options.channel);
-	bot.join(options.channel);
-	bot.say("Ich grüße euch!");
+	var database = new Database(options.database, function(err) {
+		databaseStarted(err, connection, database);
+	});
 }

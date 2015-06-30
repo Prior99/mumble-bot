@@ -3,16 +3,19 @@
  */
 
 var ESpeak = require("node-espeak");
+var Request = require("request");
+var Lame = require("lame");
 var Samplerate = require("node-samplerate");
 var Util = require("util");
 var EventEmitter = require("events").EventEmitter;
 var Winston = require("winston");
+var GoogleTTS = require("./googleTranslateTTS");
 
 /*
  * Code
  */
 
-var Speech = function(stream, espeakData) {
+var Speech = function(stream, espeakData, channel, database) {
 	this.queue = [];
 	this.gender = "female";
 	ESpeak.initialize({
@@ -24,11 +27,18 @@ var Speech = function(stream, espeakData) {
 	}, espeakData);
 	ESpeak.onVoice(this._onESpeakData.bind(this));
 	this.stream = stream;
+	this._googleEngine = new GoogleTTS("google-tts-cache", database);
+	this._googleEngine.on('data', this._onGoogleTTSData.bind(this));
+	this._googleEngine.on('speechDone', function() {
+		this._speakingStopped();
+	}.bind(this));
+	this.engine = "google";
 	this.busy = false;
 	this.current = null;
 	this.timeout = null;
 	this.speaking = false;
 	this.muted = false;
+	this.channel = channel;
 };
 
 Util.inherits(Speech, EventEmitter);
@@ -72,6 +82,16 @@ Speech.prototype._onESpeakData = function(data, samples, samplerate) {
 	this._refreshTimeout();
 };
 
+Speech.prototype._onGoogleTTSData = function(data) {
+	if(!this.speaking) {
+		this._speakingStarted();
+	}
+	var resampledData = Samplerate.resample(data, this._googleEngine.samplerate, 48000, 1);
+	if(!this.muted) {
+		this.stream.write(resampledData);
+	}
+};
+
 Speech.prototype.mute = function() {
 	this.muted = true;
 };
@@ -90,11 +110,25 @@ Speech.prototype.changeGender = function() {
 	ESpeak.setGender(this.gender);
 };
 
+Speech.prototype.speakUsingESpeak = function(text) {
+	ESpeak.speak(this.current.text);
+};
+
+Speech.prototype.speakUsingGoogle = function(text) {
+	this._googleEngine.tts(text);
+};
+
 Speech.prototype.next = function() {
 	if(!this.speaking && this.queue.length !== 0) {
 		this.current = this.queue.shift();
-		ESpeak.speak(this.current.text);
+		if(this.engine === "google") {
+			this.speakUsingGoogle(this.current.text);
+		}
+		else if(this.engine === "espeak") {
+			this.speakUsingESpeak(this.current.text);
+		}
 		Winston.info("Speaking:\"" + this.current.text + "\"");
+		this.channel.sendMessage(this.current.text);
 	}
 };
 
