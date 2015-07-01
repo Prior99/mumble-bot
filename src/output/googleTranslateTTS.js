@@ -64,8 +64,6 @@ TTS.prototype._refreshTimeout = function(time) {
 	if(this._timeout) {
 		clearTimeout(this._timeout);
 	}
-	console.log("waiting for additional " + time + "s");
-	console.log("waiting for " + this._time/1000 + "s");
 	this._timeout = setTimeout(this._speechDone.bind(this), this._time);
 };
 
@@ -78,7 +76,6 @@ TTS.prototype._speechDone = function() {
 TTS.prototype.tts = function(text) {
 	var lame = new Lame.Decoder();
 	lame.on('format', function(format) {
-		console.log(format);
 		this.samplerate = format.sampleRate;
 		lame.on('data', function(data) {
 			this._refreshTimeout(data.length / (format.sampleRate * 2));
@@ -90,7 +87,6 @@ TTS.prototype.tts = function(text) {
 
 TTS.prototype._getMP3Stream = function(text, stream) {
 	var arr = splitTextOnNearestSpace(text, 90);
-	console.log(arr)
 	var next = function() {
 		if(arr.length > 0) {
 			this._getMP3Part(arr.shift(), function(err, mp3Stream) {
@@ -170,7 +166,6 @@ TTS.prototype._retrieveMP3Part = function(text, callback, tries) {
 
 	var encoded = encodeURIComponent(text);
 	var url = "http://translate.google.com/translate_tts?tl=de&q=" + encoded;
-	console.log(url);
 
 	var request = Request.get({
 		url : url,
