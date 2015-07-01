@@ -41,7 +41,7 @@ Quotes.prototype.count = function(callback) {
 };
 
 Quotes.prototype._dispatch = function(quote, callback) {
-	this.bot.say(quote.author + " hat gesagt: " + quote.quote, callback);
+	this.bot.say(quote.quote, callback);
 };
 
 Quotes.prototype.speakRandom = function(callback) {
