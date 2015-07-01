@@ -22,15 +22,16 @@
     "jquery": "^2.1.4",
     "lame": "^1.2.2",
     "less-middleware": "^2.0.1",
-    "node-mpd": "git+https://git.cronosx.de/prior/node-mpd.git",
     "multer": "^0.1.8",
     "mumble": "git+https://github.com/Rantanen/node-mumble.git",
     "musicmetadata": "^1.0.1",
     "mysql": "^2.7.0",
     "node-espeak": "git+https://git.cronosx.de/prior/node-espeak.git",
+    "node-mpd": "git+https://git.cronosx.de/prior/node-mpd.git",
     "node-samplerate": "git+https://git.cronosx.de/prior/node-samplerate.git",
-    "pocketsphinx" : "git+https://github.com/Prior99/node-pocketsphinx.git",
+    "pocketsphinx": "git+https://github.com/Prior99/node-pocketsphinx.git",
     "request": "^2.58.0",
+    "steam": "^0.6.8",
     "winston": "^1.0.0",
     "youtube-dl": "^1.10.5"
   }

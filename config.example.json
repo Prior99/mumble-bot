@@ -22,5 +22,9 @@
 		"user" : "bot",
 		"database" : "bot",
 		"password" : "super_secret_password"
+	},
+	"steam" : {
+		"user" : "username",
+		"password" : "password"
 	}
 }
