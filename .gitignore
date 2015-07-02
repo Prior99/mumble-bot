@@ -9,3 +9,4 @@ commands.gram
 tmp
 public/style/*.css
 google-tts-cache/
+steam-sentry-hash

@@ -25,6 +25,7 @@
 	},
 	"steam" : {
 		"user" : "username",
-		"password" : "password"
+		"password" : "password",
+		"steamguard" : "ABCDEF"
 	}
 }

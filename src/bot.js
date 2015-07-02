@@ -12,6 +12,7 @@ var Website = require('./website/website');
 var Readline = require("readline");
 var Quotes = require("./quotes");
 var FS = require('fs');
+var Steam = require('./steam');
 var EventEmitter = require("events").EventEmitter;
 /*
  * Code
@@ -44,6 +45,10 @@ var Bot = function(mumble, options, database) {
 		this.mpd = new MPDControl(this);
 	}
 
+	if(options.steam) {
+		this.steam = new Steam(this, options.steam);
+	}
+
 	this._loadAddons("addons/", function() {
 		//Must be run after all commands were registered
 		this._generateGrammar();
@@ -53,12 +58,20 @@ var Bot = function(mumble, options, database) {
 			this.command.process(text);
 		}.bind(this));
 	}.bind(this));
+
+	this.mumble.on('user-connect', function(user) {
+		this.sayImportant(user.name + " hat Mumble betreten.");
+	}.bind(this));
+
 	this.newCommand("shutdown", this.shutdown.bind(this), "Fährt den bot herunter.", "power-off");
 };
 
 Util.inherits(Bot, EventEmitter);
 
 Bot.prototype.shutdown = function() {
+	if(this.steam) {
+		this.steam.stop();
+	}
 	this.say("Herunterfahren initiiert.", function() {
 		this.website.shutdown(function() {
 			this.emit("shutdown");
@@ -174,6 +187,13 @@ Bot.prototype.join = function(cname) {
 
 Bot.prototype.say = function(text, cb) {
 	return this.output.say(text, cb);
+};
+
+Bot.prototype.sayImportant = function(text, cb) {
+	if(this.steam) {
+		this.steam.broadcast(text);
+	}
+	return this.say(text, cb);
 };
 
 Bot.prototype.sayError = function(text) {
