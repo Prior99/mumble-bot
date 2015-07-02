@@ -12,6 +12,7 @@ var Less = require('less-middleware');
  */
 
 var viewDefault = require('./default');
+var viewCommands = require('./commands');
 
 /*
  * Routes
@@ -38,9 +39,14 @@ var pages = [{
 }];
 
 var subpages = [{
-	url : "tree",
+	url : "/tree/",
 	name : "Channels",
 	icon : "sitemap"
+},
+{
+	url : "/commands/",
+	name : "Commands",
+	icon : "cogs"
 }];
 
 var Website = function(bot) {
@@ -70,6 +76,7 @@ var Website = function(bot) {
 	this.app.use('/music', routeMusic(bot));
 	this.app.use('/api', routeApi(bot));
 	this.app.use('/quotes', routeQuotes(bot));
+	this.app.use('/commands', viewCommands(bot));
 	this.app.get('/tree', viewDefault("channeltree"));
 	this.app.get('/', viewDefault("home"));
 	var port = this.bot.options.website.port;

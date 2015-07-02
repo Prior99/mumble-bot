@@ -1,0 +1,14 @@
+<h1>Commands</h1>
+<p>Currently <b>{{commands.length}}</b> commands are known to this bot.</p>
+<div class="list-group">
+	{{#each commands}}
+		<a href="#" class="cmd-btn list-group-item" cmdId="{{this}}">
+			<h4>{{this}}</h4>
+		</a>
+	{{/each}}
+</ul>
+<script>
+	$("a.cmd-btn").click(function() {
+		$.ajax("/api/command?command=" + $(this).attr("cmdId"));
+	});
+</script>
