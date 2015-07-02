@@ -42,7 +42,12 @@ SteamBot.prototype._startUpSteamGuard = function() {
 	});
 	console.log("PLEASE ENTER YOUR STEAMGUARD CODE:");
 	rl.on("line", function(code) {
-		this.options.authCode = code;
+		if(code.length > 0) {
+			this.options.authCode = code;
+		}
+		else {
+			Winston.warn("No steam guardcode supplied. You should receive an email now.");
+		}
 		this._startUp();
 	}.bind(this));
 };
