@@ -73,8 +73,16 @@ var Website = function(bot) {
 	this.app.get('/tree', viewDefault("channeltree"));
 	this.app.get('/', viewDefault("home"));
 	var port = this.bot.options.website.port;
-	this.app.listen(port);
+	this.server = this.app.listen(port);
 	Winston.info("Module started: Website, listening on port " + port);
+};
+
+Website.prototype.shutdown = function(callback) {
+	Winston.info("Stopping module: Website ...");
+	this.server.close(function() {
+		Winston.info("Module stopped: Website.");
+		callback();
+	});
 };
 
 module.exports = Website;

@@ -1,6 +1,7 @@
 /*
  * Imports
  */
+var Util = require("util");
 var Input = require("./input/input");
 var Command = require("./command");
 var Output = require("./output/output");
@@ -11,6 +12,7 @@ var Website = require('./website/website');
 var Readline = require("readline");
 var Quotes = require("./quotes");
 var FS = require('fs');
+var EventEmitter = require("events").EventEmitter;
 /*
  * Code
  */
@@ -48,6 +50,17 @@ var Bot = function(mumble, options, database) {
 		this.input.on('input', function(text, user) {
 			text = text.substring(this.bot.hotword.length + 1, text.length);
 			this.command.process(text);
+		}.bind(this));
+	}.bind(this));
+	this.newCommand("shutdown", this.shutdown.bind(this));
+};
+
+Util.inherits(Bot, EventEmitter);
+
+Bot.prototype.shutdown = function() {
+	this.say("Herunterfahren initiiert.", function() {
+		this.website.shutdown(function() {
+			this.emit("shutdown");
 		}.bind(this));
 	}.bind(this));
 };

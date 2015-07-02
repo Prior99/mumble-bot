@@ -66,6 +66,23 @@ Mumble.connect("mumble://" + options.url, mumbleOptions, function(err, connectio
 	}
 });
 
+function stopDatabase(database, callback) {
+	Winston.info("Stopping database ... ");
+	database.stop(function() {
+		Winston.info("Database stopped.");
+		callback();
+	});
+}
+
+function stopMumble(connection, callback) {
+	Winston.info("Stopping connection to mumble ... ");
+	connection.on("disconnect", function() {
+		Winston.info("Connection to mumble stopped. ");
+		callback();
+	});
+	connection.disconnect();
+}
+
 function databaseStarted(err, connection, database) {
 	if(err) {
 		throw err;
@@ -75,6 +92,13 @@ function databaseStarted(err, connection, database) {
 		Winston.info("Joining channel: " + options.channel);
 		bot.join(options.channel);
 		bot.say("Ich grüße euch!");
+		bot.on("shutdown", function() {
+			stopDatabase(database, function() {
+				stopMumble(connection, function() {
+					process.exit();
+				});
+			});
+		})
 	}
 }
 
