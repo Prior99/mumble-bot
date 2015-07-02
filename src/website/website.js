@@ -80,6 +80,7 @@ var Website = function(bot) {
 	this.app.get('/', viewDefault("home"));
 	var port = this.bot.options.website.port;
 	this.server = this.app.listen(port);
+	this.server.setTimeout(5000);
 	Winston.info("Module started: Website, listening on port " + port);
 };
 
