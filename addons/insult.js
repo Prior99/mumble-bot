@@ -100,5 +100,5 @@ module.exports = function(bot) {
 
 	bot.newCommand("insult", function() {
 		bot.say(instrument(sentences, words));
-	});
+	}, "Zufällig generierte Beleidigung.", "fire");
 };

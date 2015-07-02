@@ -19,7 +19,7 @@ var Output = function(bot) {
 	this.queue = [];
 	this.current = null;
 
-	this.bot.newCommand("change voice", this.changeGender.bind(this));
+	this.bot.newCommand("change voice", this.changeGender.bind(this), "Deprecated. Wechselt das Geschlecht der Stimme.", "venus-mars");
 };
 
 Util.inherits(Output, EventEmitter);

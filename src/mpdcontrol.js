@@ -28,14 +28,14 @@ var MPDControl = function(bot) {
 		}
 	}.bind(this));
 	if(bot.options.mpd) {
-		bot.newCommand("pause", this.pause.bind(this));
-		bot.newCommand("next", this.next.bind(this));
-		bot.newCommand("volume up", this.volumeUp.bind(this));
-		bot.newCommand("volume down", this.volumeDown.bind(this));
-		bot.newCommand("volume max", this.volumeMax.bind(this));
-		bot.newCommand("volume min", this.volumeMin.bind(this));
-		bot.newCommand("volume normal", this.volumeNormal.bind(this));
-		bot.newCommand("play", this.play.bind(this));
+		bot.newCommand("pause", this.pause.bind(this), "Pausiert die Musikwiedergabe.", "pause");
+		bot.newCommand("next", this.next.bind(this), "Nächster Song.", "fast-forward");
+		bot.newCommand("volume up", this.volumeUp.bind(this), "Lautstärke erhöhen.", "volume-up");
+		bot.newCommand("volume down", this.volumeDown.bind(this), "Lautstärke senken.", "volume-down");
+		bot.newCommand("volume max", this.volumeMax.bind(this), "Lautstärke auf 100% setzen.", "volume-up");
+		bot.newCommand("volume min", this.volumeMin.bind(this), "Lautstärke auf 25% setzen.", "volume-off");
+		bot.newCommand("volume normal", this.volumeNormal.bind(this), "Lautstärke auf 50% setzen.", "volume-down");
+		bot.newCommand("play", this.play.bind(this), "Setzt die Musikwiedergabe fort.", "play");
 	}
 	Winston.info("Module started: MPD control");
 };

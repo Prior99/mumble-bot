@@ -80,5 +80,5 @@ module.exports = function(bot) {
 		}
 		gf.loadRandomNewQuestion(callback);
 		bot.say("Bitte warten.");
-	});
+	}, "Liest eine zufällige Frage von der Webseite \"gutefrage.net\" vor.", "question-circle");
 };
