@@ -56,6 +56,26 @@ SteamBot.prototype._postLogin = function() {
 	this.client.on('relationships', function() {
 		this._hasFriends = true;
 	}.bind(this));
+	this.client.on('friend', function(id, status) {
+		if(status == Steam.EFriendRelationship.RequestRecipient) {
+			this.client.addFriend(id);
+			this.client.once('user', function(friend) {
+				this.bot.sayImportant("Ich bin auf Steam jetzt mit " + friend.playerName + " befreundet.");
+			}.bind(this));
+			this.client.requestFriendData(id);
+		}
+	}.bind(this));
+	this.client.on('user', function(friend) {
+		if(!this.client.users || !this.client.users[friend.friendid]) {
+			return;
+		}
+		if(friend.personaState === 1 && this.client.users[friend.friendid].personaState === 0) {
+			this.bot.say(friend.playerName + " hat sich in Steam angemeldet.");
+		}
+		else if(friend.personaState === 0 && this.client.users[friend.friendid].personaState === 1) {
+			this.bot.say(friend.playerName + " hat sich in Steam abgemeldet.");
+		}
+	}.bind(this));
 };
 
 SteamBot.prototype.broadcast = function(message) {
