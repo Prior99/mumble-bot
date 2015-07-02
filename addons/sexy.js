@@ -92,5 +92,5 @@ module.exports = function(bot) {
 			'Ich will, dass du mein{{pettingZone}} {{pettingAction}}st.'
 		];
 		bot.say(instrument(sentences, words));
-	});
+	}, "Gibt eine zufällig generierte erotische Bemerkung aus.", "female");
 };

@@ -1,6 +1,7 @@
 /*
  * Imports
  */
+var Util = require("util");
 var Input = require("./input/input");
 var Command = require("./command");
 var Output = require("./output/output");
@@ -11,6 +12,7 @@ var Website = require('./website/website');
 var Readline = require("readline");
 var Quotes = require("./quotes");
 var FS = require('fs');
+var EventEmitter = require("events").EventEmitter;
 /*
  * Code
  */
@@ -18,6 +20,7 @@ var Bot = function(mumble, options, database) {
 	this.options = options;
 	this.mumble = mumble;
 	this.database = database;
+	this.commands = [];
 
 	this.hotword = options.hotword.replace("%name%", options.name).toLowerCase();
 	Winston.info("Hotword is '" + this.hotword + "'");
@@ -48,6 +51,17 @@ var Bot = function(mumble, options, database) {
 		this.input.on('input', function(text, user) {
 			text = text.substring(this.bot.hotword.length + 1, text.length);
 			this.command.process(text);
+		}.bind(this));
+	}.bind(this));
+	this.newCommand("shutdown", this.shutdown.bind(this), "Fährt den bot herunter.", "power-off");
+};
+
+Util.inherits(Bot, EventEmitter);
+
+Bot.prototype.shutdown = function() {
+	this.say("Herunterfahren initiiert.", function() {
+		this.website.shutdown(function() {
+			this.emit("shutdown");
 		}.bind(this));
 	}.bind(this));
 };
@@ -144,8 +158,13 @@ Bot.prototype._generateGrammar = function() {
 	FS.writeFileSync("commands.gram", grammar);
 };
 
-Bot.prototype.newCommand = function(commandName, method) {
+Bot.prototype.newCommand = function(commandName, method, description, icon) {
 	this.command.newCommand(commandName, method);
+	this.commands.push({
+		name : commandName,
+		description : description,
+		icon : icon
+	});
 };
 
 Bot.prototype.join = function(cname) {

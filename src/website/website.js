@@ -38,9 +38,14 @@ var pages = [{
 }];
 
 var subpages = [{
-	url : "tree",
+	url : "/tree/",
 	name : "Channels",
 	icon : "sitemap"
+},
+{
+	url : "/commands/",
+	name : "Commands",
+	icon : "cogs"
 }];
 
 var Website = function(bot) {
@@ -70,11 +75,21 @@ var Website = function(bot) {
 	this.app.use('/music', routeMusic(bot));
 	this.app.use('/api', routeApi(bot));
 	this.app.use('/quotes', routeQuotes(bot));
+	this.app.use('/commands', viewDefault("commands"));
 	this.app.get('/tree', viewDefault("channeltree"));
 	this.app.get('/', viewDefault("home"));
 	var port = this.bot.options.website.port;
-	this.app.listen(port);
+	this.server = this.app.listen(port);
+	this.server.setTimeout(5000);
 	Winston.info("Module started: Website, listening on port " + port);
+};
+
+Website.prototype.shutdown = function(callback) {
+	Winston.info("Stopping module: Website ...");
+	this.server.close(function() {
+		Winston.info("Module stopped: Website.");
+		callback();
+	});
 };
 
 module.exports = Website;

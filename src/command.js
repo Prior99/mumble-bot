@@ -14,7 +14,7 @@ var Command = function(bot) {
 	this.newCommand("help", function() {
 		var help = "Hilfe. Du musst mich mit meinem hot Word ansprechen. Mein hot Word ist: '" + bot.hotword + "'. Um eine Liste aller Kommandos zu erhalten, sag: '" + bot.hotword + " commands'";
 		bot.say(help);
-	});
+	}, "Gibt einen Hilfetext aus.", "info");
 	this.newCommand("commands", function() {
 		var commandsSay = "Ich kenne die folgenden Kommandos ";
 		var commandsWrite = "Ich kenne die folgenden Kommandos:<br>";
@@ -24,7 +24,7 @@ var Command = function(bot) {
 		}
 		bot.say(commandsSay + ". Ich habe diese Liste auch in den Chat geschrieben.");
 		bot.mumble.user.channel.sendMessage(commandsWrite.substring(0, commandsWrite.length - 4));
-	});
+	}, "Gibt eine Liste aller Kommandos aus.", "list-ul");
 	Winston.info("Module started: Command");
 };
 

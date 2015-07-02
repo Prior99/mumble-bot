@@ -13,7 +13,7 @@ module.exports = function(bot) {
 				merlins[0].moveToChannel(bot.options.kickChannel);
 			});
 		}
-	});
+	}, "Wirft Merlin aus dem Channel falls notwendig.", "legal");
 
 	bot.newCommand("teach", function() {
 		var url = "https://de.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&generator=random&grnnamespace=0";
@@ -30,7 +30,7 @@ module.exports = function(bot) {
 			}
 		});
 		bot.say("Bitte warten.");
-	});
+	}, "Liest die Zusammenfassung eines zufälligen Wikipedia-Artikels vor.", "question");
 
 	bot.newCommand("quote", function() {
 		var number = parseInt(Math.random() * 4740)
@@ -45,7 +45,7 @@ module.exports = function(bot) {
 			}
 		});
 		bot.say("Bitte warten.");
-	});
+	}, "Liest ein zufälliges Zitat einer Berühmtheit vor.", "graduation-cap");
 
 	bot.newCommand("kick everyone", function() {
 		bot.say("Get the fuck out.");
@@ -58,5 +58,5 @@ module.exports = function(bot) {
 				}
 			}
 		});
-	});
+	}, "Kickt jeden Benutzer aus seinem Channel auf dem gesamten Server.", "bomb");
 };

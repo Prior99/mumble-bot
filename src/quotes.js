@@ -9,7 +9,7 @@ var Quotes = function(bot) {
 	this.bot = bot;
 	bot.newCommand("speak", function() {
 		this.speakRandom();
-	}.bind(this));
+	}.bind(this), "Gibt einen zufälligen intelligenten Kommentar aus der Datenbank aus.", "quote-left");
 };
 
 Quotes.prototype.speak = function(id, callback) {
