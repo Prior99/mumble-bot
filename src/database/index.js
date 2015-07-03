@@ -34,6 +34,18 @@ var Database = function(options, callback) {
 
 require("./quotes.js")(Database);
 require("./ttscache.js")(Database);
+require("./users.js")(Database);
+
+Database.prototype._checkError = function(err, callback) {
+	if(err) {
+		if(callback) { callback(err); }
+		else { throw err; }
+		return false;
+	}
+	else {
+		return true;
+	}
+};
 
 Database.prototype._setupDatabase = function(callback) {
 	FS.readFile("schema.sql", {encoding : "utf8"}, function(err, data) {
