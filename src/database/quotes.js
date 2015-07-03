@@ -55,7 +55,7 @@ module.exports = function(Database) {
 				if(this._checkError(err, callback)) {
 					if(callback) { callback(null, rows[0].amount); }
 				}
-			}
+			}.bind(this)
 		);
 	};
 
@@ -65,7 +65,7 @@ module.exports = function(Database) {
 				if(this._checkError(err, callback)) {
 					if(callback) { callback(null, rows); }
 				}
-			}
+			}.bind(this)
 		);
 	};
 };
