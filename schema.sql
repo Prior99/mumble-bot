@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS Identifiers (
 
 CREATE TABLE IF NOT EXISTS Users (
 	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	username		VARCHAR(64),
-	password		VARCHAR(72),
+	username		VARCHAR(64) NOT NULL,
+	password		VARCHAR(72) NOT NULL,
 	steamid			VARCHAR(24),
 	identifier		INT NOT NULL,
 	rank			INT NOT NULL DEFAULT 0,
