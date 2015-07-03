@@ -5,7 +5,7 @@ module.exports = function(Database) {
 				if(this._checkError(err, callback)) {
 					callback(null, result.insertId);
 				}
-			}
+			}.bind(this)
 		);
 	};
 	Database.prototype.getUserByUsername = function(username, callback) {
@@ -14,7 +14,7 @@ module.exports = function(Database) {
 				if(this._checkError(err, callback)) {
 					callback(null, rows[0]);
 				}
-			}
+			}.bind(this)
 		);
 	};
 	Database.prototype.getUserById = function(id, callback) {
@@ -23,7 +23,7 @@ module.exports = function(Database) {
 				if(this._checkError(err, callback)) {
 					callback(null, rows[0]);
 				}
-			}
+			}.bind(this)
 		);
 	};
 	Database.prototype.checkLoginData = function(username, passwordHash, callback) {
@@ -32,7 +32,7 @@ module.exports = function(Database) {
 				if(this._checkError(err, callback)) {
 					callback(null, rows.length > 0);
 				}
-			}
+			}.bind(this)
 		);
 	};
 	Database.prototype.getFreeIdentifiers = function(callback) {
@@ -41,7 +41,7 @@ module.exports = function(Database) {
 				if(this._checkError(err, callback)) {
 					callback(null, rows);
 				}
-			}
+			}.bind(this)
 		);
 	};
 };
