@@ -34,7 +34,6 @@ var Database = function(options, callback) {
 
 require("./quotes.js")(Database);
 require("./ttscache.js")(Database);
-require("./users.js")(Database);
 
 Database.prototype._checkError = function(err, callback) {
 	if(err) {

@@ -13,7 +13,7 @@ module.exports = function(Database) {
 						}
 					}
 				}
-			}
+			}.bind(this)
 		);
 	};
 
@@ -23,7 +23,7 @@ module.exports = function(Database) {
 				if(this._checkError(err, callback)) {
 					if(callback) { callback(null, result.insertId); }
 				}
-			}
+			}.bind(this)
 		);
 	};
 };
