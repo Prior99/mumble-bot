@@ -103,9 +103,11 @@ Bot.prototype._loadAddons = function(dir, callback) {
 		}
 		else {
 			for(var i in files) {
-				var filename = dir + "/" + files[i];
-				require("../" + filename)(this);
-				Winston.info("Loaded addon " + filename + ".");
+				var filename = dir + files[i];
+				if(FS.lstatSync(filename).isDirectory()) {
+					require("../" + filename)(this);
+					Winston.info("Loaded addon " + filename + ".");
+				}
 			}
 		}
 		callback();

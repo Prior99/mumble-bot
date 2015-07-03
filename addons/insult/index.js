@@ -1,4 +1,4 @@
-var instrument = require("../src/instrument");
+var instrument = require("../instrument");
 
 module.exports = function(bot) {
 	var words = {

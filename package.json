@@ -11,7 +11,7 @@
     "url": "https://git.cronosx.de/prior/mumble-bot"
   },
   "author": "",
-  "license": "GPL",
+  "license": "GPL-3.0",
   "dependencies": {
     "bootstrap": "^3.3.4",
     "cheerio": "^0.19.0",
