@@ -90,10 +90,9 @@ TTS.prototype._getMP3Stream = function(text, stream) {
 	var next = function() {
 		if(arr.length > 0) {
 			this._getMP3Part(arr.shift(), function(err, mp3Stream) {
-				/*if(err) {
-					stream.emit("error", err);
-					stream.push(null);
-				}*/ //TODO
+				if(err) {
+					throw err;
+				} //TODO
 				//mp3Stream.pipe(stream);
 				mp3Stream.on('data', function(data) {
 					stream.write(data);
@@ -114,9 +113,11 @@ TTS.prototype._getMP3Part = function(text, callback) {
 			if(!file) {
 				this._cacheMP3Part(text, function(err) {
 					if(err) {
-						throw err;
+						callback(err);
 					}
-					this._getMP3Part(text, callback);
+					else {
+						this._getMP3Part(text, callback);
+					}
 				}.bind(this));
 			}
 			else {
