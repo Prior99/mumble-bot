@@ -3,11 +3,7 @@ module.exports = function(Database) {
 		if(quote && author) {
 			this.pool.query("INSERT INTO Quotes(quote, author, submitted) VALUES(?, ?, ?)",
 				[quote, author, new Date()], function(err, result) {
-					if(err) {
-						if(callback) { callback(err); }
-						else throw err;
-					}
-					else {
+					if(this._checkError(err, callback)) {
 						if(callback) { callback(null, result.insertId); }
 					}
 				}
@@ -23,11 +19,7 @@ module.exports = function(Database) {
 	Database.prototype.getRandomQuote = function(callback) {
 		this.pool.query("SELECT quote, author, submitted, used, id FROM Quotes, (SELECT RAND() * (SELECT MAX(id) FROM Quotes) AS tid) AS Tmp WHERE Quotes.id >= Tmp.tid ORDER BY id ASC LIMIT 1",
 			function(err, rows) {
-				if(err) {
-					if(callback) { callback(err); }
-					else throw err;
-				}
-				else {
+				if(this._checkError(err, callback)) {
 					this.increaseQuoteUsage(rows[0].id);
 					if(callback) { callback(null, rows[0]); }
 				}
@@ -38,11 +30,7 @@ module.exports = function(Database) {
 	Database.prototype.getQuote = function(id, callback) {
 		this.pool.query("SELECT quote, author, submitted, used FROM Quotes WHERE id = ?", [id],
 			function(err, rows) {
-				if(err) {
-					if(callback) { callback(err); }
-					else throw err;
-				}
-				else {
+				if(this._checkError(err, callback)) {
 					if(rows.length >= 1) {
 						this.increaseQuoteUsage(id);
 						if(callback) { callback(null, rows[0]); }
@@ -64,11 +52,7 @@ module.exports = function(Database) {
 	Database.prototype.getQuoteCount = function(callback) {
 		this.pool.query("SELECT COUNT(id) AS amount FROM Quotes",
 			function(err, rows) {
-				if(err) {
-					if(callback) { callback(err); }
-					else throw err;
-				}
-				else {
+				if(this._checkError(err, callback)) {
 					if(callback) { callback(null, rows[0].amount); }
 				}
 			}
@@ -78,14 +62,10 @@ module.exports = function(Database) {
 	Database.prototype.getQuoteList = function(callback) {
 		this.pool.query("SELECT id, author, quote, submitted, used FROM Quotes",
 			function(err, rows) {
-				if(err) {
-					if(callback) { callback(err); }
-					else throw err;
-				}
-				else {
+				if(this._checkError(err, callback)) {
 					if(callback) { callback(null, rows); }
 				}
 			}
 		);
-	};	
+	};
 };
