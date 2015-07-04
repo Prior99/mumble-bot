@@ -1,0 +1,43 @@
+<form>
+	<h2 class="form-signin-heading">Register</h2>
+
+	<div class="input-group">
+		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-user"></i></span>
+		<input type="text" class="form-control" placeholder="Username" id="username">
+	</div>
+
+	<div class="input-group">
+		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-envelope"></i></span>
+		<input type="email" class="form-control" placeholder="foo@bar.de" id="email">
+	</div>
+
+	<div class="input-group">
+		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-lock"></i></span>
+		<input type="password" class="form-control" placeholder="Password" id="password">
+	</div>
+
+	<div class="input-group">
+		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-repeat"></i></span>
+		<input type="password" class="form-control" placeholder="Password" id="repeat">
+	</div>
+
+	<div class="input-group">
+		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-steam"></i></span>
+		<input type="text" class="form-control" placeholder="Steam Username" id="steam">
+	</div>
+
+	<div class="input-group">
+		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-cubes"></i></span>
+		<input type="text" class="form-control" placeholder="Minecraft Username" id="minecraft">
+	</div>
+
+	<div class="input-group">
+		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-comment"></i></span>
+		<select class="form-control" id="identifier">
+		{{#each identifiers}}
+			<option value="{{id}}">{{identifier}}</option>
+		{{/each}}
+		</select>
+	</div>
+	<button type="button" class="btn btn-success btn-lg btn-block"><i class="fa fa-user-plus"></i> Register</button>
+</form>

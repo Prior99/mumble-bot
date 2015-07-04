@@ -1,7 +1,15 @@
-module.exports = function(view) {
+module.exports = function(bot) {
 	return function(req, res) {
-		res.render(view, {
-			layout : "registerlogin"
+		bot.database.getFreeIdentifiers(function(err, identifiers) {
+			if(err) {
+				res.locals.identifiers = [];
+			}
+			else {
+				res.locals.identifiers = identifiers;
+			}
+			res.render("users/registerlogin", {
+				layout : "registerlogin"
+			});
 		});
 	}
 };

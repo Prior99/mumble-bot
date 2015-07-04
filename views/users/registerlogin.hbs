@@ -1,32 +1,17 @@
-<form class="form-signin">
-	<h2 class="form-signin-heading">Register</h2>
-	<div class="form-group">
-		<label for="username" class="col-sm-4 control-label">Username</label>
-		<div class="col-sm-8">
-			<input type="text" class="form-control" placeholder="Foo" id="username">
-		</div>
-	</div>
-	<div class="form-group">
-		<label for="password" class="col-sm-4 control-label">Password</label>
-		<div class="col-sm-4">
-			<input type="password" class="form-control" placeholder="" id="password">
-		</div>
-		<div class="col-sm-4">
-			<input type="password" class="form-control" placeholder="" id="repeat">
-		</div>
-	</div>
-	<div class="form-group">
-		<label for="url" class="col-sm-4 control-label">Steam-ID</label>
-		<div class="col-sm-8">
-			<div class="input-group">
-				<span class="input-group-addon" id="basic-addon1">steamcommunity.com/profiles/</span>
-				<input type="text" class="form-control" placeholder="7656XXXXXXXXXXXXX" id="repeat">
+<div class="jumbotron vertical-center">
+<div class="container">
+	<div class="form-signin">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="#login" data-toggle="tab">Login</a></li>
+			<li><a href="#register" data-toggle="tab">Register</a></li>
+		</ul>
+		<div id="myTabContent" class="tab-content">
+			<div class="tab-pane active in" id="login">
+				{{> loginform}}
+			</div>
+			<div class="tab-pane fade" id="register">
+				{{> registerform}}
 			</div>
 		</div>
 	</div>
-	<div class="form-group">
-		<div class="col-sm-offset-4 col-sm-8">
-			<button class="btn btn-lg btn-primary btn-block" type="button" id="go">Register!</button>
-		</div>
-	</div>
-</form>
+</div>
