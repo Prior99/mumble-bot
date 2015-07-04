@@ -23,6 +23,7 @@
     "jquery": "^2.1.4",
     "lame": "^1.2.2",
     "less-middleware": "^2.0.1",
+    "mineflayer": "^1.2.1",
     "multer": "^0.1.8",
     "mumble": "git+https://github.com/Rantanen/node-mumble.git",
     "musicmetadata": "^1.0.1",
