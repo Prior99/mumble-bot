@@ -5,6 +5,18 @@ var Winston = require('winston');
 /*
  * Defines
  */
+
+/*
+ * Polyfills
+ */
+
+if(!String.prototype.startsWith) {
+	String.prototype.startsWith = function(searchString, position) {
+		position = position || 0;
+		return this.lastIndexOf(searchString, position) === position;
+	};
+}
+
 /*
  * Code
  */
@@ -26,6 +38,13 @@ var Command = function(bot) {
 		bot.mumble.user.channel.sendMessage(commandsWrite.substring(0, commandsWrite.length - 4));
 	}, "Gibt eine Liste aller Kommandos aus.", "list-ul");
 	Winston.info("Module started: Command");
+};
+
+Command.prototype.processPrefixed = function(text) {
+	if(text.startsWith(this.bot.hotword)) {
+		text = text.substring(this.bot.hotword.length + 1, text.length);
+		this.process(text);
+	}
 };
 
 Command.prototype.process = function(text) {
