@@ -24,7 +24,11 @@ module.exports = function(bot) {
 			"ölig",
 			"pädophil",
 			"cheatend",
-			"fischig"
+			"fischig",
+			"dumm",
+			"hirnrissig",
+			"gehirnamputiert",
+			"bekloppt"
 		],
 		subject : [
 			"es Stück Scheisse",
@@ -43,7 +47,34 @@ module.exports = function(bot) {
 			"er Spasti",
 			"er Hurensohn",
 			"er Spastiker",
-			"er Behindi"
+			"er Behindi",
+			"er Arschficker",
+			"er Mösenfurz",
+			"er Sackpickel",
+			"es Mistschwein",
+			"er Mongowixer",
+			"er Pisser"
+		],
+		food : [
+			"Käse",
+			"Wurst",
+			"Schokolade",
+			"Nutella",
+			"Kot",
+			"Smegma",
+			"Rührei"
+		],
+		food_action : [
+			"einreiben",
+			"füttern",
+			"bewerfen"
+		],
+		food_action_passive : [
+			"einführen",
+			"ins Maul stopfen",
+			"mit einer Spritzpistole in die Fresse spritzen",
+			"ins Ohr stecken",
+			"in die Nase rammen"
 		],
 		verb : [
 			"Sterben",
@@ -56,7 +87,9 @@ module.exports = function(bot) {
 			"Furzen",
 			"Anal Einführen",
 			"Lutschen",
-			"Anranzen"
+			"Anranzen",
+			"Scheißen",
+			"Fassen"
 		],
 		genitals : [
 			"Vagina",
@@ -66,7 +99,13 @@ module.exports = function(bot) {
 			"Testikel",
 			"Muschi",
 			"Hoden",
-			"Pickel"
+			"Pickel",
+			"Pussy",
+			"Schwanz",
+			"Penis",
+			"Eierstöcke",
+			"Schritt",
+			"Nase"
 		],
 		genital_action : [
 			"Leck",
@@ -74,8 +113,9 @@ module.exports = function(bot) {
 			"Lutsch",
 			"Friss",
 			"Schnüffel",
-			"Inhaliere",
-			"Kraul"
+			"Inhalier",
+			"Kraul",
+			"Kotz"
 		],
 		genital_action_hurt : [
 			"trete",
@@ -84,7 +124,10 @@ module.exports = function(bot) {
 			"wichse",
 			"kneife",
 			"pieke",
-			"beisse"
+			"beisse",
+			"penetriere",
+			"zerstöre",
+			"breche"
 		]
 	};
 
@@ -95,7 +138,11 @@ module.exports = function(bot) {
 		'Ich {{genital_action_hurt}} dir in die {{genitals}}, du {{attribute}}{{subject}}.',
 		'{{genital_action}} mir die {{genitals}}, {{attribute}}{{subject}}.',
 		'Geh doch auf deine {{genitals}} {{verb}}, du {{attribute}}{{subject}}.',
-		'Warum darf so ein {{attribute}}{{subject}} wie du überhaupt rumlaufen?'
+		'Warum darf so ein {{attribute}}{{subject}} wie du überhaupt rumlaufen?',
+		'Ich werde dir {{food}} {{food_action_passive}}, {{attribute}}{{subject}}.',
+		'Ich werde dich mit {{food}} {{food_action}}, {{attribute}}{{subject}}.',
+		'Ey, du {{attribute}}{{subject}}. Geh dich mit {{food}} {{food_action}}!',
+		'Ey, du {{attribute}}{{subject}}. Geh dir {{food}} {{food_action_passive}}!'
 	];
 
 	bot.newCommand("insult", function() {
