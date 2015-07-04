@@ -27,5 +27,9 @@
 		"user" : "username",
 		"password" : "password",
 		"steamguard" : "ABCDEF"
+	},
+	"minecraft" : {
+		"host" : "example.org",
+		"port" : 25565
 	}
 }

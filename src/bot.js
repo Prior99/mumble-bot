@@ -13,6 +13,7 @@ var Readline = require("readline");
 var Quotes = require("./quotes");
 var FS = require('fs');
 var Steam = require('./steam');
+var Minecraft = require('./minecraft');
 var EventEmitter = require("events").EventEmitter;
 /*
  * Code
@@ -49,13 +50,16 @@ var Bot = function(mumble, options, database) {
 		this.steam = new Steam(this, options.steam);
 	}
 
+	if(options.minecraft) {
+		this.minecraft = new Minecraft(options.minecraft, this);
+	}
+
 	this._loadAddons("addons/", function() {
 		//Must be run after all commands were registered
 		this._generateGrammar();
 		this.input = new Input(this);
 		this.input.on('input', function(text, user) {
-			text = text.substring(this.bot.hotword.length + 1, text.length);
-			this.command.process(text);
+			this.command.processPrefixed(text);
 		}.bind(this));
 	}.bind(this));
 
@@ -71,6 +75,9 @@ Util.inherits(Bot, EventEmitter);
 Bot.prototype.shutdown = function() {
 	if(this.steam) {
 		this.steam.stop();
+	}
+	if(this.minecraft) {
+		this.minecraft.stop();
 	}
 	this.say("Herunterfahren initiiert.", function() {
 		this.website.shutdown(function() {
@@ -188,6 +195,9 @@ Bot.prototype.join = function(cname) {
 };
 
 Bot.prototype.say = function(text, cb) {
+	if(this.minecraft) {
+		this.minecraft.say(text);
+	}
 	return this.output.say(text, cb);
 };
 
