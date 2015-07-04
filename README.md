@@ -12,7 +12,7 @@ It has a webinterface via which it can be controlled.
  - Playback music using mpd, control mpd using the bot
  - Fetch music from youtube
  - Upload music to mpd library
- 
+
 ## Install
 
 This is currently under heavy development and in no means ready for using in production.
@@ -22,14 +22,14 @@ If you still want to install this, you will need some of my (forks of) some node
  - [node-pocketsphinx](https://github.com/Prior99/node-pocketsphinx)
  - [node-espeak](https://github.com/Prior99/node-espeak)
  - [node-samplerate](https://github.com/Prior99/node-samplerate)
- 
+
 Some of which are not available on npm. If ```npm install``` fails, just clone the respective repositories into th ```node_modules/``` subdirectory.
 
 ### Installing on Arch Linux
 
 You will need to isntall some packets in order to get everything working.
 
-1. Install the following packages from the AUR: [sphinxbase](https://aur.archlinux.org/packages/sphinxbase/), [pocketsphinx](https://aur.archlinux.org/packages/pocketsphinx/) 
+1. Install the following packages from the AUR: [sphinxbase](https://aur.archlinux.org/packages/sphinxbase/), [pocketsphinx](https://aur.archlinux.org/packages/pocketsphinx/)
    as well as the following packages from the official repositories: [libsamplerate](https://www.archlinux.org/packages/extra/x86_64/libsamplerate/) and [espeak](https://www.archlinux.org/packages/community/x86_64/espeak/).
    It could be done like this:
    ```
@@ -51,7 +51,7 @@ You will need to isntall some packets in order to get everything working.
          openssl x509 -req -in bot.csr -signkey bot.key -out bot.cert
     ```
     You will need openssl for this. Do not give the key a password.
-4. Copy the ```config.example.json``` to ```config.json``` and edit it to your needs. 
+4. Copy the ```config.example.json``` to ```config.json``` and edit it to your needs.
    If you do not want to have MPD-Support (For which you will need an MPD-Server), just delete the whole "mpd"-section.
    The configfile should be self-explanatory.
 5. Start the bot:
@@ -105,7 +105,7 @@ I would happyly accept all pull-requests as well as issues and suggestions :-)
 
 The MIT License (MIT)
 
-Copyright (c) 2015 Contributors 
+Copyright (c) 2015 Contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

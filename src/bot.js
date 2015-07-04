@@ -15,8 +15,17 @@ var FS = require('fs');
 var Steam = require('./steam');
 var Minecraft = require('./minecraft');
 var EventEmitter = require("events").EventEmitter;
+
 /*
  * Code
+ */
+
+/**
+ * This is the constructor of the bot.
+ * @constructor
+ * @param mumble - already set up mumble connection
+ * @param options - Options read from the config.json
+ * @param database - Started connection to database.
  */
 var Bot = function(mumble, options, database) {
 	this.options = options;
@@ -72,6 +81,9 @@ var Bot = function(mumble, options, database) {
 
 Util.inherits(Bot, EventEmitter);
 
+/**
+ * Gently shutdown the whole bot.
+ */
 Bot.prototype.shutdown = function() {
 	if(this.steam) {
 		this.steam.stop();
@@ -121,14 +133,29 @@ Bot.prototype._loadAddons = function(dir, callback) {
 	}.bind(this));
 };
 
+/**
+ * Will return whether the bot is busy speaking or listening to anyone.
+ * @return If the bot is busy speaking or listening
+ */
 Bot.prototype.busy = function() {
 	return this.output.busy || this.input.busy;
 };
 
+/**
+ * Plays a sound in the mumble server.
+ * @param filename - Filename of the soundfile to play. Must be a mono-channel 48,000Hz WAV-File
+ * @param cb - Callback will be called when sound has finished playing
+ */
 Bot.prototype.playSound = function(filename, cb) {
 	this.output.playSound(filename, cb);
 };
 
+/**
+ * Will start echoing everything a user says.
+ * This method is used so that anyone can hear which voice-command
+ * is currently given to the bot and not just the bleeep and bloop sounds.
+ * @param user - mumble user to start piping.
+ */
 Bot.prototype.startPipingUser = function(user) {
 	//console.log("Piping started");
 	if(this.music) {
@@ -141,6 +168,9 @@ Bot.prototype.startPipingUser = function(user) {
 	this._pipeUserStream.on('data', this._pipeUserEvent);
 };
 
+/**
+ * Stop echoing the user which is currently being echoed.
+ */
 Bot.prototype.stopPipingUser = function() {
 	//console.log("Piping stopped");
 	if(this.music) {
@@ -180,6 +210,17 @@ Bot.prototype._generateGrammar = function() {
 	FS.writeFileSync("commands.gram", grammar);
 };
 
+/**
+ * This is one of the most important methods in the bot.
+ * This will define a new command in the bot. Pleas note that all commands have
+ * to be defined before the bot has finished starting up (e.g. as addon or
+ * defined in the constructor), as the grammar for the speech recognition has to
+ * be generated and will not work otherwise.
+ * @param commandName - Name of the command to create
+ * @param method - Method which will be called when the command was called
+ * @param description - Description of the command as displayed on the website
+ * @param icon - [Name of a Fontawesome-icon to display.](http://fortawesome.github.io/Font-Awesome/icons/)
+ */
 Bot.prototype.newCommand = function(commandName, method, description, icon) {
 	this.command.newCommand(commandName, method);
 	this.commands.push({
@@ -189,11 +230,21 @@ Bot.prototype.newCommand = function(commandName, method, description, icon) {
 	});
 };
 
+/**
+ * Makes the bot join a specific channel in mumble.
+ * @param cname - Name of the channel to join.
+ */
 Bot.prototype.join = function(cname) {
 	var channel = this.mumble.channelByName(cname);
 	channel.join();
 };
 
+/**
+ * Will say something. The text will be played in mumble using TTS, written to
+ * the bots current channel (theoretically) and written in minecraft.
+ * @param text - Text to say.
+ * @param cb - Callback, will be called *after playback of TTS has finished*.
+ */
 Bot.prototype.say = function(text, cb) {
 	if(this.minecraft) {
 		this.minecraft.say(text);
@@ -201,6 +252,12 @@ Bot.prototype.say = function(text, cb) {
 	return this.output.say(text, cb);
 };
 
+/**
+ * Say something important. Other than the normal say method this will also say
+ * the shit in steam.
+ * @param text - Text to say.
+ * @param cb - Callback, will be called *after playback of TTS has finished*.
+ */
 Bot.prototype.sayImportant = function(text, cb) {
 	if(this.steam) {
 		this.steam.broadcast(text);
@@ -208,10 +265,20 @@ Bot.prototype.sayImportant = function(text, cb) {
 	return this.say(text, cb);
 };
 
+/**
+ * Report an error by saying it.
+ * @param text - Message of the error to report.
+ */
 Bot.prototype.sayError = function(text) {
 	return this.output.say("Fehler:    " + text);
 };
 
+/**
+ * Find all users in mumble which contain the supplied string in their name.
+ * For example: ```bot.findUsers("merlin");``` will find "Merlin | LÖML | Mörrrlin".
+ * This method is used in *certain* methods.
+ * @param namePart - Text to search for.
+ */
 Bot.prototype.findUsers = function(namePart) {
 	namePart = namePart.toLowerCase();
 	var users = this.mumble.users();
