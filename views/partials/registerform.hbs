@@ -13,6 +13,7 @@
 				placeholder="Username"
 				id="register-username"
 				data-remote="/api/users/usernameAvailable"
+				data-remote-error="Username has already been taken."
 				required >
 		</div>
 		<div class="help-block with-errors">3 to 64 letters. Username cannot already be taken.</div>
@@ -77,7 +78,7 @@
 			<input
 				type="text"
 				class="form-control"
-				name="minecraft" 
+				name="minecraft"
 				placeholder="Minecraft Username"
 				id="register-minecraft" >
 		</div>
