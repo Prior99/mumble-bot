@@ -1,43 +1,99 @@
-<form>
+<form data-toggle="validator" role="form">
 	<h2 class="form-signin-heading">Register</h2>
 
-	<div class="input-group">
-		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-user"></i></span>
-		<input type="text" class="form-control" placeholder="Username" id="username">
+	<div class="form-group">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-user"></i></span>
+			<input
+				data-minlength="3"
+				name="username"
+				maxlength="20"
+				type="text"
+				class="form-control"
+				placeholder="Username"
+				id="register-username"
+				data-remote="/api/users/usernameAvailable"
+				required >
+		</div>
+		<div class="help-block with-errors">3 to 64 letters. Username cannot already be taken.</div>
 	</div>
 
-	<div class="input-group">
-		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-envelope"></i></span>
-		<input type="email" class="form-control" placeholder="foo@bar.de" id="email">
+	<div class="form-group">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-envelope"></i></span>
+			<input
+				type="email"
+				name="email"
+				class="form-control"
+				placeholder="foo@bar.de"
+				id="register-email"
+				required >
+		</div>
+		<div class="help-block with-errors">A valid email-address.</div>
+	</div>
+	<div class="form-group">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-lock"></i></span>
+			<input
+				data-minlength="6"
+				name="password"
+				type="password"
+				class="form-control"
+				placeholder="Password"
+				id="register-password"
+				required >
+		</div>
+		<div class="help-block with-errors">At least 6 letters.</div>
+	</div>
+	<div class="form-group">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-repeat"></i></span>
+			<input
+				data-match="#register-password"
+				name="repeat"
+				type="password"
+				class="form-control"
+				placeholder="Password"
+				id="register-repeat"
+				required >
+		</div>
+		<div class="help-block with-errors">Needs to match password.</div>
+	</div>
+	<div class="form-group">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-steam"></i></span>
+			<input
+				type="text"
+				class="form-control"
+				name="steam"
+				placeholder="Steam Username"
+				id="register-steam" >
+		</div>
+		<div class="help-block with-errors">A valid steam username.</div>
+	</div>
+	<div class="form-group">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-cubes"></i></span>
+			<input
+				type="text"
+				class="form-control"
+				name="minecraft" 
+				placeholder="Minecraft Username"
+				id="register-minecraft" >
+		</div>
+		<div class="help-block with-errors">Username you are using in minecraft.</div>
 	</div>
 
-	<div class="input-group">
-		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-lock"></i></span>
-		<input type="password" class="form-control" placeholder="Password" id="password">
+	<div class="form-group">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-comment"></i></span>
+			<select class="form-control" name="identifier" id="register-identifier" required>
+			{{#each identifiers}}
+				<option value="{{id}}">{{identifier}}</option>
+			{{/each}}
+			</select>
+		</div>
+		<div class="help-block with-errors">Select an identifier from the list.</div>
 	</div>
-
-	<div class="input-group">
-		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-repeat"></i></span>
-		<input type="password" class="form-control" placeholder="Password" id="repeat">
-	</div>
-
-	<div class="input-group">
-		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-steam"></i></span>
-		<input type="text" class="form-control" placeholder="Steam Username" id="steam">
-	</div>
-
-	<div class="input-group">
-		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-cubes"></i></span>
-		<input type="text" class="form-control" placeholder="Minecraft Username" id="minecraft">
-	</div>
-
-	<div class="input-group">
-		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-comment"></i></span>
-		<select class="form-control" id="identifier">
-		{{#each identifiers}}
-			<option value="{{id}}">{{identifier}}</option>
-		{{/each}}
-		</select>
-	</div>
-	<button type="button" class="btn btn-success btn-lg btn-block"><i class="fa fa-user-plus"></i> Register</button>
+	<button type="submit" class="btn btn-success btn-lg btn-block"><i class="fa fa-user-plus"></i> Register</button>
 </form>
