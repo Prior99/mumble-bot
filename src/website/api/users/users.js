@@ -9,6 +9,7 @@ var Express = require('express');
  */
 
 var viewAvailable = require('./usernameavailable');
+var viewSteam64Id = require('./steam64id');
 /*
  * Code
  */
@@ -16,5 +17,6 @@ var viewAvailable = require('./usernameavailable');
 module.exports = function(bot) {
 	var router = Express.Router();
 	router.use('/usernameAvailable', viewAvailable(bot));
+	router.use('/steam64id', viewSteam64Id());
 	return router;
 };

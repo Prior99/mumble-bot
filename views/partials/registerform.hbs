@@ -1,7 +1,7 @@
-<form data-toggle="validator" role="form">
+<form id="form-register">
 	<h2 class="form-signin-heading">Register</h2>
 
-	<div class="form-group">
+	<div class="form-group has-feedback">
 		<div class="input-group">
 			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-user"></i></span>
 			<input
@@ -16,10 +16,11 @@
 				data-remote-error="Username has already been taken."
 				required >
 		</div>
-		<div class="help-block with-errors">3 to 64 letters. Username cannot already be taken.</div>
+		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+		<div class="help-block with-errors"></div>
 	</div>
 
-	<div class="form-group">
+	<div class="form-group has-feedback">
 		<div class="input-group">
 			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-envelope"></i></span>
 			<input
@@ -30,9 +31,10 @@
 				id="register-email"
 				required >
 		</div>
-		<div class="help-block with-errors">A valid email-address.</div>
+		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+		<div class="help-block with-errors"></div>
 	</div>
-	<div class="form-group">
+	<div class="form-group has-feedback">
 		<div class="input-group">
 			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-lock"></i></span>
 			<input
@@ -44,9 +46,10 @@
 				id="register-password"
 				required >
 		</div>
-		<div class="help-block with-errors">At least 6 letters.</div>
+		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+		<div class="help-block with-errors"></div>
 	</div>
-	<div class="form-group">
+	<div class="form-group has-feedback">
 		<div class="input-group">
 			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-repeat"></i></span>
 			<input
@@ -58,19 +61,24 @@
 				id="register-repeat"
 				required >
 		</div>
-		<div class="help-block with-errors">Needs to match password.</div>
+		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+		<div class="help-block with-errors"></div>
 	</div>
-	<div class="form-group">
+	<div class="form-group has-feedback">
 		<div class="input-group">
 			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-steam"></i></span>
 			<input
 				type="text"
 				class="form-control"
-				name="steam"
+				name="steamusername"
 				placeholder="Steam Username"
+				data-minlength="3"
+				data-remote="/api/users/steam64id"
+				data-remote-error="This steam user does not exist."
 				id="register-steam" >
 		</div>
-		<div class="help-block with-errors">A valid steam username.</div>
+		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+		<div class="help-block with-errors"></div>
 	</div>
 	<div class="form-group">
 		<div class="input-group">
@@ -82,7 +90,8 @@
 				placeholder="Minecraft Username"
 				id="register-minecraft" >
 		</div>
-		<div class="help-block with-errors">Username you are using in minecraft.</div>
+		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+		<div class="help-block with-errors"></div>
 	</div>
 
 	<div class="form-group">
@@ -94,7 +103,13 @@
 			{{/each}}
 			</select>
 		</div>
-		<div class="help-block with-errors">Select an identifier from the list.</div>
+		<div class="help-block with-errors"></div>
 	</div>
 	<button type="submit" class="btn btn-success btn-lg btn-block"><i class="fa fa-user-plus"></i> Register</button>
 </form>
+<script>
+$('#form-register').validator({
+	delay : 100
+});
+$('#form-register').validator('validate');
+</script>
