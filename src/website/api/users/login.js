@@ -12,9 +12,19 @@ module.exports = function(bot) {
 					});
 				}
 				else {
-					req.session.user = user;
-					res.send({
-						okay : true
+					bot.permissions.hasPermission(user, "login", function(has) {
+						if(has) {
+							req.session.user = user;
+							res.send({
+								okay : true
+							});
+						}
+						else {
+							res.send({
+								okay : false,
+								reason : "insufficient_permission"
+							});
+						}
 					});
 				}
 			});

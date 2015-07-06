@@ -29,13 +29,33 @@
 		<strong>Error!</strong> Unabled to login. Please try again.
 	</div>
 </script>
+<script type="text/html" id="alert-login-permission">
+	<div class="alert alert-danger alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Error!</strong> Unabled to login. You need to be unlocked by an administrator first.
+	</div>
+</script>
+<script type="text/html" id="alert-login-internal-error">
+	<div class="alert alert-danger alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Error!</strong> An internal error occured.
+	</div>
+</script>
 <script>
 	$('#form-login').ajaxForm(function(response) {
 		if(response.okay) {
 			window.location.reload();
 		}
 		else {
-			$($("#alert-login-failed").html()).appendTo("#alerts");
+			if(response.reason === "internal_error") {
+				$($("#alert-login-internal-error").html()).appendTo("#alerts");
+			}
+			else if(response.reason === "unknown_username_or_password") {
+				$($("#alert-login-failed").html()).appendTo("#alerts");
+			}
+			else if(response.reason === "insufficient_permission") {
+				$($("#alert-login-permission").html()).appendTo("#alerts");
+			}
 		}
 	});
 </script>
