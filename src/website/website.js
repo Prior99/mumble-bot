@@ -86,6 +86,7 @@ var Website = function(bot) {
 	this.app.use('/jquery', Express.static('node_modules/jquery/dist/'));
 	this.app.use('/jquery-form', Express.static('node_modules/jquery-form/'));
 	this.app.use('/fontawesome', Express.static('node_modules/font-awesome/'));
+	this.app.use('/crypto-js', Express.static('node_modules/crypto-js/'));
 	this.app.use('/bootstrap-validator', Express.static('node_modules/bootstrap-validator/dist/'));
 	this.app.use('/api', routeApi(bot));
 	this.app.use(function(req, res, next) {
