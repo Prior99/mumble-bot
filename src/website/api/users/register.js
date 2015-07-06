@@ -2,6 +2,18 @@ var Steam64 = require("../../../steam64id");
 var Winston = require('winston');
 
 module.exports = function(bot) {
+
+	function grantAll() {
+		bot.database.getUserById(1, function(err, user) {
+			if(err) {
+				Winston.error("Error when granting all permissions to user with id 0.", err);
+			}
+			else {
+				bot.permissions.grantAllPermissions(null, user);
+			}
+		});
+	}
+
 	return function(req, res) {
 		var data = req.query;
 		Steam64(data.steamusername, function(err, steamid) {
@@ -47,6 +59,9 @@ module.exports = function(bot) {
 							okay : true,
 							id : id
 						});
+						if(id === 1) {
+							grantAll();
+						}
 					}
 				});
 			}
