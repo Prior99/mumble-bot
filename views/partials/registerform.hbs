@@ -1,5 +1,5 @@
 <form id="form-register" action="/api/users/register" method="get">
-	<h2 class="form-signin-heading">Register</h2>
+	<h2 class="form-signin-heading">Sign up</h2>
 
 	<div class="form-group has-feedback">
 		<div class="input-group">
@@ -107,12 +107,28 @@
 	</div>
 	<button type="submit" id="register-submit" class="btn btn-success btn-lg btn-block"><i class="fa fa-user-plus"></i> Register</button>
 </form>
+<script type="text/html" id="alert-registration-failed">
+	<div class="alert alert-error alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Error!</strong> Could not sign up. Please check all provided information or contact an administrator.
+	</div>
+</script>
+<script type="text/html" id="alert-registration-success">
+	<div class="alert alert-success" role="alert">
+		<strong>Success!</strong>You can now login <a href="/" class="alert-link">here</a>.
+	</div>
+</script>
 <script>
 	$('#form-register').validator({
 		delay : 100
 	});
 	$('#form-register').validator('validate');
-	$('#form-register').ajaxForm(function() {
-
+	$('#form-register').ajaxForm(function(response) {
+		if(response.okay) {
+			$($("#alert-registration-success").html()).appendTo("#alerts");
+		}
+		else {
+			$($("#alert-registration-failed").html()).appendTo("#alerts");
+		}
 	});
 </script>
