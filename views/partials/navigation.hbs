@@ -22,3 +22,10 @@
 		</div>
 	</div>
 </nav>
+<script>
+	$('#nav-sign-out').click(function() {
+		$.ajax("/api/users/logout").done(function(res) {
+			window.location.reload();
+		});
+	})
+</script>

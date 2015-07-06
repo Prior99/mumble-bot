@@ -12,6 +12,7 @@ var viewAvailable = require('./usernameavailable');
 var viewSteam64Id = require('./steam64id');
 var viewRegister = require('./register');
 var viewLogin = require('./login');
+var viewLogout = require('./logout');
 /*
  * Code
  */
@@ -22,5 +23,6 @@ module.exports = function(bot) {
 	router.use('/steam64id', viewSteam64Id());
 	router.use('/register', viewRegister(bot));
 	router.use('/login', viewLogin(bot));
+	router.use('/logout', viewLogout());
 	return router;
 };
