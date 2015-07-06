@@ -15,6 +15,7 @@ var FileStore = require('session-file-store')(Session);
 
 var viewDefault = require('./default');
 var viewRegisterLogin = require('./users/registerLogin');
+var viewProfile = require('./users/profile');
 
 /*
  * Routes
@@ -75,6 +76,7 @@ var Website = function(bot) {
 	this.app.use(function(req, res, next) {
 		res.locals.bot = bot;
 		res.locals.pages = pages;
+		res.locals.session = req.session;
 		res.locals.subpages = subpages;
 		next();
 	});
@@ -94,6 +96,7 @@ var Website = function(bot) {
 			return viewRegisterLogin(bot)(req, res);
 		}
 	});
+	this.app.use('/profile/:username', viewProfile(bot))
 	this.app.use('/music', routeMusic(bot));
 	this.app.use('/quotes', routeQuotes(bot));
 	this.app.use('/commands', viewDefault("commands"));
