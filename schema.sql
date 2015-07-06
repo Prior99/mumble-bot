@@ -23,17 +23,10 @@ CREATE TABLE IF NOT EXISTS Users (
 	password		VARCHAR(72) NOT NULL,
 	steamid			VARCHAR(24),
 	identifier		INT NOT NULL,
-	rank			INT NOT NULL DEFAULT 0,
+	minecraft		VARCHAR(64),
+	email			VARCHAR(64) NOT NULL,
 	UNIQUE(identifier),
 	FOREIGN KEY (identifier) REFERENCES Identifiers(id)
-);
-
-CREATE TABLE IF NOT EXISTS Ranks (
-	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	rank			INT NOT NULL,
-	name			VARCHAR(32) NOT NULL,
-	UNIQUE(rank),
-	UNIQUE(name)
 );
 
 
@@ -60,9 +53,3 @@ INSERT IGNORE INTO Identifiers (identifier) VALUES
 ("rabbit"),
 ("elefant"),
 ("cucumber");
-
-INSERT IGNORE INTO Ranks(rank, name) VALUES
-(0, "Deaktiviert"),
-(1, "Mitglied"),
-(10, "Moderator"),
-(100, "Admin");

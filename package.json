@@ -22,6 +22,7 @@
     "font-awesome": "^4.3.0",
     "html-entities": "^1.1.2",
     "jquery": "^2.1.4",
+    "jquery-form": "^3.50.0",
     "lame": "^1.2.2",
     "less-middleware": "^2.0.1",
     "mineflayer": "^1.2.1",

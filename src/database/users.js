@@ -1,7 +1,7 @@
 module.exports = function(Database) {
-	Database.prototype.registerUser = function(username, passwordHash, identifier, steamid, callback) {
-		this.pool.query("INSERT INTO Users(username, password, identifier, steamid) VALUES(?, ?, ?, ?)",
-			[username, passwordHash, identifier, steamid], function(err, result) {
+	Database.prototype.registerUser = function(user, callback) {
+		this.pool.query("INSERT INTO Users(email, username, password, identifier, steamid, minecraft) VALUES(?, ?, ?, ?, ?, ?)",
+			[user.email, user.username, user.password, user.identifier, user.steamid, user.minecraft], function(err, result) {
 				if(this._checkError(err, callback)) {
 					callback(null, result.insertId);
 				}
@@ -9,7 +9,7 @@ module.exports = function(Database) {
 		);
 	};
 	Database.prototype.getUserByUsername = function(username, callback) {
-		this.pool.query("SELECT u.id AS id, u.username as username, u.password AS password, i.identifier AS identifier, u.steamid AS steamid FROM Users u LEFT JOIN Identifiers i ON u.identifier = i.id WHERE u.username = ?",
+		this.pool.query("SELECT u.minecraft AS minecraft, u.id AS id, u.username as username, u.password AS password, i.identifier AS identifier, u.steamid AS steamid FROM Users u LEFT JOIN Identifiers i ON u.identifier = i.id WHERE u.username = ?",
 			[username], function(err, rows) {
 				if(this._checkError(err, callback)) {
 					callback(null, rows[0]);
@@ -18,7 +18,7 @@ module.exports = function(Database) {
 		);
 	};
 	Database.prototype.getUserById = function(id, callback) {
-		this.pool.query("SELECT u.id AS id, u.username as username, u.password AS password, i.identifier AS identifier, u.steamid AS steamid FROM Users u LEFT JOIN Identifiers i ON u.identifier = i.id WHERE u.id = ?",
+		this.pool.query("SELECT u.minecraft AS minecraft, u.id AS id, u.username as username, u.password AS password, i.identifier AS identifier, u.steamid AS steamid FROM Users u LEFT JOIN Identifiers i ON u.identifier = i.id WHERE u.id = ?",
 			[id], function(err, rows) {
 				if(this._checkError(err, callback)) {
 					callback(null, rows[0]);

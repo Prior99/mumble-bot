@@ -1,4 +1,4 @@
-<form id="form-register">
+<form id="form-register" action="/api/users/register" method="get">
 	<h2 class="form-signin-heading">Register</h2>
 
 	<div class="form-group has-feedback">
@@ -105,11 +105,14 @@
 		</div>
 		<div class="help-block with-errors"></div>
 	</div>
-	<button type="submit" class="btn btn-success btn-lg btn-block"><i class="fa fa-user-plus"></i> Register</button>
+	<button type="submit" id="register-submit" class="btn btn-success btn-lg btn-block"><i class="fa fa-user-plus"></i> Register</button>
 </form>
 <script>
-$('#form-register').validator({
-	delay : 100
-});
-$('#form-register').validator('validate');
+	$('#form-register').validator({
+		delay : 100
+	});
+	$('#form-register').validator('validate');
+	$('#form-register').ajaxForm(function() {
+
+	});
 </script>
