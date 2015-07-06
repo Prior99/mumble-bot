@@ -27,7 +27,9 @@ module.exports = function(bot) {
 	var router = Express.Router();
 	router.use('/users', routeUsers(bot));
 	router.use(function(req, res, next) {
-		next(); //TODO: CHECK LOGIN!!
+		if(req.session.user) {
+			next(); 
+		}
 	});
 	router.use('/music', routeMusic(bot));
 	router.use('/tree', viewTree(bot));

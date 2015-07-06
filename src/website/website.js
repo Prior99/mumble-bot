@@ -87,7 +87,12 @@ var Website = function(bot) {
 	this.app.use('/bootstrap-validator', Express.static('node_modules/bootstrap-validator/dist/'));
 	this.app.use('/api', routeApi(bot));
 	this.app.use(function(req, res, next) {
-		return viewRegisterLogin(bot)(req, res);
+		if(req.session.user) {
+			next();
+		}
+		else {
+			return viewRegisterLogin(bot)(req, res);
+		}
 	});
 	this.app.use('/music', routeMusic(bot));
 	this.app.use('/quotes', routeQuotes(bot));
