@@ -1,15 +1,41 @@
-<form>
+<form id="form-login" action="/api/users/login" method="get">
 	<h2 class="form-signin-heading">Login</h2>
 
 	<div class="input-group">
 		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-envelope"></i></span>
-		<input type="email" class="form-control" placeholder="foo@bar.de" id="login-email">
+		<input
+			type="text"
+			class="form-control"
+			placeholder="Username"
+			id="login-username"
+			name="username" >
 	</div>
 
 	<div class="input-group">
 		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-lock"></i></span>
-		<input type="password" class="form-control" placeholder="Password" id="login-password">
+		<input
+			type="password"
+			class="form-control"
+			placeholder="Password"
+			id="login-password"
+			name="password" >
 	</div>
 
-	<button type="button" class="btn btn-primary btn-lg btn-block"><i class="fa fa-unlock"></i> Login</button>
+	<button type="submit" class="btn btn-primary btn-lg btn-block"><i class="fa fa-unlock"></i> Login</button>
 </form>
+<script type="text/html" id="alert-login-failed">
+	<div class="alert alert-danger alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Error!</strong> Unabled to login. Please try again.
+	</div>
+</script>
+<script>
+	$('#form-login').ajaxForm(function(response) {
+		if(response.okay) {
+			window.location.reload();
+		}
+		else {
+			$($("#alert-login-failed").html()).appendTo("#alerts");
+		}
+	});
+</script>
