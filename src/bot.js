@@ -15,6 +15,7 @@ var FS = require('fs');
 var Steam = require('./steam');
 var Minecraft = require('./minecraft');
 var EventEmitter = require("events").EventEmitter;
+var Permissions = require("./permissions");
 /*
  * Code
  */
@@ -29,6 +30,7 @@ var Bot = function(mumble, options, database) {
 
 	this.command = new Command(this);
 	this.quotes = new Quotes(this);
+	this.permissions = new Permissions(database);
 
 	this._inputStream = mumble.inputStream();
 

@@ -1,0 +1,149 @@
+<form id="form-register" action="/api/users/register" method="get">
+	<h2 class="form-signin-heading">Sign up</h2>
+
+	<div class="form-group has-feedback">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-user"></i></span>
+			<input
+				data-minlength="3"
+				name="username"
+				maxlength="20"
+				type="text"
+				class="form-control"
+				placeholder="Username"
+				id="register-username"
+				data-remote="/api/users/usernameAvailable"
+				data-remote-error="Username has already been taken."
+				required >
+		</div>
+		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+		<div class="help-block with-errors"></div>
+	</div>
+
+	<div class="form-group has-feedback">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-envelope"></i></span>
+			<input
+				type="email"
+				name="email"
+				class="form-control"
+				placeholder="foo@bar.de"
+				id="register-email"
+				required >
+		</div>
+		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+		<div class="help-block with-errors"></div>
+	</div>
+	<div class="form-group has-feedback">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-lock"></i></span>
+			<input
+				data-minlength="6"
+				name="password"
+				type="password"
+				class="form-control"
+				placeholder="Password"
+				id="register-password"
+				required >
+		</div>
+		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+		<div class="help-block with-errors"></div>
+	</div>
+	<div class="form-group has-feedback">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-repeat"></i></span>
+			<input
+				data-match="#register-password"
+				name="repeat"
+				type="password"
+				class="form-control"
+				placeholder="Password"
+				id="register-repeat"
+				required >
+		</div>
+		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+		<div class="help-block with-errors"></div>
+	</div>
+	<div class="form-group has-feedback">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-steam"></i></span>
+			<input
+				type="text"
+				class="form-control"
+				name="steamusername"
+				placeholder="Steam Username"
+				data-minlength="3"
+				data-remote="/api/users/steam64id"
+				data-remote-error="This steam user does not exist."
+				id="register-steam" >
+		</div>
+		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+		<div class="help-block with-errors"></div>
+	</div>
+	<div class="form-group">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-cubes"></i></span>
+			<input
+				type="text"
+				class="form-control"
+				name="minecraft"
+				placeholder="Minecraft Username"
+				id="register-minecraft" >
+		</div>
+		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+		<div class="help-block with-errors"></div>
+	</div>
+
+	<div class="form-group">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-comment"></i></span>
+			<select class="form-control" name="identifier" id="register-identifier" required>
+			{{#each identifiers}}
+				<option value="{{id}}">{{identifier}}</option>
+			{{/each}}
+			</select>
+		</div>
+		<div class="help-block with-errors"></div>
+	</div>
+	<button type="submit" id="register-submit" class="btn btn-success btn-lg btn-block"><i class="fa fa-user-plus"></i> Register</button>
+</form>
+<script type="text/html" id="alert-registration-failed">
+	<div class="alert alert-danger alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Error!</strong> Could not sign up. Please check all provided information or contact an administrator.
+	</div>
+</script>
+<script type="text/html" id="alert-registration-success">
+	<div class="alert alert-success" role="alert">
+		<strong>Success!</strong>You can now login <a href="/" class="alert-link">here</a>.
+	</div>
+</script>
+<script>
+	$('#form-register').validator({
+		delay : 100
+	});
+	$('#form-register').validator('validate');
+	$('#register-submit').click(function(e) {
+		e.preventDefault();
+		var email = encodeURIComponent($('#register-email').val());
+		var username = encodeURIComponent($('#register-username').val());
+		var password = encodeURIComponent(CryptoJS.SHA256($('#register-password').val()));
+		var identifier = encodeURIComponent($('#register-identifier').val());
+		var steamid = encodeURIComponent($('#register-steamid').val());
+		var minecraft = encodeURIComponent($('#register-minecraft').val());
+		$.ajax("/api/users/register?email=" + email +
+			"&username=" + username +
+			"&password=" + password +
+			"&identifier=" + identifier +
+			"&steamid=" + steamid +
+			"&minecraft=" + minecraft)
+		.done(function(response) {
+			if(response.okay) {
+				$($("#alert-registration-success").html()).appendTo("#alerts");
+			}
+			else {
+				$($("#alert-registration-failed").html()).appendTo("#alerts");
+			}
+		});
+	});
+</script>

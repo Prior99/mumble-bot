@@ -6,12 +6,16 @@ var Express = require('express');
 var ExpHbs  = require('express-handlebars');
 var Winston = require('winston');
 var Less = require('less-middleware');
+var Session = require('express-session');
+var FileStore = require('session-file-store')(Session);
 
 /*
  * Views
  */
 
 var viewDefault = require('./default');
+var viewRegisterLogin = require('./users/registerLogin');
+var viewProfile = require('./users/profile');
 
 /*
  * Routes
@@ -61,9 +65,18 @@ var Website = function(bot) {
 	}));
 	this.app.set('view engine', '.hbs');
 	this.bot = bot;
+	this.app.use(Session({
+		secret: bot.options.website.sessionSecret,
+		store: new FileStore({
+			path : "session-store"
+		}),
+		resave: false,
+		saveUninitialized: true
+	}));
 	this.app.use(function(req, res, next) {
 		res.locals.bot = bot;
 		res.locals.pages = pages;
+		res.locals.session = req.session;
 		res.locals.subpages = subpages;
 		next();
 	});
@@ -71,9 +84,21 @@ var Website = function(bot) {
 	this.app.use('/', Express.static('public/'));
 	this.app.use('/bootstrap', Express.static('node_modules/bootstrap/dist/'));
 	this.app.use('/jquery', Express.static('node_modules/jquery/dist/'));
+	this.app.use('/jquery-form', Express.static('node_modules/jquery-form/'));
 	this.app.use('/fontawesome', Express.static('node_modules/font-awesome/'));
-	this.app.use('/music', routeMusic(bot));
+	this.app.use('/crypto-js', Express.static('node_modules/crypto-js/'));
+	this.app.use('/bootstrap-validator', Express.static('node_modules/bootstrap-validator/dist/'));
 	this.app.use('/api', routeApi(bot));
+	this.app.use(function(req, res, next) {
+		if(req.session.user) {
+			next();
+		}
+		else {
+			return viewRegisterLogin(bot)(req, res);
+		}
+	});
+	this.app.use('/profile/:username', viewProfile(bot))
+	this.app.use('/music', routeMusic(bot));
 	this.app.use('/quotes', routeQuotes(bot));
 	this.app.use('/commands', viewDefault("commands"));
 	this.app.get('/tree', viewDefault("channeltree"));

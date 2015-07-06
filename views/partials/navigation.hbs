@@ -1,4 +1,5 @@
 <nav class="navbar navbar-inverse no-margin navbar-fixed-top">
+	<div class="container-fluid" style="margin: 0 10px 0 10px;">
 		<div class="navbar-header fixed-brand">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
 				<span class="sr-only">Toggle navigation</span>
@@ -6,7 +7,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="#"><i class="fa fa-bullhorn fa-4"></i> {{bot.options.name}}</a>
+			<a class="navbar-brand" href="#"><i class="fa fa-bullhorn"></i> {{bot.options.name}}</a>
 		</div>
 		<div class="collapse navbar-collapse" id="navbar">
 			<ul class="nav navbar-nav">
@@ -14,6 +15,17 @@
 					<li><a href="{{this.url}}">{{this.name}}</a></li>
 				{{/each}}
 			</ul>
+			<div class="navbar-right btn-group" role="group">
+				<a class="btn btn-default navbar-btn" href="/profile/{{session.user.username}}"><i class="fa fa-user"></i> {{session.user.username}}</a>
+				<button id="nav-sign-out" class="btn btn-default navbar-btn" href="#"><i class="fa fa-sign-out"></i></button>
+			</div>
 		</div>
 	</div>
 </nav>
+<script>
+	$('#nav-sign-out').click(function() {
+		$.ajax("/api/users/logout").done(function(res) {
+			window.location.reload();
+		});
+	})
+</script>
