@@ -41,5 +41,8 @@
     "winston": "^1.0.0",
     "xml2js": "^0.4.9",
     "youtube-dl": "^1.10.5"
+  },
+  "devDependencies": {
+    "jsdoc": "^3.3.2"
   }
 }
