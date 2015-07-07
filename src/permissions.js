@@ -6,10 +6,23 @@ var Winston = require('winston');
 /*
  * Code
  */
+
+/**
+ * Handles permissions in the bot.
+ * This is basically just a nicer-to-use interface to the database.
+ * @constructor
+ * @param database - The database of the bot to use.
+ */
 var Permissions = function(database) {
 	this.database = database;
 };
 
+/**
+ * Checks whether a user has the given permission.
+ * @param user - User to check the permission of.
+ * @param {string} permission - Permission to check.
+ * @param callback - This callback is called when the data was fetched.
+ */
 Permissions.prototype.hasPermission = function(user, permission, callback) {
 	if(!user) {
 		callback(false);
@@ -23,6 +36,15 @@ Permissions.prototype.hasPermission = function(user, permission, callback) {
 	});
 };
 
+/**
+ * Grants the permission to a user. If the issuer is null or undefined, no
+ * checks will be performed. If the issuer is defined, a check will be performed
+ * whether the issuer can grant the requested permission at all.
+ * @param issuer - User that issues this command.
+ * @param user - User to grant the permission to.
+ * @param {string} permission - Permission to grant to the user.
+ * @param callback - Will be called after the permission was granted.
+ */
 Permissions.prototype.grantPermission = function(issuer, user, permission, callback) {
 	if(!callback) {
 		callback = function(){};
@@ -48,6 +70,15 @@ Permissions.prototype.grantPermission = function(issuer, user, permission, callb
 	}.bind(this));
 };
 
+/**
+ * Revokes a certain permission from a user. If the issuer is null or undefined, no
+ * checks will be performed. If the issuer is defined, a check will be performed
+ * whether the issuer can revoke the requested permission at all.
+ * @param issuer - User that issues this command.
+ * @param user - User to revoke the permission from.
+ * @param {string} permission - Permission to grant to the user.
+ * @param callback - Will be called after the permission was revoked.
+ */
 Permissions.prototype.revokePermission = function(issuer, user, permission, callback) {
 	if(!callback) {
 		callback = function(){};
@@ -73,6 +104,11 @@ Permissions.prototype.revokePermission = function(issuer, user, permission, call
 	}.bind(this));
 };
 
+/**
+ * Retrieve information about a given permission.
+ * @param {string} permission - Permission to gather information about.
+ * @param callback - Called once the inforamtion was retrieved.
+ */
 Permissions.prototype.getPermission = function(permission, callback) {
 	this.database.getPermission(permission, function(err, permission) {
 		if(err) {
@@ -85,6 +121,11 @@ Permissions.prototype.getPermission = function(permission, callback) {
 	});
 };
 
+
+/**
+ * Retrieve an array containing all permissions known to this bot.
+ * @param callback - Called once the list was retrieved.
+ */
 Permissions.prototype.listPermissions = function(callback) {
 	this.database.listPermissions(function(err, permissions) {
 		if(err) {
@@ -97,6 +138,15 @@ Permissions.prototype.listPermissions = function(callback) {
 	});
 };
 
+/**
+ * Grants all known permissions to one user. If the issuer is null or undefined
+ * no checking will be performed. Else it will be checked if the issuer can
+ * grant the requested permissions at all and only those he can grant will be
+ * granted.
+ * @param issuer - User that issued this command.
+ * @param user - User to grant the permissions to.
+ * @param callback - Called once all permissions were processed.
+ */
 Permissions.prototype.grantAllPermissions = function(issuer, user, callback) {
 	if(!callback) {
 		callback = function(){};
@@ -121,6 +171,16 @@ Permissions.prototype.grantAllPermissions = function(issuer, user, callback) {
 	}.bind(this));
 };
 
+/**
+ * Lists all permissions from the view of a single user. Information about
+ * whether the user has the permission and whether the issuer can grant it
+ * will be added.
+ * @param issuer - User that issued the command and of which it should be
+ 				   checked whether he can grant the permissions.
+ * @param user - User of which it should be checked whether he has the
+				 permissions.
+ * @param callback - Called once the list was retrieved.
+ */
 Permissions.prototype.listPermissionsForUser = function(issuer, user, callback) {
 	var array = [];
 
