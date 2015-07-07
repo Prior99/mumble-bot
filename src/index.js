@@ -145,7 +145,7 @@ Bot.prototype.busy = function() {
 
 /**
  * Plays a sound in the mumble server.
- * @param filename - Filename of the soundfile to play. Must be a mono-channel 48,000Hz WAV-File
+ * @param {string} filename - Filename of the soundfile to play. Must be a mono-channel 48,000Hz WAV-File
  * @param cb - Callback will be called when sound has finished playing
  */
 Bot.prototype.playSound = function(filename, cb) {
@@ -218,10 +218,10 @@ Bot.prototype._generateGrammar = function() {
  * to be defined before the bot has finished starting up (e.g. as addon or
  * defined in the constructor), as the grammar for the speech recognition has to
  * be generated and will not work otherwise.
- * @param commandName - Name of the command to create
+ * @param {string} commandName - Name of the command to create
  * @param method - Method which will be called when the command was called
- * @param description - Description of the command as displayed on the website
- * @param icon - [Name of a Fontawesome-icon to display.](http://fortawesome.github.io/Font-Awesome/icons/)
+ * @param {string} description - Description of the command as displayed on the website
+ * @param {string} icon - [Name of a Fontawesome-icon to display.](http://fortawesome.github.io/Font-Awesome/icons/)
  */
 Bot.prototype.newCommand = function(commandName, method, description, icon) {
 	this.command.newCommand(commandName, method);
@@ -244,7 +244,7 @@ Bot.prototype.join = function(cname) {
 /**
  * Will say something. The text will be played in mumble using TTS, written to
  * the bots current channel (theoretically) and written in minecraft.
- * @param text - Text to say.
+ * @param {string} text - Text to say.
  * @param cb - Callback, will be called *after playback of TTS has finished*.
  */
 Bot.prototype.say = function(text, cb) {
@@ -257,7 +257,7 @@ Bot.prototype.say = function(text, cb) {
 /**
  * Say something important. Other than the normal say method this will also say
  * the shit in steam.
- * @param text - Text to say.
+ * @param {string} text - Text to say.
  * @param cb - Callback, will be called *after playback of TTS has finished*.
  */
 Bot.prototype.sayImportant = function(text, cb) {
@@ -269,7 +269,7 @@ Bot.prototype.sayImportant = function(text, cb) {
 
 /**
  * Report an error by saying it.
- * @param text - Message of the error to report.
+ * @param {string} text - Message of the error to report.
  */
 Bot.prototype.sayError = function(text) {
 	return this.output.say("Fehler:    " + text);
@@ -279,7 +279,7 @@ Bot.prototype.sayError = function(text) {
  * Find all users in mumble which contain the supplied string in their name.
  * For example: ```bot.findUsers("merlin");``` will find "Merlin | LÖML | Mörrrlin".
  * This method is used in *certain* methods.
- * @param namePart - Text to search for.
+ * @param {string} namePart - Text to search for.
  */
 Bot.prototype.findUsers = function(namePart) {
 	namePart = namePart.toLowerCase();

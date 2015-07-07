@@ -44,7 +44,7 @@ Minecraft.prototype._onChat = function(username, message) {
 
 /**
  * Say something in the minecraft servers chat.
- * @param msg - The message to say in the servers chat
+ * @param {string} msg - The message to say in the servers chat
  */
 Minecraft.prototype.say = function(msg) {
 	if(this._ready) {
