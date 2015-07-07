@@ -10,7 +10,14 @@ var Readline = require('readline');
 /*
  * Code
  */
-var SteamBot = function(bot, options, callback) {
+
+/**
+ * Handles the bots connection to steam.
+ * @constructor
+ * @param bot - Bot this instance was created in.
+ * @param options - Options to connect with, read from configfile.
+ */
+var SteamBot = function(bot, options) {
 	this.bot = bot;
 	this.options = {
 		accountName : options.user,
@@ -83,6 +90,10 @@ SteamBot.prototype._postLogin = function() {
 	}.bind(this));
 };
 
+/**
+ * Sends a message to all friends of this bot.
+ * @param {string} message - Message to send to all friends.
+ */
 SteamBot.prototype.broadcast = function(message) {
 	if(this._hasFriends) {
 		for(var id in this.client.friends) {
@@ -106,6 +117,9 @@ SteamBot.prototype._startUp = function() {
 	});
 };
 
+/**
+ * Disconnect from steam gently.
+ */
 SteamBot.prototype.stop = function() {
 	this.client.setPersonaState(Steam.EPersonaState.Offline);
 	this.client.logOff();
