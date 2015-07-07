@@ -1,6 +1,10 @@
 var Winston = require('winston');
 
-module.exports = function(bot) {
+/**
+ * <b>/users/permissions/:username</b> Manage the permissions for a user.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ */
+var ViewUsersPermissions = function(bot) {
 	return function(req, res) {
 		var user = bot.database.getUserByUsername(req.params.username, function(err, user) {
 			if(err) {
@@ -22,3 +26,5 @@ module.exports = function(bot) {
 		});
 	};
 };
+
+module.exports = ViewUsersPermissions;

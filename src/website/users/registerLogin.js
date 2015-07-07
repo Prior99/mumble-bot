@@ -1,6 +1,11 @@
 var Winston = require('winston');
 
-module.exports = function(bot) {
+/**
+ * This endpoint will be used when a user is not logged in so he can register
+ * or login.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ */
+var ViewUsersRegisterLogin = function(bot) {
 	return function(req, res) {
 		bot.database.getFreeIdentifiers(function(err, identifiers) {
 			if(err) {
@@ -16,3 +21,5 @@ module.exports = function(bot) {
 		});
 	}
 };
+
+module.exports = ViewUsersRegisterLogin;

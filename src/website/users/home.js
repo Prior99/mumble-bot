@@ -1,6 +1,10 @@
 var Winston = require('winston');
 
-module.exports = function(bot) {
+/**
+ * <b>/users/</b> Displays the home page for the /users/ endpoint.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ */
+var ViewUsersHome = function(bot) {
 	return function(req, res) {
 		bot.database.countUsers(function(err, count) {
 			if(err) {
@@ -14,3 +18,5 @@ module.exports = function(bot) {
 		});
 	};
 };
+
+module.exports = ViewUsersHome;

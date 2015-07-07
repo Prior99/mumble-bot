@@ -21,7 +21,11 @@ var pages = [{
 	icon : "users"
 }];
 
-module.exports = function(bot) {
+/**
+ * Routes all requests related to users in the /users/ endpoint.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ */
+var RouteUsers = function(bot) {
 	var router = Express.Router();
 	router.use(function(req, res, next) {
 		res.locals.subpages = pages;
@@ -34,3 +38,5 @@ module.exports = function(bot) {
 
 	return router;
 };
+
+module.exports = RouteUsers;

@@ -1,6 +1,9 @@
 var Winston = require('winston');
-
-module.exports = function(bot) {
+/**
+ * <b>/users/profile/:username</b> Display the profile of a specific user.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ */
+var ViewUsersProfile = function(bot) {
 	return function(req, res) {
 		var username = req.params.username;
 		bot.database.getUserByUsername(username, function(err, user) {
@@ -20,3 +23,5 @@ module.exports = function(bot) {
 		});
 	};
 };
+
+module.exports = ViewUsersProfile;

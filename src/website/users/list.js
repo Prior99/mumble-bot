@@ -1,6 +1,9 @@
 var Winston = require('winston');
-
-module.exports = function(bot) {
+/**
+ * <b>/users/list/</b> Displays a list of users.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ */
+var ViewUsersList = function(bot) {
 	return function(req, res) {
 		bot.database.listUsers(function(err, users) {
 			if(err) {
@@ -14,3 +17,5 @@ module.exports = function(bot) {
 		});
 	};
 };
+
+module.exports = ViewUsersList;

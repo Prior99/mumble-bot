@@ -51,7 +51,13 @@ var subpages = [{
 	name : "Befehle",
 	icon : "cogs"
 }];
-
+/**
+ * Handles the whole website stuff for the bot. Using express and handlebars
+ * provides the backend for all data and the interface between the webpage and
+ * the bot itself.
+ * @constructor
+ * @param {Bot} bot - The bot to use this webpage with.
+ */
 var Website = function(bot) {
 	if(bot.music) {
 		pages.unshift({
@@ -115,6 +121,10 @@ var Website = function(bot) {
 	Winston.info("Module started: Website, listening on port " + port);
 };
 
+/**
+ * Stop the webpage immediatly.
+ * @param callback - Will be called once the webpage came to a full stop.
+ */
 Website.prototype.shutdown = function(callback) {
 	Winston.info("Stopping module: Website ...");
 	this.server.close(function() {
