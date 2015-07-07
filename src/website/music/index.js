@@ -35,7 +35,11 @@ var pages = [{
 	icon : "youtube-square"
 }];
 
-module.exports = function(bot) {
+/**
+ * Routes all requests related to music in the /music/ endpoint.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ */
+var RouteMusic = function(bot) {
 	var router = Express.Router();
 	router.use(function(req, res, next) {
 		res.locals.subpages = pages;
@@ -50,3 +54,5 @@ module.exports = function(bot) {
 
 	return router;
 };
+
+module.exports = RouteMusic;
