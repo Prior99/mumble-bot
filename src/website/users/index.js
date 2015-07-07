@@ -11,6 +11,7 @@ var Express = require('express');
 var viewList = require('./list');
 var viewHome = require('./home');
 var viewProfile = require('./profile');
+var viewPermissions = require('./permissions');
 /*
  * Code
  */
@@ -27,7 +28,8 @@ module.exports = function(bot) {
 		next();
 	});
 	router.get('/list', viewList(bot));
-	router.get('/profile/:username', viewProfile(bot))
+	router.get('/profile/:username', viewProfile(bot));
+	router.get('/permissions/:username', viewPermissions(bot));
 	router.get('/', viewHome(bot));
 
 	return router;

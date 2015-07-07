@@ -36,6 +36,7 @@ Permissions.prototype.grantPermission = function(issuer, user, permission, callb
 						callback(false);
 					}
 					else {
+						Winston.info("Permission \"" + permission + "\" was granted to user " + user.username);
 						callback(true);
 					}
 				});
@@ -60,6 +61,7 @@ Permissions.prototype.revokePermission = function(issuer, user, permission, call
 						callback(false);
 					}
 					else {
+						Winston.info("Permission \"" + permission + "\" was revoked from user " + user.username);
 						callback(true);
 					}
 				});
@@ -116,6 +118,33 @@ Permissions.prototype.grantAllPermissions = function(issuer, user, callback) {
 			});
 		}.bind(this);
 		next();
+	}.bind(this));
+};
+
+Permissions.prototype.listPermissionsForUser = function(issuer, user, callback) {
+	var array = [];
+
+	var iteratePermissions = function(permissions, issuerCanGrant) {
+		if(permissions.length > 0) {
+			var permission = permissions.shift();
+			this.hasPermission(user, permission.id, function(has) {
+				permission.granted = has;
+				this.hasPermission(issuer, permission.id, function(has) {
+					permission.canGrant = has && issuerCanGrant;
+					array.push(permission);
+					iteratePermissions(permissions, issuerCanGrant);
+				});
+			}.bind(this));
+		}
+		else {
+			callback(array);
+		}
+	}.bind(this)
+
+	this.hasPermission(issuer, "grant", function(issuerCanGrant) {
+		this.listPermissions(function(permissions) {
+			iteratePermissions(permissions, issuerCanGrant);
+		});
 	}.bind(this));
 };
 
