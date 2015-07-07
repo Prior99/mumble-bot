@@ -44,4 +44,22 @@ module.exports = function(Database) {
 			}.bind(this)
 		);
 	};
+	Database.prototype.listUsers = function(callback) {
+		this.pool.query("SELECT u.minecraft AS minecraft, u.id AS id, u.username as username, u.password AS password, i.identifier AS identifier, u.steamid AS steamid FROM Users u LEFT JOIN Identifiers i ON u.identifier = i.id ORDER BY u.username DESC",
+			function(err, rows) {
+				if(this._checkError(err, callback)) {
+					callback(null, rows);
+				}
+			}.bind(this)
+		);
+	};
+	Database.prototype.countUsers = function(callback) {
+		this.pool.query("SELECT COUNT(id) AS count FROM Users",
+			function(err, rows) {
+				if(this._checkError(err, callback)) {
+					callback(null, rows[0].count);
+				}
+			}.bind(this)
+		);
+	};
 };

@@ -15,7 +15,6 @@ var FileStore = require('session-file-store')(Session);
 
 var viewDefault = require('./default');
 var viewRegisterLogin = require('./users/registerLogin');
-var viewProfile = require('./users/profile');
 
 /*
  * Routes
@@ -23,6 +22,7 @@ var viewProfile = require('./users/profile');
 var routeMusic = require('./music');
 var routeApi = require('./api');
 var routeQuotes = require('./quotes');
+var routeUsers = require('./users');
 
 /*
  * Code
@@ -35,6 +35,10 @@ var pages = [{
 {
 	url : "/quotes/",
 	name : "Zitate"
+},
+{
+	url : "/users/",
+	name : "Benutzer"
 }];
 
 var subpages = [{
@@ -99,8 +103,8 @@ var Website = function(bot) {
 			return viewRegisterLogin(bot)(req, res);
 		}
 	});
-	this.app.use('/profile/:username', viewProfile(bot))
 	this.app.use('/music', routeMusic(bot));
+	this.app.use('/users', routeUsers(bot));
 	this.app.use('/quotes', routeQuotes(bot));
 	this.app.use('/commands', viewDefault("commands"));
 	this.app.get('/tree', viewDefault("channeltree"));
