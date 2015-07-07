@@ -29,8 +29,11 @@ var pages = [{
 	name : "Zitate anzeigen",
 	icon : "database"
 }];
-
-module.exports = function(bot) {
+/**
+ * Routes all requests related to quotes in the /quotes/ endpoint.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ */
+var RouteQuotes = function(bot) {
 	var router = Express.Router();
 	router.use(function(req, res, next) {
 		res.locals.subpages = pages;
@@ -42,3 +45,5 @@ module.exports = function(bot) {
 
 	return router;
 };
+
+module.exports = RouteQuotes;

@@ -1,6 +1,10 @@
 var Winston = require("winston");
 
-module.exports = function(bot) {
+/**
+ * <b>/quotes/add/</b> Enables the user to add a new quote.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ */
+var ViewQuotesAdd = function(bot) {
 	return function(req, res) {
 		bot.quotes.count(function(err, count) {
 			if(err) {
@@ -14,3 +18,5 @@ module.exports = function(bot) {
 		});
 	}
 };
+
+module.exports = ViewQuotesAdd;

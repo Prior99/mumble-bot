@@ -1,6 +1,10 @@
 var Winston = require("winston");
 
-module.exports = function(bot) {
+/**
+ * <b>/quotes/</b> Displays the home page for the /quotes/ endpoint.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ */
+var ViewQuotesHome = function(bot) {
 	return function(req, res) {
 		bot.quotes.count(function(err, count) {
 			if(err) {
@@ -14,3 +18,4 @@ module.exports = function(bot) {
 		});
 	}
 };
+module.exports = ViewQuotesHome;

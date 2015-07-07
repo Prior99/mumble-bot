@@ -1,6 +1,10 @@
 var Winston = require("winston");
 
-module.exports = function(bot) {
+/**
+ * <b>/quotes/list/</b> Displays a list of quotes.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ */
+var ViewQuotesList= function(bot) {
 	return function(req, res) {
 		bot.quotes.list(function(err, list) {
 			if(err) {
@@ -14,3 +18,5 @@ module.exports = function(bot) {
 		});
 	}
 };
+
+module.exports = ViewQuotesList;
