@@ -1,4 +1,10 @@
 module.exports = function(Database) {
+	/**
+	 * Add a quote to the database.
+	 * @param {string} quote - Text of the quote.
+	 * @param {string} author - Author of the quote.
+	 * @param callback - Called once the query is done.
+	 */
 	Database.prototype.addQuote = function(quote, author, callback) {
 		if(quote && author) {
 			this.pool.query("INSERT INTO Quotes(quote, author, submitted) VALUES(?, ?, ?)",
@@ -16,6 +22,10 @@ module.exports = function(Database) {
 		}
 	};
 
+	/**
+	* FReturns a random quote from the database.
+	* @param callback - Called once the query is done.
+	*/
 	Database.prototype.getRandomQuote = function(callback) {
 		this.pool.query("SELECT quote, author, submitted, used, id FROM Quotes, (SELECT RAND() * (SELECT MAX(id) FROM Quotes) AS tid) AS Tmp WHERE Quotes.id >= Tmp.tid ORDER BY id ASC LIMIT 1",
 			function(err, rows) {
@@ -26,7 +36,11 @@ module.exports = function(Database) {
 			}.bind(this)
 		);
 	};
-
+	/**
+	* Looks up the details about a specified quote.
+	* @param {number} quote - Quote to look up.
+	* @param callback - Called once the query is done.
+	*/
 	Database.prototype.getQuote = function(id, callback) {
 		this.pool.query("SELECT quote, author, submitted, used FROM Quotes WHERE id = ?", [id],
 			function(err, rows) {

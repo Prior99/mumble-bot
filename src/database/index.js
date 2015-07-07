@@ -8,6 +8,13 @@ var FS = require("fs");
 /*
  * Code
  */
+
+/**
+ * Handles the connection to a MySQL-Database.
+ * @constructor
+ * @param options - Options for connecting to the database.
+ * @param callback - Called once the connection is up and running.
+ */
 var Database = function(options, callback) {
 	this.pool = MySQL.createPool({
 		host : options.host,
@@ -66,6 +73,10 @@ Database.prototype._setupDatabase = function(callback) {
 	}.bind(this));
 };
 
+/**
+ * Stops the database by disconnecting gently.
+ * @param callback - Called once disconnected.
+ */
 Database.prototype.stop = function(callback) {
 	this.pool.end(callback);
 };
