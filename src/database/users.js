@@ -1,4 +1,14 @@
 module.exports = function(Database) {
+	/**
+	 * Register a new user in the database.
+	 * @param user - User which should be inserted into the database.
+	 * @param {string} user.email - E-Mail address of the new user.
+	 * @param {string} user.username - The new users username.
+	 * @param {string} user.password - The previously hashed password.
+	 * @param {number} user.identifier - Id for the identifier.
+	 * @param {string} user.steamid - Steam64 id of the user.
+	 * @param {string} user.minecraft - The users nickname in minecraft.
+	 */
 	Database.prototype.registerUser = function(user, callback) {
 		this.pool.query("INSERT INTO Users(email, username, password, identifier, steamid, minecraft) VALUES(?, ?, ?, ?, ?, ?)",
 			[user.email, user.username, user.password, user.identifier, user.steamid, user.minecraft], function(err, result) {
@@ -8,6 +18,12 @@ module.exports = function(Database) {
 			}.bind(this)
 		);
 	};
+
+	/**
+	 * Retrieves details about a user by his username.
+	 * @param {string} username - The username of the user to retrieve.
+	 * @param callback - Called when the details are retrieved.
+	 */
 	Database.prototype.getUserByUsername = function(username, callback) {
 		this.pool.query("SELECT u.minecraft AS minecraft, u.id AS id, u.username as username, u.password AS password, i.identifier AS identifier, u.steamid AS steamid FROM Users u LEFT JOIN Identifiers i ON u.identifier = i.id WHERE u.username = ?",
 			[username], function(err, rows) {
@@ -17,6 +33,12 @@ module.exports = function(Database) {
 			}.bind(this)
 		);
 	};
+
+	/**
+	 * Retrieves details about a user by his id.
+	 * @param {number} id - The id of the user to retrieve.
+	 * @param callback - Called when the details are retrieved.
+	 */
 	Database.prototype.getUserById = function(id, callback) {
 		this.pool.query("SELECT u.minecraft AS minecraft, u.id AS id, u.username as username, u.password AS password, i.identifier AS identifier, u.steamid AS steamid FROM Users u LEFT JOIN Identifiers i ON u.identifier = i.id WHERE u.id = ?",
 			[id], function(err, rows) {
@@ -26,6 +48,13 @@ module.exports = function(Database) {
 			}.bind(this)
 		);
 	};
+
+	/**
+	 * Check the login data of a user.
+	 * @param {string} username - Username of the user to check.
+	 * @param {string} passwordHash - Already hashed password to compare.
+	 * @param callback - Called after the check was done.
+	 */
 	Database.prototype.checkLoginData = function(username, passwordHash, callback) {
 		this.pool.query("SELECT id FROM Users WHERE username = ? AND password = ?", [username, passwordHash],
 			function(err, rows) {
@@ -35,6 +64,12 @@ module.exports = function(Database) {
 			}.bind(this)
 		);
 	};
+
+	/**
+	 * Retrieve a list of free identifiers from the database. List will only
+	 * contain identifiers which were not yet used by anyone.
+	 * @param callback - Called after the list was read from the database.
+	 */
 	Database.prototype.getFreeIdentifiers = function(callback) {
 		this.pool.query("SELECT id, identifier FROM Identifiers WHERE id NOT IN (SELECT identifier FROM Users) ORDER BY Identifiers.id",
 			function(err, rows) {
@@ -44,6 +79,11 @@ module.exports = function(Database) {
 			}.bind(this)
 		);
 	};
+
+	/**
+	 * Retrieves a list of users from the database.
+	 * @param callback - Called after the query was done.
+	 */
 	Database.prototype.listUsers = function(callback) {
 		this.pool.query("SELECT u.minecraft AS minecraft, u.id AS id, u.username as username, u.password AS password, i.identifier AS identifier, u.steamid AS steamid FROM Users u LEFT JOIN Identifiers i ON u.identifier = i.id ORDER BY u.username DESC",
 			function(err, rows) {
@@ -53,6 +93,11 @@ module.exports = function(Database) {
 			}.bind(this)
 		);
 	};
+
+	/**
+	 * Counts all user in the database.
+	 * @param callback - Called after the query was done.
+	 */
 	Database.prototype.countUsers = function(callback) {
 		this.pool.query("SELECT COUNT(id) AS count FROM Users",
 			function(err, rows) {

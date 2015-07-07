@@ -23,7 +23,7 @@ module.exports = function(Database) {
 	};
 
 	/**
-	* FReturns a random quote from the database.
+	* Returns a random quote from the database.
 	* @param callback - Called once the query is done.
 	*/
 	Database.prototype.getRandomQuote = function(callback) {
@@ -59,10 +59,18 @@ module.exports = function(Database) {
 		);
 	};
 
+	/**
+	 * Increase the amount of time this quote has already been played back..
+	 * @param {number} id - Id of the quote to increase the amount of.
+	 */
 	Database.prototype.increaseQuoteUsage = function(id) {
 		this.pool.query("UPDATE Quotes SET used = used + 1 WHERE id = ?", [id]);
 	};
 
+	/**
+	 * Retrieves the total amount of quotes in the database.
+	 * @param callback - Called after the amount was retrieved.
+	 */
 	Database.prototype.getQuoteCount = function(callback) {
 		this.pool.query("SELECT COUNT(id) AS amount FROM Quotes",
 			function(err, rows) {
@@ -73,6 +81,10 @@ module.exports = function(Database) {
 		);
 	};
 
+	/**
+	 * Retrieve a list with all quotes.
+	 * @param callback - Called after the query was done.
+	 */
 	Database.prototype.getQuoteList = function(callback) {
 		this.pool.query("SELECT id, author, quote, submitted, used FROM Quotes",
 			function(err, rows) {
