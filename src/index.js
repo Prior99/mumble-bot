@@ -77,7 +77,22 @@ var Bot = function(mumble, options, database) {
 	this.mumble.on('user-connect', function(user) {
 		this.sayImportant(user.name + " hat Mumble betreten.");
 	}.bind(this));
-
+	this.newCommand("help", function() {
+		var help = "Hilfe. Du musst mich mit meinem hot Word ansprechen. Mein hot Word ist: '" + this.hotword +
+			"'. Um eine Liste aller Kommandos zu erhalten, sag: '" + this.hotword +
+			" commands'";
+		this.say(help);
+	}.bind(this), "Gibt einen Hilfetext aus.", "info");
+	this.newCommand("commands", function() {
+		var commandsSay = "Ich kenne die folgenden Kommandos ";
+		var commandsWrite = "Ich kenne die folgenden Kommandos:<br>";
+		for(var key in this.command.commands) {
+			commandsSay += key + ",";
+			commandsWrite += "  * " + key + "<br>";
+		}
+		this.say(commandsSay + ". Ich habe diese Liste auch in den Chat geschrieben.");
+		this.mumble.user.channel.sendMessage(commandsWrite.substring(0, commandsWrite.length - 4));
+	}.bind(this), "Gibt eine Liste aller Kommandos aus.", "list-ul");
 	this.newCommand("shutdown", this.shutdown.bind(this), "Fährt den bot herunter.", "power-off");
 };
 
