@@ -1,5 +1,5 @@
-<h1>Channels</h1>
-<p>Here is a list of all channels on the server including all users.</p>
+<h1>Channel-Struktur</h1>
+<p>Hier findet sich eine Liste aller Channel im Mumble-Server inklusive Benutzer.</p>
 <ul id="tree">
 
 </ul>
@@ -8,14 +8,14 @@
 function displayChannel(elem, channel) {
 	var el = $("<li><b>Channel: " + channel.name + "</b></li>");
 	if(channel.users.length > 0) {
-		var users = $("<ul></ul>").appendTo($("<p>Users:</p>").appendTo(el));
+		var users = $("<ul></ul>").appendTo($("<p>Benutzer:</p>").appendTo(el));
 		for(var i in channel.users) {
 			var user = channel.users[i];
 			users.append("<li>" + user + "</li>");
 		}
 	}
 	if(channel.children.length > 0) {
-		var children = $("<ul></ul>").appendTo($("<p>Subchannels:</p>").appendTo(el));
+		var children = $("<ul></ul>").appendTo($("<p>Subchannel:</p>").appendTo(el));
 		for(var i in channel.children) {
 			var child = channel.children[i];
 			displayChannel(children, child);

@@ -30,25 +30,25 @@ var routeQuotes = require('./quotes');
 
 var pages = [{
 	url : "/music/",
-	name : "Music"
+	name : "Musik"
 },
 {
 	url : "/",
-	name : "Overview"
+	name : "Übersicht"
 },
 {
 	url : "/quotes/",
-	name : "Quotes"
+	name : "Zitate"
 }];
 
 var subpages = [{
 	url : "/tree/",
-	name : "Channels",
+	name : "Channel-Struktur",
 	icon : "sitemap"
 },
 {
 	url : "/commands/",
-	name : "Commands",
+	name : "Befehle",
 	icon : "cogs"
 }];
 

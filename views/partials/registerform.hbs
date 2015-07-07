@@ -1,5 +1,5 @@
 <form id="form-register" action="/api/users/register" method="get">
-	<h2 class="form-signin-heading">Sign up</h2>
+	<h2 class="form-signin-heading">Registrieren</h2>
 
 	<div class="form-group has-feedback">
 		<div class="input-group">
@@ -10,10 +10,10 @@
 				maxlength="20"
 				type="text"
 				class="form-control"
-				placeholder="Username"
+				placeholder="Benutzername"
 				id="register-username"
 				data-remote="/api/users/usernameAvailable"
-				data-remote-error="Username has already been taken."
+				data-remote-error="Benutzername bereits vergeben."
 				required >
 		</div>
 		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
@@ -42,7 +42,7 @@
 				name="password"
 				type="password"
 				class="form-control"
-				placeholder="Password"
+				placeholder="Passwort"
 				id="register-password"
 				required >
 		</div>
@@ -57,7 +57,7 @@
 				name="repeat"
 				type="password"
 				class="form-control"
-				placeholder="Password"
+				placeholder="Passwort"
 				id="register-repeat"
 				required >
 		</div>
@@ -71,10 +71,10 @@
 				type="text"
 				class="form-control"
 				name="steamusername"
-				placeholder="Steam Username"
+				placeholder="Steam Benutzername"
 				data-minlength="3"
 				data-remote="/api/users/steam64id"
-				data-remote-error="This steam user does not exist."
+				data-remote-error="Dieser Steambenutzer existiert nicht."
 				id="register-steamid" >
 		</div>
 		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
@@ -87,7 +87,7 @@
 				type="text"
 				class="form-control"
 				name="minecraft"
-				placeholder="Minecraft Username"
+				placeholder="Minecraft Benutzername"
 				id="register-minecraft" >
 		</div>
 		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
@@ -110,12 +110,12 @@
 <script type="text/html" id="alert-registration-failed">
 	<div class="alert alert-danger alert-dismissible" role="alert">
 		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		<strong>Error!</strong> Could not sign up. Please check all provided information or contact an administrator.
+		<strong>Fehler!</strong> Konnte nicht registrieren. Bitte alle Werte nochmals überprüfen oder gegebenenfallls einen Administrator kontaktieren.
 	</div>
 </script>
 <script type="text/html" id="alert-registration-success">
 	<div class="alert alert-success" role="alert">
-		<strong>Success!</strong>You can now login <a href="/" class="alert-link">here</a>.
+		<strong>Erfolgreich!</strong> Die Anmeldung kann nun <a href="/" class="alert-link">hier erfolgen</a>.
 	</div>
 </script>
 <script>
