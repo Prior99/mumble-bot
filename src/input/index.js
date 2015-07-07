@@ -11,10 +11,16 @@ var EventEmitter = require("events").EventEmitter;
  * Code
  */
 
+/**
+ * This class handles voice input for all users. It uses instances of user.js
+ * and handles them.
+ * @constructor
+ * @param {Bot} bot - Instance of the bot this belongs to.
+ */
 var VoiceInput = function(bot) {
 	this.bot = bot;
 	this.users = {};
-	this.initConnectedUsers(bot.mumble.users());
+	this._initConnectedUsers(bot.mumble.users());
 	bot.mumble.on('user-connect', this._addUser.bind(this));
 	bot.mumble.on('user-disconnect', this._removeUser.bind(this));
 	Winston.info("Module started: Voice input");
@@ -38,7 +44,7 @@ VoiceInput.prototype._setInactive = function() {
 	this.activeUser = null;
 };
 
-VoiceInput.prototype.initConnectedUsers = function(users) {
+VoiceInput.prototype._initConnectedUsers = function(users) {
 	for(var i in users) {
 		this._addUser(users[i]);
 	}

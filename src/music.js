@@ -12,7 +12,7 @@ var Winston = require('winston');
  * This only echos the music streamed from the fifo into the mumble server and
  * does not control the playback, which is handled by mpdcontrol.js
  * @constructor
- * @param bot - Bot this instance is attached to.
+ * @param {Bot} bot - Bot this instance is attached to.
  */
 
 var Music = function(bot) {

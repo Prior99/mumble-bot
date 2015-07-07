@@ -11,7 +11,7 @@ var Winston = require('winston');
 /**
  * Control the music player daemon from which the music is streamed into this bot.
  * @constructor
- * @param bot - The instance this is attached to.
+ * @param {Bot} bot - The instance this is attached to.
  */
 var MPDControl = function(bot) {
 	this.bot = bot;

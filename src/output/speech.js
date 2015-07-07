@@ -15,6 +15,18 @@ var GoogleTTS = require("./googleTranslateTTS");
  * Code
  */
 
+/**
+ * Handles the TTS for the bot. This class is intended to be used by Output and
+ * not to be used seperatly.
+ * @constructor
+ * @param {WriteableStream} stream - Stream to write audio data to.
+ * @param {string} espeakData - Path to ESpeak data directory.
+ * @param channel - Mumble channel this bot is currently in to send text as chat
+ * 				    message to. This is really not a good idea to happen here
+ * 					should be changed asap.
+ * @param {Database} database - Instance of the database to work with for Google
+ *								Translate TTS cache.
+ */
 var Speech = function(stream, espeakData, channel, database) {
 	this.queue = [];
 	this.gender = "female";
@@ -57,7 +69,7 @@ Speech.prototype._speakingStopped = function() {
 	this.emit("stop", this.current);
 	var callback = this.current.callback;
 	this.current = null;
-	this.next();
+	this._next();
 	if(callback) {
 		callback();
 	}
@@ -92,14 +104,24 @@ Speech.prototype._onGoogleTTSData = function(data) {
 	}
 };
 
+/**
+ * Mute the playback of TTS data.
+ */
 Speech.prototype.mute = function() {
 	this.muted = true;
 };
 
+/**
+ * Unmute the playback of TTS data.
+ */
 Speech.prototype.unmute = function() {
 	this.muted = false;
 };
 
+/**
+ * Changes the gender of the ESpeak TTS module from male to female and
+ * vice-verse. Has no effect on the gender of the Google Translate TTS.
+ */
 Speech.prototype.changeGender = function() {
 	if(this.gender === "male") {
 		this.gender = "female";
@@ -110,15 +132,23 @@ Speech.prototype.changeGender = function() {
 	ESpeak.setGender(this.gender);
 };
 
+/**
+ * Synthesize a text specificly using ESpeak.
+ * @param {string} text - Text to synthesize.
+ */
 Speech.prototype.speakUsingESpeak = function(text) {
 	ESpeak.speak(this.current.text);
 };
 
+/**
+ * Synthesize a text specificly using Google Translate TTS.
+ * @param {string} text - Text to synthesize.
+ */
 Speech.prototype.speakUsingGoogle = function(text) {
 	this._googleEngine.tts(text);
 };
 
-Speech.prototype.next = function() {
+Speech.prototype._next = function() {
 	if(!this.speaking && this.queue.length !== 0) {
 		this.current = this.queue.shift();
 		if(this.engine === "google") {
@@ -132,10 +162,16 @@ Speech.prototype.next = function() {
 	}
 };
 
+/**
+ * Enqueue a work item to be processed in the queue and being synthesized
+ * later on.
+ * @param workitem - Workitem to enqueue containing text to synthesize as well
+ * 					 as a callback to call once the text was spoken.
+ */
 Speech.prototype.enqueue = function(workitem) {
 	this.queue.push(workitem);
 	if(!this.speaking) {
-		this.next();
+		this._next();
 	}
 };
 

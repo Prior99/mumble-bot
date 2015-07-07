@@ -15,7 +15,15 @@ var RETRIES = 3;
 /*
  * Code
  */
-var TTS = function(cacheDir, database) {
+
+/**
+ * Provides TTS (Text-To-Speech) by querying (abusing) the inofficial Google
+ * Translate TTS api.
+ * @constructor
+ * @param {string} cacheDir - Directory where the TTS MP3 files are cached.
+ * @param {Database} database - Database providing the TTS cache.
+ */
+var GoogleTranslateTTS = function(cacheDir, database) {
 	ReadableStream.call(this);
 	this.stream = new ReadableStream();
 	this.cacheDir = cacheDir ? cacheDir : "google-tts-cache";
@@ -30,6 +38,17 @@ var TTS = function(cacheDir, database) {
 	}
 };
 
+/**
+ * Split the text on the nearest whitespace. This way the text can be split into
+ * chunks of a specified maximum length but will not be split in the middle of a
+ * word. This is important as the Google Translate TTS api will only accept
+ * string with less than 100 characters. If there are chunks longer than maximum
+ * characters without a whitespace they will be outputted as chunks longer than
+ * this length.
+ * @param {string} text - Text to split.
+ * @param {number} len - Maximum length of a chunk.
+ * @return {string[]} Array of strings smaller than the maximum length.
+ */
 function splitTextOnNearestSpace(text, len) {
 	var arr = [];
 	var found = true;
@@ -52,11 +71,11 @@ function splitTextOnNearestSpace(text, len) {
 	return arr;
 }
 
-Util.inherits(TTS, ReadableStream);
+Util.inherits(GoogleTranslateTTS, ReadableStream);
 
-TTS.prototype._read = function() { };
+GoogleTranslateTTS.prototype._read = function() { };
 
-TTS.prototype._refreshTimeout = function(time) {
+GoogleTranslateTTS.prototype._refreshTimeout = function(time) {
 	if(this._time === undefined) {
 		this._time = 0;
 	}
@@ -67,13 +86,18 @@ TTS.prototype._refreshTimeout = function(time) {
 	this._timeout = setTimeout(this._speechDone.bind(this), this._time);
 };
 
-TTS.prototype._speechDone = function() {
+GoogleTranslateTTS.prototype._speechDone = function() {
 	this._time = 0;
 	this._timeout = null;
 	this.emit("speechDone");
 };
 
-TTS.prototype.tts = function(text) {
+/**
+ * Start synthesizing a text. This will trigger this instance to emit data as it
+ * is a readable stream.
+ * @param {string} text - Text to synthesize.
+ */
+GoogleTranslateTTS.prototype.tts = function(text) {
 	var lame = new Lame.Decoder();
 	lame.on('format', function(format) {
 		this.samplerate = format.sampleRate;
@@ -85,7 +109,7 @@ TTS.prototype.tts = function(text) {
 	this._getMP3Stream(text, lame);
 };
 
-TTS.prototype._getMP3Stream = function(text, stream) {
+GoogleTranslateTTS.prototype._getMP3Stream = function(text, stream) {
 	var arr = splitTextOnNearestSpace(text, 90);
 	var next = function() {
 		if(arr.length > 0) {
@@ -104,7 +128,7 @@ TTS.prototype._getMP3Stream = function(text, stream) {
 	next();
 };
 
-TTS.prototype._getMP3Part = function(text, callback) {
+GoogleTranslateTTS.prototype._getMP3Part = function(text, callback) {
 	this.database.getCachedTTS(text, function(err, file) {
 		if(err) {
 			callback(err);
@@ -127,11 +151,11 @@ TTS.prototype._getMP3Part = function(text, callback) {
 	}.bind(this));
 };
 
-TTS.prototype._readMP3PartFromCache = function(file, callback) {
+GoogleTranslateTTS.prototype._readMP3PartFromCache = function(file, callback) {
 	callback(null, FS.createReadStream(this.cacheDir + "/" + file));
 };
 
-TTS.prototype._cacheMP3Part = function(text, callback) {
+GoogleTranslateTTS.prototype._cacheMP3Part = function(text, callback) {
 	this.database.addCachedTTS(text, function(err, filename) {
 		if(err) {
 			callback(err);
@@ -150,14 +174,14 @@ TTS.prototype._cacheMP3Part = function(text, callback) {
 	}.bind(this));
 };
 
-TTS.prototype._saveRetrievedMP3Part = function(text, mp3Stream, callback, filename) {
+GoogleTranslateTTS.prototype._saveRetrievedMP3Part = function(text, mp3Stream, callback, filename) {
 	mp3Stream.on('end', function() {
 		callback(null);
 	});
 	mp3Stream.pipe(FS.createWriteStream(this.cacheDir + "/" + filename));
 };
 
-TTS.prototype._retrieveMP3Part = function(text, callback, tries) {
+GoogleTranslateTTS.prototype._retrieveMP3Part = function(text, callback, tries) {
 	if(tries === undefined) {
 		tries = 0;
 	}
@@ -190,4 +214,4 @@ TTS.prototype._retrieveMP3Part = function(text, callback, tries) {
 	}.bind(this));
 };
 
-module.exports = TTS;
+module.exports = GoogleTranslateTTS;

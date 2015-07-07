@@ -14,7 +14,7 @@ var Readline = require('readline');
 /**
  * Handles the bots connection to steam.
  * @constructor
- * @param bot - Bot this instance was created in.
+ * @param {Bot} bot - Bot this instance was created in.
  * @param options - Options to connect with, read from configfile.
  */
 var SteamBot = function(bot, options) {

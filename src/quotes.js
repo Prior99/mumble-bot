@@ -10,7 +10,7 @@ var Winston = require('winston');
  * Provides a more nice to use interface for handling quotes than operating
  * directly on the database.
  * @constructor
- * @param bot - Bot this instance is connected to.
+ * @param {Bot} bot - Bot this instance is connected to.
  */
 var Quotes = function(bot) {
 	this.bot = bot;

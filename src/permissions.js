@@ -11,7 +11,7 @@ var Winston = require('winston');
  * Handles permissions in the bot.
  * This is basically just a nicer-to-use interface to the database.
  * @constructor
- * @param database - The database of the bot to use.
+ * @param {Database} database - The database of the bot to use.
  */
 var Permissions = function(database) {
 	this.database = database;

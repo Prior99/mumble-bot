@@ -26,7 +26,7 @@ var Permissions = require("./permissions");
  * @constructor
  * @param mumble - already set up mumble connection
  * @param options - Options read from the config.json
- * @param database - Started connection to database.
+ * @param {Database} database - Started connection to database.
  */
 var Bot = function(mumble, options, database) {
 	this.options = options;

@@ -32,7 +32,14 @@ if(!String.prototype.startsWith) {
  * Code
  */
 
-var User = function(user, hotword) {
+/**
+ * This class belongs to the VoiceInput and handles the speech recognition for a
+ * single user.
+ * @constructor
+ * @param user - Mumble user to recognize the speech of.
+ * @param {string} hotword - Hotword to start recognition by.
+ */
+var VoiceInputUser = function(user, hotword) {
 	this.hotword = hotword;
 	this._user = user;
 	this.sphinx = new PocketSphinx({samprate: SAMPLERATE, logfn : "sphinx.log"}, this._onHypothesis.bind(this));
@@ -42,25 +49,29 @@ var User = function(user, hotword) {
 	this.hypothesis = "";
 };
 
-Util.inherits(User, EventEmitter);
+Util.inherits(VoiceInputUser, EventEmitter);
 
-User.prototype.data = function(chunk) {
+/**
+ * Feed raw PCM audio data captured from mumble to this user.
+ * @param chunk - Buffer of raw PCM audio data.
+ */
+VoiceInputUser.prototype.data = function(chunk) {
 	this._onAudio(chunk);
 };
 
-User.prototype._refreshTimeout = function() {
+VoiceInputUser.prototype._refreshTimeout = function() {
 	if(this._timeout) {
 		clearTimeout(this._timeout);
 	}
 	this._timeout = setTimeout(this._speechStopped.bind(this), TIMEOUT_THRESHOLD);
 };
 
-User.prototype._speechStarted = function() {
+VoiceInputUser.prototype._speechStarted = function() {
 	this.speaking = true;
 	this.sphinx.start();
 };
 
-User.prototype._speechStopped = function() {
+VoiceInputUser.prototype._speechStopped = function() {
 	this.speaking = false;
 	this.sphinx.stop();
 	this._processSpeech();
@@ -68,7 +79,7 @@ User.prototype._speechStopped = function() {
 	this.started = false;
 };
 
-User.prototype._processSpeech = function() {
+VoiceInputUser.prototype._processSpeech = function() {
 	if(this.hypothesis === null || this.hypothesis === "" || !this.started) {
 		return;
 	}
@@ -82,21 +93,21 @@ User.prototype._processSpeech = function() {
 	}
 };
 
-User.prototype._dispatchSuccess = function() {
+VoiceInputUser.prototype._dispatchSuccess = function() {
 	this.emit("success", this.hypothesis);
 };
 
-User.prototype._dispatchFailure = function() {
+VoiceInputUser.prototype._dispatchFailure = function() {
 	this.emit("failure");
 };
 
-User.prototype._speechContinued = function(chunk) {
+VoiceInputUser.prototype._speechContinued = function(chunk) {
 	this._refreshTimeout();
 	chunk = Samplerate.resample(chunk, 48000, SAMPLERATE, 1);
 	this.sphinx.writeSync(chunk);
 };
 
-User.prototype._onHypothesis = function(err, hypothesis, score) {
+VoiceInputUser.prototype._onHypothesis = function(err, hypothesis, score) {
 	if(hypothesis !== this.hypothesis && hypothesis === this.hotword && this.score >= HOT_WORD_THRESHOLD) {
 		this.started = true;
 		this.emit("started");
@@ -105,11 +116,11 @@ User.prototype._onHypothesis = function(err, hypothesis, score) {
 	this.score = score;
 };
 
-User.prototype._onAudio = function(chunk) {
+VoiceInputUser.prototype._onAudio = function(chunk) {
 	if(!this.speaking) {
 		this._speechStarted();
 	}
 	this._speechContinued(chunk);
 };
 
-module.exports = User;
+module.exports = VoiceInputUser;

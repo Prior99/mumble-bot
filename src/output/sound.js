@@ -8,6 +8,13 @@ var Winston = require('winston');
 var FS = require("fs");
 var EventEmitter = require("events").EventEmitter;
 
+/**
+ * Handles playing back raw PCM audio soundfiles (WAV). Those need to be exactly
+ * 44,100Hz and mono-channel. This class is used by Output and is not intended
+ * to be used seperatly.
+ * @constructor
+ * @param {WritableStream} stream - Stream to write the audio data to.
+ */
 var Sound = function(stream) {
 	this.playing = false;
 	this.stream = stream;
@@ -40,23 +47,28 @@ Sound.prototype._playbackStopped = function() {
 	this.emit("stop");
 	var callback = this.current.callback;
 	this.current = null;
-	this.next();
+	this._next();
 	if(callback) {
 		callback();
 	}
 };
 
-Sound.prototype.next = function() {
+Sound.prototype._next = function() {
 	if(!this.playing && this.queue.length !== 0) {
 		this.current = this.queue.shift();
 		this._play(this.current.file);
 	}
 };
 
+/**
+ * Enqueue a new workitem to play back when queue is processed.
+ * @param workitem - Workitem to enqueue containing the filename of the
+ *					 soundfile.
+ */
 Sound.prototype.enqueue = function(workitem) {
 	this.queue.push(workitem);
 	if(!this.playing) {
-		this.next();
+		this._next();
 	}
 };
 

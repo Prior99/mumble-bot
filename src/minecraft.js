@@ -15,7 +15,7 @@ var Util = require("util");
  * This  class handles the connection of the bot to minecraft.
  * @constructor
  * @param options - Options for the connection read from config file
- * @param bot - The bot this minecraft class is attached to
+ * @param {Bot} bot - The bot this minecraft class is attached to
  */
 var Minecraft = function(options, bot) {
 	this.bot = bot;

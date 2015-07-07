@@ -11,6 +11,12 @@ var Speech = require('./speech');
  * Code
  */
 
+/**
+ * Audio output for the bot. This class handles the whole audio output,
+ * including both TTS and sounds.
+ * @constructor
+ * @param {Bot} bot - Bot this belongs to.
+ */
 var Output = function(bot) {
 	this.bot = bot;
 	this.speech = new Speech(bot.mumble.inputStream(), bot.options.espeakData, bot.mumble.user.channel, bot.database);
@@ -24,7 +30,8 @@ var Output = function(bot) {
 
 Util.inherits(Output, EventEmitter);
 
-Output.prototype.next = function() {
+
+Output.prototype._next = function() {
 	if(!this.busy && this.queue.length !== 0) {
 		this.current = this.queue.shift();
 		this._process(this.current);
@@ -64,32 +71,47 @@ Output.prototype._processStopped = function() {
 	if(callback) {
 		callback();
 	}
-	this.next();
+	this._next();
 };
 
+/**
+ * Queue playing back a soundfile. The soundfile needs to be exactly: Raw PCM
+ * audio data (*.wav is fine), 44,100Hz and mono-channel.
+ * @param {string} file - Name of the soundfile to play.
+ * @param callback - Called after the soundfile was played.
+ */
 Output.prototype.playSound = function(file, callback) {
-	this.enqueue({
+	this._enqueue({
 		type : "sound",
 		file : file,
 		callback :callback
 	});
 };
 
+/**
+ * Say something using TTS.
+ * @param {string} text -  Text to say viw TTS.
+ * @param callback - Called after the text was spoken.
+ */
 Output.prototype.say = function(text, callback) {
-	this.enqueue({
+	this._enqueue({
 		type : "speech",
 		text : text,
 		callback :callback
 	});
 };
 
-Output.prototype.enqueue = function(workitem) {
+Output.prototype._enqueue = function(workitem) {
 	this.queue.push(workitem);
 	if(!this.busy) {
-		this.next();
+		this._next();
 	}
 };
 
+/**
+ * Changes the voice of the ESpeak TTS from female to male and vice-verse.
+ * @deprecated Is no longer needed as Google Translate TTS is now used instead of ESpeak.
+ */
 Output.prototype.changeGender = function() {
 	this.speech.changeGender();
 	this.say("Geschlechtsumwandlung erfolgreich.");

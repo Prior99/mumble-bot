@@ -21,7 +21,7 @@ if(!String.prototype.startsWith) {
 /**
  * Processes the bots commands. As defined by modules and extensions.
  * @constructor
- * @param bot - Bot this instance belongs to.
+ * @param {Bot} bot - Bot this instance belongs to.
  */
 var Command = function(bot) {
 	this.bot = bot;
