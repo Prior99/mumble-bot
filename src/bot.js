@@ -2,13 +2,13 @@
  * Imports
  */
 var Util = require("util");
-var Input = require("./input/input");
+var Input = require("./input");
 var Command = require("./command");
-var Output = require("./output/output");
+var Output = require("./output");
 var Music = require("./music");
 var MPDControl = require("./mpdcontrol");
 var Winston = require('winston');
-var Website = require('./website/website');
+var Website = require('./website');
 var Readline = require("readline");
 var Quotes = require("./quotes");
 var FS = require('fs');

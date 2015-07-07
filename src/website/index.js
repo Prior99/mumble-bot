@@ -20,9 +20,9 @@ var viewProfile = require('./users/profile');
 /*
  * Routes
  */
-var routeMusic = require('./music/music');
-var routeApi = require('./api/api');
-var routeQuotes = require('./quotes/quotes');
+var routeMusic = require('./music');
+var routeApi = require('./api');
+var routeQuotes = require('./quotes');
 
 /*
  * Code
