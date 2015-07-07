@@ -1,4 +1,8 @@
-module.exports = function(bot) {
+/**
+ * <b>/api/command/</b> Runs a specified command on the bot.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ */
+var ViewAPIRunCommand = function(bot) {
 
 	function runCommand(command) {
 		bot.command.process(command);
@@ -16,3 +20,5 @@ module.exports = function(bot) {
 		}
 	}
 };
+
+module.exports = ViewAPIRunCommand;

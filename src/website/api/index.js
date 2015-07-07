@@ -23,7 +23,11 @@ var routeQuotes = require('./quotes');
  * Code
  */
 
-module.exports = function(bot) {
+/**
+ * Routes all requests related to the qpi in the /qpi/ endpoint.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ */
+var RouteAPI = function(bot) {
 	var router = Express.Router();
 	router.use('/users', routeUsers(bot));
 	router.use(function(req, res, next) {
@@ -38,3 +42,5 @@ module.exports = function(bot) {
 
 	return router;
 };
+
+module.exports = RouteAPI;
