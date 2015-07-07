@@ -75,7 +75,7 @@
 				data-minlength="3"
 				data-remote="/api/users/steam64id"
 				data-remote-error="This steam user does not exist."
-				id="register-steam" >
+				id="register-steamid" >
 		</div>
 		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
 		<div class="help-block with-errors"></div>
@@ -135,7 +135,7 @@
 			"&username=" + username +
 			"&password=" + password +
 			"&identifier=" + identifier +
-			"&steamid=" + steamid +
+			"&steamusername=" + steamid +
 			"&minecraft=" + minecraft)
 		.done(function(response) {
 			if(response.okay) {

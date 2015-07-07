@@ -16,6 +16,7 @@ module.exports = function(bot) {
 
 	return function(req, res) {
 		var data = req.query;
+		console.log(data);
 		Steam64(data.steamusername, function(err, steamid) {
 			if(err) {
 				res.send({
