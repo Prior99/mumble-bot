@@ -176,9 +176,9 @@ Permissions.prototype.grantAllPermissions = function(issuer, user, callback) {
  * whether the user has the permission and whether the issuer can grant it
  * will be added.
  * @param issuer - User that issued the command and of which it should be
- 				   checked whether he can grant the permissions.
+ *  			   checked whether he can grant the permissions.
  * @param user - User of which it should be checked whether he has the
-				 permissions.
+ *  			 permissions.
  * @param callback - Called once the list was retrieved.
  */
 Permissions.prototype.listPermissionsForUser = function(issuer, user, callback) {
