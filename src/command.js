@@ -2,9 +2,6 @@
  * Imports
  */
 var Winston = require('winston');
-/*
- * Defines
- */
 
 /*
  * Polyfills
@@ -20,14 +17,20 @@ if(!String.prototype.startsWith) {
 /*
  * Code
  */
+
+/**
+ * Processes the bots commands. As defined by modules and extensions.
+ * @constructor
+ * @param bot - Bot this instance belongs to.
+ */
 var Command = function(bot) {
 	this.bot = bot;
 	this.commands = [];
-	this.newCommand("help", function() {
+	this.bot.newCommand("help", function() {
 		var help = "Hilfe. Du musst mich mit meinem hot Word ansprechen. Mein hot Word ist: '" + bot.hotword + "'. Um eine Liste aller Kommandos zu erhalten, sag: '" + bot.hotword + " commands'";
 		bot.say(help);
 	}, "Gibt einen Hilfetext aus.", "info");
-	this.newCommand("commands", function() {
+	this.bot.newCommand("commands", function() {
 		var commandsSay = "Ich kenne die folgenden Kommandos ";
 		var commandsWrite = "Ich kenne die folgenden Kommandos:<br>";
 		for(var key in this.commands) {
@@ -40,6 +43,10 @@ var Command = function(bot) {
 	Winston.info("Module started: Command");
 };
 
+/**
+ * Process a command prefixed with the hotword.
+ * @param {string} text - Command to execute.
+ */
 Command.prototype.processPrefixed = function(text) {
 	if(text.startsWith(this.bot.hotword)) {
 		text = text.substring(this.bot.hotword.length + 1, text.length);
@@ -47,6 +54,10 @@ Command.prototype.processPrefixed = function(text) {
 	}
 };
 
+/**
+ * Processes a command not prefixed with hotword.
+ * @param {string} text - Command to execute.
+ */
 Command.prototype.process = function(text) {
 	var found = false;
 	for(var key in this.commands) {
@@ -66,8 +77,13 @@ Command.prototype.process = function(text) {
 	}
 };
 
-Command.prototype.newCommand = function(name, method) {
-	this.commands[name] = method;
+/**
+ * Registers a new command which can then be executed later on.
+ * @param {string} name - Name of the command to register.
+ * @param command - Command to register with this name.
+ */
+Command.prototype.newCommand = function(name, command) {
+	this.commands[name] = command;
 };
 
 module.exports = Command;
