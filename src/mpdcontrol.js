@@ -8,6 +8,11 @@ var Winston = require('winston');
  * Code
  */
 
+/**
+ * Control the music player daemon from which the music is streamed into this bot.
+ * @constructor
+ * @param bot - The instance this is attached to.
+ */
 var MPDControl = function(bot) {
 	this.bot = bot;
 	this.playing = false;
@@ -40,6 +45,11 @@ var MPDControl = function(bot) {
 	Winston.info("Module started: MPD control");
 };
 
+/**
+ * Start playback of music or resume. If the current playlist is empty, it will
+ * be filled with random tracks.
+ * @param cb - Callback which will be called after playback has started.
+ */
 MPDControl.prototype.play = function(cb) {
 	this.playing = true;
 	if(!this.ready) {
@@ -57,6 +67,10 @@ MPDControl.prototype.play = function(cb) {
 	}
 };
 
+/**
+ * Pause the current playback.
+ * @param cb - Callback which will be called after playback has paused.
+ */
 MPDControl.prototype.pause = function(cb) {
 	this.playing = false;
 	if(!this.ready) {
@@ -66,7 +80,12 @@ MPDControl.prototype.pause = function(cb) {
 	this.mpd.pause(cb);
 	this.bot.say("Pause.");
 };
-
+/**
+ * Skip the currently playing song and playback the next one. If no more tracks
+ * are in the playlist, a random one will be added.
+ * @param cb - Callback which will be called after the next song has started
+ * 			   playing.
+ */
 MPDControl.prototype.next = function(cb) {
 	if(!this.ready) {
 		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
@@ -83,27 +102,45 @@ MPDControl.prototype.next = function(cb) {
 		this.mpd.next(cb);
 	}
 };
-
+/**
+ * Set the volume to a normal level of 50%.
+ */
 MPDControl.prototype.volumeNormal = function() {
 	this.setVolume(50);
 };
 
+/**
+ * Set the volume to a minimum level of 25%.
+ */
 MPDControl.prototype.volumeMin = function() {
 	this.setVolume(25);
 };
 
+/**
+ * Set the volume to the maximum level of 100%.
+ */
 MPDControl.prototype.volumeMax = function() {
 	this.setVolume(100);
 };
 
+/**
+ * Increase the volume by 10%.
+ */
 MPDControl.prototype.volumeUp = function() {
 	this.setVolume(this.mpd.status.volume*100 + 10);
 };
 
+/**
+ * Decrease the volume by 10%.
+ */
 MPDControl.prototype.volumeDown = function() {
 	this.setVolume(this.mpd.status.volume*100 - 10);
 };
 
+/**
+ * Set the volume to a specified value.
+ * @param vol - Volume to set.
+ */
 MPDControl.prototype.setVolume = function(vol) {
 	this.bot.say("Lautstärke " + vol + "%", function() {
 		this.mpd.volume(vol, function(err) {
@@ -114,6 +151,10 @@ MPDControl.prototype.setVolume = function(vol) {
 	}.bind(this));
 };
 
+/**
+ * Adds a random track to the playlist.
+ * @param cb - Callback which will be called after the track was added.
+ */
 MPDControl.prototype.addRandomTrack = function(cb) {
 	this.bot.say("Zufälliger Song.", function() {
 		var song = this.mpd.songs[parseInt(this.mpd.songs.length * Math.random())];
