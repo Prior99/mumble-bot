@@ -57,43 +57,7 @@ You will need to isntall some packets in order to get everything working.
 5. Start the bot:
    ```
         user@machine:~/mumble-bot$ node index.js
-        [Function: JitterBuffer]
-        2015-06-30 21:06:58 - info: Connecting to database mysql://bot@localhost/bot ...
-        2015-06-30 21:06:58 - info: Successfully connected to database!
-        2015-06-30 21:06:58 - info: Hotword is 'okay bot'
-        2015-06-30 21:06:58 - info: Module started: Command
-        2015-06-30 21:06:58 - info: Module started: Website, listening on port 23278
-        2015-06-30 21:06:58 - info: Module started: Music
-        2015-06-30 21:06:58 - info: Module started: MPD control
-        2015-06-30 21:06:58 - info: Joining channel: Root
-        2015-06-30 21:06:59 - info: Speaking:"Ich grüße euch!"
-        2015-06-30 21:06:59 - info: Loaded addon addons//diagnostic.js.
-        2015-06-30 21:06:59 - info: Loaded addon addons//fun.js.
-        2015-06-30 21:06:59 - info: Loaded addon addons//gutefrage.js.
-        2015-06-30 21:06:59 - info: Loaded addon addons//sexy.js.
-        2015-06-30 21:06:59 - info: Command: 'help'
-        2015-06-30 21:06:59 - info: Command: 'commands'
-        2015-06-30 21:06:59 - info: Command: 'speak'
-        2015-06-30 21:06:59 - info: Command: 'change voice'
-        2015-06-30 21:06:59 - info: Command: 'pause'
-        2015-06-30 21:06:59 - info: Command: 'next'
-        2015-06-30 21:06:59 - info: Command: 'volume up'
-        2015-06-30 21:06:59 - info: Command: 'volume down'
-        2015-06-30 21:06:59 - info: Command: 'volume max'
-        2015-06-30 21:06:59 - info: Command: 'volume min'
-        2015-06-30 21:06:59 - info: Command: 'volume normal'
-        2015-06-30 21:06:59 - info: Command: 'play'
-        2015-06-30 21:06:59 - info: Command: 'tell us a story'
-        2015-06-30 21:06:59 - info: Command: 'kick merlin'
-        2015-06-30 21:06:59 - info: Command: 'teach'
-        2015-06-30 21:06:59 - info: Command: 'quote'
-        2015-06-30 21:06:59 - info: Command: 'kick everyone'
-        2015-06-30 21:06:59 - info: Command: 'question'
-        2015-06-30 21:06:59 - info: Command: 'talk dirty'
-        2015-06-30 21:06:59 - info: Input registered for user Foo
-        2015-06-30 21:06:59 - info: Input registered for user Bar
-        2015-06-30 21:07:00 - info: Module started: Voice input
-    ```
+   ```
 
 
 
