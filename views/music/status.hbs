@@ -41,19 +41,19 @@
 			var elapsed = status.time.elapsed;
 			var percent = (elapsed / status.time.length)*100 + "%";
 			$("#progressbar").css({"width":percent});
-			infotable.append('<tr><td>Total time:</td><td><span class="glyphicon glyphicon-time" aria-hidden="true"></span> ' + formatTime(status.time.length) + "</td></tr>");
-			infotable.append('<tr><td>Elapsed:</td><td><span class="glyphicon glyphicon-time" aria-hidden="true"></span> ' + formatTime(elapsed) + "</td></tr>");
+			infotable.append('<tr><td>Zeit:</td><td><span class="glyphicon glyphicon-time" aria-hidden="true"></span> ' + formatTime(status.time.length) + "</td></tr>");
+			infotable.append('<tr><td>Vergangen:</td><td><span class="glyphicon glyphicon-time" aria-hidden="true"></span> ' + formatTime(elapsed) + "</td></tr>");
 		}
 		else {
 			$("#progressbar").css({"width":"0%"});
-			infotable.append('<tr><td>Total time:</td><td><span class="glyphicon glyphicon-time" aria-hidden="true"></span> --:--</td></tr>');
-			infotable.append('<tr><td>Elapsed:</td><td><span class="glyphicon glyphicon-time" aria-hidden="true"></span> --:--</td></tr>');
+			infotable.append('<tr><td>Zeit:</td><td><span class="glyphicon glyphicon-time" aria-hidden="true"></span> --:--</td></tr>');
+			infotable.append('<tr><td>Vergangen:</td><td><span class="glyphicon glyphicon-time" aria-hidden="true"></span> --:--</td></tr>');
 		}
 		if(status.song == 0) {
-			infotable.append('<tr><td>Currently Playing:</td><td><span class="glyphicon glyphicon-headphones" aria-hidden="true"></span> ' + formatSong(playlist[0]) + "</td></tr>");
+			infotable.append('<tr><td>Aktueller Song:</td><td><span class="glyphicon glyphicon-headphones" aria-hidden="true"></span> ' + formatSong(playlist[0]) + "</td></tr>");
 		}
 		else {
-			infotable.append("<tr><td>Currently Playing:</td><td>Nothing</td></tr>");
+			infotable.append("<tr><td>Aktueller Song:</td><td>Nothing</td></tr>");
 		}
 		if(status.state == "play") {
 			infotable.append('<tr><td>Status:</td><td><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Playing</td></tr>');

@@ -14,12 +14,16 @@
   "license": "GPL-3.0",
   "dependencies": {
     "bootstrap": "^3.3.4",
+    "bootstrap-validator": "^0.8.1",
     "cheerio": "^0.19.0",
+    "crypto-js": "^3.1.5",
     "express": "^4.12.3",
     "express-handlebars": "^2.0.1",
+    "express-session": "^1.11.3",
     "font-awesome": "^4.3.0",
     "html-entities": "^1.1.2",
     "jquery": "^2.1.4",
+    "jquery-form": "^3.50.0",
     "lame": "^1.2.2",
     "less-middleware": "^2.0.1",
     "mineflayer": "^1.2.1",
@@ -32,8 +36,10 @@
     "node-samplerate": "git+https://git.cronosx.de/prior/node-samplerate.git",
     "pocketsphinx": "git+https://github.com/Prior99/node-pocketsphinx.git",
     "request": "^2.58.0",
+    "session-file-store": "0.0.14",
     "steam": "^0.6.8",
     "winston": "^1.0.0",
+    "xml2js": "^0.4.9",
     "youtube-dl": "^1.10.5"
   }
 }

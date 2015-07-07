@@ -1,5 +1,5 @@
 <h1>Youtube Extractor</h1>
-<p>Please enter the URL you want to extract the song from in the following form:</p>
+<p>Bitte die URL für den zu extrahierenden Song und die Formattierung des Titels in der folgenden Form angeben:</p>
 <form class="form-horizontal">
 	<div class="form-group">
 		<label for="url" class="col-sm-2 control-label">URL</label>
@@ -11,7 +11,7 @@
 		</div>
 	</div>
 	<div class="form-group">
-		<label for="format" class="col-sm-2 control-label">Title Format</label>
+		<label for="format" class="col-sm-2 control-label">Titel Format</label>
 		<div class="col-sm-10">
 			<div class="input-group">
 				<span class="input-group-addon" id="basic-addon1">Format</span>
@@ -69,29 +69,29 @@
 	</tbody>
 </table>
 
-<h2>Explanation</h2>
-<p>Enter the URL to a youtube vide containing music here and the bot will automagically extract the audio and add it to the library of known songs.
-	Please add a format in which to parse the metadata from the title of the video in order to have the bot extract the correct title and author.</p>
+<h2>Erklärung</h2>
+<p>Es muss die URL zum Video das den gewünschten Song enthält hier eingegeben werden und der Bot wird automatisch die Audio-Spur des Videos extrahieren und zur Datenbank von bekannten Songs hinzufügen.
+	Es muss ein Format angegeben werden, in dem der Titel des Videos formattiert ist, sodass der Interpret und Titel des Songs abgerufen werden können.</p>
 <table class="table table-striped">
 	<thead>
 		<tr>
-			<th>Expression</th>
-			<th>Meaning</th>
+			<th>Ausdruck</th>
+			<th>Bedeutung</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
 			<td>%(artist)s</td>
-			<td>Name of the artist</td>
+			<td>Name des Interpreten</td>
 		</tr>
 		<tr>
 			<td>%(title)s</td>
-			<td>Title of the song</td>
+			<td>Titel des Songs</td>
 		</tr>
 		<tr>
 			<td>%(album)s</td>
-			<td>Name of the album</td>
+			<td>Name des Albums</td>
 		</tr>
 	</tbody>
 </table>
-<p>Example: <code>%(artist)s - %(title)s</code></p>
+<p>Beispiel: <code>%(artist)s - %(title)s</code></p>

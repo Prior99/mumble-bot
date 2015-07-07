@@ -14,8 +14,9 @@ var viewCommand = require('./command');
 /*
  * Routes
  */
-var routeMusic = require('./music/music');
-var routeQuotes = require('./quotes/quotes');
+var routeMusic = require('./music');
+var routeUsers = require('./users');
+var routeQuotes = require('./quotes');
 
 
 /*
@@ -24,7 +25,12 @@ var routeQuotes = require('./quotes/quotes');
 
 module.exports = function(bot) {
 	var router = Express.Router();
-
+	router.use('/users', routeUsers(bot));
+	router.use(function(req, res, next) {
+		if(req.session.user) {
+			next();
+		}
+	});
 	router.use('/music', routeMusic(bot));
 	router.use('/tree', viewTree(bot));
 	router.use('/command', viewCommand(bot));

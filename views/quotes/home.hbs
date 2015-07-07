@@ -1,9 +1,9 @@
-<h1>Quote</h1>
+<h1>Zitate</h1>
 <br>
-<p>Currently <b>{{quoteAmount}}</b> quotes in the database.</p>
-<p>You can <a href="/quotes/add/">add your own quotes</a>, fetch <a href="/quotes/list/">a list of all quotes</a> and/or play them back.</p>
+<p>Derzeit befinden sich <b>{{quoteAmount}}</b> Zitate in der Datenbank.</p>
+<p>Es können <a href="/quotes/add/">neue Zitate eingetragen werden</a> oder <a href="/quotes/list/">eine Liste aller Zitate abgerufen werden</a>, die dann wiedergegeben werden können.</p>
 <br>
-<a class="btn btn-ld btn-default" id="speak"><span class="fa fa-comment" aria-hidden="true"></span> Speak Random Quote</a>
+<a class="btn btn-ld btn-default" id="speak"><span class="fa fa-comment" aria-hidden="true"></span> Zufälliges Zitat Wiedergeben</a>
 <script>
 $("#speak").click(function() {
 	$.ajax("/api/quotes/speak");

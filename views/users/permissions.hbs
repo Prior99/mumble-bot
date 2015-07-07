@@ -1,0 +1,95 @@
+<div id="alerts"></div>
+<h1>Berechtigungen für {{user.username}}</h1>
+<p>Hier können die einzelnen Berechtigungen für den Benutzer <b>{{user.username}}</b> eingestellt werden.</p>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th></th>
+			<th>Berechtigung</th>
+			<th>Beschreibung</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		{{#each permissions}}
+		<tr>
+			<td><i class="fa fa-{{this.icon}}"></td>
+			<td>{{this.name}}</td>
+			<td>{{this.description}}</td>
+			<td><input
+				type="checkbox"
+				permission="{{this.id}}"
+				{{#if this.granted}} checked {{/if}}
+				{{#unless this.canGrant}} disabled {{/unless}}
+				class="perm-check">
+			</td>
+		</tr>
+		{{/each}}
+	</tbody>
+</table>
+<script type="text/html" id="alert-revoke-success">
+	<div class="alert alert-success alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Erfolgreich!</strong> Die Berechtigung wurde erfolgreich entzogen!
+	</div>
+</script>
+<script type="text/html" id="alert-grant-success">
+	<div class="alert alert-success alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Erfolgreich!</strong> Die Berechtigung wurde erfolgreich erteilt!
+	</div>
+</script>
+<script type="text/html" id="alert-revoke-failure">
+	<div class="alert alert-success alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Fehler!</strong> Die Berechtigung konnte nicht entzogen werden!
+	</div>
+</script>
+<script type="text/html" id="alert-grant-failure">
+	<div class="alert alert-success alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Fehler!</strong> Die Berechtigung konnte nicht erteilt werden!
+	</div>
+</script>
+<script>
+	function revoke(checkbox) {
+		$.ajax("/api/users/revokePermission?user={{user.username}}&permission=" + checkbox.attr('permission'))
+		.done(function(res) {
+			if(res.okay) {
+				$($('#alert-revoke-success').html()).appendTo('#alerts');
+				checkbox.prop('checked', false);
+			}
+			else {
+				$($('#alert-revoke-failure').html()).appendTo('#alerts');
+				checkbox.prop('checked', true);
+			}
+		});
+	}
+
+	function grant(checkbox) {
+		$.ajax("/api/users/grantPermission?user={{user.username}}&permission=" + checkbox.attr('permission'))
+		.done(function(res) {
+			if(res.okay) {
+				$($('#alert-grant-success').html()).appendTo('#alerts');
+				checkbox.prop('checked', true);
+			}
+			else {
+				$($('#alert-grant-failure').html()).appendTo('#alerts');
+				checkbox.prop('checked', false);
+			}
+		});
+	}
+
+	$(".perm-check").change(function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		if(!$(this).attr('disabled')) {
+			if(!this.checked) {
+				revoke($(this));
+			}
+			else {
+				grant($(this));
+			}
+		}
+	});
+</script>

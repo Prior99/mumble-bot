@@ -33,29 +33,29 @@
 
 </style>
 <h1>Upload</h1>
-<p>You can upload new songs here.</p>
+<p>Hier können neue Songs hochgeladen werden.</p>
 
 <form action="upload.php" method="post" enctype="multipart/form-data">
-	<h1>Select a file</h1>
+	<h1>Datei auswählen</h1>
 	<div class="fileWrapper">
-		<span>Drag Files Here</span><br />
-		<span style="font-size: 12pt;">(Or click and select)</span>
+		<span>Dateien hierhin ziehen</span><br />
+		<span style="font-size: 12pt;">(Oder klicken und auswählen)</span>
 		<input type="file" name="upload[]" multiple="multiple"/>
 	</div>
 </form>
 <div id="progress_wrapper">
-	<h2>Files</h2>
+	<h2>Dateien</h2>
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>Filename</th>
+				<th>Dateiname</th>
 				<th>Status</th>
 			</tr>
 		</thead>
 		<tbody id="filelist">
 		</tbody>
 	</table>
-	<h2>Progress</h2>
+	<h2>Fortschritt</h2>
 	<div id="progressbar_wrapper">
 	</div>
 </div>

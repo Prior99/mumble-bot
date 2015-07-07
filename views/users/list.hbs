@@ -1,0 +1,25 @@
+<h1>Benutzer</h1>
+<p>Es folgt eine Liste aller registrierten Benutzer:</p>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Benutzername</th>
+			<th>Kennung</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		{{#each users}}
+		<tr>
+			<td>{{this.username}}</td>
+			<td>{{this.identifier}}</td>
+			<td>
+				<div class="btn-group" role="group">
+					<a type="button" class="btn btn-sm btn-default" href="/users/profile/{{this.username}}"><i class="fa fa-user"></i></a>
+					<a type="button" class="btn btn-sm btn-default" href="/users/permissions/{{this.username}}"><i class="fa fa-legal"></i></a>
+				</div>
+			</td>
+		</tr>
+		{{/each}}
+	</tbody>
+</table>

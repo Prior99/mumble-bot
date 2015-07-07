@@ -22,11 +22,11 @@ var pages = [{
 	icon : "info"
 },{
 	url : "/quotes/add/",
-	name : "Add Quote",
+	name : "Zitat hinzufügen",
 	icon : "quote-right"
 }, {
 	url : "/quotes/list/",
-	name : "List Quotes",
+	name : "Zitate anzeigen",
 	icon : "database"
 }];
 

@@ -2,19 +2,20 @@
  * Imports
  */
 var Util = require("util");
-var Input = require("./input/input");
+var Input = require("./input");
 var Command = require("./command");
-var Output = require("./output/output");
+var Output = require("./output");
 var Music = require("./music");
 var MPDControl = require("./mpdcontrol");
 var Winston = require('winston');
-var Website = require('./website/website');
+var Website = require('./website');
 var Readline = require("readline");
 var Quotes = require("./quotes");
 var FS = require('fs');
 var Steam = require('./steam');
 var Minecraft = require('./minecraft');
 var EventEmitter = require("events").EventEmitter;
+var Permissions = require("./permissions");
 
 /*
  * Code
@@ -38,6 +39,7 @@ var Bot = function(mumble, options, database) {
 
 	this.command = new Command(this);
 	this.quotes = new Quotes(this);
+	this.permissions = new Permissions(database);
 
 	this._inputStream = mumble.inputStream();
 
@@ -100,9 +102,9 @@ Bot.prototype.shutdown = function() {
 
 Bot.prototype._initPromptInput = function() {
 	this._rlStdin = Readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
+		input: process.stdin,
+		output: process.stdout
+	});
 	this._rlStdin.on('line', function(line) {
 		this.command.process(line);
 	}.bind(this));

@@ -14,7 +14,8 @@
 	},
 	"website" : {
 		"port" : 23278,
-		"tmp" : "tmp/"
+		"tmp" : "tmp/",
+		"sessionSecret" : "some_random_string"
 	},
 	"hotword" : "okay %name%",
 	"database" : {
