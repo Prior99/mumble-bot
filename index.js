@@ -2,7 +2,7 @@
  * Imports
  */
 var Mumble = require("mumble");
-var Bot = require("./src/bot.js");
+var Bot = require("./src");
 var Winston = require('winston');
 var FS = require('fs');
 var Database = require("./src/database");
