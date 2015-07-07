@@ -29,10 +29,6 @@ var routeQuotes = require('./quotes');
  */
 
 var pages = [{
-	url : "/music/",
-	name : "Musik"
-},
-{
 	url : "/",
 	name : "Übersicht"
 },
@@ -53,6 +49,12 @@ var subpages = [{
 }];
 
 var Website = function(bot) {
+	if(bot.music) {
+		pages.unshift({
+			url : "/music/",
+			name : "Musik"
+		});
+	}
 	this.app = Express();
 	this.app.engine('.hbs', ExpHbs({
 		defaultLayout : 'main',
