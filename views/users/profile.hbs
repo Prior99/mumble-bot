@@ -1,4 +1,6 @@
+<div id="alerts"></div>
 <h1>{{user.username}}</h1>
+<h2>Details</h2>
 <table class="table table-striped">
 	<tr>
 		<td>Benutzername</td>
@@ -21,3 +23,50 @@
 		<td>{{user.identifier}}</td>
 	</tr>
 </table>
+<h2>Gelinkte Mumble-Benutzer</h2>
+<ul id="linked-mumble-users" class="list-group">
+	{{#each linkedUsers}}
+	<li class="list-group-item">{{this.id}}</li>
+	{{/each}}
+</ul>
+{{#if own}}
+<div class="dropdown">
+<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+	Mumble User Linken
+	<span class="caret"></span>
+</button>
+<ul class="dropdown-menu">
+	{{#each freeMumbleUsers}}
+	<li><a mumbleId="{{this.id}}" class="link-mumble">{{this.name}} ({{this.id}})</a></li>
+	{{/each}}
+</ul>
+</div>
+<script type="text/html" id="alert-link-failed">
+	<div class="alert alert-danger alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Fehler!</strong> Link konnte nicht erstellt werden.
+	</div>
+</script>
+<script type="text/html" id="alert-link-success">
+	<div class="alert alert-success alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Erfolgreich!</strong> Link wurde erfolgreich erstellt.
+	</div>
+</script>
+<script>
+	$(".link-mumble").click(function() {
+		var id = $(this).attr('mumbleId');
+		$.ajax("/api/users/linkMumbleUser?id=" + id + "&username={{user.username}}")
+		.done(function(res) {
+			if(res.okay) {
+				$("<li class='list-group-item'>" + id + "</li>").appendTo("#linked-mumble-users");
+				$($("#alert-link-success").html()).appendTo("#alerts");
+				$(this).parent().remove();
+			}
+			else {
+				$($("#alert-link-failed").html()).appendTo("#alerts");
+			}
+		}.bind(this));
+	});
+</script>
+{{/if}}

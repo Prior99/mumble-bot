@@ -44,6 +44,12 @@ CREATE TABLE IF NOT EXISTS UserPermissions (
 	FOREIGN KEY (permission) REFERENCES Permissions(id)
 );
 
+CREATE TABLE IF NOT EXISTS MumbleUsers (
+	mumbleId		INT NOT NULL PRIMARY KEY,
+	user			INT NOT NULL,
+	FOREIGN KEY (user) REFERENCES Users(id)
+);
+
 INSERT IGNORE INTO Permissions (id, name, description, icon) VALUES
 ("login", "Anmelden", "Erlaubt einem Benutzer, sich im System anzumelden.", "sign-in"),
 ("add-quote", "Zitat Eintragen", "Erlaubt das Eintragen neuer Zitate.", "quote-left"),

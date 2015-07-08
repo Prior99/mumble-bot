@@ -43,6 +43,7 @@ require("./quotes.js")(Database);
 require("./ttscache.js")(Database);
 require("./users.js")(Database);
 require("./permissions.js")(Database);
+require("./mumbleUsers.js")(Database);
 
 Database.prototype._checkError = function(err, callback) {
 	if(err) {
