@@ -32,27 +32,34 @@ var Command = function(bot) {
 /**
  * Process a command prefixed with the hotword.
  * @param {string} text - Command to execute.
+ * @param {string} via - Origin of the command, whether it came via steam,
+ * 						 website, minecraft, terminal, mumble, ...
+ * @param user - User that issued the command or null if unknown.
  */
-Command.prototype.processPrefixed = function(text) {
+Command.prototype.processPrefixed = function(text, via, user) {
 	if(text.startsWith(this.bot.hotword)) {
 		text = text.substring(this.bot.hotword.length + 1, text.length);
-		this.process(text);
+		this.process(text, via, user);
 	}
 };
 
 /**
  * Processes a command not prefixed with hotword.
  * @param {string} text - Command to execute.
+ * @param {string} via - Origin of the command, whether it came via steam,
+ * 						 website, minecraft, terminal, mumble, ...
+ * @param user - User that issued the command or null if unknown.
  */
-Command.prototype.process = function(text) {
+Command.prototype.process = function(text, via, user) {
 	var found = false;
 	for(var key in this.commands) {
 		if(key === text.substring(0, key.length)) {
 			text = text.substring(key.length + 1, text.length);
 			var method = this.commands[key];
-			var commands = text.split(" ");
+			var arguments = text.split(" ");
 			if(typeof method === "function") {
-				method.apply(this, commands);
+				this._logCommand(key, arguments, via, user);
+				method.apply(this, arguments, via, user);
 			}
 			found = true;
 			break;
@@ -61,6 +68,17 @@ Command.prototype.process = function(text) {
 	if(!found) {
 		this.bot.playSound("sounds/recognition_failure.wav");
 	}
+};
+
+Command.prototype._logCommand = function(command, arguments, via, user) {
+	var username;
+	if(user) {
+		username = user.username;
+	}
+	else {
+		username = "Unknown user";
+	}
+	Winston.info(username + " via " + via + ": \"" + command + " " + arguments.join(" ") + "\"");
 };
 
 /**

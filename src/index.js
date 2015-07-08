@@ -141,8 +141,15 @@ Bot.prototype._initPromptInput = function() {
 };
 
 Bot.prototype._initChatInput = function() {
-	this.mumble.on("message", function(message, user, scope) {
-        this.command.process(message);
+	this.mumble.on("message", function(message, mumbleUser, scope) {
+		this.database.getUserByMumbleId(mumbleUser.id, function(err, user) {
+			if(err) {
+				Winston.error("Error fetching user by mumble user id.", err);
+			}
+			else {
+				this.command.process(text, 'mumble', user);
+			}
+		});
     }.bind(this));
 };
 
