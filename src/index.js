@@ -102,18 +102,18 @@ Util.inherits(Bot, EventEmitter);
  * Gently shutdown the whole bot.
  */
 Bot.prototype.shutdown = function() {
-	if(this.steam) {
-		this.steam.stop();
-	}
-	if(this.minecraft) {
-		this.minecraft.stop();
-	}
-	if(this.mpd) {
-		this.mpd.stop();
-		this.music.stop();
-	}
 	this.say("Herunterfahren initiiert.", function() {
 		this.website.shutdown(function() {
+			if(this.steam) {
+				this.steam.stop();
+			}
+			if(this.minecraft) {
+				this.minecraft.stop();
+			}
+			if(this.mpd) {
+				this.mpd.stop();
+				this.music.stop();
+			}
 			this.emit("shutdown");
 		}.bind(this));
 	}.bind(this));
