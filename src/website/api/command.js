@@ -11,9 +11,12 @@ var ViewAPIRunCommand = function(bot) {
 	return function(req, res) {
 		if(req.query.command) {
 			runCommand(req.query.command);
+			res.status(200).send(JSON.stringify({
+				okay : true
+			}));
 		}
 		else {
-			res.send(JSON.stringify({
+			res.status(400).send(JSON.stringify({
 				okay : false,
 				reason: "missing_arguments"
 			}));
