@@ -94,9 +94,21 @@ var Bot = function(mumble, options, database) {
 		this.mumble.user.channel.sendMessage(commandsWrite.substring(0, commandsWrite.length - 4));
 	}.bind(this), "Gibt eine Liste aller Kommandos aus.", "list-ul");
 	this.newCommand("shutdown", this.shutdown.bind(this), "Fährt den bot herunter.", "power-off");
+	this.newCommand("be quiet", this.beQuiet.bind(this), "Sofort alles, was Geräusche verursacht abschalten.", "bell-slash");
 };
 
 Util.inherits(Bot, EventEmitter);
+
+/**
+ * Instant shutdown everything which could cause noises.
+ */
+Bot.prototype.beQuiet = function() {
+	console.log("Being quiet");
+	if(this.options.mpd) {
+		this.mpd.pause();
+	}
+	this.output.clear();
+};
 
 /**
  * Gently shutdown the whole bot.

@@ -59,7 +59,7 @@ var subpages = [{
  * @param {Bot} bot - The bot to use this webpage with.
  */
 var Website = function(bot) {
-	if(bot.music) {
+	if(bot.options.mpd) {
 		pages.unshift({
 			url : "/music/",
 			name : "Musik"

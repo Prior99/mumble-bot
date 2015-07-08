@@ -37,6 +37,13 @@ Sound.prototype._play = function(filename) {
 	}.bind(this));
 };
 
+/**
+ * Clear the whole queue and stop current playback.
+ */
+Sound.prototype.clear = function() {
+	this.queue.splice(0, this.queue.length);
+};
+
 Sound.prototype._playbackStarted = function() {
 	this.playing = true;
 	this.emit("start");

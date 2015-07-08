@@ -19,8 +19,10 @@ var Speech = require('./speech');
  */
 var Output = function(bot) {
 	this.bot = bot;
-	this.speech = new Speech(bot.mumble.inputStream(), bot.options.espeakData, bot.mumble.user.channel, bot.database);
-	this.sound = new Sound(bot.mumble.inputStream());
+	this.stream = bot.mumble.inputStream();
+	console.log(this.stream);
+	this.speech = new Speech(this.stream, bot.options.espeakData, bot.mumble.user.channel, bot.database);
+	this.sound = new Sound(this.stream);
 	this.busy = false;
 	this.queue = [];
 	this.current = null;
@@ -30,6 +32,15 @@ var Output = function(bot) {
 
 Util.inherits(Output, EventEmitter);
 
+/**
+ * Clear the whole queue and stop current playback.
+ */
+Output.prototype.clear = function() {
+	this.queue.splice(0, this.queue.length);
+	this.speech.clear();
+	this.sound.clear();
+	this.stream.frameQueue.splice(0, this.stream.frameQueue.length);
+};
 
 Output.prototype._next = function() {
 	if(!this.busy && this.queue.length !== 0) {

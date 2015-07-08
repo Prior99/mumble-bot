@@ -55,6 +55,13 @@ var Speech = function(stream, espeakData, channel, database) {
 
 Util.inherits(Speech, EventEmitter);
 
+/**
+ * Clear the whole queue and stop current playback.
+ */
+Speech.prototype.clear = function() {
+	this.queue.splice(0, this.queue.length);
+};
+
 Speech.prototype._refreshTimeout = function() {
 	if(this.timeout) {
 		clearTimeout(this.timeout);
@@ -108,6 +115,7 @@ Speech.prototype._onGoogleTTSData = function(data) {
  * Mute the playback of TTS data.
  */
 Speech.prototype.mute = function() {
+	console.log("mute");
 	this.muted = true;
 };
 
