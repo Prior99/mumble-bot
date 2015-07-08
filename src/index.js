@@ -108,6 +108,10 @@ Bot.prototype.shutdown = function() {
 	if(this.minecraft) {
 		this.minecraft.stop();
 	}
+	if(this.mpd) {
+		this.mpd.stop();
+		this.music.stop();
+	}
 	this.say("Herunterfahren initiiert.", function() {
 		this.website.shutdown(function() {
 			this.emit("shutdown");

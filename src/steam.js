@@ -122,6 +122,7 @@ SteamBot.prototype._startUp = function() {
  */
 SteamBot.prototype.stop = function() {
 	this.client.setPersonaState(Steam.EPersonaState.Offline);
+	Winston.info("Disconnecting from steam ...");
 	this.client.logOff();
 };
 

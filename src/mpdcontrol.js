@@ -162,4 +162,12 @@ MPDControl.prototype.addRandomTrack = function(cb) {
 	}.bind(this));
 };
 
+/**
+ * Shutdown the client to mpd.
+ */
+MPDControl.prototype.stop = function() {
+	Winston.info("Disconnecting from mpd ... ");
+	this.mpd.disconnect();
+};
+
 module.exports = MPDControl;
