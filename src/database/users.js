@@ -25,13 +25,16 @@ module.exports = function(Database) {
 	 * @param callback - Called when the details are retrieved.
 	 */
 	Database.prototype.getUserByUsername = function(username, callback) {
-		this.pool.query("SELECT u.minecraft AS minecraft, u.id AS id, u.username as username, u.password AS password, i.identifier AS identifier, u.steamid AS steamid FROM Users u LEFT JOIN Identifiers i ON u.identifier = i.id WHERE u.username = ?",
-			[username], function(err, rows) {
-				if(this._checkError(err, callback)) {
-					callback(null, rows[0]);
+		this.pool.query("SELECT id FROM Users WHERE username = ?", [username], function(err,rows) {
+			if(this._checkError(err, callback)) {
+				if(rows.length > 0) {
+					this.getUserById(rows[0].id, callback);
 				}
-			}.bind(this)
-		);
+				else {
+					callback(null, null);
+				}
+			}
+		}.bind(this));
 	};
 
 	/**
@@ -47,6 +50,42 @@ module.exports = function(Database) {
 				}
 			}.bind(this)
 		);
+	};
+
+	/**
+	 * Retrieves details about a user by his steam Id.
+	 * @param {string} steamId - The steamid of the user to retrieve.
+	 * @param callback - Called when the details are retrieved.
+	 */
+	Database.prototype.getUserBySteamId = function(steamId, callback) {
+		this.pool.query("SELECT id FROM Users WHERE steamid = ?", [steamId], function(err,rows) {
+			if(this._checkError(err, callback)) {
+				if(rows.length > 0) {
+					this.getUserById(rows[0].id, callback);
+				}
+				else {
+					callback(null, null);
+				}
+			}
+		}.bind(this));
+	};
+
+	/**
+	 * Retrieves details about a user by his steam Id.
+	 * @param {string} minecraft - The minecraft username of the user to retrieve.
+	 * @param callback - Called when the details are retrieved.
+	 */
+	Database.prototype.getUserByMinecraftUsername = function(minecraft, callback) {
+		this.pool.query("SELECT id FROM Users WHERE minecraft = ?", [minecraft], function(err,rows) {
+			if(this._checkError(err, callback)) {
+				if(rows.length > 0) {
+					this.getUserById(rows[0].id, callback);
+				}
+				else {
+					callback(null, null);
+				}
+			}
+		}.bind(this));
 	};
 
 	/**
