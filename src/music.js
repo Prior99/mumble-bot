@@ -76,9 +76,9 @@ Music.prototype.stop = function() {
 		Winston.info("Music stopped.");
 	});
 	this.fifo.removeListener('data', this._onData);
-        var c = FS.createWriteStream(this.path);
-        c.write('\0');
-        c.close();
+	var c = FS.createWriteStream(this.path);
+	c.write('\0');
+	c.close();
 	this.fifo.pause();
 	this.fifo.close();
 };
