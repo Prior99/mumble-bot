@@ -78,7 +78,11 @@ Command.prototype._logCommand = function(command, arguments, via, user) {
 	else {
 		username = "Unknown user";
 	}
-	Winston.info(username + " via " + via + ": \"" + command + " " + arguments.join(" ") + "\"");
+	Winston.info("Issued command by user \"" + username +
+		"\" via " + via +
+		": \"" + command + (arguments.length > 0 ? " " : "") +
+		arguments.join(" ") + "\""
+	);
 };
 
 /**
