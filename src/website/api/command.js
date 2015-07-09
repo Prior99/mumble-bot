@@ -4,11 +4,12 @@
  */
 var ViewAPIRunCommand = function(bot) {
 
-	function runCommand(command) {
-		bot.command.process(command);
-	}
-
 	return function(req, res) {
+
+		function runCommand(command) {
+			bot.command.process(command, 'website', req.session.user);
+		}
+
 		if(req.query.command) {
 			runCommand(req.query.command);
 			res.status(200).send(JSON.stringify({

@@ -49,13 +49,14 @@ module.exports = function(Database) {
 	};
 
 	/**
-	 * Returns the user to which a mumble user id is linked.
+	 * Returns the full user to which a mumble user id is linked.
 	 * @param {number} id - Id of the mumble user to check.
 	 * @param callback - Called once the query is done.
 	 */
 	Database.prototype.getLinkedUser = function(id, callback) {
 		this.pool.query("SELECT user FROM MumbleUsers WHERE mumbleId = ?", [id], function(err, rows) {
 			if(this._checkError(err, callback)) {
+				console.log("The received user is", rows[0].user);
 				if(rows.length > 0) {
 					this.getUserById(rows[0].user, callback);
 				}

@@ -38,7 +38,14 @@ Util.inherits(Minecraft, EventEmitter);
 
 Minecraft.prototype._onChat = function(username, message) {
 	if(username !== this.mc.username) {
-		this.bot.command.processPrefixed(message);
+		this.bot.database.getUserByMinecraftUsername(username, function(err, user) {
+			if(err) {
+				Winston.error("Error fetching user by minecraft username.", err);
+			}
+			else {
+				this.bot.command.processPrefixed(message, 'minecraft', user);
+			}
+		});
 	}
 };
 

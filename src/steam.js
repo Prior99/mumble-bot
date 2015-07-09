@@ -59,10 +59,21 @@ SteamBot.prototype._startUpSteamGuard = function() {
 	}.bind(this));
 };
 
+SteamBot.prototype._onMessage = function(message, steamId) {
+	this.bot.database.getUserBySteamId(steamId, function(err, user) {
+		if(err) {
+			Winston("Error fetching user by steamid", err);
+		}
+		else {
+			this.bot.command.process(message, 'steam', user);
+		}
+	});
+};
+
 SteamBot.prototype._postLogin = function() {
 	this.client.on('message', function(source, message, type, chatter) {
 		if(type === Steam.EChatEntryType.ChatMsg) {
-			this.bot.command.process(message);
+			this._onMessage(message, chatter);
 		}
 	}.bind(this));
 	this.client.on('relationships', function() {
