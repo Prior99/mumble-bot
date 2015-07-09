@@ -1,3 +1,5 @@
+var Winston = require('winston');
+
 module.exports = function(bot, callback) {
 
 	function getMumbleUser(id) {
@@ -13,33 +15,55 @@ module.exports = function(bot, callback) {
 
 	function kickUser(user) {
 		bot.database.getLinkedMumbleUsersOfUser(user.username, function(err, ids) {
-			for(var i in ids) {
-				var id = ids[i];
-				var mumbleUser = getMumbleUser(id);
-				if(mumbleUser) {
-					mumbleUser.moveToChannel(bot.options.kickChannel);
+			if(err) {
+				Winston.error("Unable to fetch lined mumble users of user " + user.username, err);
+			}
+			else {
+				for(var i in ids) {
+					var id = ids[i].id;
+					var mumbleUser = getMumbleUser(id);
+					if(mumbleUser) {
+						Winston.info("Moving mumble user \"" + mumbleUser.name + "\" to channel "+ "\"" + bot.options.kickChannel + "\".");
+						mumbleUser.moveToChannel(bot.options.kickChannel);
+					}
 				}
 			}
 		});
 	};
 
-	function kickUserByIdentifier(args) {
-		if(args.length == 1) {
-			bot.database.getUserByIdentifier(args[0], function(err, user) {
-				if(err) {
-					Winston.error("Error fetching user by identifier.", err);
+	function kickUserByIdentifier(identifier) {
+		bot.database.getUserByIdentifier(identifier, function(err, user) {
+			if(err) {
+				Winston.error("Error fetching user by identifier.", err);
+			}
+			else {
+				if(user) {
+					bot.say(user.username + " verpiss dich.", function() {
+						kickUser(user);
+					});
 				}
 				else {
-					if(user) {
-						kickUser(user);
-					}
-					else {
-						Winston.warn("Tried to kick user by identifier that does not exist: " + args[0]);
-					}
+					Winston.warn("Tried to kick user by identifier that does not exist: " + identifier);
 				}
-			});
-		}
+			}
+		});
 	};
+
+	function whoIs(identifier) {
+		bot.database.getUserByIdentifier(identifier, function(err, user) {
+			if(err) {
+				Winston.error("Error fetching user by identifier.", err);
+			}
+			else {
+				if(user) {
+					bot.say(identifier + " ist " + user.username);
+				}
+				else {
+					bot.say(identifier + " ist unbekannt.");
+				}
+			}
+		});
+	}
 
 	bot.database.getAllIdentifiers(function(err, identifiers) {
 		if(err) {
@@ -49,6 +73,7 @@ module.exports = function(bot, callback) {
 			var arguments = [];
 			for(var i in identifiers) { arguments.push(identifiers[i].identifier); }
 			bot.newCommand("kick", kickUserByIdentifier, "Wird eine Person aus dem Mumble-Server werfen.", "legal", arguments);
+			bot.newCommand("who is", whoIs, "Wird eine Person aus dem Mumble-Server werfen.", "legal", arguments);
 		}
 		callback();
 	});

@@ -29,7 +29,7 @@ module.exports = function(Database) {
 		 	[identifier], function(err, rows) {
 				if(this._checkError(err, callback)) {
 					if(rows.length > 0) {
-						this.pool.getUserById(rows[0].id, callback);
+						this.getUserById(rows[0].id, callback);
 					}
 					else {
 						callback(null, null);
