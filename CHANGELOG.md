@@ -24,7 +24,8 @@ Relevant changes:
 	* mumble (chat and voice)
 	* website
 	* terminal
-  please note that commands issued from the terminal can not have a user but
+
+  Please note that commands issued from the terminal can not have a user but
   always ignore permissions.
 * Commands can now have arguments which need to be from a predefined list when
   registering the commands so the grammar can be created accordingly.
@@ -33,7 +34,6 @@ Relevant changes:
 * Added command "kick" which will kick a user by his identifier.
 * Added command "who is" which will tell the user assigned to this identifier.
 * Users can now link mumble users to their account.
-* Website now in german.
 
 Bugfixes:
 ---------
