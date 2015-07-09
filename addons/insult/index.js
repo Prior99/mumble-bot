@@ -1,6 +1,7 @@
 var instrument = require("../instrument");
+var Winston = require("winston");
 
-module.exports = function(bot) {
+module.exports = function(bot, callback) {
 	var words = {
 		attribute : [
 			"hässlich",
@@ -371,25 +372,35 @@ module.exports = function(bot) {
 			ziel : you
 		}));
 	}
+	bot.database.getAllIdentifiers(function(err, identifiers) {
+		if(err) {
+			Winston.error("Could not get all identifiers", err);
+		}
+		else {
+			var arguments = [];
+			for(var i in identifiers) { arguments.push(identifiers[i].identifier); }
+			bot.newCommand("insult person", function(user, via, target) {
+				bot.database.getUserByIdentifier(target, function(err, user) {
+					if(err) {
+						Winston.error("Unabled to get user by identifier: " + target, err);
+						unspecificTarget();
+					}
+					else {
+						if(user) {
+							specificTarget(user.username);
+						}
+						else {
+							unspecificTarget();
+						}
+					}
+				});
+			}, "Zufällig generierte Beleidigung einer Person an den Kopf werfen.", "bomb", arguments);
+		}
+		bot.newCommand("insult", function(user, via, target) {
+			unspecificTarget();
+		}, "Zufällig generierte Beleidigung.", "fire");
+		callback();
+	});
 
-	bot.newCommand("insult person", function(user, via, target) {
-		bot.database.getUserByIdentifier(target, function(err, user) {
-			if(err) {
-				Winston.error("Unabled to get user by identifier: " + target, err);
-				unspecificTarget();
-			}
-			else {
-				if(user) {
-					specificTarget(user.username);
-				}
-				else {
-					unspecificTarget();
-				}
-			}
-		});
-	}, "Zufällig generierte Beleidigung einer Person an den Kopf werfen.", "bomb");
-
-	bot.newCommand("insult", function(user, via, target) {
-		unspecificTarget();
-	}, "Zufällig generierte Beleidigung.", "fire");
+	return true;
 };
