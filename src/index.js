@@ -99,14 +99,14 @@ var Bot = function(mumble, options, database) {
 Util.inherits(Bot, EventEmitter);
 
 Bot.prototype._onVoiceInput = function(text, mumbleUser) {
-	this.database.getUserByMumbleId(mumbleUser.id, function(err, user) {
+	this.database.getLinkedUser(mumbleUser.id, function(err, user) {
 		if(err) {
 			Winston.error("Error fetching user by mumble user id.", err);
 		}
 		else {
 			this.command.processPrefixed(text, 'mumble', user);
 		}
-	});
+	}.bind(this));
 };
 
 /**
@@ -141,8 +141,15 @@ Bot.prototype._initPromptInput = function() {
 };
 
 Bot.prototype._initChatInput = function() {
-	this.mumble.on("message", function(message, user, scope) {
-        this.command.process(message);
+	this.mumble.on("message", function(message, mumbleUser, scope) {
+		this.database.getLinkedUser(mumbleUser.id, function(err, user) {
+			if(err) {
+				Winston.error("Error fetching user by mumble user id.", err);
+			}
+			else {
+				this.command.process(message, 'mumble', user);
+			}
+		}.bind(this));
     }.bind(this));
 };
 
