@@ -20,6 +20,26 @@ module.exports = function(Database) {
 	};
 
 	/**
+	 * Retrieves details about a user by his identifier.
+	 * @param {string} identifier - The identifier of the user to retrieve.
+	 * @param callback - Called when the details are retrieved.
+	 */
+	Database.prototype.getUserByIdentifier = function(identifier, callback) {
+		this.pool.query("SELECT u.id AS id FROM Users u Left JOIN Identifiers i ON u.identifier = i.id WHERE i.identifier = ?",
+		 	[identifier], function(err, rows) {
+				if(this._checkError(err, callback)) {
+					if(rows.length > 0) {
+						this.getUserById(rows[0].id, callback);
+					}
+					else {
+						callback(null, null);
+					}
+				}
+			}.bind(this)
+		);
+	};
+
+	/**
 	 * Retrieves details about a user by his username.
 	 * @param {string} username - The username of the user to retrieve.
 	 * @param callback - Called when the details are retrieved.
@@ -111,6 +131,20 @@ module.exports = function(Database) {
 	 */
 	Database.prototype.getFreeIdentifiers = function(callback) {
 		this.pool.query("SELECT id, identifier FROM Identifiers WHERE id NOT IN (SELECT identifier FROM Users) ORDER BY Identifiers.id",
+			function(err, rows) {
+				if(this._checkError(err, callback)) {
+					callback(null, rows);
+				}
+			}.bind(this)
+		);
+	};
+
+	/**
+	 * Retrieve a list of all identifiers from the database.
+	 * @param callback - Called after the list was read from the database.
+	 */
+	Database.prototype.getAllIdentifiers = function(callback) {
+		this.pool.query("SELECT id, identifier FROM Identifiers",
 			function(err, rows) {
 				if(this._checkError(err, callback)) {
 					callback(null, rows);

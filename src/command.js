@@ -89,8 +89,9 @@ Command.prototype._logCommand = function(command, arguments, via, user) {
  * Registers a new command which can then be executed later on.
  * @param {string} name - Name of the command to register.
  * @param command - Command to register with this name.
+ * @param {string[]} arguments - (Optional) Array of possible arguments.
  */
-Command.prototype.newCommand = function(name, command) {
+Command.prototype.newCommand = function(name, command, arguments) {
 	this.commands[name] = command;
 };
 
