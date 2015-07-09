@@ -56,10 +56,18 @@ Command.prototype.process = function(text, via, user) {
 		if(key === text.substring(0, key.length)) {
 			text = text.substring(key.length + 1, text.length);
 			var method = this.commands[key];
-			var arguments = text.split(" ");
+			var arguments;
+			if(text.length == 0) {
+				arguments = [];
+			}
+			else {
+				arguments = text.split(" ");
+			}
 			if(typeof method === "function") {
 				this._logCommand(key, arguments, via, user);
-				method.apply(this, arguments, via, user);
+				arguments.unshift(via);
+				arguments.unshift(user);
+				method.apply(this, arguments);
 			}
 			found = true;
 			break;

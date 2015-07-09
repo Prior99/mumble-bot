@@ -6,7 +6,12 @@ var ViewAPIRunCommand = function(bot) {
 	return function(req, res) {
 
 		function runCommand(command, argument) {
-			bot.command.process(command + " " + argument, 'website', req.session.user);
+			var string = command;
+			if(argument) {
+				string += " " + argument;
+			}
+			console.log("'"+string+"'");
+			bot.command.process(string, 'website', req.session.user);
 		}
 
 		if(req.query.command) {
