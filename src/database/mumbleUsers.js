@@ -56,7 +56,6 @@ module.exports = function(Database) {
 	Database.prototype.getLinkedUser = function(id, callback) {
 		this.pool.query("SELECT user FROM MumbleUsers WHERE mumbleId = ?", [id], function(err, rows) {
 			if(this._checkError(err, callback)) {
-				console.log("The received user is", rows[0].user);
 				if(rows.length > 0) {
 					this.getUserById(rows[0].user, callback);
 				}
