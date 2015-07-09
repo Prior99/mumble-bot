@@ -135,6 +135,9 @@ Bot.prototype._initPromptInput = function() {
 		input: process.stdin,
 		output: process.stdout
 	});
+	this._rlStdin.on('SIGINT', function() {
+		this.emit('SIGINT');
+	}.bind(this));
 	this._rlStdin.on('line', function(line) {
 		this.command.process(line, 'terminal', null);
 	}.bind(this));
