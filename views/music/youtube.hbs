@@ -1,3 +1,4 @@
+<div id="alerts"></div>
 <h1>Youtube Extractor</h1>
 <p>Bitte die URL für den zu extrahierenden Song und die Formattierung des Titels in der folgenden Form angeben:</p>
 <form class="form-horizontal">
@@ -25,9 +26,14 @@
 			</div>
 	</div>
 </form>
+<script type="text/html" id="alert-upload-failed">
+	<div class="alert alert-danger alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Fehler!</strong> Sie verfügen nicht über die nötige Berechtigung, Musik hochzuladen.
+	</div>
+</script>
 <script>
 	function downloadFinished(response) {
-
 	}
 
 	function addElem(link) {
@@ -44,6 +50,9 @@
 				elem.html("<td>" + link + "</td><td><i class=\"fa fa-check\"></i></td><td>" + response.artist + "</td><td>" + response.title + "</td>");
 			}
 			else {
+				if(response.reason == "insufficient_permission") {
+					$($("#alert-upload-failed").html()).appendTo('#alerts');
+				}
 				elem.html("<td>" + link + "</td><td><i class=\"fa fa-remove\"></i></td><td></td><td></td>");
 			}
 		});

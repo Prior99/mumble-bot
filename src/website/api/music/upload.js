@@ -11,7 +11,9 @@ var Winston = require('winston');
 
 var Upload = function(bot, router, req, res) {
 
-	this.status = {};
+	this.status = {
+		okay : true
+	};
 	//this.req;
 	//this.res;
 	//this.fileAmount;
@@ -67,7 +69,7 @@ Upload.prototype.handleFile = function(file) {
 };
 
 Upload.prototype.done = function() {
-	this.res.send(JSON.stringify(this.status));
+	this.res.send(this.status);
 };
 
 Upload.prototype.checkDone = function() {
@@ -101,6 +103,16 @@ module.exports = function(bot, router) {
 		}
 	}));
 	return function(req, res) {
-		new Upload(bot, router, req, res);
+		bot.permissions.hasPermission(req.session.user, "upload-music", function(has) {
+			if(has) {
+				new Upload(bot, router, req, res);
+			}
+			else {
+				res.send({
+					okay : false,
+					reason: "insufficient_permission"
+				});
+			}
+		});
 	}
 };
