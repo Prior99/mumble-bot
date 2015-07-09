@@ -93,7 +93,7 @@ var Bot = function(mumble, options, database) {
 		this.say(commandsSay + ". Ich habe diese Liste auch in den Chat geschrieben.");
 		this.mumble.user.channel.sendMessage(commandsWrite.substring(0, commandsWrite.length - 4));
 	}.bind(this), "Gibt eine Liste aller Kommandos aus.", "list-ul");
-	this.newCommand("shutdown", this.shutdown.bind(this), "Fährt den bot herunter.", "power-off");
+	this.newCommand("shutdown", this.shutdown.bind(this), "Fährt den bot herunter.", "power-off", null, 'shutdown');
 };
 
 Util.inherits(Bot, EventEmitter);
@@ -135,6 +135,9 @@ Bot.prototype._initPromptInput = function() {
 		input: process.stdin,
 		output: process.stdout
 	});
+	this._rlStdin.on('SIGINT', function() {
+		this.emit('SIGINT');
+	}.bind(this));
 	this._rlStdin.on('line', function(line) {
 		this.command.process(line, 'terminal', null);
 	}.bind(this));
@@ -283,17 +286,20 @@ Bot.prototype._generateGrammar = function(callback) {
  * @param {string} description - Description of the command as displayed on the website
  * @param {string} icon - [Name of a Fontawesome-icon to display.](http://fortawesome.github.io/Font-Awesome/icons/)
  * @param {string[]} arguments - (Optional) Array of possible arguments.
+ * @param {string} permission - (Optional) permission needed to execute this command.
  */
-Bot.prototype.newCommand = function(commandName, method, description, icon, arguments) {
+Bot.prototype.newCommand = function(commandName, method, description, icon, arguments, permission) {
 	if(!arguments) {
 		arguments = [];
 	}
-	this.command.newCommand(commandName, method, arguments);
+	this.command.newCommand(commandName, method, arguments, permission);
 	this.commands.push({
 		name : commandName,
 		description : description,
 		icon : icon,
-		arguments : arguments
+		arguments : arguments,
+		permission : permission,
+		hasArguments : arguments.length > 0
 	});
 };
 

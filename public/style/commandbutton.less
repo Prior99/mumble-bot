@@ -1,19 +1,29 @@
 .cmd-btn {
 	margin:10px;
-	height: 70px;
-	h3 {
-		margin: 0;
-	}
+	height: 80px;
+	border-color: #2e6da4;
+	border-radius: 5px;
 	p {
 		display : none;
 	}
-	@media(min-width:320px) {
+	@media(max-width:320px) {
 		h3 {
-			margin: inherit;
+			margin: 0 0 10px 0;
+			font-size: 16px;
+			font-weight: bold;
 		}
-		height: 150px;
+	}
+	@media(min-width:320px) {
+		height: 180px;
 		p {
 			display : block;
+			height: 3.5em;
+		}
+	}
+	@media(min-width:450px) {
+		height: 160px;
+		p {
+			height: 2.5em;
 		}
 	}
 }

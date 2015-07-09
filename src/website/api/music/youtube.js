@@ -80,27 +80,37 @@ function downloadFinished(err, output, tmpAudioName, res) {
 module.exports = function(b) {
 	bot = b;
 	return function(req, res) {
-		if(req.query.url) {
-			var url = req.query.url;
-			var format;
-			if(req.format) {
-				format = req.format;
+		bot.permissions.hasPermission(req.session.user, "upload-music", function(has) {
+			if(has) {
+				if(req.query.url) {
+					var url = req.query.url;
+					var format;
+					if(req.format) {
+						format = req.format;
+					}
+					else {
+						format = "%(artist)s - %(title)s"
+					}
+					var tmpName = bot.options.website.tmp + "/youtube" + Date.now();
+					var tmpVideoName = tmpName + ".mp4";
+					var tmpAudioName = tmpName + ".mp3";
+					YoutubeDl.exec(url, ['--add-metadata', '--metadata-from-title', format, '-x','--audio-format', 'mp3', '-o', tmpVideoName], {}, function(err, output) {
+						downloadFinished(err, output, tmpAudioName, res);
+					});
+				}
+				else {
+					res.send(JSON.stringify({
+						okay : false,
+						reason: "no_url"
+					}));
+				}
 			}
 			else {
-				format = "%(artist)s - %(title)s"
+				res.send(JSON.stringify({
+					okay : false,
+					reason: "insufficient_permission"
+				}));
 			}
-			var tmpName = bot.options.website.tmp + "/youtube" + Date.now();
-			var tmpVideoName = tmpName + ".mp4";
-			var tmpAudioName = tmpName + ".mp3";
-			YoutubeDl.exec(url, ['--add-metadata', '--metadata-from-title', format, '-x','--audio-format', 'mp3', '-o', tmpVideoName], {}, function(err, output) {
-				downloadFinished(err, output, tmpAudioName, res);
-			});
-		}
-		else {
-			res.send(JSON.stringify({
-				okay : false,
-				reason: "no_url"
-			}));
-		}
+		});
 	}
 };

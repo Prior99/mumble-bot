@@ -4,16 +4,41 @@
 <div class="container-fluid">
 	<div class="row flush-col">
 	{{#each bot.commands}}
-		<a href="#" class="mix cmd-btn col-sm-3 list-group-item" cmdId="{{name}}">
+		<div class="mix cmd-btn col-sm-3 list-group-item">
 			<h3><i class="fa fa-{{icon}}"></i> {{name}}</h3>
-			<p>{{description}}</p>
-		</a>
+			<p>
+				{{description}}
+			</p>
+			{{#if hasArguments}}
+			<div class="dropdown">
+				<button class="btn btn-primary btn-block dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+					Ausführen
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					{{#each arguments}}
+					<li><a argument="{{this}}" cmdId="{{../name}}" class="execute-command argument-select">{{this}}</a></li>
+					{{/each}}
+				</ul>
+			</div>
+			{{else}}
+			<button cmdId="{{name}}" class="execute-command btn btn-primary btn-block" type="button">
+				Ausführen
+			</button>
+			{{/if}}
+		</div>
 	{{/each}}
 	</div>
 </div>
 <script>
-	$("a.cmd-btn").click(function(e) {
+	$(".execute-command").click(function(e) {
 		e.preventDefault();
-		$.ajax("/api/command?command=" + $(this).attr("cmdId"));
+		var cmd = $(this).attr("cmdId");
+		var arg = $(this).attr("argument");
+		var string = "/api/command?command=" + cmd;
+		if(arg) {
+			string += "&argument=" + arg;
+		}
+		$.ajax(string);
 	});
 </script>

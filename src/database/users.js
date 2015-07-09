@@ -91,6 +91,23 @@ module.exports = function(Database) {
 	};
 
 	/**
+	 * Retrieves details about a random user.
+	 * @param callback - Called when the details are retrieved.
+	 */
+	Database.prototype.getRandomUser = function(callback) {
+		this.pool.query("SELECT id FROM Users ORDER BY RAND() LIMIT 1", function(err,rows) {
+			if(this._checkError(err, callback)) {
+				if(rows.length > 0) {
+					this.getUserById(rows[0].id, callback);
+				}
+				else {
+					callback(null, null);
+				}
+			}
+		}.bind(this));
+	};
+
+	/**
 	 * Retrieves details about a user by his steam Id.
 	 * @param {string} minecraft - The minecraft username of the user to retrieve.
 	 * @param callback - Called when the details are retrieved.

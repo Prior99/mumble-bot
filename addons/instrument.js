@@ -5,7 +5,7 @@ function rd(arr) {
 	return arr[parseInt(r*arr.length)];
 }
 
-var instrument = function(strings, words) {
+var instrument = function(strings, words, constants) {
 	var regex = /\{\{(.*?)\}\}/;
 	var res;
 	var string = rd(strings);
@@ -13,7 +13,11 @@ var instrument = function(strings, words) {
 		var group = res[0];
 		var key = res[1];
 		var index = res.index;
-		if(words[key] !== undefined) {
+		if(constants && constants[key]) {
+			string = string.substr(0, index) + constants[key] +
+			string.substr(index + group.length, string.length);
+		}
+		else if(words[key] !== undefined) {
 			var val = rd(words[key]);
 			if(words.multiplicators !== undefined &&
 				Math.random() < MULTIPLICATOR_PROXIMITY) {
