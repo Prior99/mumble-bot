@@ -3,12 +3,12 @@
  * @param {Bot} bot - Bot the webpage belongs to.
  */
 var ViewAPIRunCommand = function(bot) {
-
-	function runCommand(command, argument) {
-		bot.command.process(command + " " + argument);
-	}
-
 	return function(req, res) {
+
+		function runCommand(command, argument) {
+			bot.command.process(command + " " + argument, 'website', req.session.user);
+		}
+
 		if(req.query.command) {
 			runCommand(req.query.command, req.query.argument);
 			res.status(200).send(JSON.stringify({
