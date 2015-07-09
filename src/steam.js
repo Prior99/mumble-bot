@@ -67,13 +67,13 @@ SteamBot.prototype._onMessage = function(message, steamId) {
 		else {
 			this.bot.command.process(message, 'steam', user);
 		}
-	});
+	}.bind(this));
 };
 
 SteamBot.prototype._postLogin = function() {
 	this.client.on('message', function(source, message, type, chatter) {
 		if(type === Steam.EChatEntryType.ChatMsg) {
-			this._onMessage(message, chatter);
+			this._onMessage(message, source);
 		}
 	}.bind(this));
 	this.client.on('relationships', function() {
