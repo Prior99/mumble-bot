@@ -142,15 +142,26 @@ Bot.prototype._loadAddons = function(dir, callback) {
 			throw err;
 		}
 		else {
-			for(var i in files) {
-				var filename = dir + files[i];
-				if(FS.lstatSync(filename).isDirectory()) {
-					require("../" + filename)(this);
-					Winston.info("Loaded addon " + filename + ".");
+			var next = function() {
+				if(files.length > 0) {
+					var filename = dir + files.shift();
+					if(FS.lstatSync(filename).isDirectory()) {
+					Winston.info("Loading addon " + filename + " ...");
+						var isAsync = require("../" + filename)(this, next);
+						if(!isAsync) {
+							next();
+						}
+					}
+					else {
+						next();
+					}
 				}
-			}
+				else {
+					callback();
+				}
+			}.bind(this);
+			next();
 		}
-		callback();
 	}.bind(this));
 };
 
@@ -202,7 +213,8 @@ Bot.prototype.stopPipingUser = function() {
 	this._pipeUserEvent = undefined;
 };
 
-Bot.prototype._generateGrammar = function() {
+Bot.prototype._generateGrammar = function(callback) {
+	Winston.info("Generating grammar ...");
 	var grammar = "#JSGF V1.0;\n";
 	grammar += "\n";
 	grammar += "/*\n";
@@ -215,20 +227,31 @@ Bot.prototype._generateGrammar = function() {
 	grammar += "<hotword> = " + this.hotword.toLowerCase() + ";\n";
 	grammar += "\n";
 	var commandLine = "<command> =";
-	for(var key in this.command.commands) {
-		if(key === "") {
-			continue;
+	for(var i in this.commands) {
+		var command = this.commands[i];
+		Winston.info("Command: '" + command.name + "'");
+		var tag = "_" + command.name.toLowerCase();
+		while(tag.indexOf(" ") !== -1) {
+			tag = tag.replace(" ", "")
 		}
-		Winston.info("Command: '" + key + "'");
-		var tag = "_" + key.replace(" ", "").toLowerCase();
-		grammar += "<" + tag + "> = " + key.toLowerCase() + ";\n"
+		grammar += "<" + tag + "> = " + command.name.toLowerCase();
+		if(command.arguments.length > 0) {
+			grammar += " (";
+			for(var j in command.arguments) {
+				var arg = command.arguments[j];
+				grammar += arg + " | ";
+			}
+			grammar = grammar.substring(0, grammar.length - 3) + ")";
+		}
+		grammar += ";\n"
 		commandLine += " <" + tag + "> |";
 	}
-	grammar += "\n";
 	grammar += commandLine.substring(0, commandLine.length - 2) + ";\n";
 	grammar += "\n";
-	grammar += "public <commands> = <hotword> <command>;";
+	grammar += "\n";
+	grammar += "public <commands> = <hotword> <command> <identifier>;";
 	FS.writeFileSync("commands.gram", grammar);
+	Winston.info("Grammar generated.");
 };
 
 /**
@@ -241,13 +264,18 @@ Bot.prototype._generateGrammar = function() {
  * @param method - Method which will be called when the command was called
  * @param {string} description - Description of the command as displayed on the website
  * @param {string} icon - [Name of a Fontawesome-icon to display.](http://fortawesome.github.io/Font-Awesome/icons/)
+ * @param {string[]} arguments - (Optional) Array of possible arguments.
  */
-Bot.prototype.newCommand = function(commandName, method, description, icon) {
-	this.command.newCommand(commandName, method);
+Bot.prototype.newCommand = function(commandName, method, description, icon, arguments) {
+	if(!arguments) {
+		arguments = [];
+	}
+	this.command.newCommand(commandName, method, arguments);
 	this.commands.push({
 		name : commandName,
 		description : description,
-		icon : icon
+		icon : icon,
+		arguments : arguments
 	});
 };
 

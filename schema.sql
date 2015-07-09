@@ -76,5 +76,5 @@ INSERT IGNORE INTO Identifiers (identifier) VALUES
 ("cake"),
 ("cookie"),
 ("rabbit"),
-("elefant"),
+("elephant"),
 ("cucumber");

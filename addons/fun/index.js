@@ -2,19 +2,6 @@ var Request = require("request");
 
 module.exports = function(bot) {
 
-	bot.newCommand("kick merlin", function() {
-		var merlins = bot.findUsers("Moerrrlin");
-		if(merlins.length === 0) {
-			bot.say("Hmmm. I can not find him. Maybe he is hiding?");
-		}
-		else {
-			bot.say("Merlin get the fuck out.");
-			bot.output.once('speak-stop', function() {
-				merlins[0].moveToChannel(bot.options.kickChannel);
-			});
-		}
-	}, "Wirft Merlin aus dem Channel falls notwendig.", "legal");
-
 	bot.newCommand("teach", function() {
 		var url = "https://de.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&generator=random&grnnamespace=0";
 		Request({
@@ -46,17 +33,4 @@ module.exports = function(bot) {
 		});
 		bot.say("Bitte warten.");
 	}, "Liest ein zufälliges Zitat einer Berühmtheit vor.", "graduation-cap");
-
-	bot.newCommand("kick everyone", function() {
-		bot.say("Get the fuck out.");
-		var channel = bot.mumble.user.channel;
-		bot.output.once('speak-stop', function() {
-			for(var key in channel.users) {
-				var user = channel.users[key];
-				if(user !== bot.mumble.user) {
-					user.moveToChannel(bot.options.kickChannel);
-				}
-			}
-		});
-	}, "Kickt jeden Benutzer aus seinem Channel auf dem gesamten Server.", "bomb");
 };
