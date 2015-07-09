@@ -275,7 +275,8 @@ Bot.prototype.newCommand = function(commandName, method, description, icon, argu
 		name : commandName,
 		description : description,
 		icon : icon,
-		arguments : arguments
+		arguments : arguments,
+		hasArguments : arguments.length > 0
 	});
 };
 
