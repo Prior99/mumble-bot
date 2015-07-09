@@ -28,7 +28,45 @@ module.exports = function(bot) {
 			"dumm",
 			"hirnrissig",
 			"gehirnamputiert",
-			"bekloppt"
+			"bekloppt",
+			"parasitär",
+			"pickelgesichtig",
+			"ranzig",
+			"ekelhaft",
+			"missgestaltet",
+			"widerlich",
+			"entstellt",
+			"minderwertig",
+			"wertlos",
+			"zurückgeblieben",
+			"blöd",
+			"begriffsstutzig",
+			"enfältig",
+			"ungebildet",
+			"lästig",
+			"geistesgestört",
+			"minderbegabt",
+			"debil",
+			"übel riechend",
+			"verpestet",
+			"unappetitlich",
+			"abgelaufen",
+			"brünstig",
+			"lüstern",
+			"schleimig",
+			"müffelig",
+			"faulig",
+			"mverdorben",
+			"verfault",
+			"verrottet",
+			"schmierig",
+			"tranig",
+			"fettig",
+			"aufgedunsen",
+			"gettleibig",
+			"aufgebläht",
+			"seifig",
+			"gemästet"
 		],
 		subject : [
 			"es Stück Scheisse",
@@ -53,7 +91,130 @@ module.exports = function(bot) {
 			"er Sackpickel",
 			"es Mistschwein",
 			"er Mongowixer",
-			"er Pisser"
+			"er Pisser",
+			"er Affe",
+			"er Affenarsch",
+			"es Affenkotstück",
+			"er Affenmensch",
+			"er Allmachtsdackel",
+			"er Ameisenficker",
+			"er Analbaron",
+			"er Analdin",
+			"e Analraupe",
+			"e anorektische Fettsau",
+			"es Anti-Talent",
+			"e Arschbratze",
+			"er Arschforscher",
+			"es Arschfotzengesicht",
+			"es Arschgesicht",
+			"e Arschhaarbartfratze",
+			"er Arschkeks",
+			"er Arschkopf",
+			"e Arschlocke",
+			"er Aso",
+			"er Atomspast",
+			"er Auspuffbumser",
+			"es Behindikind",
+			"er Besen",
+			"er Birkenstockfotzenkopf",
+			"er Blödfisch",
+			"e Bodendompteuse",
+			"er Braunkohlebohrer",
+			"e Brunskuh",
+			"e Bumsnuss",
+			"er Buschmensch",
+			"e Butterkuh",
+			"er Computerflüsterer",
+			"er Dauerlutscher",
+			"er Dollbohrer",
+			"e Donnerfotze",
+			"er Doppeldepp",
+			"e Dreilochnutte",
+			"er Ast",
+			"er Dünnschissgurgler",
+			"er Eichelarschkopf",
+			"er Ekelbob",
+			"er Fäkalterrier",
+			"e Flattermuschi",
+			"er Fontanellenfick",
+			"e Fotze",
+			"er Fotzklotz",
+			"er Fusselbart",
+			"er Gesichtseintopf",
+			"er Gesichtsgünter",
+			"er Gnarf",
+			"es Großhirnkastrat",
+			"e Hackfresse",
+			"er Halbaffe",
+			"es Hausschuhgesicht",
+			"er Hodenbussard",
+			"er Hodenkopf",
+			"er Hodenschrubbler",
+			"e Hohlbratze",
+			"e hohle Fritte",
+			"er Honk",
+			"er Hosentaschen Godzilla",
+			"e Hutze",
+			"er Hübi",
+			"er Intelligenzverweigerer",
+			"er Kackbatzen",
+			"er Kackstrumpf",
+			"er Kanisterkopf",
+			"er Kotlutscher",
+			"er Kotzkannenfressbrett",
+			"e Kotzkrücke",
+			"es Krapfengesicht",
+			"es Kuttenluder",
+			"e Larve",
+			"er Lattenheinrich",
+			"er Loser",
+			"e Nougatnutte",
+			"er Opferspast",
+			"e Orgasmusbremse",
+			"e Nebenexistenz",
+			"es Partyopfer",
+			"er Peniskopf",
+			"er Penisprothesenträger",
+			"e Penisschlampe",
+			"e Pferdefresse",
+			"er Pfingstochse",
+			"er Spritzbock",
+			"er Pimmel",
+			"e Pimmelfresse",
+			"er Pimmelkopf",
+			"er Pimmelpapagei",
+			"e Quermöse",
+			"er Rotzpupsi",
+			"e Sackfotze",
+			"er Scheißhacken",
+			"er Schlabberlappen",
+			"er schleimscheißender Bambusaffe",
+			"es Schmalzgrab",
+			"e Schmalztitte",
+			"er schnarchzapfiger Rüsselsack",
+			"er Schuhputzer",
+			"er Schüttler",
+			"e Senfgurke",
+			"er Spongebob",
+			"er Staubbeutel",
+			"e Steroidbeule",
+			"er Steroidmutant",
+			"e Swarowski-Möse",
+			"es Tapetengerippe",
+			"er tapezierter Knochen",
+			"er Tittenfisch",
+			"es Topmoppel",
+			"es Unwerk",
+			"er Vollaffe",
+			"e vollgepisste Strumpfhose",
+			"e vollgeschissene Menschenhülle",
+			"er Vollmongo",
+			"e Wachsfresse",
+			"er Waldwichtel",
+			"e Wichsbazille",
+			"er Wichsfisch",
+			"er Zahnspangenbettler",
+			"es zoologisches Abfallprodukt"
 		],
 		food : [
 			"Käse",
@@ -62,19 +223,43 @@ module.exports = function(bot) {
 			"Nutella",
 			"Kot",
 			"Smegma",
-			"Rührei"
+			"Rührei",
+			"Grogonzola",
+			"Pizza",
+			"Gammelfleisch",
+			"Auswurf",
+			"Kotze",
+			"Stuhlgang",
+			"Mist",
+			"Dreck",
+			"Abfall",
+			"Darmausscheidungen",
+			"Butter",
+			"Quark",
+			"Erbsensuppe"
 		],
 		food_action : [
 			"einreiben",
 			"füttern",
-			"bewerfen"
+			"bewerfen",
+			"quälen",
+			"steinigen",
+			"vergewaltigen",
+			"entjungfern"
 		],
 		food_action_passive : [
 			"einführen",
 			"ins Maul stopfen",
 			"mit einer Spritzpistole in die Fresse spritzen",
 			"ins Ohr stecken",
-			"in die Nase rammen"
+			"in die Nase rammen",
+			"in die Schuhe kippen",
+			"in den USB-Port stecken",
+			"per E-Mail schicken",
+			"über den ganzen Körper schmieren",
+			"in die Hose stecken",
+			"ins Bett legen",
+			"zu Fressen geben"
 		],
 		verb : [
 			"Sterben",
@@ -89,7 +274,21 @@ module.exports = function(bot) {
 			"Lutschen",
 			"Anranzen",
 			"Scheißen",
-			"Fassen"
+			"Fassen",
+			"Koten",
+			"Wursten",
+			"Fliegen essen",
+			"Katzen ficken",
+			"Bäume knutschen",
+			"Kühlschranktüren ficken",
+			"Kot fressen",
+			"Abgammeln",
+			"Heulen",
+			"Weinen",
+			"Fisten",
+			"Schwänze Lutschen",
+			"Betteln",
+			"Schnuppern"
 		],
 		genitals : [
 			"Vagina",
@@ -115,7 +314,9 @@ module.exports = function(bot) {
 			"Schnüffel",
 			"Inhalier",
 			"Kraul",
-			"Kotz"
+			"Kotz",
+			"Rubbel",
+			"Sabber"
 		],
 		genital_action_hurt : [
 			"trete",
@@ -131,7 +332,7 @@ module.exports = function(bot) {
 		]
 	};
 
-	var sentences = [
+	var unspecificSentences = [
 		'Geh {{verb}}, du {{attribute}}{{subject}}.',
 		'{{attribute}}{{subject}}. Warum gehst du nicht einfach {{verb}}?',
 		'Du bist {{attribute}}, du {{attribute}}{{subject}}.',
@@ -145,7 +346,50 @@ module.exports = function(bot) {
 		'Ey, du {{attribute}}{{subject}}. Geh dir {{food}} {{food_action_passive}}!'
 	];
 
-	bot.newCommand("insult", function() {
-		bot.say(instrument(sentences, words));
+	specificSentences = [
+		'Geh {{verb}}, {{ziel}}, du {{attribute}}{{subject}}.',
+		'{{ziel}}! Warum gehst du nicht einfach {{verb}}?',
+		'Du bist {{attribute}}, {{ziel}}.',
+		'Ich {{genital_action_hurt}} {{ziel}} in die {{genitals}}.',
+		'{{genital_action}} mir die {{genitals}}, {{ziel}}.',
+		'Geh doch auf deine {{genitals}} {{verb}},{{ziel}}.',
+		'Warum darf so ein {{attribute}}{{subject}} wie {{ziel}} überhaupt rumlaufen?',
+		'Ich werde {{ziel}} {{food}} {{food_action_passive}}, {{attribute}}{{subject}}.',
+		'Ich werde {{ziel}} mit {{food}} {{food_action}}, {{attribute}}{{subject}}.',
+		'Yo, {{ziel}}, du {{attribute}}{{subject}}. Geh dich mit {{food}} {{food_action}}!',
+		'{{ziel}}! {{attribute}}{{subject}}. Geh dir {{food}} {{food_action_passive}}!',
+		'{{ziel}} ist ein {{attribute}}{{subject}}.',
+		'Lasst uns alle {{ziel}}s {{genitals}} mit {{food}} {{food_action}}!'
+	];
+
+	function unspecificTarget() {
+		bot.say(instrument(unspecificSentences, words));
+	}
+
+	function specificTarget(you) {
+		bot.say(instrument(specificSentences, words, {
+			ziel : you
+		}));
+	}
+
+	bot.newCommand("insult person", function(user, via, target) {
+		bot.database.getUserByIdentifier(target, function(err, user) {
+			if(err) {
+				Winston.error("Unabled to get user by identifier: " + target, err);
+				unspecificTarget();
+			}
+			else {
+				if(user) {
+					specificTarget(user.username);
+				}
+				else {
+					unspecificTarget();
+				}
+			}
+		});
+	}, "Zufällig generierte Beleidigung einer Person an den Kopf werfen.", "bomb");
+
+	bot.newCommand("insult", function(user, via, target) {
+		unspecificTarget();
 	}, "Zufällig generierte Beleidigung.", "fire");
 };
