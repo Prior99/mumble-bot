@@ -71,7 +71,7 @@ MPDControl.prototype.play = function(cb) {
  * Pause the current playback.
  * @param cb - Callback which will be called after playback has paused.
  */
-MPDControl.prototype.pause = function(cb) {
+MPDControl.prototype.pause = function(user, via, cb) {
 	this.playing = false;
 	if(!this.ready) {
 		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
@@ -86,7 +86,7 @@ MPDControl.prototype.pause = function(cb) {
  * @param cb - Callback which will be called after the next song has started
  * 			   playing.
  */
-MPDControl.prototype.next = function(cb) {
+MPDControl.prototype.next = function(user, via, cb) {
 	if(!this.ready) {
 		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
 		return;
@@ -155,7 +155,7 @@ MPDControl.prototype.setVolume = function(vol) {
  * Adds a random track to the playlist.
  * @param cb - Callback which will be called after the track was added.
  */
-MPDControl.prototype.addRandomTrack = function(cb) {
+MPDControl.prototype.addRandomTrack = function(user, via, cb) {
 	this.bot.say("Zufälliger Song.", function() {
 		var song = this.mpd.songs[parseInt(this.mpd.songs.length * Math.random())];
 		this.mpd.add(song.file, cb);
