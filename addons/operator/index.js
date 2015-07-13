@@ -31,7 +31,7 @@ module.exports = function(bot, callback) {
 		});
 	};
 
-	function kickUserByIdentifier(via, user, identifier) {
+	function kickUserByIdentifier(user, via, identifier) {
 		bot.database.getUserByIdentifier(identifier, function(err, user) {
 			if(err) {
 				Winston.error("Error fetching user by identifier.", err);
@@ -49,7 +49,7 @@ module.exports = function(bot, callback) {
 		});
 	};
 
-	function whoIs(via, user, identifier) {
+	function whoIs(user, via, identifier) {
 		bot.database.getUserByIdentifier(identifier, function(err, user) {
 			if(err) {
 				Winston.error("Error fetching user by identifier.", err);
