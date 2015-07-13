@@ -1,0 +1,197 @@
+#!/bin/bash
+
+function editconfig {
+	if node scripts/genconfig.js ; then
+		echo -e "\033[32mOkay.\033[0m Configfile created."
+	else
+		echo -e "\033[33mAborted by user.\033[0m\nPlease create the configfile manually by copying the server/config.json.example to server/config.json and edit it according to your needs."
+		exit 1
+	fi
+}
+
+function check_env {
+	#
+	# Make sure that this script is not run as root
+	# running this server as root could lead to severe security risks
+	# Generally speaking, do never run any serversoftware cloned from any
+	# repository as root. Unless you want your server rootkitted and taken over.
+	#
+
+	echo -n "  Checking for user ... "
+	if [ $EUID -eq 0 ]; then
+		echo -ne "\033[31mnot okay.\033[0m Do not run this script as root."
+		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+		exit 1
+	else
+		echo -ne "\033[32mokay.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+	fi
+
+	#
+	# Check for node and npm.
+	#
+
+		echo -n "  Checking for node ... "
+	if ! type node &> /dev/null ; then
+		echo -ne "\033[31mnot found!\033[0m Please install nodejs (http://nodejs.org/)"
+		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+		exit 1
+	else
+		echo -ne "\033[32mfound.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+		echo -n "  Checking for version ... "
+		NODE_VERSION=$(node -v)
+		if ! echo $NODE_VERSION | grep v0.12 > /dev/null ; then
+			echo -ne "\033[33munknown version of node: $NODE_VERSION!\033[0m Recommended is v0.12."
+			echo -e "\r\033[33m\xe2\x9d\xa2\033[0m"
+		else
+			echo -ne "\033[32m$NODE_VERSION.\033[0m"
+			echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+		fi
+	fi
+
+	echo -n "  Checking for npm ... "
+	if ! type npm &> /dev/null ; then
+		echo -ne "\033[31mnot found!\033[0m Please install nodejs (http://nodejs.org/)"
+		echo -e "\r\033[31m\xe2\x9d\xa2\033[0m"
+		exit 1
+	else
+		echo -ne "\033[32mfound.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x98\033[0m"
+	fi
+}
+
+function setup {
+
+	#
+	# Check for pocketsphinx
+	#
+
+	echo -n "  Checking for Pocketsphinx ... "
+	if ! pkg-config --exists pocketsphinx ; then
+		echo -ne "\033[31mnot found!\033[0m"
+		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+		echo -e "\r\033[31mPlease install pocketsphinx from source and make it available to pkg-config.\033[0m"
+		exit 1
+	else
+		echo -ne "\033[32mfound.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+	fi
+
+	#
+	# Check for OpenSSL
+	#
+
+	echo -n "  Checking for OpenSSL ... "
+	if ! type npm &> /dev/null ; then
+		echo -ne "\033[31mnot found!\033[0m"
+		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+		echo -e "\r\033[31mPlease install openssl.\033[0m"
+		exit 1
+	else
+		echo -ne "\033[32mfound.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+	fi
+	#
+	# Install all npm dependencies.
+	# This also includes bower and grunt-cli as local installations.
+	# No need to install them system-wide.
+	#
+
+	echo -n "  Installing npm dependencies (This could take a LONG time) ... "
+	if npm install > install.log 2>&1; then
+		echo -ne "\033[32mdone.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+	else
+		echo -ne "\033[31mfailed!\033[0m"
+		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+		echo -e "\r\033[31mInstall the dependencies manually using \"npm install\". Output written to \"intall.log\".\033[0m"
+		exit 1
+	fi
+
+	#
+	# Create key and certificate
+	#
+
+	echo -n "  Checking for TLS key and certificate (bot.key and bot.cert) ... "
+	if [ -f bot.cert ] && [ -f bot.key ] ; then
+		echo -ne "\033[32mokay.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+	else
+		echo -ne "\033[33mnot found!\033[0m A new one will be generated ... "
+		echo -e "\r\033[33m\xe2\x9c\x98\033[0m"
+		echo -n "  Generating new certificate ... "
+		openssl genrsa -out bot.key 2048 2> /dev/null
+		openssl req -new -sha256 -key bot.key -out bot.csr -subj "/"
+		openssl x509 -req -in bot.csr -signkey bot.key -out bot.cert 2> /dev/null
+		echo -ne "\033[32mokay.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+	fi
+}
+
+function start {
+	check_env
+	#
+	# Check for required files
+	#
+	echo -n "  Checking for required files ... "
+	if [ -f bot.cert ] && [ -f bot.key ] && [ -d node_modules ] ; then
+		echo -ne "\033[32mokay.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+	else
+		echo -ne "\033[31mnot found!\033[0m"
+		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+		echo -e "\033[31mPlease run \"$0 setup\" to install dependencies, generate a certificate and create a configuration file.\033[0m"
+		exit 1
+	fi
+
+	#
+	# Check if the user created a configfile.
+	#
+
+	echo -n "  Checking for config ... "
+	if [ -f "config.json" ]; then
+		if node scripts/checkconfig.js ; then
+			echo -ne "\033[32mokay.\033[0m"
+			echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+		else
+			echo -ne "\033[31mfound but invalid!\033[0m"
+			echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+			if node scripts/genconfig.js ; then
+				echo -e "\033[32mOkay.\033[0m Configfile created."
+			else
+				echo "Please edit the configfile at config.json manually."
+				exit 1
+			fi
+		fi
+	else
+		echo -ne "\033[31mnot found!\033[0m"
+		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+		editconfig
+	fi
+
+	#
+	# Everything went right, we may now start the server.
+	#
+	echo
+	echo -e "\033[32mEnvironement is sane.\033[0m"
+	echo -e "\033[32mStarting bot now.\033[0m"
+	echo
+
+	node index.js
+}
+
+case $1 in
+	start)
+		start
+	;;
+	setup)
+		setup
+	;;
+	editconfig)
+		editconfig
+	;;
+	*)
+		echo "Usage: $0 {setup|start|editconfig|help}"
+	;;
+esac
