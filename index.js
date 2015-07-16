@@ -59,6 +59,11 @@ Mumble.connect("mumble://" + options.url, mumbleOptions, function(err, connectio
 		throw err;
 	}
 	else {
+
+		connection.on('error', function(data) {
+			Winston.error("An error with the mumble connection has occured:", data);
+		});
+
 		connection.authenticate(options.name);
 		connection.on('ready', function() {
 			startup(connection);
