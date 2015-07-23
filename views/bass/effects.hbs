@@ -1,0 +1,75 @@
+<div id="alerts"></div>
+<h1>Effekte</h1>
+<p>Hier können die zahlreichen "Effekte" für den Dubstepgenerator dieses Bots verwaltet werden.</p>
+<h2>Effekte Hinzufügen</h2>
+<p>Hier können neue "Effekte" hinzugefügt werden:</p>
+<form class="form-horizontal">
+	<div class="form-group">
+		<label for="url" class="col-sm-2 control-label">Effekt</label>
+		<div class="col-sm-10">
+			<div class="input-group">
+				<input type="text" class="form-control" placeholder="Wobbel Wobbel" id="effect">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button class="btn btn-default" type="button" id="submit">Speichern</button>
+		</div>
+	</div>
+</form>
+<script>
+	$("#submit").click(function() {
+		var quote = $("#effect").val();
+		$.ajax("/api/bass/addEffect?effect=" + encodeURI(quote)).done(function(res) {
+			if(res.okay) {
+				$($("#success-add-effect").html()).appendTo($("#alerts"));
+				refreshList();
+			}
+		})
+		.error(function() {
+			$($("#error-add-effect").html()).appendTo($("#alerts"));
+		});
+	});
+</script>
+<h2>Effekte</h2>
+<p>Aktuell sind folgende "Effekte" bekannt:</p>
+<ul class="list-group" id="effect-list">
+
+</ul>
+<script type="text/html" id="error-retrieve-list">
+	<div class="alert alert-danger alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Fehler!</strong> Konnte Liste von Effekten nicht abrufen.
+	</div>
+</script>
+<script type="text/html" id="error-add-effect">
+	<div class="alert alert-danger alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Fehler!</strong> Konnte Effekt nicht hinzufügen.
+	</div>
+</script>
+<script type="text/html" id="success-add-effect">
+	<div class="alert alert-success alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Erfolgreich!</strong> Effekt erfolgreich ergänzt.
+	</div>
+</script>
+<script>
+	function refreshList() {
+		$.ajax("/api/bass/effects").done(function(res) {
+			if(res.okay) {
+				$("#effect-list").html("");
+				var effects = res.effects;
+				for(var i in effects) {
+					var e = effects[i];
+					$("#effect-list").append("<li class='list-group-item'>" + e + "</li>");
+				}
+			}
+		})
+		.error(function() {
+			$($("#error-retrieve-list").html()).appendTo($("#alerts"));
+		});
+	}
+	refreshList();
+</script>
