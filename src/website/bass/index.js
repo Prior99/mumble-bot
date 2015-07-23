@@ -35,7 +35,7 @@ var RouteBass = function(bot) {
 	});
 	router.use('/designer', viewCreator(bot));
 	router.use('/effects', viewDefault("bass/effects"));
-	router.get('/', viewDefault("bass/designer"));
+	router.get('/', viewCreator(bot));
 
 	return router;
 };
