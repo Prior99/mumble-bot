@@ -17,6 +17,7 @@ var viewCommand = require('./command');
 var routeMusic = require('./music');
 var routeUsers = require('./users');
 var routeQuotes = require('./quotes');
+var routeBass = require('./bass');
 
 
 /*
@@ -39,6 +40,7 @@ var RouteAPI = function(bot) {
 	router.use('/tree', viewTree(bot));
 	router.use('/command', viewCommand(bot));
 	router.use('/quotes', routeQuotes(bot));
+	router.use('/bass', routeBass(bot));
 
 	return router;
 };

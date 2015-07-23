@@ -50,6 +50,10 @@ CREATE TABLE IF NOT EXISTS MumbleUsers (
 	FOREIGN KEY (user) REFERENCES Users(id)
 );
 
+CREATE TABLE IF NOT EXISTS BassEffects (
+	effect			VARCHAR(128) NOT NULL PRIMARY KEY
+);
+
 INSERT IGNORE INTO Permissions (id, name, description, icon) VALUES
 ("login", "Anmelden", "Erlaubt einem Benutzer, sich im System anzumelden.", "sign-in"),
 ("add-quote", "Zitat Eintragen", "Erlaubt das Eintragen neuer Zitate.", "quote-left"),
@@ -57,6 +61,22 @@ INSERT IGNORE INTO Permissions (id, name, description, icon) VALUES
 ("grant", "Berechtigungen Vergeben", "Hat ein Benutzer diese Berechtigung, so kann er anderen Benutzern dieselben Berechtigungen zuweisen, die er selber besitzt.", "legal"),
 ("upload-music", "Musik hochladen", "Diese Berechtigung wird benötigt, um Musik hochzuladen, oder aus Youtube zu extrahieren.", "upload"),
 ("kick", "Kicken", "Mit dieser Berechtigung ist es möglich, Benutzer in Mumble aus ihrem Channel zu kicken.", "legal");
+
+INSERT IGNORE INTO BassEffects (effect) VALUES
+("Drop den Bass"),
+("härter"),
+("Schlampe"),
+("Put your hands up in the air"),
+("wui"),
+("wubsch"),
+("wobbel"),
+("wub"),
+("wob"),
+("boi"),
+("bröm"),
+("blu"),
+("lublub"),
+("fie");
 
 INSERT IGNORE INTO Identifiers (identifier) VALUES
 ("orange"),

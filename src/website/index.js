@@ -23,6 +23,7 @@ var routeMusic = require('./music');
 var routeApi = require('./api');
 var routeQuotes = require('./quotes');
 var routeUsers = require('./users');
+var routeBass = require('./bass');
 
 /*
  * Code
@@ -39,6 +40,10 @@ var pages = [{
 {
 	url : "/users/",
 	name : "Benutzer"
+},
+{
+	url : "/bass/",
+	name : "Bass"
 }];
 
 var subpages = [{
@@ -111,6 +116,7 @@ var Website = function(bot) {
 	});
 	this.app.use('/music', routeMusic(bot));
 	this.app.use('/users', routeUsers(bot));
+	this.app.use('/bass', routeBass(bot));
 	this.app.use('/quotes', routeQuotes(bot));
 	this.app.use('/commands', viewDefault("commands"));
 	this.app.get('/tree', viewDefault("channeltree"));
