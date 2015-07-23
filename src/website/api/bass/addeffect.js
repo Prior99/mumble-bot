@@ -2,7 +2,7 @@ var Winston = require('winston');
 
 module.exports = function(bot) {
 	return function(req, res) {
-		if(req.query.effect) {
+		if(req.query.effect && req.query.effect.trim().length > 0) {
 			bot.database.addBassEffect(req.query.effect, function(err) {
 				if(err) {
 					if(err.code !== "ER_DUP_ENTRY") {

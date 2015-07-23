@@ -1,7 +1,7 @@
 module.exports = function(bot) {
 	return function(req, res) {
 		if(req.query.bass) {
-			var string = JSON.parse(req.query.bass).join('');
+			var string = JSON.parse(req.query.bass).join(' ');
 			bot.say(string);
 			res.status(200).send({
 				okay : true

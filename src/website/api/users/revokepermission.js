@@ -1,3 +1,5 @@
+var Winston = require('winston');
+
 module.exports = function(bot) {
 	return function(req, res) {
 
@@ -20,7 +22,7 @@ module.exports = function(bot) {
 		var permission = req.query.permission;
 		bot.database.getUserByUsername(req.query.user, function(err, user) {
 			if(err) {
-				Winston("Could not fetch user while granting permission", err);
+				Winston.error("Could not fetch user while granting permission", err);
 				res.status(500).send({
 					okay : false,
 					reason : "internal_error"

@@ -9,6 +9,7 @@ var Express = require('express');
  */
 
 var viewDefault = require('../default');
+var viewCreator = require('./creator');
 /*
  * Code
  */
@@ -18,7 +19,7 @@ var pages = [{
 	icon : "puzzle-piece"
 }, {
 	url : "/bass/designer/",
-	name : "Creator",
+	name : "Designer",
 	icon : "magic"
 }];
 
@@ -32,7 +33,7 @@ var RouteBass = function(bot) {
 		res.locals.subpages = pages;
 		next();
 	});
-	router.use('/designer', viewDefault("bass/designer"));
+	router.use('/designer', viewCreator(bot));
 	router.use('/effects', viewDefault("bass/effects"));
 	router.get('/', viewDefault("bass/designer"));
 

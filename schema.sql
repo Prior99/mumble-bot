@@ -67,16 +67,9 @@ INSERT IGNORE INTO BassEffects (effect) VALUES
 ("härter"),
 ("Schlampe"),
 ("Put your hands up in the air"),
-("wui"),
 ("wubsch"),
 ("wobbel"),
-("wub"),
-("wob"),
-("boi"),
-("bröm"),
-("blu"),
-("lublub"),
-("fie");
+("lublub");
 
 INSERT IGNORE INTO Identifiers (identifier) VALUES
 ("orange"),
