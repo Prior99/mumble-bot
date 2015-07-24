@@ -30,11 +30,60 @@ var routeSpeak = require('./speak');
  * @param {Bot} bot - Bot the webpage belongs to.
  */
 var RouteAPI = function(bot) {
+
+	function loginByQueryString(req, res, next) {
+		bot.database.checkLoginData(req.query.username, req.query.password, function(err, okay) {
+			if(err) {
+				Winston.error("Error checking whether user exists", err);
+				res.status(500).send({
+					okay : false,
+					reason : "internal_error"
+				});
+			}
+			else {
+				if(okay) {
+					bot.database.getUserByUsername(req.query.username, function(err, user) {
+						if(err) {
+							Winston.error("Error fetching user.", err);
+							res.status(500).send({
+								okay : false,
+								reason : "internal_error"
+							});
+						}
+						else {
+							bot.permissions.hasPermission(user, "login", function(has) {
+								if(has) {
+									req.session.user = user;
+									next();
+								}
+								else {
+									res.status(400).send({
+										okay : false,
+										reason : "no_login"
+									});
+								}
+							});
+						}
+					});
+				}
+				else {
+					res.status(400).send({
+						okay : false,
+						reason : "no_login"
+					});
+				}
+			}
+		});
+	}
+
 	var router = Express.Router();
 	router.use('/users', routeUsers(bot));
 	router.use(function(req, res, next) {
 		if(req.session.user) {
 			next();
+		}
+		else {
+			loginByQueryString(req, res, next);
 		}
 	});
 	router.use('/music', routeMusic(bot));
