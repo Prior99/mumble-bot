@@ -1,4 +1,3 @@
-<div id="alerts"></div>
 <h1>Designer</h1>
 <p>Hier können tolle Songs designed werden.</p>
 <div class="panel panel-default">
@@ -30,18 +29,6 @@
 	</div>
 </div>
 <button class="btn btn-lg btn-success btn-block" id="play">Play!</button>
-<script type="text/html" id="error-play">
-	<div class="alert alert-danger alert-dismissible" role="alert">
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		<strong>Fehler!</strong> Konnte nicht abspielen.
-	</div>
-</script>
-<script type="text/html" id="success-play">
-	<div class="alert alert-success alert-dismissible" role="alert">
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		<strong>Erfolgreich!</strong> Erfolgreich abgespielt.
-	</div>
-</script>
 <script>
 	var arr = [];
 	$(".cmd-btn").click(function() {
@@ -52,12 +39,12 @@
 
 	$("#play").click(function() {
 		$.ajax("/api/bass/play?bass=" + encodeURI(JSON.stringify(arr))).done(function(res) {
-			$($("#success-play").html()).appendTo($("#alerts"));
+			spawnNotification('success', "Erfolgreich abgespielt.");
 			arr = [];
 			$("#line").html("");
 		})
 		.error(function() {
-			$($("#error-play").html()).appendTo($("#alerts"));
+			spawnNotification('error', "Konnte nicht abspielen.");
 		});
 	});
 </script>

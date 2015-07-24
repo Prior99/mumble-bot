@@ -23,24 +23,6 @@
 
 	<button type="submit" id="login-submit" class="btn btn-primary btn-lg btn-block"><i class="fa fa-unlock"></i> Login</button>
 </form>
-<script type="text/html" id="alert-login-failed">
-	<div class="alert alert-danger alert-dismissible" role="alert">
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		<strong>Fehler!</strong> Anmeldung nicht erfolgreich. Bitte nochmal versuchen.
-	</div>
-</script>
-<script type="text/html" id="alert-login-permission">
-	<div class="alert alert-danger alert-dismissible" role="alert">
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		<strong>Fehler!</strong> Anmeldung konnte nicht erfolgen, Account muss durch Admin freigeschaltet werden.
-	</div>
-</script>
-<script type="text/html" id="alert-login-internal-error">
-	<div class="alert alert-danger alert-dismissible" role="alert">
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		<strong>Fehler!</strong> Ein interner Fehler ist aufgetreten.
-	</div>
-</script>
 <script>
 	$('#login-submit').click(function(e) {
 		e.preventDefault();
@@ -54,13 +36,13 @@
 			}
 			else {
 				if(response.reason === "internal_error") {
-					$($("#alert-login-internal-error").html()).appendTo("#alerts");
+					spawnNotification('error', "Ein interner Fehler ist aufgetreten.");
 				}
 				else if(response.reason === "unknown_username_or_password") {
-					$($("#alert-login-failed").html()).appendTo("#alerts");
+					spawnNotification('error', "Anmeldung nicht erfolgreich. Bitte nochmal versuchen.");
 				}
 				else if(response.reason === "insufficient_permission") {
-					$($("#alert-login-permission").html()).appendTo("#alerts");
+					spawnNotification('error', "Anmeldung konnte nicht erfolgen, Account muss durch Admin freigeschaltet werden.");
 				}
 			}
 		});

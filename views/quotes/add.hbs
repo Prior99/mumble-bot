@@ -1,4 +1,3 @@
-<div id="alerts"></div>
 <h1>Zitate</h1>
 <p>Derzeit befinden sich <b>{{quoteAmount}}</b> Zitate in der Datenbank.</p>
 <h2>Zitat Eintragen</h2>
@@ -38,12 +37,6 @@
 	<tbody id="results">
 	</tbody>
 </table>
-<script type="text/html" id="alert-add-failed">
-	<div class="alert alert-danger alert-dismissible" role="alert">
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		<strong>Fehler!</strong> Sie verfügen nicht über die nötige Berechtigung, Zitate einzutragen.
-	</div>
-</script>
 <script>
 function addElem(quote, author) {
 	var elem = $("<tr><td>" + quote + "</td><td>" + author + "</td><td><i class=\"fa fa-cog fa-spin\"></i></td></tr>").appendTo("#results");
@@ -63,7 +56,7 @@ function startQuote(quote, author) {
 	})
 	.error(function() {
 		elem.html("<td>" + quote + "</td><td>" + author + "</td><td><i class=\"fa fa-remove\"></i></td>");
-		$($('#alert-add-failed').html()).appendTo('#alerts');
+		spawnNotification('error', "Sie verfügen nicht über die nötige Berechtigung, Zitate einzutragen.");
 	});
 }
 
