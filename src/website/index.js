@@ -14,6 +14,7 @@ var FileStore = require('session-file-store')(Session);
  */
 
 var viewDefault = require('./default');
+var viewSpeak = require('./speak');
 var viewRegisterLogin = require('./users/registerLogin');
 
 /*
@@ -55,6 +56,11 @@ var subpages = [{
 	url : "/commands/",
 	name : "Befehle",
 	icon : "cogs"
+},
+{
+	url : "/speak/",
+	name : "Sprich!",
+	icon : "comment"
 }];
 /**
  * Handles the whole website stuff for the bot. Using express and handlebars
@@ -104,6 +110,8 @@ var Website = function(bot) {
 	this.app.use('/jquery-form', Express.static('node_modules/jquery-form/'));
 	this.app.use('/fontawesome', Express.static('node_modules/font-awesome/'));
 	this.app.use('/crypto-js', Express.static('node_modules/crypto-js/'));
+	this.app.use('/typeahead', Express.static('node_modules/typeahead.js/dist/'));
+	this.app.use('/typeahead-bootstrap', Express.static('node_modules/typeahead.js-bootstrap3.less/'));
 	this.app.use('/bootstrap-validator', Express.static('node_modules/bootstrap-validator/dist/'));
 	this.app.use('/api', routeApi(bot));
 	this.app.use(function(req, res, next) {
@@ -121,6 +129,7 @@ var Website = function(bot) {
 	this.app.use('/commands', viewDefault("commands"));
 	this.app.get('/tree', viewDefault("channeltree"));
 	this.app.get('/', viewDefault("home"));
+	this.app.get('/speak', viewSpeak(bot));
 	var port = this.bot.options.website.port;
 	this.server = this.app.listen(port);
 	this.server.setTimeout(5000);

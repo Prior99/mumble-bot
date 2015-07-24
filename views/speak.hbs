@@ -1,0 +1,104 @@
+<div id="alerts"></div>
+<h1>Sprich!</h1>
+<p>Hier kann Besitz von dem Bot ergriffen und durch seinen Mund gesprochen werden.</p>
+<h2>Sprechen</h2>
+<p>Die maximale Länge des textes beträgt 100 Zeichen. Für Längere Texte kann die Zitat-Datenbank verwendet werden.</p>
+<form id="form">
+	<div class="input-group">
+		<span class="input-group-addon" id="sizing-addon2"><i class="fa fa-comment"></i></span>
+		<input type="text" class="form-control typeahead" placeholder="Schlampe" id="input">
+		<span class="input-group-btn">
+			<input class="btn btn-default" type="submit" value="Sprich">
+		</span>
+	</div>
+</form>
+<h2>Top 10</h2>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Text</th>
+			<th>Verwendet</th>
+		</tr>
+	</thead>
+	<tbody id="table">
+	</tbody>
+</table>
+
+<script type="text/html" id="error-speak">
+	<div class="alert alert-danger alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Fehler!</strong> Konnte Text nicht sprechen.
+	</div>
+</script>
+<script type="text/html" id="error-best">
+	<div class="alert alert-danger alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Fehler!</strong> Konnte Bestenliste nicht laden.
+	</div>
+</script>
+<script type="text/html" id="success-speak">
+	<div class="alert alert-success alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Erfolgreich!</strong> Text wurde gesprochen.
+	</div>
+</script>
+
+<script>
+var bloodhound = new Bloodhound({
+	identify: function(sentence) {
+		return sentence.id;
+	},
+	queryTokenizer: Bloodhound.tokenizers.whitespace,
+	datumTokenizer: Bloodhound.tokenizers.obj.whitespace('sentence'),
+	dupDetector: function(a, b) {
+		return a.id === b.id;
+	},
+	remote: {
+		url: '/api/speak/lookup?text=%QUERY',
+		wildcard: '%QUERY',
+		transform: function(response) {
+			return response.suggestions;
+		}
+	}
+});
+
+$('#form').submit(function(e) {
+	e.preventDefault();
+	$.ajax("/api/speak/speak?text=" + encodeURI($("#input").val())).done(function(res) {
+		if(res.okay) {
+			$($("#success-speak").html()).appendTo($("#alerts"));
+			bloodhound.clear();
+			refreshBestOf();
+		}
+	})
+	.error(function(res) {
+		$($("#error-speak").html()).appendTo($("#alerts"));
+	});
+});
+
+$('#input').typeahead(null, {
+	name: 'sentence',
+	display: 'sentence',
+	source: bloodhound,
+	templates: {
+		suggestion: function(value) {
+			return "<div><strong>" + value.sentence + "</strong>  (" + value.used + ")</div>";
+		}
+	}
+});
+
+function refreshBestOf() {
+	$("#table").html("");
+	$.ajax("/api/speak/lookup").done(function(res) {
+		res.suggestions.map(function(val, key) {
+			$("<tr><td>" + (key + 1) + "</td><td>" + val.sentence + "</td><td>" + val.used + "</td></tr>")
+				.appendTo($("#table"));
+		});
+	})
+	.error(function(res) {
+		$($("#error-best").html()).appendTo($("#alerts"));
+	});
+}
+refreshBestOf();
+</script>

@@ -54,6 +54,13 @@ CREATE TABLE IF NOT EXISTS BassEffects (
 	effect			VARCHAR(128) NOT NULL PRIMARY KEY
 );
 
+CREATE TABLE IF NOT EXISTS AutoComplete (
+	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	sentence		VARCHAR(100) NOT NULL,
+	used			INT DEFAULT 1,
+	UNIQUE(sentence)
+);
+
 INSERT IGNORE INTO Permissions (id, name, description, icon) VALUES
 ("login", "Anmelden", "Erlaubt einem Benutzer, sich im System anzumelden.", "sign-in"),
 ("add-quote", "Zitat Eintragen", "Erlaubt das Eintragen neuer Zitate.", "quote-left"),

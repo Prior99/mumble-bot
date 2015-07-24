@@ -18,6 +18,7 @@ var routeMusic = require('./music');
 var routeUsers = require('./users');
 var routeQuotes = require('./quotes');
 var routeBass = require('./bass');
+var routeSpeak = require('./speak');
 
 
 /*
@@ -41,6 +42,7 @@ var RouteAPI = function(bot) {
 	router.use('/command', viewCommand(bot));
 	router.use('/quotes', routeQuotes(bot));
 	router.use('/bass', routeBass(bot));
+	router.use('/speak', routeSpeak(bot));
 
 	return router;
 };

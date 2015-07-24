@@ -39,6 +39,8 @@
     "request": "^2.58.0",
     "session-file-store": "0.0.14",
     "steam": "^0.6.8",
+    "typeahead.js": "^0.11.1",
+    "typeahead.js-bootstrap3.less": "git+https://github.com/hyspace/typeahead.js-bootstrap3.less.git",
     "winston": "^1.0.0",
     "xml2js": "^0.4.9",
     "youtube-dl": "^1.10.5"
