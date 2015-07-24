@@ -51,9 +51,11 @@ var Bot = function(mumble, options, database) {
 	this.output = new Output(this);
 
 	if(options.mpd) {
-		this.music = new Music(this);
-		this.output.on("start", this.music.mute.bind(this.music));
-		this.output.on("stop", this.music.unmute.bind(this.music));
+		if(options.mpd.fifo) {
+			this.music = new Music(this);
+			this.output.on("start", this.music.mute.bind(this.music));
+			this.output.on("stop", this.music.unmute.bind(this.music));
+		}
 		this.mpd = new MPDControl(this);
 	}
 
