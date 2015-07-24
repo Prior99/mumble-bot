@@ -112,6 +112,7 @@ var Website = function(bot) {
 	this.app.use('/fontawesome', Express.static('node_modules/font-awesome/'));
 	this.app.use('/crypto-js', Express.static('node_modules/crypto-js/'));
 	this.app.use('/typeahead', Express.static('node_modules/typeahead.js/dist/'));
+	this.app.use('/bootswatch', Express.static('node_modules/bootswatch/'));
 	this.app.use('/typeahead-bootstrap', Express.static('node_modules/typeahead.js-bootstrap3.less/'));
 	this.app.use('/bootstrap-validator', Express.static('node_modules/bootstrap-validator/dist/'));
 	this.app.use('/api', routeApi(bot));
