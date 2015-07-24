@@ -91,7 +91,8 @@ var Website = function(bot) {
 	this.app.use(Session({
 		secret: bot.options.website.sessionSecret,
 		store: new FileStore({
-			path : "session-store"
+			path : "session-store",
+			ttl : 315569260
 		}),
 		resave: false,
 		saveUninitialized: true
