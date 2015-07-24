@@ -92,11 +92,13 @@ SteamBot.prototype._postLogin = function() {
 		if(!this.client.users || !this.client.users[friend.friendid]) {
 			return;
 		}
-		if(friend.personaState === 1 && this.client.users[friend.friendid].personaState === 0) {
+		if(friend.personaState === 1 && this.client.users[friend.friendid].personaState === 0 && this._lastLoginAnnounced !== friend.playerName) {
 			this.bot.say(friend.playerName + " hat sich in Steam angemeldet.");
+			this._lastLoginAnnounced = friend.playerName;
 		}
-		else if(friend.personaState === 0 && this.client.users[friend.friendid].personaState === 1) {
+		else if(friend.personaState === 0 && this.client.users[friend.friendid].personaState === 1 && this._lastLogoutAnnounced !== friend.playerName) {
 			this.bot.say(friend.playerName + " hat sich in Steam abgemeldet.");
+			this._lastLogoutAnnounced = friend.playerName;
 		}
 	}.bind(this));
 };
