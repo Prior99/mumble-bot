@@ -69,8 +69,7 @@ var schema = {
 var mpd = {
 	properties : {
 		fifo : {
-			required : true,
-			message : "Please enter the path to the fifo mpd will output the music to.",
+			message : "Please enter the path to the fifo mpd will output the music to, if you want to have it played back.",
 			description : "Please enter the path to the fifo where mpd will write the raw PCM audio data to:"
 		},
 		port : {

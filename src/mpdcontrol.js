@@ -91,16 +91,17 @@ MPDControl.prototype.next = function(user, via, cb) {
 		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
 		return;
 	}
-	this.bot.say("Nächster Song.");
-	if(this.mpd.status.playlistlength <= 1) {
-		this.addRandomTrack(function() {
+	this.bot.say("Nächster Song.", function() {
+		if(this.mpd.status.playlistlength <= 1) {
+			this.addRandomTrack(function() {
+				this.mpd.next(cb);
+				this.mpd.play();
+			}.bind(this));
+		}
+		else {
 			this.mpd.next(cb);
-			this.mpd.play();
-		}.bind(this));
-	}
-	else {
-		this.mpd.next(cb);
-	}
+		}
+	}.bind(this));
 };
 /**
  * Set the volume to a normal level of 50%.
@@ -142,7 +143,7 @@ MPDControl.prototype.volumeDown = function() {
  * @param vol - Volume to set.
  */
 MPDControl.prototype.setVolume = function(vol) {
-	this.bot.say("Lautstärke " + vol + "%", function() {
+	this.bot.say(vol + "%", function() {
 		this.mpd.volume(vol, function(err) {
 			if(err) {
 				Winston.error(err);

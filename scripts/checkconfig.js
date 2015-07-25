@@ -10,8 +10,8 @@ function check(key, config) {
 
 check("url", config);
 check("name", config);
-check("key", config);
-check("cert", config);
+//check("key", config);
+//check("cert", config);
 check("channel", config);
 check("afkChannel", config);
 check("kickChannel", config);
@@ -20,7 +20,7 @@ check("website", config);
 check("database", config);
 
 if(config.mpd) {
-	check("fifo", config.mpd);
+	//check("fifo", config.mpd);
 	check("port", config.mpd);
 	check("host", config.mpd);
 	check("directory", config.mpd);
