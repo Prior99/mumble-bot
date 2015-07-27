@@ -15,6 +15,7 @@ var FileStore = require('session-file-store')(Session);
 
 var viewDefault = require('./default');
 var viewSpeak = require('./speak');
+var viewSounds = require('./sounds');
 var viewRegisterLogin = require('./users/registerLogin');
 
 /*
@@ -61,6 +62,11 @@ var subpages = [{
 	url : "/speak/",
 	name : "Sprich!",
 	icon : "comment"
+},
+{
+	url : "/sounds/",
+	name : "Sounds",
+	icon : "volume-down"
 }];
 /**
  * Handles the whole website stuff for the bot. Using express and handlebars
@@ -132,6 +138,7 @@ var Website = function(bot) {
 	this.app.get('/tree', viewDefault("channeltree"));
 	this.app.get('/', viewDefault("home"));
 	this.app.get('/speak', viewSpeak(bot));
+	this.app.get('/sounds', viewSounds(bot));
 	var port = this.bot.options.website.port;
 	this.server = this.app.listen(port);
 	this.server.setTimeout(5000);

@@ -7,6 +7,7 @@ var Util = require("util");
 var Winston = require('winston');
 var FS = require("fs");
 var EventEmitter = require("events").EventEmitter;
+var FFMpeg = require('fluent-ffmpeg');
 
 /**
  * Handles playing back raw PCM audio soundfiles (WAV). Those need to be exactly
@@ -25,15 +26,22 @@ var Sound = function(stream) {
 Util.inherits(Sound, EventEmitter);
 
 Sound.prototype._play = function(filename) {
+	var samplesTotal = 0;
+	var startTime = Date.now();
 	this._playbackStarted();
-	FS.readFile(filename, function(err, data) {
-		if(err) {
-			Winston.error(err);
-			return;
-		}
-		var playTimeoutDuration = (data.length / 44100) * 1000;
-		this.stream.write(Samplerate.resample(data, 44100, 48000, 1));
-		this.timeout = setTimeout(this._playbackStopped.bind(this), playTimeoutDuration);
+	FFMpeg(filename)
+	.format('s16le')
+	.audioChannels(1)
+	.audioFrequency(48000)
+	.stream().on('data', function(chunk) {
+		samplesTotal += chunk.length / 2;
+		this.stream.write(chunk);
+	}.bind(this))
+	.on('end', function() {
+		var timeAlreadyTaken = Date.now() - startTime;
+		var totalTime = (samplesTotal / 48000) * 1000;
+		var waitTime = totalTime - timeAlreadyTaken;
+		setTimeout(this._playbackStopped.bind(this), waitTime);
 	}.bind(this));
 };
 

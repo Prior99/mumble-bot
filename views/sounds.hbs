@@ -1,0 +1,95 @@
+<link href="/style/filewrapper.css" rel="stylesheet">
+<h1>Sounds</h1>
+
+<h2>Upload</h2>
+<p>Hier können neue Sounds hochgeladen werden.</p>
+
+<form action="upload.php" method="post" enctype="multipart/form-data">
+	<h1>Datei auswählen</h1>
+	<div class="fileWrapper">
+		<span>Dateien hierhin ziehen</span><br />
+		<span style="font-size: 12pt;">(Oder klicken und auswählen)</span>
+		<input type="file" name="upload" multiple="multiple"/>
+	</div>
+</form>
+
+<div id="progressbar_wrapper">
+	<h3>Fortschritt</h3>
+	<div class="progress">
+		<div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+	</div>
+</div>
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Dateiname</th>
+			<th>Used</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+	{{#each sounds}}
+		<tr>
+			<td>{{name}}</td>
+			<td>{{used}}</td>
+			<td><a soundsId="{{id}}" class="playsound quote-btn btn btn-xs btn-success"><span class="fa fa-volume-down" aria-hidden="true"></span></a></td>
+		</tr>
+	{{/each}}
+	</tbody>
+</table>
+
+<script>
+
+$(".playsound").click(function(e) {
+	var id = $(this).attr('soundsId');
+	$.ajax("/api/sounds/play?id=" + id).done(function(res) {
+		if(res.okay) {
+			spawnNotification('success', "Sound abgespielt.");
+		}
+	})
+	.error(function(res) {
+		spawnNotification('error', "Konnte Sound nicht wiedergeben.");
+	});
+});
+
+function updateProgress(e) {
+	if(e.lengthComputable) {
+		var percent = parseInt((e.loaded/e.total)*100) +"%";
+		$(".progress-bar").css({"width" : percent});
+	}
+}
+
+$("#progress_wrapper").hide();
+$(":file").change(function() {
+	$("#progress_wrapper").show();
+	$("form").hide();
+	var formdata = new FormData($("form")[0]);
+	$.ajax({
+		url : "/api/sounds/add",
+		type : "POST",
+		xhr : function() {
+			var xhr = $.ajaxSettings.xhr();
+			if(xhr.upload) {
+				xhr.upload.addEventListener("progress", updateProgress, false);
+			}
+			return xhr;
+		},
+		cache : false,
+		data: formdata,
+		processData: false,
+		contentType : false
+	})
+	.done(function(res) {
+		if(res) {
+			$("form").show();
+			$("#progress_wrapper").hide();
+			spawnNotification('success', "Sound was uploaded.");
+		}
+	})
+	.error(function(res) {
+		$("form").show();
+		spawnNotification('error', "Failed to upload sound.");
+	});
+});
+</script>

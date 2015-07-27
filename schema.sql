@@ -61,6 +61,12 @@ CREATE TABLE IF NOT EXISTS AutoComplete (
 	UNIQUE(sentence)
 );
 
+CREATE TABLE IF NOT EXISTS Sounds (
+	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	name			VARCHAR(64) NOT NULL,
+	used			INT DEFAULT 0
+);
+
 INSERT IGNORE INTO Permissions (id, name, description, icon) VALUES
 ("login", "Anmelden", "Erlaubt einem Benutzer, sich im System anzumelden.", "sign-in"),
 ("add-quote", "Zitat Eintragen", "Erlaubt das Eintragen neuer Zitate.", "quote-left"),

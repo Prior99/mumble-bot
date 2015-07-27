@@ -21,6 +21,7 @@
     "express": "^4.12.3",
     "express-handlebars": "^2.0.1",
     "express-session": "^1.11.3",
+    "fluent-ffmpeg": "^2.0.1",
     "font-awesome": "^4.3.0",
     "html-entities": "^1.1.2",
     "jquery": "^2.1.4",
@@ -42,6 +43,7 @@
     "steam": "^0.6.8",
     "typeahead.js": "^0.11.1",
     "typeahead.js-bootstrap3.less": "git+https://github.com/hyspace/typeahead.js-bootstrap3.less.git",
+    "wav": "^1.0.0",
     "winston": "^1.0.0",
     "xml2js": "^0.4.9",
     "youtube-dl": "^1.10.5"
