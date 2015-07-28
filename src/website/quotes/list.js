@@ -12,6 +12,12 @@ var ViewQuotesList= function(bot) {
 				res.locals.quotes = [];
 			}
 			else {
+				var maxTextLength = 50;
+				for(var k in list) {
+					if(list[k].quote.length > maxTextLength) {
+						list[k].quote = list[k].quote.substring(0, maxTextLength - 3) + "...";
+					}
+				}
 				res.locals.quotes = list;
 			}
 			res.render("quotes/list");

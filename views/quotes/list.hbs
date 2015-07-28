@@ -1,28 +1,27 @@
 <h1>Zitate</h1>
 <p>Derzeit befinden sich <b>{{quotes.length}}</b> Zitate in der Datenbank.</p>
-<table class="table table-striped">
+<table class="table table-striped table-responsive">
 	<thead>
-		<tr>
-			<td>Autor</td>
-			<td>Zitate</td>
-			<td>Eingetragen</td>
-			<td>Verwendet</td>
-			<td></td>
+		<tr class="row">
+			<th class="col-md-2">Autor</th>
+			<th class="col-md-6">Zitat</th>
+			<th class="col-md-2">Eingetragen</th>
+			<th class="col-md-1">Verwendet</th>
+			<th class="col-md-1"></th>
 		</tr>
 	</thead>
 	<tbody>
 	{{#each quotes}}
-		<tr>
-			<td>{{author}}</td>
-			<td>{{quote}}</td>
-			<td>{{{formatDate submitted}}}</td>
-			<td>{{used}}</td>
-			<td><td><a quoteId="{{id}}"class="quote-btn btn btn-xs btn-success"><span class="fa fa-comment" aria-hidden="true"></span></a></td></td>
+		<tr class="row">
+			<td class="col-md-2">{{author}}</td>
+			<td class="col-md-6">{{quote}}</td>
+			<td class="col-md-2">{{{formatDate submitted}}}</td>
+			<td class="col-md-1">{{used}}</td>
+			<td class="col-md-1"><a quoteId="{{id}}"class="quote-btn btn btn-xs btn-success"><span class="fa fa-comment" aria-hidden="true"></span></a></td>
 		</tr>
 	{{/each}}
-	</tbody
+	</tbody>
 </table>
-
 <script>
 	$("a.quote-btn").click(function() {
 		$.ajax("/api/quotes/speak?id=" + $(this).attr("quoteId"));
