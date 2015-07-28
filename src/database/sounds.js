@@ -9,7 +9,7 @@ module.exports = function(Database) {
 		);
 	};
 	Database.prototype.listSounds = function(callback) {
-		this.pool.query("SELECT id, name, used FROM Sounds ORDER BY used",
+		this.pool.query("SELECT id, name, used FROM Sounds ORDER BY used DESC",
 			function(err, rows) {
 				if(this._checkError(err, callback)) {
 					if(callback) { callback(null, rows); }
