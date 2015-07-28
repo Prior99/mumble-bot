@@ -140,12 +140,21 @@ Speech.prototype.speakUsingESpeak = function(text) {
 	ESpeak.speak(this.current.text);
 };
 
+Speech.prototype._onGoogleTTSError = function(err, text) {
+	 Winston.error("Received error from google tts. Using ESpeak instead. " + err);
+         this.speakUsingESpeak(text);
+};
+
 /**
  * Synthesize a text specificly using Google Translate TTS.
  * @param {string} text - Text to synthesize.
  */
 Speech.prototype.speakUsingGoogle = function(text) {
+	this._googleEngine.removeAllListeners('error'); //TODO: This is a nasty dirty piece of shit code line
 	this._googleEngine.tts(text);
+	this._googleEngine.once('error', function(err) {
+		this._onGoogleTTSError(err, text);
+	}.bind(this));
 };
 
 Speech.prototype._next = function() {

@@ -115,14 +115,18 @@ GoogleTranslateTTS.prototype._getMP3Stream = function(text, stream) {
 		if(arr.length > 0) {
 			this._getMP3Part(arr.shift(), function(err, mp3Stream) {
 				if(err) {
-					throw err;
+					//throw err;
+					this.emit('error', err);
 				} //TODO
-				//mp3Stream.pipe(stream);
-				mp3Stream.on('data', function(data) {
-					stream.write(data);
-				});
+				else {
+					//mp3Stream.pipe(stream);
+					mp3Stream.on('data', function(data) {
+						stream.write(data);
+					});
+					//next();
+				}
 				next();
-			});
+			}.bind(this));
 		}
 	}.bind(this);
 	next();
@@ -156,21 +160,21 @@ GoogleTranslateTTS.prototype._readMP3PartFromCache = function(file, callback) {
 };
 
 GoogleTranslateTTS.prototype._cacheMP3Part = function(text, callback) {
-	this.database.addCachedTTS(text, function(err, filename) {
-		if(err) {
-			callback(err);
-		}
-		else {
-			this._retrieveMP3Part(text, function(err, mp3Stream) {
-				if(err) {
-					callback(err);
-				}
-				else {
-					//console.log(data);
-					this._saveRetrievedMP3Part(text, mp3Stream, callback, filename);
-				}
-			}.bind(this));
-		}
+	this._retrieveMP3Part(text, function(err, mp3Stream) {
+		 if(err) {
+                 	callback(err);
+                 }
+                 else {
+                 	//console.log(data);
+			this.database.addCachedTTS(text, function(err, filename) {
+		                if(err) {
+                		        callback(err);
+		                }
+                		else {
+                                	this._saveRetrievedMP3Part(text, mp3Stream, callback, filename);
+                		}
+		        }.bind(this));
+                 }
 	}.bind(this));
 };
 
