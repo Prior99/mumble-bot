@@ -57,7 +57,7 @@ function check_env {
 		exit 1
 	else
 		echo -ne "\033[32mfound.\033[0m"
-		echo -e "\r\033[32m\xe2\x9c\x98\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
 	fi
 }
 
