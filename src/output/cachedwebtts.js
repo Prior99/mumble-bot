@@ -17,17 +17,23 @@ var RETRIES = 3;
  */
 
 /**
- * Provides TTS (Text-To-Speech) by querying (abusing) the inofficial Google
- * Translate TTS api.
+ * Provides TTS (Text-To-Speech) by querying (abusing) the any TTS api.
  * @constructor
+ * @param {string} url - Base URL to fetch. Query will be appended.
+ * @param header - Custom parameters to attach to the header.
  * @param {string} cacheDir - Directory where the TTS MP3 files are cached.
- * @param {Database} database - Database providing the TTS cache.
+ * @param storeCallback - Will be called with the text to obtain a new id.
+ * @param {number} splitAfter - Maximum amount of characters per query.
  */
-var GoogleTranslateTTS = function(cacheDir, database) {
+var CachedWebTTS = function(options) {
 	ReadableStream.call(this);
 	this.stream = new ReadableStream();
-	this.cacheDir = cacheDir ? cacheDir : "google-tts-cache";
-	this.database = database;
+	this.cacheDir = options.cacheDir ? options.cacheDir : "tts-cache";
+	this.splitAfter = options.splitAfter;
+	this.header = options.header;
+	this.url = options.url;
+	this.retrieveCallback = options.retrieveCallback;
+	this.storeCallback = options.storeCallback;
 	try {
 		FS.mkdirSync(this.cacheDir);
 	}
@@ -71,11 +77,11 @@ function splitTextOnNearestSpace(text, len) {
 	return arr;
 }
 
-Util.inherits(GoogleTranslateTTS, ReadableStream);
+Util.inherits(CachedWebTTS, ReadableStream);
 
-GoogleTranslateTTS.prototype._read = function() { };
+CachedWebTTS.prototype._read = function() { };
 
-GoogleTranslateTTS.prototype._refreshTimeout = function(time) {
+CachedWebTTS.prototype._refreshTimeout = function(time) {
 	if(this._time === undefined) {
 		this._time = 0;
 	}
@@ -86,7 +92,7 @@ GoogleTranslateTTS.prototype._refreshTimeout = function(time) {
 	this._timeout = setTimeout(this._speechDone.bind(this), this._time);
 };
 
-GoogleTranslateTTS.prototype._speechDone = function() {
+CachedWebTTS.prototype._speechDone = function() {
 	this._time = 0;
 	this._timeout = null;
 	this.emit("speechDone");
@@ -97,7 +103,7 @@ GoogleTranslateTTS.prototype._speechDone = function() {
  * is a readable stream.
  * @param {string} text - Text to synthesize.
  */
-GoogleTranslateTTS.prototype.tts = function(text) {
+CachedWebTTS.prototype.tts = function(text) {
 	var lame = new Lame.Decoder();
 	lame.on('format', function(format) {
 		this.samplerate = format.sampleRate;
@@ -109,8 +115,14 @@ GoogleTranslateTTS.prototype.tts = function(text) {
 	this._getMP3Stream(text, lame);
 };
 
-GoogleTranslateTTS.prototype._getMP3Stream = function(text, stream) {
-	var arr = splitTextOnNearestSpace(text, 90);
+CachedWebTTS.prototype._getMP3Stream = function(text, stream) {
+	var arr;
+	if(this.splitAfter) {
+		arr = splitTextOnNearestSpace(text, this.splitAfter);
+	}
+	else {
+		arr = [text];
+	}
 	var next = function() {
 		if(arr.length > 0) {
 			this._getMP3Part(arr.shift(), function(err, mp3Stream) {
@@ -132,8 +144,8 @@ GoogleTranslateTTS.prototype._getMP3Stream = function(text, stream) {
 	next();
 };
 
-GoogleTranslateTTS.prototype._getMP3Part = function(text, callback) {
-	this.database.getCachedTTS(text, function(err, file) {
+CachedWebTTS.prototype._getMP3Part = function(text, callback) {
+	this.retrieveCallback(text, function(err, file) {
 		if(err) {
 			callback(err);
 		}
@@ -155,67 +167,65 @@ GoogleTranslateTTS.prototype._getMP3Part = function(text, callback) {
 	}.bind(this));
 };
 
-GoogleTranslateTTS.prototype._readMP3PartFromCache = function(file, callback) {
+CachedWebTTS.prototype._readMP3PartFromCache = function(file, callback) {
 	callback(null, FS.createReadStream(this.cacheDir + "/" + file));
 };
 
-GoogleTranslateTTS.prototype._cacheMP3Part = function(text, callback) {
+CachedWebTTS.prototype._cacheMP3Part = function(text, callback) {
 	this._retrieveMP3Part(text, function(err, mp3Stream) {
-		 if(err) {
-                 	callback(err);
-                 }
-                 else {
-                 	//console.log(data);
-			this.database.addCachedTTS(text, function(err, filename) {
-		                if(err) {
-                		        callback(err);
-		                }
-                		else {
-                                	this._saveRetrievedMP3Part(text, mp3Stream, callback, filename);
-                		}
-		        }.bind(this));
-                 }
+		if(err) {
+			callback(err);
+		}
+		else {
+			this.storeCallback(text, function(err, filename) {
+				if(err) {
+					callback(err);
+				}
+				else {
+					this._saveRetrievedMP3Part(text, mp3Stream, callback, filename);
+				}
+			}.bind(this));
+		}
 	}.bind(this));
 };
 
-GoogleTranslateTTS.prototype._saveRetrievedMP3Part = function(text, mp3Stream, callback, filename) {
+CachedWebTTS.prototype._saveRetrievedMP3Part = function(text, mp3Stream, callback, filename) {
+	var writeStream = FS.createWriteStream(this.cacheDir + "/" + filename);
+	mp3Stream.on('data',function(data){
+		writeStream.write(data);
+	});
 	mp3Stream.on('end', function() {
 		callback(null);
 	});
-	mp3Stream.pipe(FS.createWriteStream(this.cacheDir + "/" + filename));
+	mp3Stream.resume();
 };
 
-GoogleTranslateTTS.prototype._retrieveMP3Part = function(text, callback, tries) {
+CachedWebTTS.prototype._retrieveMP3Part = function(text, callback, tries) {
 	if(tries === undefined) {
 		tries = 0;
 	}
 	if(tries > RETRIES) {
-		callback(new Error("Could not retrieve speech from google after 3 tries. Falling back to espeak!"), text);
+		callback(new Error("Could not retrieve speech from tts after 3 tries."));
 	}
-
 	var encoded = encodeURIComponent(text);
-	var url = "http://translate.google.com/translate_tts?tl=de&q=" + encoded;
-
+	var url = this.url + encoded;
 	var request = Request.get({
 		url : url,
 		timeout : 1000,
-		headers: {
-			'Host' : "translate.google.com",
-			'Referer' : "http://gstatic.com/translate/sound_player.swf",
-			'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.82 Safari/537.36'
-		}
+		headers: this.header
 	});
-	request.end();
 	request.on('response', function(response) {
 		if(response.statusCode !== 200) {
-			callback(new Error("Could not retrieve speech from google. Bad status code: " + response.statusCode + " Falling back to espeak!"));
+			callback(new Error("Could not retrieve speech from tts api. Bad status code: " + response.statusCode));
 		}
 		else {
 			callback(null, request);
+			request.end();
 		}
 	}).on('error', function(err) {
 		this._retrieveMP3Part(text, callback, tries + 1);
 	}.bind(this));
+	request.pause();
 };
 
-module.exports = GoogleTranslateTTS;
+module.exports = CachedWebTTS;

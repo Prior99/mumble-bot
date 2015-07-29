@@ -38,7 +38,7 @@
     "node-samplerate": "git+https://git.cronosx.de/prior/node-samplerate.git",
     "pocketsphinx": "git+https://github.com/Prior99/node-pocketsphinx.git",
     "prompt": "^0.2.14",
-    "request": "^2.58.0",
+    "request": "^2.60.0",
     "session-file-store": "0.0.14",
     "steam": "^0.6.8",
     "typeahead.js": "^0.11.1",

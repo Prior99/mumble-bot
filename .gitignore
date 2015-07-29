@@ -8,7 +8,7 @@ commands.gram
 *.log
 tmp
 public/style/*.css
-google-tts-cache/
+*-tts-cache/
 steam-sentry-hash
 session-store
 sounds/uploaded/

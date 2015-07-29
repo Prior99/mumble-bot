@@ -19,7 +19,7 @@ var Speech = require('./speech');
  */
 var Output = function(bot) {
 	this.bot = bot;
-	this.speech = new Speech(bot.mumble.inputStream(), bot.options.espeakData, bot.mumble.user.channel, bot.database);
+	this.speech = new Speech(bot.mumble.inputStream(), bot.options.espeakData, bot.mumble.user.channel, bot.database, bot);
 	this.sound = new Sound(bot.mumble.inputStream());
 	this.busy = false;
 	this.queue = [];
