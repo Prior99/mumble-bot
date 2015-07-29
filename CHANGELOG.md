@@ -1,3 +1,37 @@
+v0.1.1
+======
+Migration:
+----------
+Execute the following on the SQL database: ```ALTER TABLE TTSCache ADD COLUMN api VARCHAR(16) DEFAULT 'google';``` to get the database schema up-to-date. Run ```npm install``` to install and upgrade all dependencies.
+
+Relevant Changes:
+-----------------
+* Can now playback sound files which can be uploaded.
+* Added "Bass" for playing back nice mixed tracks of beatbox music.
+* Added microsoft translator TTS.
+* Added possibility to only control mpd but not playback the music.
+* New notification system in webfrontend.
+* Added possibility to login by passing logindata to the query.
+* Sessions expire after 10 years.
+* Added page "speak" with autocompletition.
+* Removed piping of user input.
+* Made compatible to error handling and permissions of latest mumble version.
+* Added favicon.
+* Added neat startup wrapper script which checks the environment, generates and fixes the config and creates an tls certificate usign OpenSSL.
+* Added scripts for generating and checking config.
+* Added compliments.
+* Can now insult people on the server directly
+
+Bugfixes:
+---------
+* Fixes to design. Changed Page with quotes to display only first 50 characters to prevent bugs in chrome.
+* Fixed falling back to espeak when google TTS failed.
+* Fixed reporting login and logout of users in steam multiple times.
+
+Contributors:
+-------------
+* Prior
+
 v0.1.0
 ======
 
