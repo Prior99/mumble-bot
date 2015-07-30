@@ -10,6 +10,7 @@ var Express = require('express');
 
 var viewTree = require('./channeltree');
 var viewCommand = require('./command');
+var viewGoogleLookup = require('./googlelookup');
 
 /*
  * Routes
@@ -94,6 +95,7 @@ var RouteAPI = function(bot) {
 	router.use('/bass', routeBass(bot));
 	router.use('/speak', routeSpeak(bot));
 	router.use('/sounds', routeSounds(bot));
+	router.use('/google', viewGoogleLookup(bot));
 
 	return router;
 };
