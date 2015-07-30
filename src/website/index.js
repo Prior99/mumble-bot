@@ -67,6 +67,11 @@ var subpages = [{
 	url : "/sounds/",
 	name : "Sounds",
 	icon : "volume-down"
+},
+{
+	url : "/google/",
+	name : "Google Instant",
+	icon : "google"
 }];
 /**
  * Handles the whole website stuff for the bot. Using express and handlebars
@@ -139,6 +144,7 @@ var Website = function(bot) {
 	this.app.get('/', viewDefault("home"));
 	this.app.get('/speak', viewSpeak(bot));
 	this.app.get('/sounds', viewSounds(bot));
+	this.app.get('/google', viewDefault("googlelookup"));
 	var port = this.bot.options.website.port;
 	this.server = this.app.listen(port);
 	this.server.setTimeout(5000);

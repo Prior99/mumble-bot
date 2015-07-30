@@ -1,0 +1,43 @@
+<h1>Frag Google Instant!</h1>
+<p>Falls man mal nicht weiß, was man googlen sollte, kann man auch einfach Jenny googlen lassen!</p>
+<p>Einfach den Anfang einer Frage eingeben und die Zahlreichen Suchvorschläge genießen!</p>
+<h2>Fragen</h2>
+<form id="form">
+	<div class="input-group">
+		<span class="input-group-addon" id="sizing-addon2"><i class="fa fa-question"></i></span>
+		<input type="text" class="form-control typeahead" placeholder="Warum riecht" id="input">
+		<span class="input-group-btn">
+			<input class="btn btn-default" type="submit" value="Los!">
+		</span>
+	</div>
+</form>
+<div class="result" style="display:none;">
+	<h2>Ergebnisse</h2>
+	<p>Die Ergebnisse, die vorgelesen werden:</p>
+	<p><b><span id="amount"></span></b> Vorschläge.</p>
+	<ul class="result-list list-group">
+
+	</ul>
+</div>
+<script>
+	$('#form').submit(function(e) {
+		$(".result-list").html("");
+		$(".result").hide();
+		e.preventDefault();
+		$.ajax("/api/google?string=" + encodeURIComponent($("#input").val()))
+		.done(function(res) {
+			if(res.okay) {
+				spawnNotification("success", "Abfrage erfolgreich durchgeführt.");
+			}
+			for(var i in res.results) {
+				var s = res.results[i];
+				$(".result-list").append("<li class='list-group-item'>" + s + "</li>");
+			}
+			$("#amount").html(res.results.length);
+			$(".result").show();
+		})
+		.error(function() {
+			spawnNotification("error", "Konnte Abfrage nicht durchführen!");
+		});
+	});
+</script>
