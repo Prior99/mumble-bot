@@ -546,6 +546,11 @@ module.exports = function(bot, callback) {
 	];
 
 	specificSentences = [
+		'Ich glaube, dies{{subject}} von {{ziel}} hätte es wohl gerne, wenn ihm mal jemand ein bisschen {{food}} in die {{genitals}} stopfen würde!',
+		'{{ziel}}! Geh und friss {{food}}.',
+		'{{ziel} hat vermutlich zu lange keiner mehr mal so richtig in die {{genitals}} ge{{genital_action_hurt}}t.',
+		'{{ziel}} riecht nach {{food}}.',
+		'Was riecht denn hier so nach {{food}}? Achso, das ist {{ziel}}, dies{{subject}}',
 		'Geh {{verb}}, {{ziel}}, du {{attribute}}{{subject}}.',
 		'{{ziel}}! Warum gehst du nicht einfach {{verb}}?',
 		'Du bist {{attribute}}, {{ziel}}.',
