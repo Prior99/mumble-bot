@@ -64,7 +64,7 @@ module.exports = function(bot, callback) {
 			"tranig",
 			"fettig",
 			"aufgedunsen",
-			"gettleibig",
+			"fettleibig",
 			"aufgebläht",
 			"seifig",
 			"gemästet"
@@ -546,6 +546,19 @@ module.exports = function(bot, callback) {
 	];
 
 	specificSentences = [
+		'Ich glaube, dies{{subject}} von {{ziel}} hätte es wohl gerne, wenn ihm mal jemand ein bisschen {{food}} in die {{genitals}} stopfen würde!',
+		'{{ziel}}! Geh und friss {{food}}.',
+		'{{ziel} hat vermutlich zu lange keiner mehr mal so richtig in die {{genitals}} ge{{genital_action_hurt}}t.',
+		'{{ziel}} riecht nach {{food}}.',
+		'Was riecht denn hier so nach {{food}}? Achso, das ist {{ziel}}, dies{{subject}}.',
+		'Bäh. Riecht ihr das auch? Ich glaube, {{ziel}} hat mal wieder {{food}} gegessen.',
+		'Ich {{genital_action}}e {{ziel}}s {{genitals}}.',
+		'{{ziel}}? {{ziel}}? Hörst du mir zu, du {{attribute}}{{subject}}? Du bist {{attribute}}.',
+		'Was ist {{attribute}} und stinkt nach {{genitals}}? {{ziel}}!',
+		'Was würde ich dafür geben, {{ziel}} auf die {{genitals}} {{genital_action_hurt}}n zu dürfen!',
+		'Mmh. Oh ja, {{genital_action}} mir die {{genitals}}. Da stehst du doch drauf, {{ziel}}, du {{attribute}}{{subject}}!',
+		'Wisst ihr, was {{ziel}} mit seiner Freundin macht? {{food}} {{food_action}}en und dann {{verb}}.',
+		'Wer würde eigentlich nicht gerne mal mit {{ziel}} {{verb}}, oder seine {{genitals}} {{genital_action}}en? Achja, jeder.',
 		'Geh {{verb}}, {{ziel}}, du {{attribute}}{{subject}}.',
 		'{{ziel}}! Warum gehst du nicht einfach {{verb}}?',
 		'Du bist {{attribute}}, {{ziel}}.',
