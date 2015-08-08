@@ -126,6 +126,7 @@ var Website = function(bot) {
 	this.app.use('/bootswatch', Express.static('node_modules/bootswatch/'));
 	this.app.use('/typeahead-bootstrap', Express.static('node_modules/typeahead.js-bootstrap3.less/'));
 	this.app.use('/bootstrap-validator', Express.static('node_modules/bootstrap-validator/dist/'));
+	this.app.use('/tablesorter', Express.static('node_modules/tablesorter/dist/'));
 	this.app.use('/api', routeApi(bot));
 	this.app.use(function(req, res, next) {
 		if(req.session.user) {
