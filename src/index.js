@@ -17,6 +17,8 @@ var Minecraft = require('./minecraft');
 var EventEmitter = require("events").EventEmitter;
 var Permissions = require("./permissions");
 
+var AUDIO_CACHE_AMOUNT = 5;
+
 /*
  * Code
  */
@@ -33,6 +35,7 @@ var Bot = function(mumble, options, database) {
 	this.mumble = mumble;
 	this.database = database;
 	this.commands = [];
+	this._cachedAudios = [];
 
 	this.hotword = options.hotword.replace("%name%", options.name).toLowerCase();
 	Winston.info("Hotword is '" + this.hotword + "'");
@@ -69,7 +72,6 @@ var Bot = function(mumble, options, database) {
 
 	this._loadAddons("addons/", function() {
 		//Must be run after all commands were registered
-		this._generateGrammar();
 		this.input = new Input(this);
 		this.input.on('input', function(text, user) {
 			this._onVoiceInput(text, user);
@@ -116,6 +118,7 @@ Bot.prototype._onVoiceInput = function(text, mumbleUser) {
  */
 Bot.prototype.shutdown = function() {
 	this.say("Herunterfahren initiiert.", function() {
+		this._deleteAllCachedAudio(0);
 		this.website.shutdown(function() {
 			if(this.steam) {
 				this.steam.stop();
@@ -236,46 +239,6 @@ Bot.prototype.stopPipingUser = function() {
 	this._pipeUserEvent = undefined;
 };
 
-Bot.prototype._generateGrammar = function(callback) {
-	Winston.info("Generating grammar ...");
-	var grammar = "#JSGF V1.0;\n";
-	grammar += "\n";
-	grammar += "/*\n";
-	grammar += " * This is an automatic generated file. Do not edit.\n";
-	grammar += " * Changes will be overwritten on next start of bot.\n";
-	grammar += " */\n";
-	grammar += "\n";
-	grammar += "grammar commands;\n";
-	grammar += "\n";
-	grammar += "<hotword> = " + this.hotword.toLowerCase() + ";\n";
-	grammar += "\n";
-	var commandLine = "<command> =";
-	for(var i in this.commands) {
-		var command = this.commands[i];
-		Winston.info("Command: '" + command.name + "'");
-		var tag = "_" + command.name.toLowerCase();
-		while(tag.indexOf(" ") !== -1) {
-			tag = tag.replace(" ", "")
-		}
-		grammar += "<" + tag + "> = " + command.name.toLowerCase();
-		if(command.arguments.length > 0) {
-			grammar += " (";
-			for(var j in command.arguments) {
-				var arg = command.arguments[j];
-				grammar += arg + " | ";
-			}
-			grammar = grammar.substring(0, grammar.length - 3) + ")";
-		}
-		grammar += ";\n"
-		commandLine += " <" + tag + "> |";
-	}
-	grammar += commandLine.substring(0, commandLine.length - 2) + ";\n";
-	grammar += "\n";
-	grammar += "\n";
-	grammar += "public <commands> = <hotword> <command> <identifier>;";
-	FS.writeFileSync("commands.gram", grammar);
-	Winston.info("Grammar generated.");
-};
 
 /**
  * This is one of the most important methods in the bot.
@@ -312,6 +275,33 @@ Bot.prototype.newCommand = function(commandName, method, description, icon, argu
 Bot.prototype.join = function(cname) {
 	var channel = this.mumble.channelByName(cname);
 	channel.join();
+};
+
+Bot.prototype.addCachedAudio = function(filename, user) {
+	this._cachedAudios.push({
+		file : filename,
+		date : Date.now(),
+		user : user
+	});
+	this._clearUpCachedAudio();
+	console.log(this._cachedAudios);
+};
+
+Bot.prototype._clearUpCachedAudio = function() {
+	this._deleteAllCachedAudio(AUDIO_CACHE_AMOUNT);
+};
+
+Bot.prototype._deleteAllCachedAudio = function(amount) {
+	while(this._cachedAudios.length > amount) {
+		var elem = this._cachedAudios.shift();
+		try {
+			FS.unlinkSync(elem.file);
+			Winston.info("Deleted cached audio file " + elem.file + ".");
+		}
+		catch(err) {
+			Winston.error("Error when cleaning up cached audios!", err);
+		}
+	}
 };
 
 /**

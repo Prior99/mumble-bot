@@ -21,6 +21,7 @@ var VoiceInput = function(bot) {
 	this.bot = bot;
 	this.users = {};
 	this._initConnectedUsers(bot.mumble.users());
+	console.log(bot.mumble.users());
 	bot.mumble.on('user-connect', this._addUser.bind(this));
 	bot.mumble.on('user-disconnect', this._removeUser.bind(this));
 	Winston.info("Module started: Voice input");
@@ -55,9 +56,9 @@ VoiceInput.prototype._dispatch = function(command, user) {
 	this.emit('input', command, user);
 };
 
-VoiceInput.prototype._addUser = function(user) {
+VoiceInput.prototype._addRegisteredUser = function(user, databaseUser) {
 	Winston.info("Input registered for user " + user.name);
-	var localUser = new User(user, this.bot.hotword);
+	var localUser = new User(user, databaseUser, this.bot);
 	this.users[user.id] = localUser;
 	user.outputStream(true).on('data', function(chunk) {
 		if(!this.bot.busy()) {
@@ -93,6 +94,20 @@ VoiceInput.prototype._addUser = function(user) {
 			this.bot.playSound("sounds/recognition_started.wav", function() {
 				//this.bot.startPipingUser(user);
 			}.bind(this));
+		}
+	}.bind(this));
+};
+
+VoiceInput.prototype._addUser = function(user) {
+	this.bot.database.getLinkedUser(user.id, function(err, databaseUser) {
+		if(err) {
+			Winston.error("Error occured when trying to fetch user by mumble id", err);
+		}
+		if(databaseUser) {
+			this._addRegisteredUser(user, databaseUser);
+		}
+		else {
+			Winston.info("Did not register input for user " + user.name + " as this user is not linked to any database user.");
 		}
 	}.bind(this));
 };
