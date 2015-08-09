@@ -17,7 +17,7 @@ var Minecraft = require('./minecraft');
 var EventEmitter = require("events").EventEmitter;
 var Permissions = require("./permissions");
 
-var AUDIO_CACHE_AMOUNT = 5;
+var AUDIO_CACHE_AMOUNT = 100;
 
 /*
  * Code
@@ -35,7 +35,8 @@ var Bot = function(mumble, options, database) {
 	this.mumble = mumble;
 	this.database = database;
 	this.commands = [];
-	this._cachedAudios = [];
+	this.cachedAudios = [];
+	this._audioId = 0;
 
 	this.hotword = options.hotword.replace("%name%", options.name).toLowerCase();
 	Winston.info("Hotword is '" + this.hotword + "'");
@@ -278,13 +279,23 @@ Bot.prototype.join = function(cname) {
 };
 
 Bot.prototype.addCachedAudio = function(filename, user) {
-	this._cachedAudios.push({
+	this.cachedAudios.push({
 		file : filename,
-		date : Date.now(),
-		user : user
+		date : new Date(),
+		user : user,
+		id : this._audioId++
 	});
 	this._clearUpCachedAudio();
-	console.log(this._cachedAudios);
+};
+
+Bot.prototype.getCachedAudioById = function(id) {
+	for(var key in this.cachedAudios) {
+		var audio = this.cachedAudios[key];
+		if(audio.id == id) {
+			return audio;
+		}
+	}
+	return null;
 };
 
 Bot.prototype._clearUpCachedAudio = function() {
@@ -292,8 +303,8 @@ Bot.prototype._clearUpCachedAudio = function() {
 };
 
 Bot.prototype._deleteAllCachedAudio = function(amount) {
-	while(this._cachedAudios.length > amount) {
-		var elem = this._cachedAudios.shift();
+	while(this.cachedAudios.length > amount) {
+		var elem = this.cachedAudios.shift();
 		try {
 			FS.unlinkSync(elem.file);
 			Winston.info("Deleted cached audio file " + elem.file + ".");

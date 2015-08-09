@@ -26,6 +26,7 @@ var routeApi = require('./api');
 var routeQuotes = require('./quotes');
 var routeUsers = require('./users');
 var routeBass = require('./bass');
+var routeRecord = require('./record');
 
 /*
  * Code
@@ -46,6 +47,10 @@ var pages = [{
 {
 	url : "/bass/",
 	name : "Bass"
+},
+{
+	url : "/record/",
+	name : "Aufnahmen"
 }];
 
 var subpages = [{
@@ -93,7 +98,10 @@ var Website = function(bot) {
 		extname: '.hbs',
 		helpers : {
 			"formatDate" : function(date) {
-				return date.toLocaleDateString();
+				return date.toLocaleDateString('de-DE');
+			},
+			"formatTime" : function(date) {
+				return date.toLocaleTimeString('de-DE');
 			}
 		}
 	}));
@@ -138,6 +146,7 @@ var Website = function(bot) {
 	this.app.use('/music', routeMusic(bot));
 	this.app.use('/users', routeUsers(bot));
 	this.app.use('/bass', routeBass(bot));
+	this.app.use('/record', routeRecord(bot));
 	this.app.use('/quotes', routeQuotes(bot));
 	this.app.use('/commands', viewDefault("commands"));
 	this.app.get('/tree', viewDefault("channeltree"));

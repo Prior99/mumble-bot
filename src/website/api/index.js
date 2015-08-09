@@ -21,6 +21,7 @@ var routeQuotes = require('./quotes');
 var routeBass = require('./bass');
 var routeSpeak = require('./speak');
 var routeSounds = require('./sounds');
+var routeRecord = require('./record');
 
 
 /*
@@ -96,6 +97,7 @@ var RouteAPI = function(bot) {
 	router.use('/speak', routeSpeak(bot));
 	router.use('/sounds', routeSounds(bot));
 	router.use('/google', viewGoogleLookup(bot));
+	router.use('/record', routeRecord(bot));
 
 	return router;
 };
