@@ -129,6 +129,8 @@ Bot.prototype.shutdown = function() {
 			}
 			if(this.mpd) {
 				this.mpd.stop();
+			}
+			if(this.music) {
 				this.music.stop();
 			}
 			this.emit("shutdown");

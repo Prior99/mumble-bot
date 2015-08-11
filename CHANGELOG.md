@@ -48,6 +48,7 @@ Bugfixes:
 * Fixes to design. Changed Page with quotes to display only first 50 characters to prevent bugs in chrome.
 * Fixed falling back to espeak when google TTS failed.
 * Fixed reporting login and logout of users in steam multiple times.
+* Bot will crash on shutdown if mpd control is used but music playback is not.
 
 Contributors:
 -------------
