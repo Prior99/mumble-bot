@@ -167,7 +167,7 @@ Bot.prototype._initChatInput = function() {
 Bot.prototype._loadAddons = function(dir, callback) {
 	FS.readdir(dir, function(err, files) {
 		if(err) {
-			Winston.console.error("Error loading addons!");
+			Winston.error("Error loading addons!");
 			throw err;
 		}
 		else {
