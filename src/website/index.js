@@ -15,7 +15,6 @@ var FileStore = require('session-file-store')(Session);
 
 var viewDefault = require('./default');
 var viewSpeak = require('./speak');
-var viewSounds = require('./sounds');
 var viewRegisterLogin = require('./users/registerLogin');
 
 /*
@@ -27,30 +26,41 @@ var routeQuotes = require('./quotes');
 var routeUsers = require('./users');
 var routeBass = require('./bass');
 var routeRecord = require('./record');
+var routeSounds = require('./sounds');
 
 /*
  * Code
  */
 
 var pages = [{
-	url : "/",
-	name : "Übersicht"
-},
-{
 	url : "/quotes/",
-	name : "Zitate"
+	name : "Zitate",
+	icon : "commenting"
 },
 {
 	url : "/users/",
-	name : "Benutzer"
+	name : "Benutzer",
+	icon : "group"
 },
 {
 	url : "/bass/",
-	name : "Bass"
+	name : "Bass",
+	icon : "play-circle"
 },
 {
 	url : "/record/",
-	name : "Aufnahmen"
+	name : "Aufnahmen",
+	icon : "microphone"
+},
+{
+	url : "/sounds/",
+	name : "Sounds",
+	icon : "volume-down"
+},
+{
+	url : "/",
+	name : "Sonstiges",
+	icon : "dashboard"
 }];
 
 var subpages = [{
@@ -67,11 +77,6 @@ var subpages = [{
 	url : "/speak/",
 	name : "Sprich!",
 	icon : "comment"
-},
-{
-	url : "/sounds/",
-	name : "Sounds",
-	icon : "volume-down"
 },
 {
 	url : "/google/",
@@ -149,11 +154,11 @@ var Website = function(bot) {
 	this.app.use('/bass', routeBass(bot));
 	this.app.use('/record', routeRecord(bot));
 	this.app.use('/quotes', routeQuotes(bot));
+	this.app.use('/sounds', routeSounds(bot));
 	this.app.use('/commands', viewDefault("commands"));
 	this.app.get('/tree', viewDefault("channeltree"));
 	this.app.get('/', viewDefault("home"));
 	this.app.get('/speak', viewSpeak(bot));
-	this.app.get('/sounds', viewSounds(bot));
 	this.app.get('/google', viewDefault("googlelookup"));
 	var port = this.bot.options.website.port;
 	this.server = this.app.listen(port);
