@@ -44,8 +44,8 @@ var VoiceInputUser = function(user, databaseUser, bot) {
 	this.bot = bot;
 	this._databaseUser = databaseUser;
 	this.speaking = false;
-	this._currentAudioBuffers = [];
 	Stream.Writable.call(this);
+	this._createNewRecordFile();
 };
 
 Util.inherits(VoiceInputUser, Stream.Writable);
@@ -74,15 +74,12 @@ VoiceInputUser.prototype._speechStarted = function() {
 	this._speakStartTime = Date.now();
 };
 
-VoiceInputUser.prototype._speechStopped = function() {
-	this.speaking = false;
-	this.started = false;
+VoiceInputUser.prototype._createNewRecordFile = function() {
 	try { FS.mkdirSync('tmp'); } catch(err) { }
 	try { FS.mkdirSync('tmp/useraudio'); } catch(err) { }
 	try { FS.mkdirSync('tmp/useraudio/' + this._user.id); } catch(err) { }
-	var filename = 'tmp/useraudio/' + this._user.id + '/' + Date.now() + '.mp3';
-	var bufferStream = FS.createWriteStream(filename);
-	var encoder = new Lame.Encoder({
+	this._filename = 'tmp/useraudio/' + this._user.id + '/' + Date.now() + '.mp3';
+	this._encoder = new Lame.Encoder({
 		channels : 1,
 		bitDepth : 16,
 		sampleRate : 48000,
@@ -90,16 +87,20 @@ VoiceInputUser.prototype._speechStopped = function() {
 		outSampleRate : 44100,
 		mode : Lame.MONO
 	});
-	encoder.pipe(bufferStream);
-	while(this._currentAudioBuffers.length > 0) {
-		encoder.write(this._currentAudioBuffers.shift());
-	}
-	encoder.end();
-	this.bot.addCachedAudio(filename, this._databaseUser, (Date.now() - this._speakStartTime)/1000);
+	this._recordStream = FS.createWriteStream(this._filename);
+	this._encoder.pipe(this._recordStream);
+};
+
+VoiceInputUser.prototype._speechStopped = function() {
+	this.speaking = false;
+	this.started = false;
+	this._encoder.end();
+	this.bot.addCachedAudio(this._filename, this._databaseUser, (Date.now() - this._speakStartTime)/1000);
+	this._createNewRecordFile();
 };
 
 VoiceInputUser.prototype._speechContinued = function(chunk) {
-	this._currentAudioBuffers.push(chunk);
+	this._encoder.write(chunk);
 	this._refreshTimeout();
 };
 
