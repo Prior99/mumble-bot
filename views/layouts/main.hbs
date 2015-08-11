@@ -17,9 +17,27 @@
 		</div>
 	</div>
 	<script>
+		$.tablesorter.themes.custom = {
+			table        : 'table table-striped',
+			caption      : 'caption',
+			icons        : '', // add "icon-white" to make them white; this icon class is added to the <i> in the header
+			iconSortNone : 'fa fa-unsorted', // class name added to icon when column is not sorted
+			iconSortAsc  : 'fa fa-sort-up', // class name added to icon when column has ascending sort
+			iconSortDesc : 'fa fa-sort-down', // class name added to icon when column has descending sort
+			filterRow    : '', // filter row class; use widgetOptions.filter_cssFilter for the input/select element
+		};
 		$(function() {
+			var sortingHeaders = {}
+			$('th.no-sort').each(function(i, elem) {
+				sortingHeaders[$(this).index()] = {
+					sorter: false
+				};
+			});
 			$('table.tablesorter').tablesorter({
-				widgets : ['columns']
+				widgets : ['uitheme', 'columns'],
+				theme : "custom",
+				headers : sortingHeaders,
+				headerTemplate : '{content} {icon}'
 			});
 		});
 	</script>
