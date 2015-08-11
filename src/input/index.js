@@ -38,7 +38,7 @@ VoiceInput.prototype._addRegisteredUser = function(user, databaseUser) {
 	Winston.info("Input registered for user " + user.name);
 	var localUser = new User(user, databaseUser, this.bot);
 	this.users[user.id] = localUser;
-	var stream = this.bot.mumble.outputStream(true);
+	var stream = user.outputStream(true);
 	stream.pipe(localUser);
 };
 
