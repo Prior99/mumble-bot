@@ -68,6 +68,15 @@ CREATE TABLE IF NOT EXISTS Sounds (
 	used			INT DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS Records (
+	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	quote			TEXT,
+	submitted		DATETIME,
+	user			INT NOT NOLL,
+	used			INT NOT NULL DEFAULT 0,
+	FOREIGN KEY(user) REFERENCES Users(id)
+);
+
 INSERT IGNORE INTO Permissions (id, name, description, icon) VALUES
 ("login", "Anmelden", "Erlaubt einem Benutzer, sich im System anzumelden.", "sign-in"),
 ("add-quote", "Zitat Eintragen", "Erlaubt das Eintragen neuer Zitate.", "quote-left"),

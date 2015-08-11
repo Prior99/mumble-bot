@@ -47,6 +47,7 @@ require("./mumbleUsers.js")(Database);
 require("./bass.js")(Database);
 require("./autocomplete.js")(Database);
 require("./sounds.js")(Database);
+require("./records.js")(Database);
 
 Database.prototype._checkError = function(err, callback) {
 	if(err) {
