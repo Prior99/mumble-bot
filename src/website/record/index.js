@@ -9,7 +9,8 @@ var Express = require('express');
  */
 
 var viewCurrentCached = require('./cached');
-/*var viewStored = require("./stored");*/
+var viewSave = require('./save');
+var viewStored = require("./stored");
 
 /*
  * Code
@@ -30,7 +31,8 @@ var RouteRecord = function(bot) {
 		next();
 	});
 	router.get('/cached', viewCurrentCached(bot));
-	/*router.get('/', viewStored(bot));*/
+	router.get('/save', viewSave(bot));
+	router.get('/', viewStored(bot));
 
 	return router;
 };
