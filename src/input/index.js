@@ -39,9 +39,7 @@ VoiceInput.prototype._addRegisteredUser = function(user, databaseUser) {
 	var localUser = new User(user, databaseUser, this.bot);
 	this.users[user.id] = localUser;
 	var stream = user.outputStream(true);
-	stream.on('data', function(chunk) {
-		localUser.data(chunk);
-	}.bind(this));
+	stream.pipe(localUser);
 };
 
 VoiceInput.prototype._addUser = function(user) {
@@ -49,15 +47,12 @@ VoiceInput.prototype._addUser = function(user) {
 		if(err) {
 			Winston.error("Error occured when trying to fetch user by mumble id", err);
 		}
-		if(!databaseUser) {
+		if(databaseUser) {
+			this._addRegisteredUser(user, databaseUser);
+		}
+		else {
 			Winston.info("Did not register input for user " + user.name + " as this user is not linked to any database user.");
-			return;
 		}
-		if(databaseUser.settings.record !== true) {
-			Winston.info("Did not register input for user " + user.name + " as this user does not want to be recorded.");
-			return;
-		}
-		this._addRegisteredUser(user, databaseUser);
 	}.bind(this));
 };
 

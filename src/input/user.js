@@ -8,6 +8,8 @@ var Util = require("util");
 var EventEmitter = require("events").EventEmitter;
 var FS = require("fs");
 var Lame = require("lame");
+var Stream = require('stream');
+var Util = require('util');
 
 /*
  * Defines
@@ -43,16 +45,21 @@ var VoiceInputUser = function(user, databaseUser, bot) {
 	this._databaseUser = databaseUser;
 	this.speaking = false;
 	this._currentAudioBuffers = [];
+	Stream.Writable.call(this);
 };
 
-Util.inherits(VoiceInputUser, EventEmitter);
+Util.inherits(VoiceInputUser, Stream.Writable);
 
 /**
  * Feed raw PCM audio data captured from mumble to this user.
  * @param chunk - Buffer of raw PCM audio data.
  */
-VoiceInputUser.prototype.data = function(chunk) {
-	this._onAudio(chunk);
+VoiceInputUser.prototype._write = function(chunk, encoding, done) {
+	if(!this.speaking) {
+		this._speechStarted();
+	}
+	this._speechContinued(chunk);
+	done();
 };
 
 VoiceInputUser.prototype._refreshTimeout = function() {
@@ -94,14 +101,6 @@ VoiceInputUser.prototype._speechStopped = function() {
 VoiceInputUser.prototype._speechContinued = function(chunk) {
 	this._currentAudioBuffers.push(chunk);
 	this._refreshTimeout();
-};
-
-
-VoiceInputUser.prototype._onAudio = function(chunk) {
-	if(!this.speaking) {
-		this._speechStarted();
-	}
-	this._speechContinued(chunk);
 };
 
 module.exports = VoiceInputUser;
