@@ -34,7 +34,7 @@ module.exports = function(Database) {
 		);
 	};
 	Database.prototype.listRecordsForUser = function(user, callback) {
-		this.pool.query("SELECT id, quote, used, submitted FROM Records ORDER BY used DESC WHERE user = ?", [user.id],
+		this.pool.query("SELECT id, quote, used, submitted FROM Records WHERE user = ? ORDER BY used DESC", [user.id],
 			function(err, rows) {
 				if(this._checkError(err, callback)) {
 					if(callback) { callback(null, rows); }

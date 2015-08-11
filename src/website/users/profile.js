@@ -64,7 +64,7 @@ var ViewUsersProfile = function(bot) {
 	}
 
 	function fetchRecords(user, username, req, res) {
-			bot.database.listRecordsForUser(user.id, function(err, records) {
+			bot.database.listRecordsForUser(user, function(err, records) {
 				if(err) {
 					Winston.error("Error fetching records of user " + username + ".", err);
 					records = [];
