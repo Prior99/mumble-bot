@@ -45,6 +45,14 @@ CREATE TABLE IF NOT EXISTS UserPermissions (
 	FOREIGN KEY (permission) REFERENCES Permissions(id)
 );
 
+CREATE TABLE IF NOT EXISTS UserSettings (
+	user			INT NOT NULL,
+	setting			VARCHAR(32) NOT NULL,
+	value			TEXT,
+	FOREIGN KEY (user) REFERENCES Users(id),
+	PRIMARY KEY(user, setting)
+);
+
 CREATE TABLE IF NOT EXISTS MumbleUsers (
 	mumbleId		INT NOT NULL PRIMARY KEY,
 	user			INT NOT NULL,

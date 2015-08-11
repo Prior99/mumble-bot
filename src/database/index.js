@@ -48,6 +48,7 @@ require("./bass.js")(Database);
 require("./autocomplete.js")(Database);
 require("./sounds.js")(Database);
 require("./records.js")(Database);
+require("./settings.js")(Database);
 
 Database.prototype._checkError = function(err, callback) {
 	if(err) {

@@ -66,7 +66,13 @@ module.exports = function(Database) {
 		this.pool.query("SELECT u.minecraft AS minecraft, u.id AS id, u.username as username, u.password AS password, i.identifier AS identifier, u.steamid AS steamid FROM Users u LEFT JOIN Identifiers i ON u.identifier = i.id WHERE u.id = ?",
 			[id], function(err, rows) {
 				if(this._checkError(err, callback)) {
-					callback(null, rows[0]);
+					var user = rows[0];
+					this.getSettings(user, function(err, settings) {
+						if(this._checkError(err, callback)) {
+							user.settings = settings;
+							callback(null, user);
+						}
+					}.bind(this));
 				}
 			}.bind(this)
 		);
