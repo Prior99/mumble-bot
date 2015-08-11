@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS Records (
 	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	quote			TEXT,
 	submitted		DATETIME,
-	user			INT NOT NOLL,
+	user			INT NOT NULL,
 	used			INT NOT NULL DEFAULT 0,
 	FOREIGN KEY(user) REFERENCES Users(id)
 );
