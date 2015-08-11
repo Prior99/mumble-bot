@@ -6,7 +6,14 @@ module.exports = function(bot) {
 		if(req.query.id && req.query.quote) {
 			var sound = bot.getCachedAudioById(req.query.id);
 			var quote = req.query.quote;
-			try { FS.mkdirSync('records'); } catch(err) { }
+				try {
+					FS.mkdirSync("sounds/recorded");
+				}
+				catch(e) {
+					if(e.code !== "EEXIST") {
+						throw e;
+					}
+				}
 			bot.database.addRecord(quote, sound.user, sound.date, function(err, id) {
 				if(err) {
 					Winston.error("Could not add record to database.", err);
@@ -16,7 +23,7 @@ module.exports = function(bot) {
 					});
 				}
 				else {
-					FS.rename(sound.file, "records/" + id, function(err) {
+					FS.rename(sound.file, "sounds/recorded/" + id, function(err) {
 						if(err) {
 							Winston.error("Could not rename new record file.", err);
 							res.status(500).send({

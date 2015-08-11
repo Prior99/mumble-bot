@@ -21,7 +21,6 @@ var VoiceInput = function(bot) {
 	this.bot = bot;
 	this.users = {};
 	this._initConnectedUsers(bot.mumble.users());
-	console.log(bot.mumble.users());
 	bot.mumble.on('user-connect', this._addUser.bind(this));
 	bot.mumble.on('user-disconnect', this._removeUser.bind(this));
 	Winston.info("Module started: Voice input");
