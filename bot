@@ -59,24 +59,13 @@ function check_env {
 		echo -ne "\033[32mfound.\033[0m"
 		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
 	fi
+
+	if ! [ -e addons ]; then
+		mkdir addons
+	fi
 }
 
 function setup {
-
-	#
-	# Check for pocketsphinx
-	#
-
-	echo -n "  Checking for Pocketsphinx ... "
-	if ! pkg-config --exists pocketsphinx ; then
-		echo -ne "\033[31mnot found!\033[0m"
-		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
-		echo -e "\r\033[31mPlease install pocketsphinx from source and make it available to pkg-config.\033[0m"
-		exit 1
-	else
-		echo -ne "\033[32mfound.\033[0m"
-		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
-	fi
 
 	#
 	# Check for OpenSSL
