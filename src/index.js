@@ -38,9 +38,6 @@ var Bot = function(mumble, options, database) {
 	this.cachedAudios = [];
 	this._audioId = 0;
 
-	this.hotword = options.hotword.replace("%name%", options.name).toLowerCase();
-	Winston.info("Hotword is '" + this.hotword + "'");
-
 	this.command = new Command(this);
 	this.quotes = new Quotes(this);
 	this.permissions = new Permissions(database);

@@ -17,7 +17,6 @@
 		"tmp" : "tmp/",
 		"sessionSecret" : "some_random_string"
 	},
-	"hotword" : "okay %name%",
 	"database" : {
 		"host" : "localhost",
 		"user" : "bot",

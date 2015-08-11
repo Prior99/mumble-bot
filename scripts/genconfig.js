@@ -63,13 +63,7 @@ var schema = {
 			description : "Do you want the bot to connect to a minecraft server? The server must be in offline mode.",
 			required : true,
 			default : false
-		},
-		hotword : {
-			message : "Enter a hotword.",
-			description : "Enter a phrase on which the speech recognition will start. You can use %name% as the bots name:",
-			required : true,
-			default : "okay %name%"
-		}
+		}	
 	}
 };
 

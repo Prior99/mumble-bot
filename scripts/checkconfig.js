@@ -15,7 +15,6 @@ check("name", config);
 check("channel", config);
 check("afkChannel", config);
 check("kickChannel", config);
-check("hotword", config);
 check("website", config);
 check("database", config);
 
