@@ -88,7 +88,8 @@ var Website = function(bot) {
 	if(bot.options.mpd) {
 		pages.unshift({
 			url : "/music/",
-			name : "Musik"
+			name : "Musik",
+			icon : "music"
 		});
 	}
 	this.app = Express();
