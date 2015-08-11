@@ -12,6 +12,7 @@ var viewList = require('./list');
 var viewHome = require('./home');
 var viewProfile = require('./profile');
 var viewPermissions = require('./permissions');
+var viewSettings = require('./settings');
 /*
  * Code
  */
@@ -32,6 +33,7 @@ var RouteUsers = function(bot) {
 		next();
 	});
 	router.get('/list', viewList(bot));
+	router.get('/settings', viewSettings(bot));
 	router.get('/profile/:username', viewProfile(bot));
 	router.get('/permissions/:username', viewPermissions(bot));
 	router.get('/', viewHome(bot));
