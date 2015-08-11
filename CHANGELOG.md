@@ -11,6 +11,8 @@ Relevant Changes:
 * Moved sounds to own page with subpages for uploading and playing.
 * Tables can now be sorted. Add class ```tablesorter``` to any html table to have it sortable. Add class ```no-sort``` to the head of columns which should not be sortable.
 * Added fun feature: Google Instant which will retrieve a set of suggestions from googles instant engine and read them.
+* Bot will record everything a registered user is saying and cache it accessible on a page. It is then possible to persist these records and play them back later for amusement.
+* Speechrecognition via pocketsphinx removed.
 
 Bugfixes:
 ---------
