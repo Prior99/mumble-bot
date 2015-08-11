@@ -47,12 +47,15 @@ VoiceInput.prototype._addUser = function(user) {
 		if(err) {
 			Winston.error("Error occured when trying to fetch user by mumble id", err);
 		}
-		if(databaseUser) {
-			this._addRegisteredUser(user, databaseUser);
-		}
-		else {
+		if(!databaseUser) {
 			Winston.info("Did not register input for user " + user.name + " as this user is not linked to any database user.");
+			return;
 		}
+		if(databaseUser.settings.record !== true) {
+			Winston.info("Did not register input for user " + user.name + " as this user does not want to be recorded.");
+			return;
+		}
+		this._addRegisteredUser(user, databaseUser);
 	}.bind(this));
 };
 
