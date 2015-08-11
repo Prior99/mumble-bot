@@ -1,3 +1,22 @@
+v0.1.2
+======
+Migration:
+----------
+Install all new dependencies and upgrade outdated ones by rebuilding them using ```npm install```.
+
+Relevant Changes:
+-----------------
+* Addons moved to own repository *mumble-bot-addons* to have this repository save for work.
+* Icons on top-level pages.
+* Moved sounds to own page with subpages for uploading and playing.
+* Tables can now be sorted. Add class ```tablesorter``` to any html table to have it sortable. Add class ```no-sort``` to the head of columns which should not be sortable.
+* Added fun feature: Google Instant which will retrieve a set of suggestions from googles instant engine and read them.
+
+Bugfixes:
+---------
+* Fixed style for empty buttons in bass feature.
+* Fixed updating amount of uses of sounds.
+
 v0.1.1
 ======
 Migration:
