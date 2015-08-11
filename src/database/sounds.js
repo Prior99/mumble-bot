@@ -9,7 +9,7 @@ module.exports = function(Database) {
 		);
 	};
 	Database.prototype.listSounds = function(callback) {
-		this.pool.query("SELECT id, name, used FROM Sounds ORDER BY used DESC",
+		this.pool.query("SELECT id, name, used FROM Sounds ORDER BY name, used DESC",
 			function(err, rows) {
 				if(this._checkError(err, callback)) {
 					if(callback) { callback(null, rows); }
@@ -18,7 +18,7 @@ module.exports = function(Database) {
 		);
 	};
 	Database.prototype.usedSound = function(id, callback) {
-		this.pool.query("UPDATE Sounds SET used = used +1",
+		this.pool.query("UPDATE Sounds SET used = used +1 WHERE id = ?",
 			[id], function(err) {
 				if(this._checkError(err, callback)) {
 					if(callback) { callback(null); }
