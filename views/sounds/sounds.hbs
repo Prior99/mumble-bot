@@ -1,0 +1,33 @@
+<h1>Sounds</h1>
+<table class="table table-striped tablesorter">
+	<thead>
+		<tr>
+			<th>Dateiname</th>
+			<th>Used</th>
+			<th style='width: 30pt;' class="no-sort"></th>
+		</tr>
+	</thead>
+	<tbody>
+	{{#each sounds}}
+		<tr>
+			<td>{{name}}</td>
+			<td>{{used}}</td>
+			<td><a soundsId="{{id}}" class="playsound quote-btn btn btn-xs btn-success"><span class="fa fa-volume-down" aria-hidden="true"></span> Play</a></td>
+		</tr>
+	{{/each}}
+	</tbody>
+</table>
+
+<script>
+$(".playsound").click(function(e) {
+	var id = $(this).attr('soundsId');
+	$.ajax("/api/sounds/play?id=" + id).done(function(res) {
+		if(res.okay) {
+			spawnNotification('success', "Sound abgespielt.");
+		}
+	})
+	.error(function(res) {
+		spawnNotification('error', "Konnte Sound nicht wiedergeben.");
+	});
+});
+</script>

@@ -169,8 +169,9 @@ Bot.prototype._loadAddons = function(dir, callback) {
 		else {
 			var next = function() {
 				if(files.length > 0) {
-					var filename = dir + files.shift();
-					if(FS.lstatSync(filename).isDirectory()) {
+					var file = files.shift()
+					var filename = dir + file;
+					if(FS.lstatSync(filename).isDirectory() && file.substr(0, 1) != ".") {
 					Winston.info("Loading addon " + filename + " ...");
 						var isAsync = require("../" + filename)(this, next);
 						if(!isAsync) {

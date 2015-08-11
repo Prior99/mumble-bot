@@ -2,22 +2,20 @@
 <p>Derzeit befinden sich <b>{{quotes.length}}</b> Zitate in der Datenbank.</p>
 <table class="table table-striped table-responsive tablesorter">
 	<thead>
-		<tr class="row">
-			<th class="col-md-2">Autor</th>
-			<th class="col-md-6">Zitat</th>
-			<th class="col-md-2">Eingetragen</th>
-			<th class="col-md-1">Verwendet</th>
-			<th class="col-md-1"></th>
-		</tr>
+		<th>Autor</th>
+		<th>Zitat</th>
+		<th>Eingetragen</th>
+		<th>Verwendet</th>
+		<th class="no-sort"></th>
 	</thead>
 	<tbody>
 	{{#each quotes}}
-		<tr class="row">
-			<td class="col-md-2">{{author}}</td>
-			<td class="col-md-6">{{quote}}</td>
-			<td class="col-md-2">{{{formatDate submitted}}}</td>
-			<td class="col-md-1">{{used}}</td>
-			<td class="col-md-1"><a quoteId="{{id}}"class="quote-btn btn btn-xs btn-success"><span class="fa fa-comment" aria-hidden="true"></span></a></td>
+		<tr>
+			<td>{{author}}</td>
+			<td>{{quote}}</td>
+			<td>{{{formatDate submitted}}}</td>
+			<td>{{used}}</td>
+			<td style="width: 30px;"><a quoteId="{{id}}"class="quote-btn btn btn-xs btn-success"><span class="fa fa-comment" aria-hidden="true"></span> Play</a></td>
 		</tr>
 	{{/each}}
 	</tbody>

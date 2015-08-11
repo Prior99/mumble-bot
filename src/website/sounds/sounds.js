@@ -8,7 +8,7 @@ var Sounds = function(bot) {
 			else {
 				res.locals.sounds = sounds;
 			}
-			res.render("sounds");
+			res.render("sounds/sounds");
 		});
 	};
 };
