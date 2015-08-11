@@ -8,7 +8,7 @@ var Express = require('express');
  * Views
  */
 
-var viewPlay = require('./play');
+var viewPlayCached = require('./playcached');
 
 /*
  * Code
@@ -17,7 +17,7 @@ var viewPlay = require('./play');
 module.exports = function(bot) {
 	var router = Express.Router();
 
-	router.use('/play', viewPlay(bot));
+	router.use('/playcached', viewPlayCached(bot));
 
 	return router;
 };

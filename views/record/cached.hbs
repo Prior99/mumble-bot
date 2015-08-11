@@ -23,7 +23,7 @@
 <script>
 	$('a.playbutton').click(function() {
 		var id = $(this).attr("soundId");
-		$.ajax("/api/record/play?id=" + id).done(function(response) {
+		$.ajax("/api/record/playcached?id=" + id).done(function(response) {
 			if(response.okay) {
 				spawnNotification('success', "Datei erfolgreich wiedergegeben!");
 			}
