@@ -50,6 +50,12 @@ var Bot = function(mumble, options, database) {
 	this._initPromptInput();
 
 	this.output = new Output(this);
+	if(options.audioCacheAmount) {
+		this.audioCacheAmount = options.audioCacheAmount;
+	}
+	else {
+		this.audioCacheAmount = AUDIO_CACHE_AMOUNT;
+	}
 
 	if(options.mpd) {
 		if(options.mpd.fifo) {
@@ -311,7 +317,7 @@ Bot.prototype.removeCachedAudio = function(audio) {
 };
 
 Bot.prototype._clearUpCachedAudio = function() {
-	this._deleteAllCachedAudio(AUDIO_CACHE_AMOUNT);
+	this._deleteAllCachedAudio(this.audioCacheAmount);
 };
 
 Bot.prototype._deleteAllCachedAudio = function(amount) {

@@ -23,6 +23,7 @@
 		"database" : "bot",
 		"password" : "super_secret_password"
 	},
+	"audioCacheAmount" : 500
 	"steam" : {
 		"user" : "username",
 		"password" : "password",

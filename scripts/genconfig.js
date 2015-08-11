@@ -63,7 +63,14 @@ var schema = {
 			description : "Do you want the bot to connect to a minecraft server? The server must be in offline mode.",
 			required : true,
 			default : false
-		}	
+		},
+		audioCacheAmount : {
+			required : false,
+			default : 100,
+			pattern : /\d+/,
+			message : "Enter the amount of records you want to keep.",
+			description : "How many temporary records do you want to keep?"
+		},
 	}
 };
 
