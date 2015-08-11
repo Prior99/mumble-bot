@@ -298,6 +298,17 @@ Bot.prototype.getCachedAudioById = function(id) {
 	return null;
 };
 
+Bot.prototype.removeCachedAudio = function(audio) {
+	var index = this.cachedAudios.indexOf(audio);
+	if(index !== -1) {
+		this.cachedAudios.splice(index, 1);
+		return true;
+	}
+	else {
+		return false;
+	}
+};
+
 Bot.prototype._clearUpCachedAudio = function() {
 	this._deleteAllCachedAudio(AUDIO_CACHE_AMOUNT);
 };

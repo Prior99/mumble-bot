@@ -22,7 +22,7 @@ module.exports = function(Database) {
 									finished.push(row);
 									next(); //Continue recursion
 								}
-							});
+							}.bind(this));
 						}
 						else {
 							if(callback) { callback(null, finished); } // All rows done
