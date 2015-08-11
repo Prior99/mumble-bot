@@ -17,7 +17,7 @@ module.exports = function(Database) {
 			if(this._checkError(err, callback)) {
 				var settings = {};
 				rows.forEach(function(row) {
-					settings[row.setting] = row.value;
+					settings[row.setting] = JSON.parse(row.value);
 				});
 				if(callback) { callback(null, settings); }
 			}
@@ -26,7 +26,7 @@ module.exports = function(Database) {
 
 	Database.prototype.setSetting = function(user, setting, value, callback) {
 		this.pool.query("INSERT INTO UserSettings(user, setting, value) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)", [user.id, setting, value], function(err) {
-			this._checkError(err, callback);
+			if(this._checkError(err, callback) && callback) { callback(); };
 		}.bind(this));
 	};
 };

@@ -5,7 +5,7 @@ module.exports = function(bot) {
 	function applySettings(settings, user, callback) {
 		function next() {
 			var setting = settings.pop();
-			bot.database.setSetting(user, setting.key, setting.key, function(err) {
+			bot.database.setSetting(user, setting.key, setting.val, function(err) {
 				if(err) {
 					callback(err);
 				}
@@ -22,6 +22,18 @@ module.exports = function(bot) {
 		if(settings.length > 0) {
 			next();
 		}
+		else {
+			callback();
+		}
+	}
+
+	function reloadUser(req, callback) {
+		bot.database.getUserById(req.session.user.id, function(err, user) {
+			if(!err) {
+				req.session.user = user;
+			}
+			callback(err);
+		});
 	}
 
 	return function(req, res) {
@@ -37,8 +49,19 @@ module.exports = function(bot) {
 				});
 			}
 			else {
-				res.status(200).send({
-					okay : true
+				reloadUser(req, function(err) {
+					if(err) {
+						Winston.error("Error reloading user into session.", err);
+						res.status(500).send({
+							okay : false,
+							reason : "internal_error"
+						});
+					}
+					else {
+						res.status(200).send({
+							okay : true
+						});
+					}
 				});
 			}
 		});
