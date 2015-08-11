@@ -11,7 +11,7 @@
 	<tbody>
 	{{#each cached}}
 		<tr>
-			<td>{{this.user.username}}</td>
+			<td><a href="/users/profile/{{this.user.username}}">{{this.user.username}}</a></td>
 			<td>{{formatDate this.date}} {{formatTime this.date}}</td>
 			<td><a soundId="{{this.id}}" class="playbutton btn btn-info btn-xs"><span class="fa fa-volume-down" aria-hidden="true"></span> Play</a></td>
 			<td><a href="/record/save?id={{this.id}}" class="btn btn-success btn-xs"><span class="fa fa-save" aria-hidden="true"></span> Save</a></td>

@@ -46,35 +46,57 @@ var ViewUsersProfile = function(bot) {
 		});
 	}
 
-	return function(req, res) {
-		var username = req.params.username;
+	function fetchUser(username, req, res) {
 		bot.database.getUserByUsername(username, function(err, user) {
-				if(err) {
-					Winston.error("Error displaying profile of user " + username + ".", err);
-					res.status(500).send("Internal error.");
+			if(err) {
+				Winston.error("Error displaying profile of user " + username + ".", err);
+				res.status(500).send("Internal error.");
+			}
+			else {
+				if(user) {
+					fetchRecords(user, username, req, res);
 				}
 				else {
-					if(user) {
-						bot.database.getLinkedMumbleUsersOfUser(username, function(err, linkedUsers) {
-							if(err) {
-								Winston.error("Unabled to fetch linked mumble users of user " + username, err);
-								linkedUsers = [];
-							}
-							getMumbleUsersLinkingPossible(getRegisteredMumbleUsers(bot.mumble), function(mumbleUsers) {
-								res.locals.user = user;
-								res.locals.freeMumbleUsers = mumbleUsers;
-								res.locals.linkedUsers = linkedUsers;
-								res.locals.own = req.session.user.id == user.id;
-								res.render("users/profile");
-							});
-						})
-					}
-					else {
-						res.status(404).send("Unknown user.");
-					}
+					res.status(404).send("Unknown user.");
 				}
 			}
-		);
+		});
+	}
+
+	function fetchRecords(user, username, req, res) {
+			bot.database.listRecordsForUser(user.id, function(err, records) {
+				if(err) {
+					Winston.error("Error fetching records of user " + username + ".", err);
+					records = [];
+				}
+				fetchLinkedMumbleUsers(records, user, username, req, res);
+			});
+	}
+
+	function fetchLinkedMumbleUsers(records, user, username, req, res) {
+		bot.database.getLinkedMumbleUsersOfUser(username, function(err, linkedUsers) {
+			if(err) {
+				Winston.error("Unabled to fetch linked mumble users of user " + username, err);
+				linkedUsers = [];
+			}
+			renderPage(linkedUsers, records, user, username, req, res);
+		});
+	}
+
+	function renderPage(linkedUsers, records, user, username, req, res) {
+		getMumbleUsersLinkingPossible(getRegisteredMumbleUsers(bot.mumble), function(mumbleUsers) {
+			res.locals.user = user;
+			res.locals.freeMumbleUsers = mumbleUsers;
+			res.locals.linkedUsers = linkedUsers;
+			res.locals.own = req.session.user.id == user.id;
+			res.locals.records = records;
+			res.render("users/profile");
+		});
+	}
+
+	return function(req, res) {
+		var username = req.params.username;
+		fetchUser(username, req, res);
 	};
 };
 
