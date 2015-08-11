@@ -278,12 +278,13 @@ Bot.prototype.join = function(cname) {
 	channel.join();
 };
 
-Bot.prototype.addCachedAudio = function(filename, user) {
+Bot.prototype.addCachedAudio = function(filename, user, duration) {
 	this.cachedAudios.push({
 		file : filename,
 		date : new Date(),
 		user : user,
-		id : this._audioId++
+		id : this._audioId++,
+		duration : duration
 	});
 	this._clearUpCachedAudio();
 };

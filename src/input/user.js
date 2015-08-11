@@ -52,7 +52,6 @@ Util.inherits(VoiceInputUser, EventEmitter);
  * @param chunk - Buffer of raw PCM audio data.
  */
 VoiceInputUser.prototype.data = function(chunk) {
-	this._currentAudioBuffers.push(chunk);
 	this._onAudio(chunk);
 };
 
@@ -65,6 +64,7 @@ VoiceInputUser.prototype._refreshTimeout = function() {
 
 VoiceInputUser.prototype._speechStarted = function() {
 	this.speaking = true;
+	this._speakStartTime = Date.now();
 };
 
 VoiceInputUser.prototype._speechStopped = function() {
@@ -88,10 +88,11 @@ VoiceInputUser.prototype._speechStopped = function() {
 		encoder.write(this._currentAudioBuffers.shift());
 	}
 	encoder.end();
-	this.bot.addCachedAudio(filename, this._databaseUser);
+	this.bot.addCachedAudio(filename, this._databaseUser, (Date.now() - this._speakStartTime)/1000);
 };
 
 VoiceInputUser.prototype._speechContinued = function(chunk) {
+	this._currentAudioBuffers.push(chunk);
 	this._refreshTimeout();
 };
 
