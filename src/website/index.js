@@ -32,24 +32,29 @@ var routeSounds = require('./sounds');
  */
 
 var pages = [{
-	url : "/",
-	name : "Übersicht"
-},
-{
 	url : "/quotes/",
-	name : "Zitate"
+	name : "Zitate",
+	icon : "commenting"
 },
 {
 	url : "/users/",
-	name : "Benutzer"
+	name : "Benutzer",
+	icon : "group"
 },
 {
 	url : "/bass/",
-	name : "Bass"
+	name : "Bass",
+	icon : "play-circle"
 },
 {
 	url : "/sounds/",
-	name : "Sounds"
+	name : "Sounds",
+	icon : "volume-down"
+},
+{
+	url : "/",
+	name : "Sonstiges",
+	icon : "dashboard"
 }];
 
 var subpages = [{
