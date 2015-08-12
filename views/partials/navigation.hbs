@@ -15,6 +15,9 @@
 				{{/each}}
 			</ul>
 			<div class="navbar-right btn-group" role="group">
+				{{#if userPermissions.be-quiet}}
+				<a class="btn btn-danger navbar-btn" id="quiet-nav-btn"><i class="fa fa-bell-slash"></i></a>
+				{{/if}}
 				<a class="btn btn-default navbar-btn" href="/users/profile/{{session.user.username}}"><i class="fa fa-user"></i> {{session.user.username}}</a>
 				<a class="btn btn-default navbar-btn" href="/users/settings"><i class="fa fa-cogs"></i></a>
 				<button id="nav-sign-out" class="btn btn-default navbar-btn" href="#"><i class="fa fa-sign-out"></i></button>
@@ -26,6 +29,14 @@
 	$('#nav-sign-out').click(function() {
 		$.ajax("/api/users/logout").done(function(res) {
 			window.location.reload();
+		});
+	})
+	$('#quiet-nav-btn').click(function() {
+		$.ajax("/api/command?command=be%20quiet").done(function(res) {
+			spawnNotification('success', "Ausgabe von Sound sollte zeitnah aufhören.");
+		})
+		.error(function() {
+			spawnNotification('error', "Konnte Befehl nicht ausführen.");
 		});
 	})
 </script>

@@ -7,6 +7,7 @@ var EventEmitter = require("events").EventEmitter;
 var Winston = require('winston');
 var Sound = require('./sound');
 var Speech = require('./speech');
+var Stream = require('stream');
 /*
  * Code
  */
@@ -19,17 +20,73 @@ var Speech = require('./speech');
  */
 var Output = function(bot) {
 	this.bot = bot;
-	this.speech = new Speech(bot.mumble.inputStream(), bot.options.espeakData, bot.mumble.user.channel, bot.database, bot);
-	this.sound = new Sound(bot.mumble.inputStream());
+	this.stream = bot.mumble.inputStream();
+	this.speech = new Speech(this, bot.options.espeakData, bot.mumble.user.channel, bot.database, bot);
+	this.sound = new Sound(this);
 	this.busy = false;
 	this.queue = [];
 	this.current = null;
-
+	Stream.Writable.call(this);
+	this._bufferQueue = [];
+	this._playbackAhead = 0;
 	this.bot.newCommand("change voice", this.changeGender.bind(this), "Deprecated. Wechselt das Geschlecht der Stimme.", "venus-mars");
 };
 
-Util.inherits(Output, EventEmitter);
+Util.inherits(Output, Stream.Writable);
 
+var PREBUFFER = 0.5;
+
+Output.prototype._shiftBuffer = function() {
+	if(this._lastBufferShift) {
+		var timePassed = (Date.now() - this._lastBufferShift) / 1000;
+		this._playbackAhead -= timePassed;
+	}
+	if(this._bufferQueue.length > 0) {
+		var start = Date.now();
+		if(this._playbackAhead < 0 && this._lastBufferShift) {
+			Winston.warn("Buffer underflow.");
+		}
+		while(this._playbackAhead < PREBUFFER && this._bufferQueue.length > 0) {
+			var b = this._bufferQueue.shift();
+			var lengthOfBuffer = (b.length / 2) / 48000;
+			this._playbackAhead += lengthOfBuffer;
+			this.stream.write(b);
+		}
+		var waitFor;
+		var overfilled = this._playbackAhead - PREBUFFER;
+		if(overfilled > 0) {
+			waitFor = 1000 * overfilled;
+		}
+		else {
+			waitFor = 100;
+		}
+		this._timeout = setTimeout(this._shiftBuffer.bind(this), waitFor);
+		this._lastBufferShift = Date.now();
+	}
+	else {
+		this._playbackAhead = 0;
+		this._lastBufferShift = null;
+		this._timeout = null;
+	}
+};
+
+Output.prototype._write = function(chunk, encoding, done) {
+	this._bufferQueue.push(chunk);
+	if(!this._timeout) {
+		this._shiftBuffer(); //Not currently processing queue? Sleeping? Wake up!
+	}
+	done();
+};
+
+/**
+ * Clear the whole queue and stop current playback.
+ */
+Output.prototype.clear = function() {
+	this.queue = [];
+	this._bufferQueue = [];
+	this.speech.clear();
+	this.sound.clear();
+};
 
 Output.prototype._next = function() {
 	if(!this.busy && this.queue.length !== 0) {

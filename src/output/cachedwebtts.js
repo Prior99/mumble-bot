@@ -136,8 +136,8 @@ CachedWebTTS.prototype._getMP3Stream = function(text, stream) {
 						stream.write(data);
 					});
 					//next();
+					next();
 				}
-				next();
 			}.bind(this));
 		}
 	}.bind(this);
@@ -206,6 +206,7 @@ CachedWebTTS.prototype._retrieveMP3Part = function(text, callback, tries) {
 	}
 	if(tries > RETRIES) {
 		callback(new Error("Could not retrieve speech from tts after 3 tries."));
+		return;
 	}
 	var encoded = encodeURIComponent(text);
 	var url = this.url + encoded;
@@ -222,8 +223,9 @@ CachedWebTTS.prototype._retrieveMP3Part = function(text, callback, tries) {
 			callback(null, request);
 			request.end();
 		}
-	}).on('error', function(err) {
+	}).once('error', function(err) {
 		this._retrieveMP3Part(text, callback, tries + 1);
+		request.end();
 	}.bind(this));
 	request.pause();
 };

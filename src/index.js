@@ -101,6 +101,7 @@ var Bot = function(mumble, options, database) {
 		this.say(commandsSay + ". Ich habe diese Liste auch in den Chat geschrieben.");
 		this.mumble.user.channel.sendMessage(commandsWrite.substring(0, commandsWrite.length - 4));
 	}.bind(this), "Gibt eine Liste aller Kommandos aus.", "list-ul");
+	this.newCommand("be quiet", this.beQuiet.bind(this), "Sofort alles, was Geräusche verursacht abschalten.", "bell-slash", null, 'be-quiet');
 	this.newCommand("shutdown", this.shutdown.bind(this), "Fährt den bot herunter.", "power-off", null, 'shutdown');
 };
 
@@ -115,6 +116,13 @@ Bot.prototype._onVoiceInput = function(text, mumbleUser) {
 			this.command.processPrefixed(text, 'mumble', user);
 		}
 	}.bind(this));
+};
+
+/**
+ * Instant shutdown everything which could cause noises.
+ */
+Bot.prototype.beQuiet = function() {
+	this.output.clear();
 };
 
 /**

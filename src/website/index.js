@@ -117,7 +117,10 @@ var Website = function(bot) {
 		secret: bot.options.website.sessionSecret,
 		store: new FileStore({
 			path : "session-store",
-			ttl : 315569260
+			ttl : 315569260,
+			retries : 3,
+			minTimeout : 200,
+			maxTimeout : 1000
 		}),
 		resave: false,
 		saveUninitialized: true
@@ -127,7 +130,15 @@ var Website = function(bot) {
 		res.locals.pages = pages;
 		res.locals.session = req.session;
 		res.locals.subpages = subpages;
-		next();
+		if(req.session.user) {
+			bot.permissions.listPermissionsAssocForUser(req.session.user, function(permissions) {
+				res.locals.userPermissions = permissions;
+				next();
+			});
+		}
+		else {
+			next();
+		}
 	});
 	this.app.use(Less('public/'));
 	this.app.use('/', Express.static('public/'));

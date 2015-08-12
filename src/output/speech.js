@@ -65,6 +65,19 @@ var Speech = function(stream, espeakData, channel, database, bot) {
 
 Util.inherits(Speech, EventEmitter);
 
+/**
+ * Clear the whole queue and stop current playback.
+ */
+Speech.prototype.clear = function() {
+	this.queue = [];
+	ESpeak.cancel();
+	if(this.timeout) {
+		clearTimeout(this.timeout);
+		this.timeout = null;
+	}
+	this._speakingStopped();
+};
+
 Speech.prototype._refreshTimeout = function() {
 	if(this.timeout) {
 		clearTimeout(this.timeout);
@@ -77,11 +90,13 @@ Speech.prototype._speakingStopped = function() {
 	this.speaking = false;
 	this.timeout = null;
 	this.emit("stop", this.current);
-	var callback = this.current.callback;
-	this.current = null;
-	this._next();
-	if(callback) {
-		callback();
+	if(this.current) {
+		var callback = this.current.callback;
+		this.current = null;
+		this._next();
+		if(callback) {
+			callback();
+		}
 	}
 };
 
@@ -149,7 +164,7 @@ Speech.prototype.changeGender = function() {
  */
 Speech.prototype.speakUsingESpeak = function(text) {
 	this._currentEngine = null;
-	ESpeak.speak(this.current.text);
+	ESpeak.speak(text);
 };
 
 Speech.prototype._onGoogleTTSError = function(err, text) {
@@ -169,19 +184,19 @@ Speech.prototype._onBingTTSError = function(err, text) {
 Speech.prototype.speakUsingGoogle = function(text) {
 	this._currentEngine = this._googleEngine;
 	this._googleEngine.removeAllListeners('error'); //TODO: This is a nasty dirty piece of shit code line
-	this._googleEngine.tts(text);
-	this._googleEngine.once('error', function(err) {
+	this._googleEngine.on('error', function(err) {
 		this._onGoogleTTSError(err, text);
 	}.bind(this));
+	this._googleEngine.tts(text);
 };
 
 Speech.prototype.speakUsingBing = function(text) {
 	this._currentEngine = this._bingEngine;
 	this._bingEngine.removeAllListeners('error'); //TODO: This is a nasty dirty piece of shit code line
-	this._bingEngine.tts(text);
-	this._bingEngine.once('error', function(err) {
+	this._bingEngine.on('error', function(err) {
 		this._onBingTTSError(err, text);
 	}.bind(this));
+	this._bingEngine.tts(text);
 };
 
 Speech.prototype._next = function() {
