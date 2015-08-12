@@ -206,6 +206,7 @@ CachedWebTTS.prototype._retrieveMP3Part = function(text, callback, tries) {
 	}
 	if(tries > RETRIES) {
 		callback(new Error("Could not retrieve speech from tts after 3 tries."));
+		return;
 	}
 	var encoded = encodeURIComponent(text);
 	var url = this.url + encoded;

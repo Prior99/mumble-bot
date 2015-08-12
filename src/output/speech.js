@@ -177,19 +177,19 @@ Speech.prototype._onBingTTSError = function(err, text) {
 Speech.prototype.speakUsingGoogle = function(text) {
 	this._currentEngine = this._googleEngine;
 	this._googleEngine.removeAllListeners('error'); //TODO: This is a nasty dirty piece of shit code line
-	this._googleEngine.tts(text);
 	this._googleEngine.once('error', function(err) {
 		this._onGoogleTTSError(err, text);
 	}.bind(this));
+	this._googleEngine.tts(text);
 };
 
 Speech.prototype.speakUsingBing = function(text) {
 	this._currentEngine = this._bingEngine;
 	this._bingEngine.removeAllListeners('error'); //TODO: This is a nasty dirty piece of shit code line
-	this._bingEngine.tts(text);
 	this._bingEngine.once('error', function(err) {
 		this._onBingTTSError(err, text);
 	}.bind(this));
+	this._bingEngine.tts(text);
 };
 
 Speech.prototype._next = function() {
