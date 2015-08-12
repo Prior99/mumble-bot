@@ -122,10 +122,6 @@ Bot.prototype._onVoiceInput = function(text, mumbleUser) {
  * Instant shutdown everything which could cause noises.
  */
 Bot.prototype.beQuiet = function() {
-	console.log("Being quiet");
-	if(this.options.mpd) {
-		this.mpd.pause();
-	}
 	this.output.clear();
 };
 
