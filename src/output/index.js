@@ -30,7 +30,6 @@ var Output = function(bot) {
 
 Util.inherits(Output, EventEmitter);
 
-
 Output.prototype._next = function() {
 	if(!this.busy && this.queue.length !== 0) {
 		this.current = this.queue.shift();
