@@ -9,7 +9,8 @@ var Samplerate = require("node-samplerate");
 var Util = require("util");
 var EventEmitter = require("events").EventEmitter;
 var Winston = require("winston");
-var GoogleTTS = require("./googleTranslateTTS");
+var GoogleTTS = require("./googletranslatetts");
+var BingTTS = require("./bingtranslatetts");
 
 /*
  * Code
@@ -27,7 +28,7 @@ var GoogleTTS = require("./googleTranslateTTS");
  * @param {Database} database - Instance of the database to work with for Google
  *								Translate TTS cache.
  */
-var Speech = function(stream, espeakData, channel, database) {
+var Speech = function(stream, espeakData, channel, database, bot) {
 	this.queue = [];
 	this.gender = "female";
 	ESpeak.initialize({
@@ -39,12 +40,21 @@ var Speech = function(stream, espeakData, channel, database) {
 	}, espeakData);
 	ESpeak.onVoice(this._onESpeakData.bind(this));
 	this.stream = stream;
-	this._googleEngine = new GoogleTTS("google-tts-cache", database);
-	this._googleEngine.on('data', this._onGoogleTTSData.bind(this));
+	this.engine = "google";
+	if(bot.options.bingTTS) {
+		this._bingEngine = BingTTS(bot.options.bingTTS.clientID, bot.options.bingTTS.clientSecret, database);
+		this._bingEngine.on('data', this._onTTSData.bind(this));
+		this._bingEngine.setGender("female");
+		this._bingEngine.on('speechDone', function() {
+			this._speakingStopped();
+		}.bind(this));
+		this.engine = "bing";
+	}
+	this._googleEngine = GoogleTTS(database);
+	this._googleEngine.on('data', this._onTTSData.bind(this));
 	this._googleEngine.on('speechDone', function() {
 		this._speakingStopped();
 	}.bind(this));
-	this.engine = "google";
 	this.busy = false;
 	this.current = null;
 	this.timeout = null;
@@ -101,11 +111,11 @@ Speech.prototype._onESpeakData = function(data, samples, samplerate) {
 	this._refreshTimeout();
 };
 
-Speech.prototype._onGoogleTTSData = function(data) {
+Speech.prototype._onTTSData = function(data) {
 	if(!this.speaking) {
 		this._speakingStarted();
 	}
-	var resampledData = Samplerate.resample(data, this._googleEngine.samplerate, 48000, 1);
+	var resampledData = Samplerate.resample(data, this._currentEngine.samplerate, 48000, 1);
 	if(!this.muted) {
 		this.stream.write(resampledData);
 	}
@@ -137,6 +147,7 @@ Speech.prototype.changeGender = function() {
 	else {
 		this.gender = "male";
 	}
+	this._bingEngine.setGender(this.gender);
 	ESpeak.setGender(this.gender);
 };
 
@@ -145,7 +156,18 @@ Speech.prototype.changeGender = function() {
  * @param {string} text - Text to synthesize.
  */
 Speech.prototype.speakUsingESpeak = function(text) {
+	this._currentEngine = null;
 	ESpeak.speak(this.current.text);
+};
+
+Speech.prototype._onGoogleTTSError = function(err, text) {
+	Winston.error("Received error from google tts. Using ESpeak instead. " + err);
+	this.speakUsingESpeak(text);
+};
+
+Speech.prototype._onBingTTSError = function(err, text) {
+	Winston.error("Received error from bing tts. Using Google instead. " + err);
+	this.speakUsingGoogle(text);
 };
 
 /**
@@ -153,7 +175,21 @@ Speech.prototype.speakUsingESpeak = function(text) {
  * @param {string} text - Text to synthesize.
  */
 Speech.prototype.speakUsingGoogle = function(text) {
+	this._currentEngine = this._googleEngine;
+	this._googleEngine.removeAllListeners('error'); //TODO: This is a nasty dirty piece of shit code line
 	this._googleEngine.tts(text);
+	this._googleEngine.once('error', function(err) {
+		this._onGoogleTTSError(err, text);
+	}.bind(this));
+};
+
+Speech.prototype.speakUsingBing = function(text) {
+	this._currentEngine = this._bingEngine;
+	this._bingEngine.removeAllListeners('error'); //TODO: This is a nasty dirty piece of shit code line
+	this._bingEngine.tts(text);
+	this._bingEngine.once('error', function(err) {
+		this._onBingTTSError(err, text);
+	}.bind(this));
 };
 
 Speech.prototype._next = function() {
@@ -164,6 +200,9 @@ Speech.prototype._next = function() {
 		}
 		else if(this.engine === "espeak") {
 			this.speakUsingESpeak(this.current.text);
+		}
+		else if(this.engine == "bing") {
+			this.speakUsingBing(this.current.text);
 		}
 		Winston.info("Speaking:\"" + this.current.text + "\"");
 		this.channel.sendMessage(this.current.text);

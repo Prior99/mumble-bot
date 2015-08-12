@@ -59,6 +59,11 @@ Mumble.connect("mumble://" + options.url, mumbleOptions, function(err, connectio
 		throw err;
 	}
 	else {
+
+		connection.on('error', function(data) {
+			Winston.error("An error with the mumble connection has occured:", data);
+		});
+
 		connection.authenticate(options.name);
 		connection.on('ready', function() {
 			startup(connection);
@@ -98,7 +103,25 @@ function databaseStarted(err, connection, database) {
 					process.exit();
 				});
 			});
-		})
+		});
+
+		var killed = false;
+
+		function sigint() {
+			if(killed) {
+				Winston.error("CTRL^C detected. Terminating!");
+				process.exit(1);
+			}
+			else {
+				killed = true;
+				Winston.warn("CTRL^C detected. Secure shutdown initiated.");
+				Winston.warn("Press CTRL^C again to terminate at your own risk.");
+				bot.shutdown();
+			}
+		}
+
+		process.on('SIGINT', sigint);
+		bot.on('SIGINT', sigint);
 	}
 }
 

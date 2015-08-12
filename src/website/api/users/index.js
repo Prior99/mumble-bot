@@ -16,6 +16,8 @@ var viewLogout = require('./logout');
 var viewPermissions = require('./permissions');
 var viewGrant = require('./grantpermission');
 var viewRevoke = require('./revokepermission');
+var viewLinkMumbleUser = require('./linkmumbleuser');
+var viewSettings = require('./settings');
 /*
  * Code
  */
@@ -30,5 +32,7 @@ module.exports = function(bot) {
 	router.use('/permissions', viewPermissions(bot));
 	router.get('/grantPermission', viewGrant(bot));
 	router.get('/revokePermission', viewRevoke(bot));
+	router.get('/linkMumbleUser', viewLinkMumbleUser(bot));
+	router.get('/settings', viewSettings(bot));
 	return router;
 };

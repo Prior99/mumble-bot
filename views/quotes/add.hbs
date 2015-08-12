@@ -45,13 +45,18 @@ function addElem(quote, author) {
 
 function startQuote(quote, author) {
 	var elem = addElem(quote, author);
-	$.getJSON("/api/quotes/add?quote=" + encodeURI(quote) + "&author=" + encodeURI(author), function(response) {
+	$.ajax("/api/quotes/add?quote=" + encodeURI(quote) + "&author=" + encodeURI(author))
+	.done(function(response) {
 		if(response.okay) {
 			elem.html("<td>" + quote + "</td><td>" + author + "</td><td><i class=\"fa fa-check\"></i></td>");
 		}
 		else {
 			elem.html("<td>" + quote + "</td><td>" + author + "</td><td><i class=\"fa fa-remove\"></i></td>");
 		}
+	})
+	.error(function() {
+		elem.html("<td>" + quote + "</td><td>" + author + "</td><td><i class=\"fa fa-remove\"></i></td>");
+		spawnNotification('error', "Sie verfügen nicht über die nötige Berechtigung, Zitate einzutragen.");
 	});
 }
 

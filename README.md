@@ -25,6 +25,11 @@ If you still want to install this, you will need some of my (forks of) some node
 
 Some of which are not available on npm. If ```npm install``` fails, just clone the respective repositories into th ```node_modules/``` subdirectory.
 
+### Addons
+
+If you want to use addons, you will have to create a directory ```addons/``` and put them in there. Each addon needs to be defined as an own directory containing an ```index.js``` file.
+There is a repository with default addons which can be found [here](https://git.cronosx.de/prior/mumble-bot-addons). Please note that thosa are **not safe for work**.
+
 ### Installing on Arch Linux
 
 You will need to isntall some packets in order to get everything working.

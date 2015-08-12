@@ -14,6 +14,7 @@ var FileStore = require('session-file-store')(Session);
  */
 
 var viewDefault = require('./default');
+var viewSpeak = require('./speak');
 var viewRegisterLogin = require('./users/registerLogin');
 
 /*
@@ -23,22 +24,43 @@ var routeMusic = require('./music');
 var routeApi = require('./api');
 var routeQuotes = require('./quotes');
 var routeUsers = require('./users');
+var routeBass = require('./bass');
+var routeRecord = require('./record');
+var routeSounds = require('./sounds');
 
 /*
  * Code
  */
 
 var pages = [{
-	url : "/",
-	name : "Übersicht"
-},
-{
 	url : "/quotes/",
-	name : "Zitate"
+	name : "Zitate",
+	icon : "commenting"
 },
 {
 	url : "/users/",
-	name : "Benutzer"
+	name : "Benutzer",
+	icon : "group"
+},
+{
+	url : "/bass/",
+	name : "Bass",
+	icon : "play-circle"
+},
+{
+	url : "/record/",
+	name : "Aufnahmen",
+	icon : "microphone"
+},
+{
+	url : "/sounds/",
+	name : "Sounds",
+	icon : "volume-down"
+},
+{
+	url : "/",
+	name : "Sonstiges",
+	icon : "dashboard"
 }];
 
 var subpages = [{
@@ -50,6 +72,16 @@ var subpages = [{
 	url : "/commands/",
 	name : "Befehle",
 	icon : "cogs"
+},
+{
+	url : "/speak/",
+	name : "Sprich!",
+	icon : "comment"
+},
+{
+	url : "/google/",
+	name : "Google Instant",
+	icon : "google"
 }];
 /**
  * Handles the whole website stuff for the bot. Using express and handlebars
@@ -62,7 +94,8 @@ var Website = function(bot) {
 	if(bot.options.mpd) {
 		pages.unshift({
 			url : "/music/",
-			name : "Musik"
+			name : "Musik",
+			icon : "music"
 		});
 	}
 	this.app = Express();
@@ -71,7 +104,10 @@ var Website = function(bot) {
 		extname: '.hbs',
 		helpers : {
 			"formatDate" : function(date) {
-				return date.toLocaleDateString();
+				return date.toLocaleDateString('de-DE');
+			},
+			"formatTime" : function(date) {
+				return date.toLocaleTimeString('de-DE');
 			}
 		}
 	}));
@@ -80,7 +116,8 @@ var Website = function(bot) {
 	this.app.use(Session({
 		secret: bot.options.website.sessionSecret,
 		store: new FileStore({
-			path : "session-store"
+			path : "session-store",
+			ttl : 315569260
 		}),
 		resave: false,
 		saveUninitialized: true
@@ -99,7 +136,11 @@ var Website = function(bot) {
 	this.app.use('/jquery-form', Express.static('node_modules/jquery-form/'));
 	this.app.use('/fontawesome', Express.static('node_modules/font-awesome/'));
 	this.app.use('/crypto-js', Express.static('node_modules/crypto-js/'));
+	this.app.use('/typeahead', Express.static('node_modules/typeahead.js/dist/'));
+	this.app.use('/bootswatch', Express.static('node_modules/bootswatch/'));
+	this.app.use('/typeahead-bootstrap', Express.static('node_modules/typeahead.js-bootstrap3.less/'));
 	this.app.use('/bootstrap-validator', Express.static('node_modules/bootstrap-validator/dist/'));
+	this.app.use('/tablesorter', Express.static('node_modules/tablesorter/dist/'));
 	this.app.use('/api', routeApi(bot));
 	this.app.use(function(req, res, next) {
 		if(req.session.user) {
@@ -111,10 +152,15 @@ var Website = function(bot) {
 	});
 	this.app.use('/music', routeMusic(bot));
 	this.app.use('/users', routeUsers(bot));
+	this.app.use('/bass', routeBass(bot));
+	this.app.use('/record', routeRecord(bot));
 	this.app.use('/quotes', routeQuotes(bot));
+	this.app.use('/sounds', routeSounds(bot));
 	this.app.use('/commands', viewDefault("commands"));
 	this.app.get('/tree', viewDefault("channeltree"));
 	this.app.get('/', viewDefault("home"));
+	this.app.get('/speak', viewSpeak(bot));
+	this.app.get('/google', viewDefault("googlelookup"));
 	var port = this.bot.options.website.port;
 	this.server = this.app.listen(port);
 	this.server.setTimeout(5000);

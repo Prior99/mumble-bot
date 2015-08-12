@@ -3,17 +3,25 @@
  * @param {Bot} bot - Bot the webpage belongs to.
  */
 var ViewAPIRunCommand = function(bot) {
-
-	function runCommand(command) {
-		bot.command.process(command);
-	}
-
 	return function(req, res) {
+
+		function runCommand(command, argument) {
+			var string = command;
+			if(argument) {
+				string += " " + argument;
+			}
+			console.log("'"+string+"'");
+			bot.command.process(string, 'website', req.session.user);
+		}
+
 		if(req.query.command) {
-			runCommand(req.query.command);
+			runCommand(req.query.command, req.query.argument);
+			res.status(200).send(JSON.stringify({
+				okay : true
+			}));
 		}
 		else {
-			res.send(JSON.stringify({
+			res.status(400).send(JSON.stringify({
 				okay : false,
 				reason: "missing_arguments"
 			}));

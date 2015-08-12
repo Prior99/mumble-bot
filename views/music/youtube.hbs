@@ -27,7 +27,6 @@
 </form>
 <script>
 	function downloadFinished(response) {
-
 	}
 
 	function addElem(link) {
@@ -44,6 +43,9 @@
 				elem.html("<td>" + link + "</td><td><i class=\"fa fa-check\"></i></td><td>" + response.artist + "</td><td>" + response.title + "</td>");
 			}
 			else {
+				if(response.reason == "insufficient_permission") {
+					spawnNotification('error', "Sie verfügen nicht über die nötige Berechtigung, Musik hochzuladen.");
+				}
 				elem.html("<td>" + link + "</td><td><i class=\"fa fa-remove\"></i></td><td></td><td></td>");
 			}
 		});

@@ -71,7 +71,7 @@ MPDControl.prototype.play = function(cb) {
  * Pause the current playback.
  * @param cb - Callback which will be called after playback has paused.
  */
-MPDControl.prototype.pause = function(cb) {
+MPDControl.prototype.pause = function(user, via, cb) {
 	this.playing = false;
 	if(!this.ready) {
 		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
@@ -86,21 +86,22 @@ MPDControl.prototype.pause = function(cb) {
  * @param cb - Callback which will be called after the next song has started
  * 			   playing.
  */
-MPDControl.prototype.next = function(cb) {
+MPDControl.prototype.next = function(user, via, cb) {
 	if(!this.ready) {
 		this.bot.sayError("Musikwiedergabemodul nicht bereit.");
 		return;
 	}
-	this.bot.say("Nächster Song.");
-	if(this.mpd.status.playlistlength <= 1) {
-		this.addRandomTrack(function() {
+	this.bot.say("Nächster Song.", function() {
+		if(this.mpd.status.playlistlength <= 1) {
+			this.addRandomTrack(function() {
+				this.mpd.next(cb);
+				this.mpd.play();
+			}.bind(this));
+		}
+		else {
 			this.mpd.next(cb);
-			this.mpd.play();
-		}.bind(this));
-	}
-	else {
-		this.mpd.next(cb);
-	}
+		}
+	}.bind(this));
 };
 /**
  * Set the volume to a normal level of 50%.
@@ -142,7 +143,7 @@ MPDControl.prototype.volumeDown = function() {
  * @param vol - Volume to set.
  */
 MPDControl.prototype.setVolume = function(vol) {
-	this.bot.say("Lautstärke " + vol + "%", function() {
+	this.bot.say(vol + "%", function() {
 		this.mpd.volume(vol, function(err) {
 			if(err) {
 				Winston.error(err);
@@ -155,11 +156,19 @@ MPDControl.prototype.setVolume = function(vol) {
  * Adds a random track to the playlist.
  * @param cb - Callback which will be called after the track was added.
  */
-MPDControl.prototype.addRandomTrack = function(cb) {
+MPDControl.prototype.addRandomTrack = function(user, via, cb) {
 	this.bot.say("Zufälliger Song.", function() {
 		var song = this.mpd.songs[parseInt(this.mpd.songs.length * Math.random())];
 		this.mpd.add(song.file, cb);
 	}.bind(this));
+};
+
+/**
+ * Shutdown the client to mpd.
+ */
+MPDControl.prototype.stop = function() {
+	Winston.info("Disconnecting from mpd ... ");
+	this.mpd.disconnect();
 };
 
 module.exports = MPDControl;

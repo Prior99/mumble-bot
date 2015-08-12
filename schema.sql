@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS Quotes (
 
 CREATE TABLE IF NOT EXISTS TTSCache (
 	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	text			VARCHAR(128) NOT NULL
+	text			TEXT NOT NULL,
+	api				VARCHAR(16) NOT NULL DEFAULT 'google'
 );
 
 CREATE TABLE IF NOT EXISTS Identifiers (
@@ -44,11 +45,63 @@ CREATE TABLE IF NOT EXISTS UserPermissions (
 	FOREIGN KEY (permission) REFERENCES Permissions(id)
 );
 
+CREATE TABLE IF NOT EXISTS UserSettings (
+	user			INT NOT NULL,
+	setting			VARCHAR(32) NOT NULL,
+	value			TEXT,
+	FOREIGN KEY (user) REFERENCES Users(id),
+	PRIMARY KEY(user, setting)
+);
+
+CREATE TABLE IF NOT EXISTS MumbleUsers (
+	mumbleId		INT NOT NULL PRIMARY KEY,
+	user			INT NOT NULL,
+	FOREIGN KEY (user) REFERENCES Users(id)
+);
+
+CREATE TABLE IF NOT EXISTS BassEffects (
+	effect			VARCHAR(128) NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS AutoComplete (
+	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	sentence		VARCHAR(100) NOT NULL,
+	used			INT DEFAULT 1,
+	UNIQUE(sentence)
+);
+
+CREATE TABLE IF NOT EXISTS Sounds (
+	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	name			VARCHAR(64) NOT NULL,
+	used			INT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS Records (
+	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	quote			TEXT,
+	submitted		DATETIME,
+	user			INT NOT NULL,
+	used			INT NOT NULL DEFAULT 0,
+	FOREIGN KEY(user) REFERENCES Users(id)
+);
+
 INSERT IGNORE INTO Permissions (id, name, description, icon) VALUES
 ("login", "Anmelden", "Erlaubt einem Benutzer, sich im System anzumelden.", "sign-in"),
 ("add-quote", "Zitat Eintragen", "Erlaubt das Eintragen neuer Zitate.", "quote-left"),
 ("shutdown", "Herunterfahren", "Mit dieser Berechtigung kann der gesamte Bot heruntergefahren werden.", "power-off"),
-("grant", "Berechtigungen Vergeben", "Hat ein Benutzer diese Berechtigung, so kann er anderen Benutzern dieselben Berechtigungen zuweisen, die er selber besitzt.", "legal");
+("grant", "Berechtigungen Vergeben", "Hat ein Benutzer diese Berechtigung, so kann er anderen Benutzern dieselben Berechtigungen zuweisen, die er selber besitzt.", "legal"),
+("upload-music", "Musik hochladen", "Diese Berechtigung wird benötigt, um Musik hochzuladen, oder aus Youtube zu extrahieren.", "upload"),
+("kick", "Kicken", "Mit dieser Berechtigung ist es möglich, Benutzer in Mumble aus ihrem Channel zu kicken.", "legal"),
+("be-quiet", "Stumm Stellen", "Mit dieser Berechtigung kann ein Nutzer die gesamte Ausgabequeue des Bots leeren und so die aktuelle Wiedergabe unterbrechen.", "bell-slash");
+
+INSERT IGNORE INTO BassEffects (effect) VALUES
+("Drop den Bass"),
+("härter"),
+("Schlampe"),
+("Put your hands up in the air"),
+("wubsch"),
+("wobbel"),
+("lublub");
 
 INSERT IGNORE INTO Identifiers (identifier) VALUES
 ("orange"),
@@ -70,5 +123,5 @@ INSERT IGNORE INTO Identifiers (identifier) VALUES
 ("cake"),
 ("cookie"),
 ("rabbit"),
-("elefant"),
+("elephant"),
 ("cucumber");

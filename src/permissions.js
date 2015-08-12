@@ -37,6 +37,30 @@ Permissions.prototype.hasPermission = function(user, permission, callback) {
 };
 
 /**
+ * Checks whether a user has the given permission and executes the callback if
+ * does. Otherwise logs a warning.
+ * @param user - User to check the permission of.
+ * @param {string} permission - Permission to check.
+ * @param callback - This callback is called when the permission was available.
+ */
+Permissions.prototype.requirePermission = function(user, permission, callback) {
+	if(!user) {
+		Winston.warn("Unknown user tried to execute something which required permission \"" + permission + "\"");
+		return;
+	}
+	else {
+		this.hasPermission(user, permission, function(has) {
+			if(has) {
+				callback();
+			}
+			else {
+				Winston.warn("User \"" + user.username + "\" tried to execute something which required permission \"" + permission + "\"");
+			}
+		});
+	}
+};
+
+/**
  * Grants the permission to a user. If the issuer is null or undefined, no
  * checks will be performed. If the issuer is defined, a check will be performed
  * whether the issuer can grant the requested permission at all.

@@ -16,17 +16,21 @@ var Winston = require('winston');
  */
 
 var Music = function(bot) {
-	this.fifo = FS.createReadStream(bot.options.mpd.fifo);
+	this.path = bot.options.mpd.fifo;
+	this.fifo = FS.createReadStream(this.path, {
+		flags : 'r+'
+	});
 	this.inputStream = bot.mumble.inputStream();
 	this.muted = false;
 	this.volume = 0.5;
-	this.fifo.on('data', function(chunk) {
-		if(!this.muted) {
-			//scaleVolume(chunk, this.volume);
-			this.inputStream.write(chunk);
-		}
-	}.bind(this));
+	this.fifo.on('data', this._onData.bind(this));
 	Winston.info("Module started: Music");
+};
+
+Music.prototype._onData = function(chunk) {
+	if(!this.muted) {
+		this.inputStream.write(chunk);
+	}
 };
 
 /**
@@ -61,6 +65,22 @@ Music.prototype.mute = function() {
  */
 Music.prototype.unmute = function() {
 	this.muted = false;
+};
+
+/**
+ * Shuts down this module.
+ */
+Music.prototype.stop = function() {
+	Winston.info("Shutting down music ... ");
+	this.fifo.once('close', function() {
+		Winston.info("Music stopped.");
+	});
+	this.fifo.removeListener('data', this._onData);
+	var c = FS.createWriteStream(this.path);
+	c.write('\0');
+	c.close();
+	this.fifo.pause();
+	this.fifo.close();
 };
 
 module.exports = Music;

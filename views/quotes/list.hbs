@@ -1,14 +1,12 @@
 <h1>Zitate</h1>
 <p>Derzeit befinden sich <b>{{quotes.length}}</b> Zitate in der Datenbank.</p>
-<table class="table table-striped">
+<table class="table table-striped table-responsive tablesorter">
 	<thead>
-		<tr>
-			<td>Autor</td>
-			<td>Zitate</td>
-			<td>Eingetragen</td>
-			<td>Verwendet</td>
-			<td></td>
-		</tr>
+		<th>Autor</th>
+		<th>Zitat</th>
+		<th>Eingetragen</th>
+		<th>Verwendet</th>
+		<th class="no-sort"></th>
 	</thead>
 	<tbody>
 	{{#each quotes}}
@@ -17,12 +15,11 @@
 			<td>{{quote}}</td>
 			<td>{{{formatDate submitted}}}</td>
 			<td>{{used}}</td>
-			<td><td><a quoteId="{{id}}"class="quote-btn btn btn-xs btn-success"><span class="fa fa-comment" aria-hidden="true"></span></a></td></td>
+			<td style="width: 30px;"><a quoteId="{{id}}"class="quote-btn btn btn-xs btn-success"><span class="fa fa-comment" aria-hidden="true"></span> Play</a></td>
 		</tr>
 	{{/each}}
-	</tbody
+	</tbody>
 </table>
-
 <script>
 	$("a.quote-btn").click(function() {
 		$.ajax("/api/quotes/speak?id=" + $(this).attr("quoteId"));

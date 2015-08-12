@@ -1,37 +1,4 @@
-<style>
-
-.fileWrapper {
-	width: 100%;
-	margin: auto;
-	position: relative;
-	background-color: rgba(179, 179, 179, 0.2);
-	color: rgb(179, 179, 179);
-	border: 4px dashed rgb(179, 179, 179);
-	border-radius: 4px;
-	overflow: hidden;
-	height: 200px;
-	text-align: center;
-	padding-top: 70px;
-}
-
-.fileWrapper span{
-	font-size: 15pt;
-	margin: auto;
-}
-
-.fileWrapper input{
-	position: absolute;
-	top: 0;
-	left: 0;
-	margin: 0;
-	padding: 0;
-	cursor: pointer;
-	opacity: .0;
-	height: 200px;
-	width: inherit;
-}
-
-</style>
+<link href="/style/filewrapper.css" rel="stylesheet">
 <h1>Upload</h1>
 <p>Hier können neue Songs hochgeladen werden.</p>
 
@@ -59,7 +26,6 @@
 	<div id="progressbar_wrapper">
 	</div>
 </div>
-
 <script>
 $("#progress_wrapper").hide();
 $(":file").change(function() {
@@ -107,20 +73,24 @@ $(":file").change(function() {
 		data: formdata,
 		processData: false,
 		contentType : false,
-		success : function(json) {
-			var data = JSON.parse(json);
-			for(var key in data) {
-				var file = data[key];
-				var elem = files[key];
-				elem.symbol.remove();
-				if(file.okay) {
-					elem.symbol = $('<td><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></td>').appendTo(elem.row);
+		success : function(data) {
+			if(data.okay) {
+				for(var key in data) {
+					var file = data[key];
+					var elem = files[key];
+					elem.symbol.remove();
+					if(file.okay) {
+						elem.symbol = $('<td><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></td>').appendTo(elem.row);
+					}
+					else {
+						elem.symbol = $('<td><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></td>').appendTo(elem.row);
+					}
 				}
-				else {
-					elem.symbol = $('<td><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></td>').appendTo(elem.row);
-				}
+				$("form").show();
 			}
-			$("form").show();
+			else {
+				spawnNotification('error', "Sie verfügen nicht über die nötige Berechtigung, Musik hochzuladen.");
+			}
 		}
 	});
 });

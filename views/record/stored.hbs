@@ -1,0 +1,22 @@
+<h1>Gespeicherte Aufnahmen</h1>
+<table class="table-responsive table-striped tablesorter">
+	<thead>
+		<th>Benutzer</th>
+		<th>Zeitpunkt</th>
+		<th>Text</th>
+		<th>Benutzt</th>
+		<th class="no-sort"></th>
+	</thead>
+	<tbody>
+		{{#each records}}
+		<tr>
+			<td><a href="/users/profile/{{this.user.username}}">{{user.username}}</a></td>
+			<td>{{formatDate submitted}}</td>
+			<td>{{quote}}</td>
+			<td>{{used}}</td>
+			<td><a recordId="{{this.id}}" class="playrecord quote-btn btn btn-xs btn-success"><span class="fa fa-volume-down" aria-hidden="true"></span> Play</a></td>
+		</tr>
+		{{/each}}
+	</tbody>
+</table>
+<script src="/js/playrecord.js"></script>

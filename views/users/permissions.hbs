@@ -1,4 +1,3 @@
-<div id="alerts"></div>
 <h1>Berechtigungen für {{user.username}}</h1>
 <p>Hier können die einzelnen Berechtigungen für den Benutzer <b>{{user.username}}</b> eingestellt werden.</p>
 <table class="table table-striped">
@@ -27,40 +26,16 @@
 		{{/each}}
 	</tbody>
 </table>
-<script type="text/html" id="alert-revoke-success">
-	<div class="alert alert-success alert-dismissible" role="alert">
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		<strong>Erfolgreich!</strong> Die Berechtigung wurde erfolgreich entzogen!
-	</div>
-</script>
-<script type="text/html" id="alert-grant-success">
-	<div class="alert alert-success alert-dismissible" role="alert">
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		<strong>Erfolgreich!</strong> Die Berechtigung wurde erfolgreich erteilt!
-	</div>
-</script>
-<script type="text/html" id="alert-revoke-failure">
-	<div class="alert alert-success alert-dismissible" role="alert">
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		<strong>Fehler!</strong> Die Berechtigung konnte nicht entzogen werden!
-	</div>
-</script>
-<script type="text/html" id="alert-grant-failure">
-	<div class="alert alert-success alert-dismissible" role="alert">
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		<strong>Fehler!</strong> Die Berechtigung konnte nicht erteilt werden!
-	</div>
-</script>
 <script>
 	function revoke(checkbox) {
 		$.ajax("/api/users/revokePermission?user={{user.username}}&permission=" + checkbox.attr('permission'))
 		.done(function(res) {
 			if(res.okay) {
-				$($('#alert-revoke-success').html()).appendTo('#alerts');
+				spawnNotification('success', "Die Berechtigung wurde erfolgreich entzogen!");
 				checkbox.prop('checked', false);
 			}
 			else {
-				$($('#alert-revoke-failure').html()).appendTo('#alerts');
+				spawnNotification('error', "Die Berechtigung konnte nicht entzogen werden!");
 				checkbox.prop('checked', true);
 			}
 		});
@@ -70,11 +45,11 @@
 		$.ajax("/api/users/grantPermission?user={{user.username}}&permission=" + checkbox.attr('permission'))
 		.done(function(res) {
 			if(res.okay) {
-				$($('#alert-grant-success').html()).appendTo('#alerts');
+				spawnNotification('success', "Die Berechtigung wurde erfolgreich erteilt!");
 				checkbox.prop('checked', true);
 			}
 			else {
-				$($('#alert-grant-failure').html()).appendTo('#alerts');
+				spawnNotification('error', "Die Berechtigung konnte nicht erteilt werden!");
 				checkbox.prop('checked', false);
 			}
 		});

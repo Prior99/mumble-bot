@@ -17,6 +17,8 @@ var Minecraft = require('./minecraft');
 var EventEmitter = require("events").EventEmitter;
 var Permissions = require("./permissions");
 
+var AUDIO_CACHE_AMOUNT = 100;
+
 /*
  * Code
  */
@@ -33,9 +35,8 @@ var Bot = function(mumble, options, database) {
 	this.mumble = mumble;
 	this.database = database;
 	this.commands = [];
-
-	this.hotword = options.hotword.replace("%name%", options.name).toLowerCase();
-	Winston.info("Hotword is '" + this.hotword + "'");
+	this.cachedAudios = [];
+	this._audioId = 0;
 
 	this.command = new Command(this);
 	this.quotes = new Quotes(this);
@@ -49,11 +50,19 @@ var Bot = function(mumble, options, database) {
 	this._initPromptInput();
 
 	this.output = new Output(this);
+	if(options.audioCacheAmount) {
+		this.audioCacheAmount = options.audioCacheAmount;
+	}
+	else {
+		this.audioCacheAmount = AUDIO_CACHE_AMOUNT;
+	}
 
 	if(options.mpd) {
-		this.music = new Music(this);
-		this.output.on("start", this.music.mute.bind(this.music));
-		this.output.on("stop", this.music.unmute.bind(this.music));
+		if(options.mpd.fifo) {
+			this.music = new Music(this);
+			this.output.on("start", this.music.mute.bind(this.music));
+			this.output.on("stop", this.music.unmute.bind(this.music));
+		}
 		this.mpd = new MPDControl(this);
 	}
 
@@ -67,10 +76,9 @@ var Bot = function(mumble, options, database) {
 
 	this._loadAddons("addons/", function() {
 		//Must be run after all commands were registered
-		this._generateGrammar();
 		this.input = new Input(this);
 		this.input.on('input', function(text, user) {
-			this.command.processPrefixed(text);
+			this._onVoiceInput(text, user);
 		}.bind(this));
 	}.bind(this));
 
@@ -93,11 +101,22 @@ var Bot = function(mumble, options, database) {
 		this.say(commandsSay + ". Ich habe diese Liste auch in den Chat geschrieben.");
 		this.mumble.user.channel.sendMessage(commandsWrite.substring(0, commandsWrite.length - 4));
 	}.bind(this), "Gibt eine Liste aller Kommandos aus.", "list-ul");
-	this.newCommand("shutdown", this.shutdown.bind(this), "Fährt den bot herunter.", "power-off");
-	this.newCommand("be quiet", this.beQuiet.bind(this), "Sofort alles, was Geräusche verursacht abschalten.", "bell-slash");
+	this.newCommand("be quiet", this.beQuiet.bind(this), "Sofort alles, was Geräusche verursacht abschalten.", "bell-slash", null, 'be-quiet');
+	this.newCommand("shutdown", this.shutdown.bind(this), "Fährt den bot herunter.", "power-off", null, 'shutdown');
 };
 
 Util.inherits(Bot, EventEmitter);
+
+Bot.prototype._onVoiceInput = function(text, mumbleUser) {
+	this.database.getLinkedUser(mumbleUser.id, function(err, user) {
+		if(err) {
+			Winston.error("Error fetching user by mumble user id.", err);
+		}
+		else {
+			this.command.processPrefixed(text, 'mumble', user);
+		}
+	}.bind(this));
+};
 
 /**
  * Instant shutdown everything which could cause noises.
@@ -114,14 +133,21 @@ Bot.prototype.beQuiet = function() {
  * Gently shutdown the whole bot.
  */
 Bot.prototype.shutdown = function() {
-	if(this.steam) {
-		this.steam.stop();
-	}
-	if(this.minecraft) {
-		this.minecraft.stop();
-	}
 	this.say("Herunterfahren initiiert.", function() {
+		this._deleteAllCachedAudio(0);
 		this.website.shutdown(function() {
+			if(this.steam) {
+				this.steam.stop();
+			}
+			if(this.minecraft) {
+				this.minecraft.stop();
+			}
+			if(this.mpd) {
+				this.mpd.stop();
+			}
+			if(this.music) {
+				this.music.stop();
+			}
 			this.emit("shutdown");
 		}.bind(this));
 	}.bind(this));
@@ -132,33 +158,55 @@ Bot.prototype._initPromptInput = function() {
 		input: process.stdin,
 		output: process.stdout
 	});
+	this._rlStdin.on('SIGINT', function() {
+		this.emit('SIGINT');
+	}.bind(this));
 	this._rlStdin.on('line', function(line) {
-		this.command.process(line);
+		this.command.process(line, 'terminal', null);
 	}.bind(this));
 };
 
 Bot.prototype._initChatInput = function() {
-	this.mumble.on("message", function(message, user, scope) {
-        this.command.process(message);
+	this.mumble.on("message", function(message, mumbleUser, scope) {
+		this.database.getLinkedUser(mumbleUser.id, function(err, user) {
+			if(err) {
+				Winston.error("Error fetching user by mumble user id.", err);
+			}
+			else {
+				this.command.process(message, 'mumble', user);
+			}
+		}.bind(this));
     }.bind(this));
 };
 
 Bot.prototype._loadAddons = function(dir, callback) {
 	FS.readdir(dir, function(err, files) {
 		if(err) {
-			Winston.console.error("Error loading addons!");
+			Winston.error("Error loading addons!");
 			throw err;
 		}
 		else {
-			for(var i in files) {
-				var filename = dir + files[i];
-				if(FS.lstatSync(filename).isDirectory()) {
-					require("../" + filename)(this);
-					Winston.info("Loaded addon " + filename + ".");
+			var next = function() {
+				if(files.length > 0) {
+					var file = files.shift()
+					var filename = dir + file;
+					if(FS.lstatSync(filename).isDirectory() && file.substr(0, 1) != ".") {
+					Winston.info("Loading addon " + filename + " ...");
+						var isAsync = require("../" + filename)(this, next);
+						if(!isAsync) {
+							next();
+						}
+					}
+					else {
+						next();
+					}
 				}
-			}
+				else {
+					callback();
+				}
+			}.bind(this);
+			next();
 		}
-		callback();
 	}.bind(this));
 };
 
@@ -210,34 +258,6 @@ Bot.prototype.stopPipingUser = function() {
 	this._pipeUserEvent = undefined;
 };
 
-Bot.prototype._generateGrammar = function() {
-	var grammar = "#JSGF V1.0;\n";
-	grammar += "\n";
-	grammar += "/*\n";
-	grammar += " * This is an automatic generated file. Do not edit.\n";
-	grammar += " * Changes will be overwritten on next start of bot.\n";
-	grammar += " */\n";
-	grammar += "\n";
-	grammar += "grammar commands;\n";
-	grammar += "\n";
-	grammar += "<hotword> = " + this.hotword.toLowerCase() + ";\n";
-	grammar += "\n";
-	var commandLine = "<command> =";
-	for(var key in this.command.commands) {
-		if(key === "") {
-			continue;
-		}
-		Winston.info("Command: '" + key + "'");
-		var tag = "_" + key.replace(" ", "").toLowerCase();
-		grammar += "<" + tag + "> = " + key.toLowerCase() + ";\n"
-		commandLine += " <" + tag + "> |";
-	}
-	grammar += "\n";
-	grammar += commandLine.substring(0, commandLine.length - 2) + ";\n";
-	grammar += "\n";
-	grammar += "public <commands> = <hotword> <command>;";
-	FS.writeFileSync("commands.gram", grammar);
-};
 
 /**
  * This is one of the most important methods in the bot.
@@ -249,13 +269,21 @@ Bot.prototype._generateGrammar = function() {
  * @param method - Method which will be called when the command was called
  * @param {string} description - Description of the command as displayed on the website
  * @param {string} icon - [Name of a Fontawesome-icon to display.](http://fortawesome.github.io/Font-Awesome/icons/)
+ * @param {string[]} arguments - (Optional) Array of possible arguments.
+ * @param {string} permission - (Optional) permission needed to execute this command.
  */
-Bot.prototype.newCommand = function(commandName, method, description, icon) {
-	this.command.newCommand(commandName, method);
+Bot.prototype.newCommand = function(commandName, method, description, icon, arguments, permission) {
+	if(!arguments) {
+		arguments = [];
+	}
+	this.command.newCommand(commandName, method, arguments, permission);
 	this.commands.push({
 		name : commandName,
 		description : description,
-		icon : icon
+		icon : icon,
+		arguments : arguments,
+		permission : permission,
+		hasArguments : arguments.length > 0
 	});
 };
 
@@ -266,6 +294,55 @@ Bot.prototype.newCommand = function(commandName, method, description, icon) {
 Bot.prototype.join = function(cname) {
 	var channel = this.mumble.channelByName(cname);
 	channel.join();
+};
+
+Bot.prototype.addCachedAudio = function(filename, user, duration) {
+	this.cachedAudios.push({
+		file : filename,
+		date : new Date(),
+		user : user,
+		id : this._audioId++,
+		duration : duration
+	});
+	this._clearUpCachedAudio();
+};
+
+Bot.prototype.getCachedAudioById = function(id) {
+	for(var key in this.cachedAudios) {
+		var audio = this.cachedAudios[key];
+		if(audio.id == id) {
+			return audio;
+		}
+	}
+	return null;
+};
+
+Bot.prototype.removeCachedAudio = function(audio) {
+	var index = this.cachedAudios.indexOf(audio);
+	if(index !== -1) {
+		this.cachedAudios.splice(index, 1);
+		return true;
+	}
+	else {
+		return false;
+	}
+};
+
+Bot.prototype._clearUpCachedAudio = function() {
+	this._deleteAllCachedAudio(this.audioCacheAmount);
+};
+
+Bot.prototype._deleteAllCachedAudio = function(amount) {
+	while(this.cachedAudios.length > amount) {
+		var elem = this.cachedAudios.shift();
+		try {
+			FS.unlinkSync(elem.file);
+			Winston.info("Deleted cached audio file " + elem.file + ".");
+		}
+		catch(err) {
+			Winston.error("Error when cleaning up cached audios!", err);
+		}
+	}
 };
 
 /**

@@ -17,13 +17,13 @@
 		"tmp" : "tmp/",
 		"sessionSecret" : "some_random_string"
 	},
-	"hotword" : "okay %name%",
 	"database" : {
 		"host" : "localhost",
 		"user" : "bot",
 		"database" : "bot",
 		"password" : "super_secret_password"
 	},
+	"audioCacheAmount" : 500
 	"steam" : {
 		"user" : "username",
 		"password" : "password",

@@ -1,0 +1,55 @@
+<h1>Designer</h1>
+<p>Hier können tolle Songs designed werden.</p>
+<div class="panel panel-default">
+	<div class="panel-body">
+		<ul class="list-inline btn" id="line">
+
+		</ul>
+	</div>
+</div>
+<style>
+	.cmd-btn {
+		margin: 5pt;
+	}
+	.designer-button {
+		height: 26pt;
+	}
+	.effect {
+		margin-right: 3pt;
+	}
+</style>
+<div class="panel panel-default">
+	<div class="panel-body">
+		<div class="container-fluid">
+			<div class="row flush-col">
+				{{#each effects}}
+				<div class="mix cmd-btn col-sm-3">
+					<div class="designer-button btn btn-primary btn-block" effectValue="{{this}}">
+						{{this}}
+					</div>
+				</div>
+				{{/each}}
+			</div>
+		</div>
+	</div>
+</div>
+<button class="btn btn-lg btn-success btn-block" id="play">Play!</button>
+<script>
+	var arr = [];
+	$(".designer-button").click(function() {
+		var val = $(this).attr('effectValue');
+		arr.push(val);
+		$("#line").append("<li class='btn btn-default btn-sm list-group-item effect'>" + val + "</li>");
+	});
+
+	$("#play").click(function() {
+		$.ajax("/api/bass/play?bass=" + encodeURI(JSON.stringify(arr))).done(function(res) {
+			spawnNotification('success', "Erfolgreich abgespielt.");
+			arr = [];
+			$("#line").html("");
+		})
+		.error(function() {
+			spawnNotification('error', "Konnte nicht abspielen.");
+		});
+	});
+</script>

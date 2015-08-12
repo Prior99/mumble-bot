@@ -1,0 +1,84 @@
+<h1>Sprich!</h1>
+<p>Hier kann Besitz von dem Bot ergriffen und durch seinen Mund gesprochen werden.</p>
+<h2>Sprechen</h2>
+<p>Die maximale Länge des textes beträgt 100 Zeichen. Für Längere Texte kann die Zitat-Datenbank verwendet werden.</p>
+<form id="form">
+	<div class="input-group">
+		<span class="input-group-addon" id="sizing-addon2"><i class="fa fa-comment"></i></span>
+		<input type="text" class="form-control typeahead" placeholder="Schlampe" id="input">
+		<span class="input-group-btn">
+			<input class="btn btn-default" type="submit" value="Sprich">
+		</span>
+	</div>
+</form>
+<h2>Top 10</h2>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Text</th>
+			<th>Verwendet</th>
+		</tr>
+	</thead>
+	<tbody id="table">
+	</tbody>
+</table>
+
+<script>
+var bloodhound = new Bloodhound({
+	identify: function(sentence) {
+		return sentence.id;
+	},
+	queryTokenizer: Bloodhound.tokenizers.whitespace,
+	datumTokenizer: Bloodhound.tokenizers.obj.whitespace('sentence'),
+	dupDetector: function(a, b) {
+		return a.id === b.id;
+	},
+	remote: {
+		url: '/api/speak/lookup?text=%QUERY',
+		wildcard: '%QUERY',
+		transform: function(response) {
+			return response.suggestions;
+		}
+	}
+});
+
+$('#form').submit(function(e) {
+	e.preventDefault();
+	$.ajax("/api/speak/speak?text=" + encodeURI($("#input").val())).done(function(res) {
+		if(res.okay) {
+		spawnNotification('success', "Erfolgreich gesprochen.");
+			bloodhound.clear();
+			refreshBestOf();
+		}
+	})
+	.error(function(res) {
+		spawnNotification('error', "Konnte Text nicht sprechen.");
+	});
+});
+
+$('#input').typeahead(null, {
+	name: 'sentence',
+	display: 'sentence',
+	source: bloodhound,
+	templates: {
+		suggestion: function(value) {
+			return "<div><strong>" + value.sentence + "</strong>  (" + value.used + ")</div>";
+		}
+	}
+});
+
+function refreshBestOf() {
+	$("#table").html("");
+	$.ajax("/api/speak/lookup").done(function(res) {
+		res.suggestions.map(function(val, key) {
+			$("<tr><td>" + (key + 1) + "</td><td>" + val.sentence + "</td><td>" + val.used + "</td></tr>")
+				.appendTo($("#table"));
+		});
+	})
+	.error(function(res) {
+		spawnNotification('error', "Konnte Bestenliste nicht laden.");
+	});
+}
+refreshBestOf();
+</script>

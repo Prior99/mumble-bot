@@ -1,0 +1,36 @@
+<h1>Temporäre Aufnahmen</h1>
+<p>Es wird nur eine gewisse Anzahl an Aufnahmen temporär gecached, danach werden alte Aufnahmen gelöscht.</p>
+<p>Sollen Aufnahmen gespeichert werden, kann dies hier erfolgen.</p>
+<table class="table table-striped table-responsive tablesorter">
+	<thead>
+		<th>Benutzer</th>
+		<th>Zeitpunkt</th>
+		<th>Länge</th>
+		<th class="no-sort"></th>
+		<th class="no-sort"></th>
+	</thead>
+	<tbody>
+	{{#each cached}}
+		<tr>
+			<td><a href="/users/profile/{{this.user.username}}">{{this.user.username}}</a></td>
+			<td>{{formatDate this.date}} {{formatTime this.date}}</td>
+			<td>{{this.duration}}s</td>
+			<td><a soundId="{{this.id}}" class="playbutton btn btn-info btn-xs"><span class="fa fa-volume-down" aria-hidden="true"></span> Play</a></td>
+			<td><a href="/record/save?id={{this.id}}" class="btn btn-success btn-xs"><span class="fa fa-save" aria-hidden="true"></span> Save</a></td>
+		</tr>
+	{{/each}}
+	</tbody>
+</table>
+<script>
+	$('a.playbutton').click(function() {
+		var id = $(this).attr("soundId");
+		$.ajax("/api/record/playcached?id=" + id).done(function(response) {
+			if(response.okay) {
+				spawnNotification('success', "Datei erfolgreich wiedergegeben!");
+			}
+		})
+		.error(function() {
+			spawnNotification('error', "Konnte Datei nicht abspielen.");
+		});
+	});
+</script>

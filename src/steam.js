@@ -59,10 +59,21 @@ SteamBot.prototype._startUpSteamGuard = function() {
 	}.bind(this));
 };
 
+SteamBot.prototype._onMessage = function(message, steamId) {
+	this.bot.database.getUserBySteamId(steamId, function(err, user) {
+		if(err) {
+			Winston("Error fetching user by steamid", err);
+		}
+		else {
+			this.bot.command.process(message, 'steam', user);
+		}
+	}.bind(this));
+};
+
 SteamBot.prototype._postLogin = function() {
 	this.client.on('message', function(source, message, type, chatter) {
 		if(type === Steam.EChatEntryType.ChatMsg) {
-			this.bot.command.process(message);
+			this._onMessage(message, source);
 		}
 	}.bind(this));
 	this.client.on('relationships', function() {
@@ -81,11 +92,13 @@ SteamBot.prototype._postLogin = function() {
 		if(!this.client.users || !this.client.users[friend.friendid]) {
 			return;
 		}
-		if(friend.personaState === 1 && this.client.users[friend.friendid].personaState === 0) {
+		if(friend.personaState === 1 && this.client.users[friend.friendid].personaState === 0 && this._lastLoginAnnounced !== friend.playerName) {
 			this.bot.say(friend.playerName + " hat sich in Steam angemeldet.");
+			this._lastLoginAnnounced = friend.playerName;
 		}
-		else if(friend.personaState === 0 && this.client.users[friend.friendid].personaState === 1) {
+		else if(friend.personaState === 0 && this.client.users[friend.friendid].personaState === 1 && this._lastLogoutAnnounced !== friend.playerName) {
 			this.bot.say(friend.playerName + " hat sich in Steam abgemeldet.");
+			this._lastLogoutAnnounced = friend.playerName;
 		}
 	}.bind(this));
 };
@@ -122,6 +135,7 @@ SteamBot.prototype._startUp = function() {
  */
 SteamBot.prototype.stop = function() {
 	this.client.setPersonaState(Steam.EPersonaState.Offline);
+	Winston.info("Disconnecting from steam ...");
 	this.client.logOff();
 };
 
