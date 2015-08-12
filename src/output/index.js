@@ -35,7 +35,7 @@ Util.inherits(Output, EventEmitter);
  * Clear the whole queue and stop current playback.
  */
 Output.prototype.clear = function() {
-	this.queue.splice(0, this.queue.length);
+	this.queue = [];
 	this.speech.clear();
 	this.sound.clear();
 	this.stream.frameQueue.splice(0, this.stream.frameQueue.length);
