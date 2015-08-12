@@ -16,6 +16,7 @@ var FileStore = require('session-file-store')(Session);
 var viewDefault = require('./default');
 var viewSpeak = require('./speak');
 var viewRegisterLogin = require('./users/registerLogin');
+var viewLog = require('./log');
 
 /*
  * Routes
@@ -82,6 +83,11 @@ var subpages = [{
 	url : "/google/",
 	name : "Google Instant",
 	icon : "google"
+},
+{
+	url : "/log/",
+	name : "Log",
+	icon : "file-text"
 }];
 /**
  * Handles the whole website stuff for the bot. Using express and handlebars
@@ -108,6 +114,17 @@ var Website = function(bot) {
 			},
 			"formatTime" : function(date) {
 				return date.toLocaleTimeString('de-DE');
+			},
+			"bootstrapClassByLogLevel" : function(level) {
+				if(level === "info") {
+					return 'success';
+				}
+				else if(level === "warn") {
+					return 'warning';
+				}
+				else if(level === "error") {
+					return 'danger';
+				}
 			}
 		}
 	}));
@@ -172,6 +189,7 @@ var Website = function(bot) {
 	this.app.get('/', viewDefault("home"));
 	this.app.get('/speak', viewSpeak(bot));
 	this.app.get('/google', viewDefault("googlelookup"));
+	this.app.get('/log', viewLog(bot));
 	var port = this.bot.options.website.port;
 	this.server = this.app.listen(port);
 	this.server.setTimeout(5000);

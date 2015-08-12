@@ -9,6 +9,7 @@ var Database = require("./src/database");
 /*
  * Winston
  */
+require('winston-mysql-transport').Mysql;
 function fillZero(number, len) {
 	number = "" + number;
 	while(number.length < len) {
@@ -93,6 +94,13 @@ function databaseStarted(err, connection, database) {
 		throw err;
 	}
 	else {
+		Winston.add(Winston.transports.Mysql, {
+			host : options.database.host,
+			user : options.database.user,
+			password : options.database.password,
+			database : options.database.database,
+			table : "Log"
+		});
 		var bot = new Bot(connection, options, database);
 		Winston.info("Joining channel: " + options.channel);
 		bot.join(options.channel);

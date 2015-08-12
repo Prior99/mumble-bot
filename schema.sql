@@ -76,6 +76,15 @@ CREATE TABLE IF NOT EXISTS Sounds (
 	used			INT DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS Log (
+	id 				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	level 			VARCHAR(45) NOT NULL,
+	message 		TEXT NOT NULL,
+	`timestamp` 	DATETIME NOT NULL,
+	`meta` 			VARCHAR(255),
+	hostname 		VARCHAR(255)
+);
+
 CREATE TABLE IF NOT EXISTS Records (
 	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	quote			TEXT,
@@ -92,7 +101,8 @@ INSERT IGNORE INTO Permissions (id, name, description, icon) VALUES
 ("grant", "Berechtigungen Vergeben", "Hat ein Benutzer diese Berechtigung, so kann er anderen Benutzern dieselben Berechtigungen zuweisen, die er selber besitzt.", "legal"),
 ("upload-music", "Musik hochladen", "Diese Berechtigung wird benötigt, um Musik hochzuladen, oder aus Youtube zu extrahieren.", "upload"),
 ("kick", "Kicken", "Mit dieser Berechtigung ist es möglich, Benutzer in Mumble aus ihrem Channel zu kicken.", "legal"),
-("be-quiet", "Stumm Stellen", "Mit dieser Berechtigung kann ein Nutzer die gesamte Ausgabequeue des Bots leeren und so die aktuelle Wiedergabe unterbrechen.", "bell-slash");
+("be-quiet", "Stumm Stellen", "Mit dieser Berechtigung kann ein Nutzer die gesamte Ausgabequeue des Bots leeren und so die aktuelle Wiedergabe unterbrechen.", "bell-slash"),
+("log", "Log anzeigen", "Erlaubt es einem Benutzer, die Logausgabe des Bots zu betrachten.", "file-text");
 
 INSERT IGNORE INTO BassEffects (effect) VALUES
 ("Drop den Bass"),

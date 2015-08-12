@@ -1,0 +1,18 @@
+<h1>Log</h1>
+<p>Hier sind die letzten 500 Einträge des Logs zu finden</p>
+<table class="table-responsive tablesorter">
+	<thead>
+		<th>Zeitpunkt</th>
+		<th>Level</th>
+		<th>Nachricht</th>
+	</thead>
+	<tbody>
+		{{#each log}}
+		<tr class="{{bootstrapClassByLogLevel level}}">
+			<td>{{formatDate timestamp}} {{formatTime timestamp}}</td>
+			<td>{{level}}</td>
+			<td>{{message}}</td>
+		</tr>
+		{{/each}}
+	</tbody>
+</table>
