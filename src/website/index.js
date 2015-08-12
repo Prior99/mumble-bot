@@ -127,7 +127,12 @@ var Website = function(bot) {
 		res.locals.pages = pages;
 		res.locals.session = req.session;
 		res.locals.subpages = subpages;
-		next();
+		if(req.session.user) {
+			bot.permissions.listPermissionsAssocForUser(req.session.user, function(permissions) {
+				res.locals.userPermissions = permissions;
+				next();
+			});
+		}
 	});
 	this.app.use(Less('public/'));
 	this.app.use('/', Express.static('public/'));

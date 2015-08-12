@@ -233,4 +233,25 @@ Permissions.prototype.listPermissionsForUser = function(issuer, user, callback) 
 };
 
 
+Permissions.prototype.listPermissionsAssocForUser = function(user, callback) {
+	var obj = {};
+	var iteratePermissions = function(permissions) {
+		if(permissions.length > 0) {
+			var permission = permissions.shift();
+			this.hasPermission(user, permission.id, function(has) {
+				obj[permission.id] = has;
+				iteratePermissions(permissions);
+			}.bind(this));
+		}
+		else {
+			callback(obj);
+		}
+	}.bind(this)
+
+	this.listPermissions(function(permissions) {
+		iteratePermissions(permissions);
+	});
+};
+
+
 module.exports = Permissions;
