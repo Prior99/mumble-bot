@@ -117,7 +117,10 @@ var Website = function(bot) {
 		secret: bot.options.website.sessionSecret,
 		store: new FileStore({
 			path : "session-store",
-			ttl : 315569260
+			ttl : 315569260,
+			retries : 3,
+			minTimeout : 200,
+			maxTimeout : 1000
 		}),
 		resave: false,
 		saveUninitialized: true
@@ -132,6 +135,9 @@ var Website = function(bot) {
 				res.locals.userPermissions = permissions;
 				next();
 			});
+		}
+		else {
+			next();
 		}
 	});
 	this.app.use(Less('public/'));
