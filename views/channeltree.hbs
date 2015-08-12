@@ -1,24 +1,26 @@
 <h1>Channel-Struktur</h1>
 <p>Hier findet sich eine Liste aller Channel im Mumble-Server inklusive Benutzer.</p>
-<ul id="tree">
+<ul class="list-group" id="tree">
 
 </ul>
 <script>
 
 function displayChannel(elem, channel) {
-	var el = $("<li><b>Channel: " + channel.name + "</b></li>");
+	var el = $("<li class='list-group-item'><b><i class='fa fa-home'></i> " + channel.name + "</b></li>");
+	var sub;
+	if(channel.users.length > 0 || channel.children.length > 0) {
+		sub = $("<ul class='list-group'></ul>").appendTo(el);
+	}
 	if(channel.users.length > 0) {
-		var users = $("<ul></ul>").appendTo($("<p>Benutzer:</p>").appendTo(el));
 		for(var i in channel.users) {
 			var user = channel.users[i];
-			users.append("<li>" + user + "</li>");
+			sub.append("<li class='list-group-item'><i class='fa fa-user'></i> " + user + "</li>");
 		}
 	}
 	if(channel.children.length > 0) {
-		var children = $("<ul></ul>").appendTo($("<p>Subchannel:</p>").appendTo(el));
 		for(var i in channel.children) {
 			var child = channel.children[i];
-			displayChannel(children, child);
+			displayChannel(sub, child);
 		}
 	}
 	el.appendTo(elem);
