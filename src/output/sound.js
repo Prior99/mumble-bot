@@ -29,11 +29,11 @@ Sound.prototype._play = function(filename) {
 	var samplesTotal = 0;
 	var startTime = Date.now();
 	this._playbackStarted();
-	FFMpeg(filename)
+	this._ffmpeg = FFMpeg(filename)
 	.format('s16le')
 	.audioChannels(1)
-	.audioFrequency(48000)
-	.stream().on('data', function(chunk) {
+	.audioFrequency(48000);
+	this._ffmpeg.stream().on('data', function(chunk) {
 		samplesTotal += chunk.length / 2;
 		this.stream.write(chunk);
 	}.bind(this))
@@ -41,7 +41,7 @@ Sound.prototype._play = function(filename) {
 		var timeAlreadyTaken = Date.now() - startTime;
 		var totalTime = (samplesTotal / 48000) * 1000;
 		var waitTime = totalTime - timeAlreadyTaken;
-		setTimeout(this._playbackStopped.bind(this), waitTime);
+		this._timeout = setTimeout(this._playbackStopped.bind(this), waitTime);
 	}.bind(this));
 };
 
@@ -49,7 +49,15 @@ Sound.prototype._play = function(filename) {
  * Clear the whole queue and stop current playback.
  */
 Sound.prototype.clear = function() {
-	this.queue.splice(0, this.queue.length);
+	this.queue = [];
+	if(this._timeout) {
+		clearTimeout(this._timeout);
+		this._timeout = null;
+	}
+	if(this._ffmpeg) {
+		this._ffmpeg.kill();
+	}
+	this._playbackStopped();
 };
 
 Sound.prototype._playbackStarted = function() {
@@ -59,12 +67,14 @@ Sound.prototype._playbackStarted = function() {
 
 Sound.prototype._playbackStopped = function() {
 	this.playing = false;
-	this.emit("stop");
-	var callback = this.current.callback;
-	this.current = null;
-	this._next();
-	if(callback) {
-		callback();
+	if(this.current) {
+		this.emit("stop");
+		var callback = this.current.callback;
+		this.current = null;
+		this._next();
+		if(callback) {
+			callback();
+		}
 	}
 };
 

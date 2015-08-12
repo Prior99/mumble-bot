@@ -69,7 +69,13 @@ Util.inherits(Speech, EventEmitter);
  * Clear the whole queue and stop current playback.
  */
 Speech.prototype.clear = function() {
-	this.queue.splice(0, this.queue.length);
+	this.queue = [];
+	ESpeak.cancel();
+	if(this.timeout) {
+		clearTimeout(this.timeout);
+		this.timeout = null;
+	}
+	this._speakingStopped();
 };
 
 Speech.prototype._refreshTimeout = function() {
@@ -84,11 +90,13 @@ Speech.prototype._speakingStopped = function() {
 	this.speaking = false;
 	this.timeout = null;
 	this.emit("stop", this.current);
-	var callback = this.current.callback;
-	this.current = null;
-	this._next();
-	if(callback) {
-		callback();
+	if(this.current) {
+		var callback = this.current.callback;
+		this.current = null;
+		this._next();
+		if(callback) {
+			callback();
+		}
 	}
 };
 
@@ -125,7 +133,6 @@ Speech.prototype._onTTSData = function(data) {
  * Mute the playback of TTS data.
  */
 Speech.prototype.mute = function() {
-	console.log("mute");
 	this.muted = true;
 };
 
@@ -157,7 +164,7 @@ Speech.prototype.changeGender = function() {
  */
 Speech.prototype.speakUsingESpeak = function(text) {
 	this._currentEngine = null;
-	ESpeak.speak(this.current.text);
+	ESpeak.speak(text);
 };
 
 Speech.prototype._onGoogleTTSError = function(err, text) {
