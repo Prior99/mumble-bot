@@ -25,7 +25,8 @@ Winston.add(Winston.transports.Console, {
 		var d = new Date();
 		return d.getYear() + 1900 + "-" + fillZero(d.getMonth() + 1, 2) + "-" + fillZero(d.getDate(), 2) + " " +
 		fillZero(d.getHours(), 2) + ":" + fillZero(d.getMinutes(), 2) + ":" + fillZero(d.getSeconds(),2);
-	}
+	},
+	level : 'verbose'
 });
 
 Winston.add(Winston.transports.File, {
@@ -33,6 +34,7 @@ Winston.add(Winston.transports.File, {
 	maxsize : '64000',
 	maxFiles : 7,
 	json: false,
+	level : 'verbose',
 	colorize: true,
 	timestamp: function() {
 		var d = new Date();
@@ -94,6 +96,7 @@ function databaseStarted(err, connection, database) {
 		throw err;
 	}
 	else {
+		Winston.transports.Mysql.prototype.level = 'verbose';
 		Winston.add(Winston.transports.Mysql, {
 			host : options.database.host,
 			user : options.database.user,

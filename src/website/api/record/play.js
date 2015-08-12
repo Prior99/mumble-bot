@@ -1,3 +1,5 @@
+var Winston = require('winston');
+
 module.exports = function(bot) {
 	return function(req, res) {
 		if(req.query.id) {
@@ -10,6 +12,7 @@ module.exports = function(bot) {
 					});
 				}
 				else {
+					Winston.log('verbose', req.session.user.username + " played back record #" + req.query.id);
 					bot.playSound("sounds/recorded/" + req.query.id);
 					res.status(200).send({
 						okay : true

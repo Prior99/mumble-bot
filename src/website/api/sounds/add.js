@@ -28,6 +28,7 @@ module.exports = function(bot, router) {
 				});
 			}
 			else {
+				Winston.log('verbose', req.session.user.username + " added new sound #" + id);
 				FS.renameSync(file.path, "sounds/uploaded/" + id);
 				res.status(200).send({
 					okay :true,

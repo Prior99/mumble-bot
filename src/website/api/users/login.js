@@ -15,6 +15,7 @@ module.exports = function(bot) {
 					bot.permissions.hasPermission(user, "login", function(has) {
 						if(has) {
 							req.session.user = user;
+							Winston.log('verbose', req.session.user.username + " logged in.");
 							res.send({
 								okay : true
 							});

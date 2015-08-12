@@ -14,6 +14,7 @@ module.exports = function(bot) {
 					});
 				}
 				else {
+					Winston.log('verbose', req.session.user.username + " added new bass-effect: \"" + req.query.effect + "\"");
 					res.status(200).send({
 						okay : true
 					});

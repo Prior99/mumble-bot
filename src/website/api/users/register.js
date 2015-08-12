@@ -56,6 +56,7 @@ module.exports = function(bot) {
 						}
 					}
 					else {
+						Winston.debug('verbose', "A new user registered: " + data.username);
 						res.send({
 							okay : true,
 							id : id

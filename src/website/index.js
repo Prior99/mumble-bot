@@ -125,6 +125,9 @@ var Website = function(bot) {
 				else if(level === "error") {
 					return 'danger';
 				}
+				else {
+					return '';
+				}
 			}
 		}
 	}));

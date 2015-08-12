@@ -8,6 +8,7 @@ module.exports = function(bot) {
 					Winston.error("Error entering autocomplete", err);
 				}
 			});
+			Winston.log('verbose', req.session.user.username + " speak: \"" + req.query.text + "\"");
 			bot.say(req.query.text);
 			res.status(200).send({
 				okay : true

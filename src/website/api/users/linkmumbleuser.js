@@ -16,6 +16,7 @@ var ViewAPIUsersLinkMumbleUser = function(bot) {
 					});
 				}
 				else {
+					Winston.log('verbose', req.session.user.username + " linked mumble user with id " + req.query.id);
 					res.status(200).send({
 						okay : true
 					});

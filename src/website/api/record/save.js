@@ -33,6 +33,7 @@ module.exports = function(bot) {
 						}
 						else {
 							if(bot.removeCachedAudio(sound)) {
+								Winston.log('verbose', req.session.user.username + " added new record #" + id);
 								res.status(200).send({
 									okay : true
 								});
