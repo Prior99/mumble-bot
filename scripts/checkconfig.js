@@ -18,6 +18,8 @@ check("kickChannel", config);
 check("website", config);
 check("database", config);
 check("webpageurl", config);
+check("afkWarnTimeout", config);
+check("afkTimeout", config);
 
 if(config.mpd) {
 	//check("fifo", config.mpd);

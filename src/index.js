@@ -16,6 +16,7 @@ var Steam = require('./steam');
 var Minecraft = require('./minecraft');
 var EventEmitter = require("events").EventEmitter;
 var Permissions = require("./permissions");
+var AFKObserver = require("./afkobserver");
 
 var AUDIO_CACHE_AMOUNT = 100;
 
@@ -73,6 +74,8 @@ var Bot = function(mumble, options, database) {
 	if(options.minecraft) {
 		this.minecraft = new Minecraft(options.minecraft, this);
 	}
+
+	this.afkObserver = new AFKObserver(this);
 
 	this._loadAddons("addons/", function() {
 		//Must be run after all commands were registered

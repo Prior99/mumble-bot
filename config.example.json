@@ -6,6 +6,8 @@
 	"channel" : "Root",
 	"afkChannel" : "Bot AFK",
 	"kickChannel" : "Kicked",
+	"afkWarnTimeout" : 300,
+	"afkTimeout" : 360,
 	"webpageurl" : "http://mumble.example.org/",
 	"mpd" : {
 		"fifo" : "path/to/fifo",

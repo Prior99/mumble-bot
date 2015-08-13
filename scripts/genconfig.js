@@ -30,6 +30,20 @@ var schema = {
 			description : "Enter the name of the channel the bot should move users that are afk to:",
 			required : true
 		},
+		afkWarnTimeout : {
+			message : "Enter the amount of time after which a user should be warned about AFK in seconds.",
+			default : 300,
+			pattern : /\d+/,
+			description : "After how long should a user be warned about AFK? (Seconds)",
+			required : true
+		},
+		afkTimeout : {
+			message : "Enter the amount of time after which a user should be moved to the AFK channel in seconds.",
+			default : 360,
+			pattern : /\d+/,
+			description : "After how long should a user be moved into the AFK channel? (Seconds)",
+			required : true
+		},
 		webpageurl : {
 			message : "Please enter the url on which the website can be reached.",
 			default : "http://localhost/",
