@@ -17,6 +17,7 @@ var viewDefault = require('./default');
 var viewSpeak = require('./speak');
 var viewRegisterLogin = require('./users/registerLogin');
 var viewLog = require('./log');
+var viewQueue = require('./queue');
 
 /*
  * Routes
@@ -88,6 +89,11 @@ var subpages = [{
 	url : "/log/",
 	name : "Log",
 	icon : "file-text"
+},
+{
+	url : "/queue/",
+	name : "Queue",
+	icon : "road"
 }];
 /**
  * Handles the whole website stuff for the bot. Using express and handlebars
@@ -114,6 +120,12 @@ var Website = function(bot) {
 			},
 			"formatTime" : function(date) {
 				return date.toLocaleTimeString('de-DE');
+			},
+			"isSpeech" : function(a, block) {
+				return a.type == "speech" ? block.fn(this) : undefined;
+			},
+			"isSound" : function(a, block) {
+				return a.type == "sound" ? block.fn(this) : undefined;
 			},
 			"bootstrapClassByLogLevel" : function(level) {
 				if(level === "info") {
@@ -193,6 +205,7 @@ var Website = function(bot) {
 	this.app.get('/speak', viewSpeak(bot));
 	this.app.get('/google', viewDefault("googlelookup"));
 	this.app.get('/log', viewLog(bot));
+	this.app.get('/queue', viewQueue(bot));
 	var port = this.bot.options.website.port;
 	this.server = this.app.listen(port);
 	this.server.setTimeout(5000);
