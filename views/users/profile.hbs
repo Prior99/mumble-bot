@@ -48,35 +48,6 @@
 <h2>Gelinkte Mumble-Benutzer</h2>
 <ul id="linked-mumble-users" class="list-group">
 	{{#each linkedUsers}}
-	<li class="list-group-item">{{this.id}}</li>
+	<li class="list-group-item">{{this.name}} ({{this.id}})</li>
 	{{/each}}
 </ul>
-{{#if own}}
-<div class="dropdown">
-<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-	Mumble User Linken
-	<span class="caret"></span>
-</button>
-<ul class="dropdown-menu">
-	{{#each freeMumbleUsers}}
-	<li><a mumbleId="{{this.id}}" class="link-mumble">{{this.name}} ({{this.id}})</a></li>
-	{{/each}}
-</ul>
-</div>
-<script>
-	$(".link-mumble").click(function() {
-		var id = $(this).attr('mumbleId');
-		$.ajax("/api/users/linkMumbleUser?id=" + id + "&username={{user.username}}")
-		.done(function(res) {
-			if(res.okay) {
-				$("<li class='list-group-item'>" + id + "</li>").appendTo("#linked-mumble-users");
-				spawnNotification('success', "Link wurde erfolgreich erstellt.");
-				$(this).parent().remove();
-			}
-			else {
-				spawnNotification('error', "Link konnte nicht erstellt werden.");
-			}
-		}.bind(this));
-	});
-</script>
-{{/if}}
