@@ -1,8 +1,14 @@
-v0.1.2
+v0.2.0
 ======
 Migration:
 ----------
-Install all new dependencies and upgrade outdated ones by rebuilding them using ```npm install```.
+There are new values which have to be added to the configuration file. Take a look at the example file or generate a new one interactively using ```./bot editconfig```.
+You will need to install all new dependencies and upgrade outdated ones by rebuilding them using ```npm install```.
+Additionally there are two new permissions "log" and "be-quiet". You will need to add them to at least one user in order to grant them to anyone. To do this find out your database user id (Take a look at the ```Users``` table) and then execute the following SQL queries (substitute [userid] with your user id):
+```
+INSERT INTO UserPermissions(user, permission) VALUES([userid], 'be-quiet');
+INSERT INTO UserPermissions(user, permission) VALUES([userid], 'log');
+```
 
 Relevant Changes:
 -----------------
@@ -13,11 +19,29 @@ Relevant Changes:
 * Added fun feature: Google Instant which will retrieve a set of suggestions from googles instant engine and read them.
 * Bot will record everything a registered user is saying and cache it accessible on a page. It is then possible to persist these records and play them back later for amusement.
 * Speechrecognition via pocketsphinx removed.
+* Users which are inactive for some time will be warned and then moved into the AFK channel.
+* Users which are unknown to the bot will be greeted and then moved to the kicked channel. Also an administrator will be notified if an administrator is currently online.
+* Linking mumble users now happens in the settings instead of the profile page.
+* Can now see queued sounds and speech.
+* More verbose logging.
+* Log will be displayed on the website.
+* Added the ability be empty the whole queue and make the bot shut up at once.
+* Made amount of temporary records to keep configurable.
+* Users can configure whether they want to be recorded or not. Default is no.
+* Display duration of temporary records.
+* Removed useless logo in navbar.
+* Added user settings.
 
 Bugfixes:
 ---------
+* Attempted to fix some problems with session-store.
+* Fixed several problems with error-handling in cachedwebtts.
 * Fixed style for empty buttons in bass feature.
 * Fixed updating amount of uses of sounds.
+
+Contributors:
+-------------
+* Prior
 
 v0.1.1
 ======
