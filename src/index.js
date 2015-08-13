@@ -105,6 +105,21 @@ var Bot = function(mumble, options, database) {
 
 Util.inherits(Bot, EventEmitter);
 
+/**
+ * Returns only those users which have a unique id and are thous registered on
+ * the mumble server.
+ */
+Bot.prototype.getRegisteredMumbleUsers = function() {
+	var users = this.mumble.users();
+	var result = [];
+	for(var i in users) {
+		if(users[i].id) {
+			result.push(users[i]);
+		}
+	}
+	return result;
+};
+
 Bot.prototype.handleUserConnect = function(user) {
 	this.database.getLinkedUser(user.id, function(err, dbUser) {
 		if(err) {
@@ -140,7 +155,7 @@ Bot.prototype.notifyOnlineUsersWithPermission = function(permission, message) {
 							else {
 								ids.forEach(function(id) {
 									var mumbleUser;
-									if(mumbleUser = this.mumble.userById(id.mumbleId)) {
+									if(mumbleUser = this.mumble.userById(id.id)) {
 										mumbleUser.sendMessage(message);
 									}
 								}.bind(this));
