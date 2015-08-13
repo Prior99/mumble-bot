@@ -82,9 +82,7 @@ var Bot = function(mumble, options, database) {
 		}.bind(this));
 	}.bind(this));
 
-	this.mumble.on('user-connect', function(user) {
-		this.sayImportant(user.name + " hat Mumble betreten.");
-	}.bind(this));
+	this.mumble.on('user-connect', this.handleUserConnect.bind(this));
 	this.newCommand("help", function() {
 		var help = "Hilfe. Du musst mich mit meinem hot Word ansprechen. Mein hot Word ist: '" + this.hotword +
 			"'. Um eine Liste aller Kommandos zu erhalten, sag: '" + this.hotword +
@@ -106,6 +104,54 @@ var Bot = function(mumble, options, database) {
 };
 
 Util.inherits(Bot, EventEmitter);
+
+Bot.prototype.handleUserConnect = function(user) {
+	this.database.getLinkedUser(user.id, function(err, dbUser) {
+		if(err) {
+			Winston.error("Unable to fetch mumble user linkage.", err);
+		}
+		else {
+			if(dbUser) {
+				this.sayImportant(dbUser.username + " hat als " + user.name + " Mumble betreten.");
+			}
+			else {
+				this.sayImportant("Unbekannter Nutzer \"" + user.name + "\" hat Mumble betreten.");
+				user.moveToChannel(this.options.kickChannel);
+				user.sendMessage("Herzlich Willkommen. Ich bin " + this.options.name + ". Es sollte ein Administrator kommen und dich begrüßen. In der Zwischenzeit kannst du dir unter " + this.options.webpageurl + " einen Account anlegen.");
+				this.notifyOnlineUsersWithPermission('grant', "Ein unbekannter Nutzer mit Namen \"" + user.name + "\" hat soeben Mumble betreten.");
+			}
+		}
+	}.bind(this));
+};
+
+Bot.prototype.notifyOnlineUsersWithPermission = function(permission, message) {
+	this.database.listUsers(function(err, users) {
+		if(err) {
+			Winston.error("Unable to list users.", err);
+		}
+		else {
+			users.forEach(function(potential) {
+				this.permissions.hasPermission(potential, permission, function(has) {
+					if(has) {
+						this.database.getLinkedMumbleUsersOfUser(potential.username, function(err, ids) {
+							if(err) {
+								Winston.error("Unable to get linked mumble users of user " + potential.username, err);
+							}
+							else {
+								ids.forEach(function(id) {
+									var mumbleUser;
+									if(mumbleUser = this.mumble.userById(id.mumbleId)) {
+										mumbleUser.sendMessage(message);
+									}
+								}.bind(this));
+							}
+						}.bind(this));
+					}
+				}.bind(this));
+			}.bind(this));
+		}
+	}.bind(this));
+};
 
 Bot.prototype._onVoiceInput = function(text, mumbleUser) {
 	this.database.getLinkedUser(mumbleUser.id, function(err, user) {

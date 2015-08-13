@@ -6,6 +6,7 @@
 	"channel" : "Root",
 	"afkChannel" : "Bot AFK",
 	"kickChannel" : "Kicked",
+	"webpageurl" : "http://mumble.example.org/",
 	"mpd" : {
 		"fifo" : "path/to/fifo",
 		"port" : 6601,

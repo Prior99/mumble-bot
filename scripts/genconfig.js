@@ -30,6 +30,12 @@ var schema = {
 			description : "Enter the name of the channel the bot should move users that are afk to:",
 			required : true
 		},
+		webpageurl : {
+			message : "Please enter the url on which the website can be reached.",
+			default : "http://localhost/",
+			description : "What is the external URL to reach the website on?",
+			required : true
+		},
 		kickChannel : {
 			message : "Enter the name of a channel to move kicked users into.",
 			default : "Root",
