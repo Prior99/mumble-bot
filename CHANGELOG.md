@@ -1,3 +1,15 @@
+v0.2.1
+======
+Bugfixes:
+---------
+* Upgraded Mumble to v0.3.2 which fixes multiple serious issues.
+* Fixed increasing of usage of records.
+* Fixed useless verbosity.
+
+Contributors:
+-------------
+* Prior
+
 v0.2.0
 ======
 Migration:
