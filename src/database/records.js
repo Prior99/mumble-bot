@@ -43,7 +43,7 @@ module.exports = function(Database) {
 		);
 	};
 	Database.prototype.usedRecord = function(id, callback) {
-		this.pool.query("UPDATE Records SET used = used +1",
+		this.pool.query("UPDATE Records SET used = used +1 WHERE id = ?",
 			[id], function(err) {
 				if(this._checkError(err, callback)) {
 					if(callback) { callback(null); }
