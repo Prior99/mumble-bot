@@ -1,10 +1,10 @@
 <h1>Gespeicherte Aufnahmen</h1>
-<table class="table-responsive table-striped tablesorter">
+<table class="table table-condensed table-responsive table-striped tablesorter table-condensed">
 	<thead>
 		<th>Benutzer</th>
 		<th>Zeitpunkt</th>
 		<th>Text</th>
-		<th>Benutzt</th>
+		<th><i class="fa fa-repeat"></i></th>
 		<th class="no-sort"></th>
 		<th class="no-sort"></th>
 	</thead>
@@ -15,8 +15,8 @@
 			<td>{{formatDate submitted}} {{formatTime submitted}}</td>
 			<td>{{quote}}</td>
 			<td>{{used}}</td>
-			<td><a recordId="{{this.id}}" class="playrecord quote-btn btn btn-xs btn-success"><span class="fa fa-volume-down" aria-hidden="true"></span> Play</a></td>
-			<td><a href="/api/record/download?id={{this.id}}" class="quote-btn btn btn-xs btn-default"><span class="fa fa-download" aria-hidden="true"></span> Download</a></td>
+			<td><a recordId="{{this.id}}" class="playrecord quote-btn btn btn-xs btn-success"><span class="fa fa-volume-down" aria-hidden="true"></span></a></td>
+			<td><a href="/api/record/download?id={{this.id}}" class="quote-btn btn btn-xs btn-default"><span class="fa fa-download" aria-hidden="true"></span></a></td>
 		</tr>
 		{{/each}}
 	</tbody>

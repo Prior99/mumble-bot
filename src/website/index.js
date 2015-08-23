@@ -8,6 +8,7 @@ var Winston = require('winston');
 var Less = require('less-middleware');
 var Session = require('express-session');
 var FileStore = require('session-file-store')(Session);
+var Moment = require('moment');
 
 /*
  * Views
@@ -116,10 +117,10 @@ var Website = function(bot) {
 		extname: '.hbs',
 		helpers : {
 			"formatDate" : function(date) {
-				return date.toLocaleDateString('de-DE');
+				return Moment(date).format("DD.MM.YY");
 			},
 			"formatTime" : function(date) {
-				return date.toLocaleTimeString('de-DE');
+				return Moment(date).format("HH:mm");
 			},
 			"isSpeech" : function(a, block) {
 				return a.type == "speech" ? block.fn(this) : undefined;
