@@ -6,15 +6,29 @@
 		<th>Benutzer</th>
 		<th>Zeitpunkt</th>
 		<th>Länge</th>
+		<th><i class="fa fa-lock" aria-hidden="true"></i></th>
+		<th class="no-sort"></th>
+		<th class="no-sort"></th>
 		<th class="no-sort"></th>
 		<th class="no-sort"></th>
 	</thead>
 	<tbody>
 	{{#each cached}}
-		<tr>
+		<tr class="{{bootstrapClassIfProtected this}}">
 			<td><a href="/users/profile/{{this.user.username}}">{{this.user.username}}</a></td>
 			<td>{{formatDate this.date}} {{formatTime this.date}}</td>
 			<td>{{this.duration}}s</td>
+			<td class="protectindicate">
+			{{#if this.protected}}
+				<i class="fa fa-check" aria-hidden="true"></i>
+				<span style="display: none">1</div>
+			{{else}}
+				<i class="fa fa-remove" aria-hidden="true"></i>
+				<span style="display: none">0</div>
+			{{/if}}
+			</td>
+			<td><a soundId="{{this.id}}" class="deletebutton btn btn-danger btn-xs"><span class="fa fa-remove" aria-hidden="true"></span> Löschen</a></td>
+			<td><a soundId="{{this.id}}" class="protectbutton btn btn-warning btn-xs"><span class="fa fa-lock" aria-hidden="true"></span> Schützen</a></td>
 			<td><a soundId="{{this.id}}" class="playbutton btn btn-info btn-xs"><span class="fa fa-volume-down" aria-hidden="true"></span> Play</a></td>
 			<td><a href="/record/save?id={{this.id}}" class="btn btn-success btn-xs"><span class="fa fa-save" aria-hidden="true"></span> Save</a></td>
 		</tr>
@@ -22,6 +36,29 @@
 	</tbody>
 </table>
 <script>
+
+	$('a.protectbutton').click(function() {
+		var id = $(this).attr("soundId");
+		var t = $(this);
+		$.ajax("/api/record/protect?id=" + id).done(function(response) {
+			spawnNotification('success', "Aufnahme geschützt.");
+			console.log($(this).parent().parent());
+			t.parent().parent().addClass('warning');
+			t.parent().parent().find('td.protectindicate').html('').append('<i class="fa fa-check" aria-hidden="true"></i><span style="display: none">1</div>');
+		}).error(function() {
+			spawnNotification('error', "Schützen fehlgeschlagen.");
+		});
+	});
+	$('a.deletebutton').click(function() {
+		var id = $(this).attr("soundId");
+		var t = $(this);
+		$.ajax("/api/record/deletecached?id=" + id).done(function(response) {
+			spawnNotification('success', "Aufnahme gelöscht.");
+			t.parent().parent().remove();
+		}).error(function() {
+			spawnNotification('error', "Konnte Aufnahme nicht löschen.");
+		});
+	});
 	$('a.playbutton').click(function() {
 		var id = $(this).attr("soundId");
 		$.ajax("/api/record/playcached?id=" + id).done(function(response) {

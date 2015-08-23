@@ -12,6 +12,8 @@ var viewPlayCached = require('./playcached');
 var viewSave = require('./save');
 var viewPlay = require('./play');
 var viewDownload = require('./download');
+var viewDeleteCached = require('./deletecached');
+var viewProtect = require('./protect');
 
 /*
  * Code
@@ -24,6 +26,8 @@ module.exports = function(bot) {
 	router.use('/play', viewPlay(bot));
 	router.use('/playcached', viewPlayCached(bot));
 	router.use('/download', viewDownload(bot));
+	router.use('/protect', viewProtect(bot));
+	router.use('/deletecached', viewDeleteCached(bot));
 
 	return router;
 };

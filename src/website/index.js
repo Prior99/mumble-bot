@@ -140,6 +140,14 @@ var Website = function(bot) {
 				else {
 					return '';
 				}
+			},
+			"bootstrapClassIfProtected" : function(audio) {
+				if(audio.protected) {
+					return 'warning';
+				}
+				else {
+					return '';
+				}
 			}
 		}
 	}));

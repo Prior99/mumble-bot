@@ -18,7 +18,7 @@ var EventEmitter = require("events").EventEmitter;
 var Permissions = require("./permissions");
 var AFKObserver = require("./afkobserver");
 
-var AUDIO_CACHE_AMOUNT = 100;
+var AUDIO_CACHE_AMOUNT = 4;
 
 /*
  * Code
@@ -362,7 +362,8 @@ Bot.prototype.addCachedAudio = function(filename, user, duration) {
 		date : new Date(),
 		user : user,
 		id : this._audioId++,
-		duration : duration
+		duration : duration,
+		protected : false
 	});
 	this._clearUpCachedAudio();
 };
@@ -375,6 +376,28 @@ Bot.prototype.getCachedAudioById = function(id) {
 		}
 	}
 	return null;
+};
+
+Bot.prototype.protectCachedAudio = function(id) {
+	var elem = this.getCachedAudioById(id);
+	if(!elem) {
+		return false;
+	}
+	else {
+		elem.protected = true;
+		return true;
+	}
+};
+
+Bot.prototype.removeCachedAudioById = function(id) {
+	var elem = this.getCachedAudioById(id);
+	if(!elem) {
+		return false;
+	}
+	else {
+		this.removeCachedAudio(elem);
+		return true;
+	}
 };
 
 Bot.prototype.removeCachedAudio = function(audio) {
@@ -393,15 +416,25 @@ Bot.prototype._clearUpCachedAudio = function() {
 };
 
 Bot.prototype._deleteAllCachedAudio = function(amount) {
+	var prot = [];
 	while(this.cachedAudios.length > amount) {
 		var elem = this.cachedAudios.shift();
-		try {
-			FS.unlinkSync(elem.file);
-			Winston.info("Deleted cached audio file " + elem.file + ".");
+		if(elem.protected) {
+			amount --;
+			prot.push(elem);
 		}
-		catch(err) {
-			Winston.error("Error when cleaning up cached audios!", err);
+		else {
+			try {
+				FS.unlinkSync(elem.file);
+				Winston.info("Deleted cached audio file " + elem.file + ".");
+			}
+			catch(err) {
+				Winston.error("Error when cleaning up cached audios!", err);
+			}
 		}
+	}
+	while(prot.length > 0) {
+		this.cachedAudios.unshift(prot.pop());
 	}
 };
 

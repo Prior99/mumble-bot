@@ -35,7 +35,7 @@
 	<tbody>
 		{{#each records}}
 		<tr>
-			<td>{{formatDate submitted}}</td>
+			<td>{{formatDate submitted}} {{formatTime submitted}}</td>
 			<td>{{quote}}</td>
 			<td>{{used}}</td>
 			<td><a recordId="{{this.id}}" class="playrecord quote-btn btn btn-xs btn-success"><span class="fa fa-volume-down" aria-hidden="true"></span> Play</a></td>
