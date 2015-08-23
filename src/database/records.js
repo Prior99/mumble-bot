@@ -51,4 +51,13 @@ module.exports = function(Database) {
 			}.bind(this)
 		);
 	};
+	Database.prototype.getRecord = function(id, callback) {
+		this.pool.query("SELECT id, quote, used, user, submitted FROM Records WHERE id = ?",
+			[id], function(err, rows) {
+				if(this._checkError(err, callback)) {
+					if(callback) { callback(null, rows[0]); }
+				}
+			}.bind(this)
+		);
+	};
 };
