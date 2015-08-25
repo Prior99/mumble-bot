@@ -29,7 +29,7 @@ var Output = function(bot) {
 	Stream.Writable.call(this);
 	this._bufferQueue = [];
 	this._playbackAhead = 0;
-	this.bot.newCommand("change voice", this.changeGender.bind(this), "Deprecated. Wechselt das Geschlecht der Stimme.", "venus-mars");
+	this.bot.newCommand("change voice", this.changeGender.bind(this), "Deprecated. Changes the gender of the voice.", "venus-mars");
 };
 
 Util.inherits(Output, Stream.Writable);

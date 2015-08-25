@@ -134,7 +134,7 @@ Bot.prototype.handleUserConnect = function(user) {
 			}
 			else {
 				this.sayImportant("Unbekannter Nutzer \"" + user.name + "\" hat Mumble betreten.");
-				user.moveToChannel(this.options.kickChannel);
+				user.moveToChannel(this.options.publicChannel);
 				user.sendMessage("Herzlich Willkommen. Ich bin " + this.options.name + ". Es sollte ein Administrator kommen und dich begrüßen. In der Zwischenzeit kannst du dir unter " + this.options.webpageurl + " einen Account anlegen.");
 				this.notifyOnlineUsersWithPermission('grant', "Ein unbekannter Nutzer mit Namen \"" + user.name + "\" hat soeben Mumble betreten.");
 			}
@@ -240,32 +240,40 @@ Bot.prototype._initChatInput = function() {
 };
 
 Bot.prototype._loadAddons = function(dir, callback) {
-	FS.readdir(dir, function(err, files) {
-		if(err) {
-			Winston.error("Error loading addons!");
-			throw err;
+	FS.stat(dir, function(err, stats) {
+		if(err || !stats.isDirectory()) {
+			Winston.warn("Cannot access directory " + dir);
+			return;
 		}
 		else {
-			var next = function() {
-				if(files.length > 0) {
-					var file = files.shift()
-					var filename = dir + file;
-					if(FS.lstatSync(filename).isDirectory() && file.substr(0, 1) != ".") {
-					Winston.info("Loading addon " + filename + " ...");
-						var isAsync = require("../" + filename)(this, next);
-						if(!isAsync) {
-							next();
-						}
-					}
-					else {
-						next();
-					}
+			FS.readdir(dir, function(err, files) {
+				if(err) {
+					Winston.error("Error loading addons!");
+					throw err;
 				}
 				else {
-					callback();
+					var next = function() {
+						if(files.length > 0) {
+							var file = files.shift()
+							var filename = dir + file;
+							if(FS.lstatSync(filename).isDirectory() && file.substr(0, 1) != ".") {
+							Winston.info("Loading addon " + filename + " ...");
+								var isAsync = require("../" + filename)(this, next);
+								if(!isAsync) {
+									next();
+								}
+							}
+							else {
+								next();
+							}
+						}
+						else {
+							callback();
+						}
+					}.bind(this);
+					next();
 				}
-			}.bind(this);
-			next();
+			}.bind(this));
 		}
 	}.bind(this));
 };
@@ -321,12 +329,9 @@ Bot.prototype.stopPipingUser = function() {
 
 /**
  * This is one of the most important methods in the bot.
- * This will define a new command in the bot. Pleas note that all commands have
- * to be defined before the bot has finished starting up (e.g. as addon or
- * defined in the constructor), as the grammar for the speech recognition has to
- * be generated and will not work otherwise.
+ * This method registers a new command in the bot.
  * @param {string} commandName - Name of the command to create
- * @param method - Method which will be called when the command was called
+ * @param method - Method which will be executed when the command was called
  * @param {string} description - Description of the command as displayed on the website
  * @param {string} icon - [Name of a Fontawesome-icon to display.](http://fortawesome.github.io/Font-Awesome/icons/)
  * @param {string[]} arguments - (Optional) Array of possible arguments.
@@ -469,7 +474,7 @@ Bot.prototype.sayImportant = function(text, cb) {
  * @param {string} text - Message of the error to report.
  */
 Bot.prototype.sayError = function(text) {
-	return this.output.say("Fehler:    " + text);
+	return this.output.say("Error:    " + text);
 };
 
 /**
