@@ -12,14 +12,18 @@ AFKObserver.prototype.check = function() {
 		var idleTime = Math.round((now - this.times[key])/1000);
 		var mumbleUser = this.bot.mumble.userBySession(key);
 		if(mumbleUser) {
+			//don't move the bot to afk channel
 			if(mumbleUser.channel.name !== this.bot.options.afkChannel) {
-				if(idleTime == this.bot.options.afkTimeout) {
-					mumbleUser.sendMessage("Da du über " + this.bot.options.afkTimeout + " Sekunden inaktiv warst, wirst du in den AFK-Channel verschoben.");
-					mumbleUser.moveToChannel(this.bot.options.afkChannel);
-					this.bot.sayImportant(mumbleUser.name + " ist jetzt AFK.");
-				}
-				else if(idleTime == this.bot.options.afkWarnTimeout) {
-					mumbleUser.sendMessage("Du bist seit " + idleTime + " Sekunden inaktiv. Wenn in den nächsten " + (this.bot.options.afkTimeout - this.bot.options.afkWarnTimeout) + " Sekunden keine Aktivität besteht, wirst du als AFK gewertet.");
+				//don't move user to afk channel when he's alone in a channel
+				if(mumbleUser.channel.users.length > 1)	{
+					if(idleTime >= this.bot.options.afkTimeout) {
+						mumbleUser.sendMessage("Da du über " + this.bot.options.afkTimeout + " Sekunden inaktiv warst, wirst du in den AFK-Channel verschoben.");
+						mumbleUser.moveToChannel(this.bot.options.afkChannel);
+						this.bot.sayImportant(mumbleUser.name + " ist jetzt AFK.");
+					}
+					else if(idleTime == this.bot.options.afkWarnTimeout) {
+						mumbleUser.sendMessage("Du bist seit " + idleTime + " Sekunden inaktiv. Wenn in den nächsten " + (this.bot.options.afkTimeout - this.bot.options.afkWarnTimeout) + " Sekunden keine Aktivität besteht, wirst du als AFK gewertet.");
+					}
 				}
 			}
 		}

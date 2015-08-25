@@ -34,12 +34,11 @@ There is a repository with default addons which can be found [here](https://git.
 
 You will need to isntall some packets in order to get everything working.
 
-1. Install the following packages from the AUR: [sphinxbase](https://aur.archlinux.org/packages/sphinxbase/), [pocketsphinx](https://aur.archlinux.org/packages/pocketsphinx/)
-   as well as the following packages from the official repositories: [libsamplerate](https://www.archlinux.org/packages/extra/x86_64/libsamplerate/) and [espeak](https://www.archlinux.org/packages/community/x86_64/espeak/).
-   It could be done like this:
-   ```
-         user@machine:~$ yaourt -S sphinxbase
-         user@machine:~$ yaourt -S pocketsphinx
+1. Install the following packages from the official repositories: 
+    [libsamplerate](https://www.archlinux.org/packages/extra/x86_64/libsamplerate/) 
+    [espeak](https://www.archlinux.org/packages/community/x86_64/espeak/).
+    It could be done like this:
+    ```
          user@machine:~$ sudo pacman -S libsamplerate espeak
     ```
     Additionally you will need a MySQL-Server.
@@ -57,8 +56,9 @@ You will need to isntall some packets in order to get everything working.
     ```
     You will need openssl for this. Do not give the key a password.
 4. Copy the ```config.example.json``` to ```config.json``` and edit it to your needs.
-   If you do not want to have MPD-Support (For which you will need an MPD-Server), just delete the whole "mpd"-section.
-   The configfile should be self-explanatory.
+    If you do not want to have MPD-Support (For which you will need an MPD-Server), just delete the whole "mpd"-section.
+    The configfile should be self-explanatory.
+    The bot might complain about not finding espeak-data, which is located in different places, depending on your distro.
 5. Start the bot:
    ```
         user@machine:~/mumble-bot$ node index.js

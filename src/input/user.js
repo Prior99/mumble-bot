@@ -37,7 +37,8 @@ if(!String.prototype.startsWith) {
  * single user.
  * @constructor
  * @param user - Mumble user to recognize the speech of.
- * @param {string} hotword - Hotword to start recognition by.
+ * @param databaseUser - ??
+ * @param bot - ??
  */
 var VoiceInputUser = function(user, databaseUser, bot) {
 	this._user = user;

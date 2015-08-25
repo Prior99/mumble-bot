@@ -1,14 +1,16 @@
 {
 	"url" : "example.org",
-	"name" : "bob",
-	"key" : "./bob.key",
-	"cert" : "./bob.cert",
+	"name" : "bot",
+	"key" : "./bot.key",
+	"cert" : "./bot.cert",
 	"channel" : "Root",
 	"afkChannel" : "Bot AFK",
-	"kickChannel" : "Kicked",
+	"publicChannel" : "Flur (Öffentlich)",
 	"afkWarnTimeout" : 300,
 	"afkTimeout" : 360,
 	"webpageurl" : "http://mumble.example.org/",
+	"audioCacheAmount" : 500,
+	"espeakData" : "/usr/lib/x86_64-linux-gnu",
 	"mpd" : {
 		"fifo" : "path/to/fifo",
 		"port" : 6601,
@@ -26,7 +28,6 @@
 		"database" : "bot",
 		"password" : "super_secret_password"
 	},
-	"audioCacheAmount" : 500
 	"steam" : {
 		"user" : "username",
 		"password" : "password",
