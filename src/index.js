@@ -27,7 +27,7 @@ var AUDIO_CACHE_AMOUNT = 4;
 /**
  * This is the constructor of the bot.
  * @constructor
- * @param mumble - already set up mumble connection
+ * @param mumble - already set up mumble connection (MumbleClient)
  * @param options - Options read from the config.json
  * @param {Database} database - Started connection to database.
  */
