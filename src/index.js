@@ -449,6 +449,16 @@ Bot.prototype._deleteAllCachedAudio = function(amount) {
  * @param {string} text - Text to say.
  * @param cb - Callback, will be called *after playback of TTS has finished*.
  */
+Bot.prototype.sayOnlyVoice = function(text, cb) {
+	return this.output.sayOnlyVoice(text, cb);
+};
+
+/**
+ * Will say something. The text will be played in mumble using TTS, written to
+ * the bots current channel (theoretically) and written in minecraft.
+ * @param {string} text - Text to say.
+ * @param cb - Callback, will be called *after playback of TTS has finished*.
+ */
 Bot.prototype.say = function(text, cb) {
 	if(this.minecraft) {
 		this.minecraft.say(text);

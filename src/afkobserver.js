@@ -65,7 +65,7 @@ AFKObserver.prototype.registerUser = function(user) {
 		var idleTime = (now - this.times[user.session])/1000;
 		this.times[user.session] = Date.now();
 		if(idleTime > this.bot.options.afkWarnTimeout) {
-			this.bot.say("Ok.");
+			this.bot.sayOnlyVoice("Ok.");
 			//user.sendMessage("AFK Status zurückgesetzt.");
 		}
 	}.bind(this));
@@ -96,7 +96,7 @@ AFKObserver.prototype.check = function() {
 				this.bot.sayImportant(mumbleUser.name + " ist jetzt AFK.");
 			}
 			else if(idleTime == this.bot.options.afkWarnTimeout) {
-				this.bot.sayImportant(mumbleUser.name + ", bist du AFK?");
+				this.bot.sayOnlyVoice(mumbleUser.name + ", bist du AFK?");
 				//mumbleUser.sendMessage("Du bist seit " + idleTime + " Sekunden inaktiv. Wenn in den nächsten " + (this.bot.options.afkTimeout - this.bot.options.afkWarnTimeout) + " Sekunden keine Aktivität besteht, wirst du als AFK gewertet.");
 			}
 		}
