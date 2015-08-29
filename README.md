@@ -34,12 +34,9 @@ There is a repository with default addons which can be found [here](https://git.
 
 You will need to isntall some packets in order to get everything working.
 
-1. Install the following packages from the AUR: [sphinxbase](https://aur.archlinux.org/packages/sphinxbase/), [pocketsphinx](https://aur.archlinux.org/packages/pocketsphinx/)
-   as well as the following packages from the official repositories: [libsamplerate](https://www.archlinux.org/packages/extra/x86_64/libsamplerate/) and [espeak](https://www.archlinux.org/packages/community/x86_64/espeak/).
+1. Installthe following packages from the official repositories: [libsamplerate](https://www.archlinux.org/packages/extra/x86_64/libsamplerate/) and [espeak](https://www.archlinux.org/packages/community/x86_64/espeak/).
    It could be done like this:
    ```
-         user@machine:~$ yaourt -S sphinxbase
-         user@machine:~$ yaourt -S pocketsphinx
          user@machine:~$ sudo pacman -S libsamplerate espeak
     ```
     Additionally you will need a MySQL-Server.
@@ -50,6 +47,7 @@ You will need to isntall some packets in order to get everything working.
          user@machine:~/mumble-bot$ npm install --python=python2
     ```
 3. Generate a TLS-certificate for the bot:
+   The startupscript can also do this automatically for you.
     ```
          openssl genrsa -out bot.key 2048
          openssl req -new -sha256 -key bot.key -out bot.csr
@@ -61,7 +59,7 @@ You will need to isntall some packets in order to get everything working.
    The configfile should be self-explanatory.
 5. Start the bot:
    ```
-        user@machine:~/mumble-bot$ node index.js
+        user@machine:~/mumble-bot$ ./bot start
    ```
 
 
