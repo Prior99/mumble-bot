@@ -6,12 +6,15 @@ It has a webinterface via which it can be controlled.
 
 ## Current list of features
 
- - Speechrecognition via pocketsphinx, automatical generation of grammar
- - Speechdispatching using espeak
+ - Speechdispatching using espeak, google or bing
  - Webinterface to control everything from within a browser
  - Playback music using mpd, control mpd using the bot
  - Fetch music from youtube
  - Upload music to mpd library
+ - Usermanagement
+ - Record users and playback the records
+ - Add quotations
+ - Upload sounds
 
 ## Install
 
