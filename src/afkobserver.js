@@ -1,4 +1,6 @@
 
+var Winston = require('winston');
+
 /**
  * This object is responsible for maintaining an activity tab.
  * When a user in the same channel as the bot stays afk for a `config` time
@@ -16,6 +18,9 @@ var AFKObserver = function(bot) {
 		this.someUserMoved(user, undefined, undefined);
 	}.bind(this));
 	setInterval(this.check.bind(this), 1000);
+	Winston.info("Module started: AFKObserver");
+	Winston.info("Warn time: " + this.bot.options.afkWarnTimeout);
+	Winston.info("AFK time: " + this.bot.options.afkTimeout);
 };
 
 AFKObserver.prototype.someUserMoved = function(user, oldc, newc) {
@@ -59,6 +64,7 @@ AFKObserver.prototype.registerUser = function(user) {
 	//don't mark yourself as afk
 	if(user.session == this.bot.mumble.session)
 		return;
+	Winston.info("Registering AFKhandler for user " + user.name);
 	this.times[user.session] = Date.now();
 	user.outputStream(true).on('data', function() {
 		var now = Date.now();
@@ -72,7 +78,8 @@ AFKObserver.prototype.registerUser = function(user) {
 };
 
 /**
- * Removes the times-entry ot the user
+ * Removes the times-entry ot the user. Does not remove the data listener.
+ * To fully unregister an afkHandler the user must also be moved to another channel.
  */
 AFKObserver.prototype.unregisterUser = function(user) {
 	delete this.times[user.session];
