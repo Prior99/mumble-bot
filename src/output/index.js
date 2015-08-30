@@ -100,6 +100,7 @@ Output.prototype._process = function() {
 	if(this.current.type === "speech") {
 		this.speech.enqueue({
 			text : this.current.text,
+			print : this.current.print,
 			callback : this._processStopped.bind(this)
 		});
 	}
@@ -153,10 +154,26 @@ Output.prototype.playSound = function(file, callback) {
 Output.prototype.say = function(text, callback) {
 	this._enqueue({
 		type : "speech",
+		print : true,
 		text : text,
 		callback :callback
 	});
 };
+
+/**
+ * Say something using TTS, don't print it to the chat.
+ * @param {string} text -  Text to say viw TTS.
+ * @param callback - Called after the text was spoken.
+ */
+Output.prototype.sayOnlyVoice = function(text, callback) {
+	this._enqueue({
+		type : "speech",
+		print : false,
+		text : text,
+		callback :callback
+	});
+};
+
 
 Output.prototype._enqueue = function(workitem) {
 	this.queue.push(workitem);

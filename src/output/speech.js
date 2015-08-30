@@ -212,7 +212,9 @@ Speech.prototype._next = function() {
 			this.speakUsingBing(this.current.text);
 		}
 		Winston.info("Speaking:\"" + this.current.text + "\"");
-		this.channel.sendMessage(this.current.text);
+		if(this.current.print) {
+			this.channel.sendMessage(this.current.text);
+		}
 	}
 };
 

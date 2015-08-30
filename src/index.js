@@ -27,7 +27,7 @@ var AUDIO_CACHE_AMOUNT = 4;
 /**
  * This is the constructor of the bot.
  * @constructor
- * @param mumble - already set up mumble connection
+ * @param mumble - already set up mumble connection (MumbleClient)
  * @param options - Options read from the config.json
  * @param {Database} database - Started connection to database.
  */
@@ -441,6 +441,16 @@ Bot.prototype._deleteAllCachedAudio = function(amount) {
 	while(prot.length > 0) {
 		this.cachedAudios.unshift(prot.pop());
 	}
+};
+
+/**
+ * Will say something. The text will be played in mumble using TTS, written to
+ * the bots current channel (theoretically) and written in minecraft.
+ * @param {string} text - Text to say.
+ * @param cb - Callback, will be called *after playback of TTS has finished*.
+ */
+Bot.prototype.sayOnlyVoice = function(text, cb) {
+	return this.output.sayOnlyVoice(text, cb);
 };
 
 /**
