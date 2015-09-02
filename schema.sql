@@ -96,9 +96,15 @@ CREATE TABLE IF NOT EXISTS Records (
 
 CREATE TABLE IF NOT EXISTS RSS (
 	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	url				TEXT
+	url				TEXT NOT NULL,
+	name			VARCHAR(32) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS KnownRSSEntries (
+	hash			VARCHAR(32) NOT NULL PRIMARY KEY,
+	url				TEXT NOT NULL,
+	seen			DATETIME NOT NULL
+);
 INSERT IGNORE INTO Permissions (id, name, description, icon) VALUES
 ("login", "Anmelden", "Erlaubt einem Benutzer, sich im System anzumelden.", "sign-in"),
 ("add-quote", "Zitat Eintragen", "Erlaubt das Eintragen neuer Zitate.", "quote-left"),

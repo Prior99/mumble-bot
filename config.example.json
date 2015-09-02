@@ -62,5 +62,6 @@
 			"effect" : "pitch" ,
 			"options" : [150]
 		}
-	]
+	],
+	"rssFetchInterval" : 120
 }

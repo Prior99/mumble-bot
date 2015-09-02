@@ -17,6 +17,7 @@ var Minecraft = require('./minecraft');
 var EventEmitter = require("events").EventEmitter;
 var Permissions = require("./permissions");
 var AFKObserver = require("./afkobserver");
+var RSS = require("./rss");
 
 var AUDIO_CACHE_AMOUNT = 4;
 
@@ -74,6 +75,8 @@ var Bot = function(mumble, options, database) {
 	if(options.minecraft) {
 		this.minecraft = new Minecraft(options.minecraft, this);
 	}
+
+	this.rss = new RSS(this);
 
 	this.afkObserver = new AFKObserver(this);
 

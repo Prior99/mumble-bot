@@ -3,13 +3,13 @@
 <ul class="list-group" id="feeds">
 {{#if canrss}}
 {{#each feeds}}
-	<li class="list-group-item">{{this.url}}
+	<li class="list-group-item"><b>{{this.name}}</b> {{this.url}}
 			<a style="float:right" class="btn btn-xs btn-danger delete-feed" rssId="{{this.id}}"><i class="fa fa-remove"></i></a>
 	</li>
 {{/each}}
 {{else}}
 {{#each feeds}}
-	<li class="list-group-item">{{this.url}}</li>
+	<li class="list-group-item"><b>{{this.name}}</b> {{this.url}}</li>
 {{/each}}
 {{/if}}
 </ul>
@@ -28,6 +28,14 @@
 		</div>
 	</div>
 	<div class="form-group">
+		<label for="name" class="col-sm-2 control-label">Name</label>
+		<div class="col-sm-10">
+			<div class="input-group">
+				<input type="text" class="form-control" placeholder="Name" id="name">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
 		<div class="col-sm-offset-2 col-sm-10">
 			<button class="btn btn-default" type="button" id="go">Hinzufügen</button>
 			</div>
@@ -36,11 +44,12 @@
 <script>
 $("#go").click(function() {
 	var url = $("#url").val();
-	$.ajax("/api/rss/add?url=" + encodeURI(url))
+	var name = $("#name").val();
+	$.ajax("/api/rss/add?url=" + encodeURI(url) + "&name=" + encodeURI(name))
 	.done(function(res) {
 		if(res.okay) {
 			spawnNotification('success', "Feed abonniert.");
-			$("#feeds").append("<li class='list-group-item'>" + url + "</li>")
+			$("#feeds").append("<li class='list-group-item'><b>" + name + "</b> " + url + "</li>")
 		}
 	})
 	.error(function(res) {

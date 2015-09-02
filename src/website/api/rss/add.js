@@ -3,9 +3,10 @@ var Winston = require('winston');
 module.exports = function(bot) {
 	return function(req, res) {
 		bot.permissions.hasPermission(req.session.user, 'rss', function(has) {
-			if(req.query.url) {
+			if(req.query.url && req.query.name) {
 				if(has) {
-					bot.database.addRSSFeed(req.query.url, function(err) {
+					bot.rss.markAllArticlesAsKnown(req.query.url);
+					bot.database.addRSSFeed(req.query.url, req.query.name, function(err) {
 						if(err) {
 							Winston.error("Could not add new RSS feed.", err);
 							res.status(500).send({
