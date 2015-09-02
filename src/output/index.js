@@ -19,6 +19,7 @@ var Stream = require('stream');
  * @param {Bot} bot - Bot this belongs to.
  */
 var Output = function(bot) {
+	Stream.Writable.call(this);
 	this.bot = bot;
 	this.stream = bot.mumble.inputStream();
 	this.speech = new Speech(this, bot.options.espeakData, bot.mumble.user.channel, bot.database, bot);
@@ -26,7 +27,6 @@ var Output = function(bot) {
 	this.busy = false;
 	this.queue = [];
 	this.current = null;
-	Stream.Writable.call(this);
 	this._bufferQueue = [];
 	this._playbackAhead = 0;
 	this.bot.newCommand("change voice", this.changeGender.bind(this), "Deprecated. Changes the gender of the voice.", "venus-mars");

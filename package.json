@@ -40,6 +40,7 @@
     "prompt": "^0.2.14",
     "request": "^2.60.0",
     "session-file-store": "0.0.17",
+    "sox-audio": "^0.3.0",
     "steam": "^0.6.8",
     "tablesorter": "^2.22.5",
     "typeahead.js": "^0.11.1",

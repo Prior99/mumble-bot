@@ -11,6 +11,9 @@ var EventEmitter = require("events").EventEmitter;
 var Winston = require("winston");
 var GoogleTTS = require("./googletranslatetts");
 var BingTTS = require("./bingtranslatetts");
+var Sox = require("sox-audio");
+var PassThroughStream = require('stream').PassThrough;
+var FS = require("fs");
 
 /*
  * Code
@@ -39,7 +42,27 @@ var Speech = function(stream, espeakData, channel, database, bot) {
 		gap: 1.5
 	}, espeakData);
 	ESpeak.onVoice(this._onESpeakData.bind(this));
-	this.stream = stream;
+
+	this.stream = new PassThroughStream();
+	this._sox = new Sox(this.stream)
+		.inputSampleRate('48k')
+		.inputBits(16)
+		.inputChannels(1)
+		.inputFileType('raw')
+		.inputEncoding('signed')
+	var output = this._sox.output(stream)
+		.outputSampleRate('48k')
+		.outputEncoding('signed')
+		.outputBits(16)
+		.outputChannels(1)
+		.outputFileType('raw');
+	if(bot.options.audioEffects) {
+		bot.options.audioEffects.forEach(function(effect) {
+			output.addEffect(effect.effect, effect.options);
+			Winston.info("Adding sox effect to output: " + effect.effect + ", " + effect.options.join(" "));
+		});
+	}
+	this._sox.run();
 	this.engine = "google";
 	if(bot.options.bingTTS) {
 		this._bingEngine = BingTTS(bot.options.bingTTS.clientID, bot.options.bingTTS.clientSecret, database);
