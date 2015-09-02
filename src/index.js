@@ -107,6 +107,7 @@ var Bot = function(mumble, options, database) {
 	}.bind(this), "Gibt eine Liste aller Kommandos aus.", "list-ul");
 	this.newCommand("be quiet", this.beQuiet.bind(this), "Sofort alles, was Geräusche verursacht abschalten.", "bell-slash", null, 'be-quiet');
 	this.newCommand("shutdown", this.shutdown.bind(this), "Fährt den bot herunter.", "power-off", null, 'shutdown');
+	this.mumble.users().forEach(this._addEventListenersToMumbleUser.bind(this));
 };
 
 Util.inherits(Bot, EventEmitter);
@@ -142,6 +143,16 @@ Bot.prototype.handleUserConnect = function(user) {
 				this.notifyOnlineUsersWithPermission('grant', "Ein unbekannter Nutzer mit Namen \"" + user.name + "\" hat soeben Mumble betreten.");
 			}
 		}
+	}.bind(this));
+	this._addEventListenersToMumbleUser(user);
+};
+
+Bot.prototype._addEventListenersToMumbleUser = function(user) {
+	user.on('disconnect', function() {
+		this.sayImportant(user.name + " hat Mumble verlassen");
+	}.bind(this));
+	user.on('move', function(oldChan, newChan, actor) {
+		this.sayImportant(user.name + " ging von Channel " + oldChan.name + " nach " + newChan.name);
 	}.bind(this));
 };
 
