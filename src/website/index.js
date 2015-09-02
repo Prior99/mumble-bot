@@ -19,6 +19,7 @@ var viewSpeak = require('./speak');
 var viewRegisterLogin = require('./users/registerLogin');
 var viewLog = require('./log');
 var viewQueue = require('./queue');
+var viewRSS = require('./rss');
 
 /*
  * Routes
@@ -95,6 +96,11 @@ var subpages = [{
 	url : "/queue/",
 	name : "Queue",
 	icon : "road"
+},
+{
+	url : "/rss/",
+	name : "RSS Feeds",
+	icon : "rss"
 }];
 /**
  * Handles the whole website stuff for the bot. Using express and handlebars
@@ -215,6 +221,7 @@ var Website = function(bot) {
 	this.app.get('/google', viewDefault("googlelookup"));
 	this.app.get('/log', viewLog(bot));
 	this.app.get('/queue', viewQueue(bot));
+	this.app.get('/rss', viewRSS(bot));
 	var port = this.bot.options.website.port;
 	this.server = this.app.listen(port);
 	this.server.setTimeout(5000);

@@ -50,6 +50,7 @@ require("./sounds.js")(Database);
 require("./records.js")(Database);
 require("./settings.js")(Database);
 require("./log.js")(Database);
+require("./rss.js")(Database);
 
 Database.prototype._checkError = function(err, callback) {
 	if(err) {

@@ -94,6 +94,11 @@ CREATE TABLE IF NOT EXISTS Records (
 	FOREIGN KEY(user) REFERENCES Users(id)
 );
 
+CREATE TABLE IF NOT EXISTS RSS (
+	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	url				TEXT
+);
+
 INSERT IGNORE INTO Permissions (id, name, description, icon) VALUES
 ("login", "Anmelden", "Erlaubt einem Benutzer, sich im System anzumelden.", "sign-in"),
 ("add-quote", "Zitat Eintragen", "Erlaubt das Eintragen neuer Zitate.", "quote-left"),
@@ -102,7 +107,8 @@ INSERT IGNORE INTO Permissions (id, name, description, icon) VALUES
 ("upload-music", "Musik hochladen", "Diese Berechtigung wird benötigt, um Musik hochzuladen, oder aus Youtube zu extrahieren.", "upload"),
 ("kick", "Kicken", "Mit dieser Berechtigung ist es möglich, Benutzer in Mumble aus ihrem Channel zu kicken.", "legal"),
 ("be-quiet", "Stumm Stellen", "Mit dieser Berechtigung kann ein Nutzer die gesamte Ausgabequeue des Bots leeren und so die aktuelle Wiedergabe unterbrechen.", "bell-slash"),
-("log", "Log anzeigen", "Erlaubt es einem Benutzer, die Logausgabe des Bots zu betrachten.", "file-text");
+("log", "Log anzeigen", "Erlaubt es einem Benutzer, die Logausgabe des Bots zu betrachten.", "file-text"),
+("rss", "RSS Feed abonnieren", "Mit dieser Berechtigung darf ein Nutzer RSS-Feeds abonnieren.", "rss");
 
 INSERT IGNORE INTO BassEffects (effect) VALUES
 ("Drop den Bass"),
