@@ -71,7 +71,7 @@ function setup {
 	# Check for OpenSSL
 	#
 
-	echo -n "  Checking for OpenSSL ... "
+	echo -n "  Checking for NPM ... "
 	if ! type npm &> /dev/null ; then
 		echo -ne "\033[31mnot found!\033[0m"
 		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"

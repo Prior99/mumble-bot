@@ -105,6 +105,17 @@ CREATE TABLE IF NOT EXISTS KnownRSSEntries (
 	url				TEXT NOT NULL,
 	seen			DATETIME NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS RecordLabels (
+	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	name			TEXT
+);
+
+CREATE TABLE IF NOT EXISTS RecordLabelRelation (
+	record				INT NOT NULL,
+	label					INT NOT NULL,
+	PRIMARY KEY(record, label)
+);
 INSERT IGNORE INTO Permissions (id, name, description, icon) VALUES
 ("login", "Anmelden", "Erlaubt einem Benutzer, sich im System anzumelden.", "sign-in"),
 ("add-quote", "Zitat Eintragen", "Erlaubt das Eintragen neuer Zitate.", "quote-left"),

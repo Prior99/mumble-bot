@@ -1,0 +1,49 @@
+<link href="/style/label.css" rel="stylesheet">
+<h1>Tags</h2>
+<p>Hier können Tags für Aufnahmen verwaltet werden.</p>
+<h2>Tag Hinzufügen</h2>
+<p>Hier können weitere Tags hinzugefügt werden.</p>
+<form class="form-horizontal">
+	<div class="form-group">
+		<label for="url" class="col-sm-2 control-label">Effekt</label>
+		<div class="col-sm-10">
+			<div class="input-group">
+				<input type="Tagname" class="form-control" placeholder="Name" id="name">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button class="btn btn-default" type="button" id="submit">Speichern</button>
+		</div>
+	</div>
+</form>
+<script>
+	$("#submit").click(function() {
+		var name = encodeURI($("#name").val());
+		$.ajax("/api/record/addlabel?name=" + name).done(function(res) {
+			if(res.okay) {
+				$("#tags").append('<tr><td><span class="label" style="background: ' + res.color + ';">' + name + '</span></td><td>0</td></tr>');
+			}
+		}).error(function(res) {
+			spawnNotification('error', "Konnte Label nicht hinzufügen");
+		});
+	});
+</script>
+<h2>Tags</h2>
+<table class="table table-responsive tablesorter">
+	<thead>
+		<tr>
+			<td>Label</td>
+			<td>Anzahl</td>
+		</tr>
+	</thead>
+	<tbody id="tags">
+		{{#each labels}}
+		<tr>
+			<td><span class="label" style="background: {{colorify this.name}};">{{this.name}}</span></td>
+			<td>{{this.records}}</td>
+		</tr>
+		{{/each}}
+	</tbody>
+</table>

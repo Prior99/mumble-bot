@@ -11,6 +11,7 @@ var Express = require('express');
 var viewCurrentCached = require('./cached');
 var viewSave = require('./save');
 var viewStored = require("./stored");
+var viewLabels = require("./labels");
 
 /*
  * Code
@@ -23,6 +24,10 @@ var pages = [{
 	url : "/record/cached/",
 	name : "Aufnahme Speichern",
 	icon : "save"
+},{
+	url : "/record/labels/",
+	name : "Tags",
+	icon : "tags"
 }];
 var RouteRecord = function(bot) {
 	var router = Express.Router();
@@ -32,6 +37,7 @@ var RouteRecord = function(bot) {
 	});
 	router.get('/cached', viewCurrentCached(bot));
 	router.get('/save', viewSave(bot));
+	router.get('/labels', viewLabels(bot));
 	router.get('/', viewStored(bot));
 
 	return router;

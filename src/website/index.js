@@ -9,7 +9,7 @@ var Less = require('less-middleware');
 var Session = require('express-session');
 var FileStore = require('session-file-store')(Session);
 var Moment = require('moment');
-
+var colorify = require('../colorbystring');
 /*
  * Views
  */
@@ -122,6 +122,9 @@ var Website = function(bot) {
 		defaultLayout : 'main',
 		extname: '.hbs',
 		helpers : {
+			"colorify" : function(string) {
+				return colorify(string);
+			},
 			"formatDate" : function(date) {
 				return Moment(date).format("DD.MM.YY");
 			},

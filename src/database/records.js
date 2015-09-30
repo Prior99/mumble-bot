@@ -60,4 +60,32 @@ module.exports = function(Database) {
 			}.bind(this)
 		);
 	};
+	Database.prototype.addRecordLabel = function(name, callback) {
+		this.pool.query("INSERT INTO RecordLabels(name) VALUES(?)", [name], function(err, result) {
+			if(this._checkError(err, callback)) {
+				if(callback) { callback(null, result.insertId); }
+			}
+		}.bind(this));
+	};
+	Database.prototype.listLabels = function(callback) {
+		this.pool.query("SELECT name, id, COUNT(record) AS records FROM RecordLabels LEFT JOIN RecordLabelRelation ON id = label GROUP BY id", function(err, rows) {
+			if(this._checkError(err, callback)) {
+				callback(null, rows);
+			}
+		}.bind(this));
+	};
+	Database.prototype.addRecordToLabel = function(record, label, callback) {
+		this.pool.query("INSERT INTO RecordLabelRelation(record, label) VALUES(?, ?)", [record, label], function(err, result) {
+			if(this._checkError(err, callback)) {
+				if(callback) { callback(null); }
+			}
+		}.bind(this));
+	};
+	Database.prototype.listRecordsByLabel = function(label, callback) {
+		this.pool.query("SELECT id, quote, used, user, submitted FROM RecordLabelRelation LEFT JOIN RecordLabelRelation ON id = record WHERE label = ? ORDER BY used DESC", [label], function(err, rows) {
+			if(this._checkError(err, callback)) {
+				callback(null, rows);
+			}
+		}.bind(this));
+	};
 };
