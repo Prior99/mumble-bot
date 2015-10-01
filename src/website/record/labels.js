@@ -8,7 +8,6 @@ var ViewLabels = function(bot) {
 				res.locals.labels = [];
 			}
 			else {
-				console.log(labels);
 				res.locals.labels = labels;
 			}
 			res.render("record/labels");

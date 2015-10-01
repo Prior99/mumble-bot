@@ -1,3 +1,20 @@
+<link href="/style/label.css" rel="stylesheet">
+<style>
+
+input:not(:checked)~span {
+	background: #bbb !important;
+}
+
+input[type="checkbox"] {
+	display:none;
+}
+
+label.tag-label {
+	padding: 0;
+	margin: 0;
+}
+
+</style>
 <h1>Aufnahme abspeichern</h1>
 <p>Hier kann eine Aufnahme abgespeichert werden. Bitte geben Sie eine Beschreibung an.</p>
 <form class="form-horizontal">
@@ -26,6 +43,17 @@
 				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-edit"></i></span>
 				<textarea style="resize: none;" rows="3" name="description" class="form-control" id="description"></textarea>
 			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Tags</label>
+		<div class="col-sm-10">
+			{{#each labels}}
+			<label class="checkbox-inline tag-label">
+				<input type="checkbox" class="tag-checkbox">
+				<span class="label" style="background: {{colorify this.name}};">{{this.name}}</span>
+			</label>
+			{{/each}}
 		</div>
 	</div>
 	<div class="form-group">
