@@ -18,13 +18,13 @@ module.exports = function(bot) {
 		var data = req.query;
 		console.log(data);
 		Steam64(data.steamusername, function(err, steamid) {
-			if(err) {
+			if(err && data.steamusername) {
 				res.send({
 					okay : false,
 					reason : "error_fetching_steamid"
 				});
 			}
-			else if(!steamid) {
+			else if(!steamid && data.steamusername) {
 				res.send({
 					okay : false,
 					reason : "unknown_steam_username"
