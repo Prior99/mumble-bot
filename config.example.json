@@ -3,6 +3,7 @@
 	"name" : "bot",
 	"key" : "./bot.key",
 	"cert" : "./bot.cert",
+	"password" : "this is optional",
 	"channel" : "Root",
 	"afkChannel" : "Bot AFK",
 	"publicChannel" : "Flur (Öffentlich)",
