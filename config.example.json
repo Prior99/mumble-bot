@@ -23,6 +23,11 @@
 		"tmp" : "tmp/",
 		"sessionSecret" : "some_random_string"
 	},
+	"announce" : {
+		"connect" : true,
+		"move" : false,
+		"disconnect" : false
+	},
 	"database" : {
 		"host" : "localhost",
 		"user" : "bot",

@@ -134,13 +134,19 @@ Bot.prototype.handleUserConnect = function(user) {
 		}
 		else {
 			if(dbUser) {
-				this.sayImportant(dbUser.username + " hat als " + user.name + " Mumble betreten.");
+				if(!this.options.announce || (this.options.announce.connect != false && this.options.announce.connect != "false")) {
+					this.sayImportant(dbUser.username + " hat als " + user.name + " Mumble betreten.");
+				}
 			}
 			else {
-				this.sayImportant("Unbekannter Nutzer \"" + user.name + "\" hat Mumble betreten.");
-				user.moveToChannel(this.options.publicChannel);
-				user.sendMessage("Herzlich Willkommen. Ich bin " + this.options.name + ". Es sollte ein Administrator kommen und dich begrüßen. In der Zwischenzeit kannst du dir unter " + this.options.webpageurl + " einen Account anlegen.");
-				this.notifyOnlineUsersWithPermission('grant', "Ein unbekannter Nutzer mit Namen \"" + user.name + "\" hat soeben Mumble betreten.");
+				if(!this.options.announce || (this.options.announce.connect != false && this.options.announce.connect != "false")) {
+					this.sayImportant("Unbekannter Nutzer \"" + user.name + "\" hat Mumble betreten.");
+					this.notifyOnlineUsersWithPermission('grant', "Ein unbekannter Nutzer mit Namen \"" + user.name + "\" hat soeben Mumble betreten.");
+					user.sendMessage("Herzlich Willkommen. Ich bin " + this.options.name + ". Es sollte ein Administrator kommen und dich begrüßen. In der Zwischenzeit kannst du dir unter " + this.options.webpageurl + " einen Account anlegen.");
+				}
+				if(this.options.kickChannel) {
+					user.moveToChannel(this.options.publicChannel);
+				}
 			}
 		}
 	}.bind(this));
@@ -149,10 +155,14 @@ Bot.prototype.handleUserConnect = function(user) {
 
 Bot.prototype._addEventListenersToMumbleUser = function(user) {
 	user.on('disconnect', function() {
-		this.sayImportant(user.name + " hat Mumble verlassen");
+		if(!this.options.announce || (this.options.announce.disconnect != false && this.options.announce.disconnect != "false")) {
+			this.sayImportant(user.name + " hat Mumble verlassen");
+		}
 	}.bind(this));
 	user.on('move', function(oldChan, newChan, actor) {
-		this.sayImportant(user.name + " ging von Channel " + oldChan.name + " nach " + newChan.name);
+		if(!this.options.announce || (this.options.announce.move != false && this.options.announce.move != "false")) {
+			this.sayImportant(user.name + " ging von Channel " + oldChan.name + " nach " + newChan.name);
+		}
 	}.bind(this));
 };
 

@@ -15,7 +15,7 @@ var schema = {
 		},
 		name : {
 			message : "Please enter the name of the bot.",
-			description : "What should the bot be named like? Please note that for a hotword containing the bots name to work the name must be a valid english word known to the dictonary cmu-sphinx is using.",
+			description : "What should the bot be named like? ",
 			required : true
 		},
 		channel : {
@@ -51,10 +51,10 @@ var schema = {
 			required : true
 		},
 		kickChannel : {
-			message : "Enter the name of a channel to move kicked users into.",
+			message : "Enter the name of a channel to move kicked users as well as unknown users into. Leave this blank if you do not want to kick users or have unknown users moved.",
 			default : "Root",
-			description : "Which channel should users be moved to which were kicked by the bot?",
-			required : true
+			description : "Which channel should users be moved to which were kicked by the bot or are unknown?",
+			required : false
 		},
 		mpd : {
 			pattern : /true|false/,
@@ -91,6 +91,12 @@ var schema = {
 			message : "Enter the amount of records you want to keep.",
 			description : "How many temporary records do you want to keep?"
 		},
+		rssFetchInterval : {
+			required : true,
+			default : 300,
+			pattern : /\d=/,
+			message : "How often should the rss feed be updated?"
+		}
 	}
 };
 
@@ -132,7 +138,31 @@ var bingTTS = {
 			message : "Enter the client secret generated from the ms azure marketplace:"
 		}
 	}
-}
+};
+
+
+var announce = {
+	properties : {
+		connect : {
+			pattern : /true|false/,
+			default : false,
+			required : false,
+			message : "Set this to false if you do not want the bot to announce users connecting:"
+		},
+		move : {
+			pattern : /true|false/,
+			default : false,
+			required : false,
+			message : "Set this to false if you do not want the bot to announce users moving:"
+		},
+		disconnect : {
+			pattern : /true|false/,
+			default : false,
+			required : false,
+			message : "Set this to false if you do not want the bot to announce users disconnecting:"
+		}
+	}
+};
 
 var website = {
 	properties : {
@@ -295,6 +325,11 @@ function getBingTTS(active, callback) {
 		});
 	}
 }
+function getAnnounce(callback) {
+	Prompt.get(announce, function(err, announce) {
+		callback(announce);
+	});
+}
 
 function getWebsite(callback) {
 	Prompt.get(website, function(err, website) {
@@ -339,6 +374,17 @@ function startOver() {
 			}
 			else {
 				results.bingTTS = bingTTS;
+			}
+			getAnnounce(announceDone);
+		}
+
+
+		function announceDone(announce)  {
+			if(!announce) {
+				delete results.announce;
+			}
+			else {
+				results.announce = announce;
 			}
 			getWebsite(websiteDone);
 		}
