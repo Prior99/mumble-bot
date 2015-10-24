@@ -1,8 +1,11 @@
 module.exports = function(Database) {
-	Database.prototype.addRecord = function(quote, user, date, callback) {
+	Database.prototype.addRecord = function(quote, user, date, labels, callback) {
 		this.pool.query("INSERT INTO Records(quote, user, submitted) VALUES(?, ?, ?)",
 			[quote, user.id, date], function(err, result) {
 				if(this._checkError(err, callback)) {
+					labels.forEach(function(label) {
+						this.addRecordToLabel(result.insertId, label);
+					}.bind(this));
 					if(callback) { callback(null, result.insertId); }
 				}
 			}.bind(this)

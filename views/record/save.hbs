@@ -50,7 +50,7 @@ label.tag-label {
 		<div class="col-sm-10">
 			{{#each labels}}
 			<label class="checkbox-inline tag-label">
-				<input type="checkbox" class="tag-checkbox">
+				<input type="checkbox" class="tag-checkbox" tagId="{{this.id}}">
 				<span class="label" style="background: {{colorify this.name}};">{{this.name}}</span>
 			</label>
 			{{/each}}
@@ -66,7 +66,14 @@ label.tag-label {
 <script>
 $("#submit").click(function() {
 	var quote = encodeURI($("#description").val());
-	$.ajax("/api/record/save?id={{record.id}}&quote=" + quote).done(function(res) {
+	var labels = [];
+	$(".tag-checkbox").each(function() {
+		if($(this).prop('checked')) {
+			labels.push($(this).attr('tagId'));
+		}
+	});
+	var jsonLabels = encodeURI(JSON.stringify(labels));
+	$.ajax("/api/record/save?id={{record.id}}&quote=" + quote + "&labels=" + jsonLabels).done(function(res) {
 		if(res.okay) {
 			window.location.href = "/record/";
 		}
