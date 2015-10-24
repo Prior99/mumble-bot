@@ -12,6 +12,7 @@ var viewCurrentCached = require('./cached');
 var viewSave = require('./save');
 var viewStored = require("./stored");
 var viewLabels = require("./labels");
+var viewEdit = require("./edit");
 
 /*
  * Code
@@ -38,6 +39,7 @@ var RouteRecord = function(bot) {
 	router.get('/cached', viewCurrentCached(bot));
 	router.get('/save', viewSave(bot));
 	router.get('/labels', viewLabels(bot));
+	router.get('/edit', viewEdit(bot));
 	router.get('/', viewStored(bot));
 
 	return router;

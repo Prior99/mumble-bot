@@ -1,6 +1,7 @@
 /*
  * Imports
  */
+require('array.prototype.find');
 var Mumble = require("mumble");
 var Bot = require("./src");
 var Winston = require('winston');

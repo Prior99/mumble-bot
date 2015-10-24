@@ -23,6 +23,38 @@ module.exports = function(Database) {
 			callback(null, records);
 		});
 	};
+	Database.prototype.updateRecord = function(id, quote, labels, callback) {
+		new Promise(function(okay, fail) {
+			this.pool.query("UPDATE Records SET quote = ? WHERE id = ?", [quote, id], function(err, rows) {
+				if(err) {
+					fail(err);
+				}
+				else {
+					okay(rows);
+				}
+			});
+		}.bind(this))
+		.catch(callback)
+		.then(function() {
+			return new Promise(function(okay, fail) {
+				this.pool.query("DELETE FROM RecordLabelRelation WHERE record = ?", [id], function(err) {
+					if(err) {
+						fail(err);
+					}
+					else {
+						okay();
+					}
+				});
+			}.bind(this));
+		}.bind(this))
+		.catch(callback)
+		.then(function() {
+			labels.forEach(function(label) {
+				this.addRecordToLabel(id, label);
+			}.bind(this));
+			callback();
+		}.bind(this));
+	};
 	Database.prototype.listRecords = function(callback) {
 		new Promise(function(okay, fail) {
 			this.pool.query("SELECT id FROM Records ORDER BY used DESC", function(err, rows) {

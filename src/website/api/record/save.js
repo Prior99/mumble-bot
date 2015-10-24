@@ -5,7 +5,6 @@ module.exports = function(bot) {
 	return function(req, res) {
 		if(req.query.id && req.query.quote && req.query.labels) {
 			var labels = JSON.parse(req.query.labels);
-			console.log(labels);
 			var sound = bot.getCachedAudioById(req.query.id);
 			var quote = req.query.quote;
 				try {

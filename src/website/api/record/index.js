@@ -15,6 +15,7 @@ var viewDownload = require('./download');
 var viewDeleteCached = require('./deletecached');
 var viewProtect = require('./protect');
 var viewAddLabel = require('./addlabel');
+var viewEdit = require('./edit');
 
 /*
  * Code
@@ -30,6 +31,7 @@ module.exports = function(bot) {
 	router.use('/protect', viewProtect(bot));
 	router.use('/deletecached', viewDeleteCached(bot));
 	router.use('/addlabel', viewAddLabel(bot));
+	router.use('/edit', viewEdit(bot));
 
 	return router;
 };

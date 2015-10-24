@@ -13,6 +13,7 @@
   "author": "",
   "license": "GPL-3.0",
   "dependencies": {
+    "array.prototype.find": "^1.0.0",
     "bootstrap": "^3.3.4",
     "bootstrap-validator": "^0.9.0",
     "bootswatch": "^3.3.5",
