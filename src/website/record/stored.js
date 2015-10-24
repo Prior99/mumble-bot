@@ -9,7 +9,6 @@ var ViewCached= function(bot) {
 					res.locals.records = [];
 				}
 				else {
-					console.log(records);
 					res.locals.records = records;
 				}
 				res.render("record/stored");
