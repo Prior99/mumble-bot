@@ -39,6 +39,6 @@ module.exports = function(bot, router) {
 	}
 
 	return function(req, res) {
-		handleFile(req.files["upload"], res);
+		handleFile(req.files["upload"], res, req);
 	};
 };
