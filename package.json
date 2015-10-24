@@ -39,6 +39,7 @@
     "node-mpd": "git+https://git.cronosx.de/prior/node-mpd.git",
     "node-samplerate": "git+https://git.cronosx.de/prior/node-samplerate.git",
     "onecolor": "^2.5.0",
+    "promise": "^7.0.4",
     "prompt": "^0.2.14",
     "request": "^2.60.0",
     "rng-js": "^1.0.1",

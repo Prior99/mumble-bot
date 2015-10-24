@@ -13,7 +13,14 @@
 		<tr>
 			<td><a href="/users/profile/{{this.user.username}}">{{user.username}}</a></td>
 			<td>{{formatDate submitted}} {{formatTime submitted}}</td>
-			<td>{{quote}}</td>
+			<td>
+				<p>{{quote}}</p>
+				<p>
+				{{#each labels}}
+					<a class="label" style="background: {{colorify this.name}};" href="/record/?tag={{this.id}}">{{this.name}}</a>
+				{{/each}}
+				</p>
+			</td>
 			<td>{{used}}</td>
 			<td><a recordId="{{this.id}}" class="playrecord quote-btn btn btn-xs btn-success"><span class="fa fa-volume-down" aria-hidden="true"></span></a></td>
 			<td><a href="/api/record/download?id={{this.id}}" class="quote-btn btn btn-xs btn-default"><span class="fa fa-download" aria-hidden="true"></span></a></td>

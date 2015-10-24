@@ -1,3 +1,5 @@
+var Promise = require('promise');
+
 module.exports = function(Database) {
 	Database.prototype.addRecord = function(quote, user, date, labels, callback) {
 		this.pool.query("INSERT INTO Records(quote, user, submitted) VALUES(?, ?, ?)",
@@ -11,39 +13,57 @@ module.exports = function(Database) {
 			}.bind(this)
 		);
 	};
+	Database.prototype._completeRecords = function(records, callback) {
+		var promises = records.map(function(record) {
+			return Promise.denodeify(this.getRecord.bind(this))(record.id);
+		}.bind(this));
+		Promise.all(promises)
+		.catch(callback)
+		.then(function(records) {
+			callback(null, records);
+		});
+	};
 	Database.prototype.listRecords = function(callback) {
-		this.pool.query("SELECT id, quote, used, user, submitted FROM Records ORDER BY used DESC",
-			function(err, rows) {
-				if(this._checkError(err, callback)) { //Check error for this query
-					var finished = []; //This array will be filled with all sounds already having user
-					var next = function() { //Called recursively
-						if(rows.length > 0) { //Only do this if rows are left to process
-							var row = rows.pop(); //Take next row
-							this.getUserById(row.user, function(err, user) { //Fetch user
-								if(this._checkError(err, callback)) {
-									row.user = user; //Save user in row
-									finished.push(row);
-									next(); //Continue recursion
-								}
-							}.bind(this));
-						}
-						else {
-							if(callback) { callback(null, finished); } // All rows done
-						}
-					}.bind(this);
-					next();
+		new Promise(function(okay, fail) {
+			this.pool.query("SELECT id FROM Records ORDER BY used DESC", function(err, rows) {
+					if(err) {
+						fail(err);
+					}
+					else {
+						okay(rows);
+					}
 				}
-			}.bind(this)
-		);
+			);
+		}.bind(this))
+		.catch(callback)
+		.then(function(records) {
+			return Promise.denodeify(this._completeRecords.bind(this))(records);
+		}.bind(this))
+		.catch(callback)
+		.then(function(records) {
+			callback(null, records);
+		});
 	};
 	Database.prototype.listRecordsForUser = function(user, callback) {
-		this.pool.query("SELECT id, quote, used, submitted FROM Records WHERE user = ? ORDER BY used DESC", [user.id],
-			function(err, rows) {
-				if(this._checkError(err, callback)) {
-					if(callback) { callback(null, rows); }
+		new Promise(function(okay, fail) {
+			this.pool.query("SELECT id FROM Records WHERE user = ? ORDER BY used DESC", [user.id], function(err, rows) {
+					if(err) {
+						fail(err);
+					}
+					else {
+						okay(rows);
+					}
 				}
-			}.bind(this)
-		);
+			);
+		}.bind(this))
+		.catch(callback)
+		.then(function(records) {
+			return Promise.denodeify(this._completeRecords.bind(this))(records);
+		}.bind(this))
+		.catch(callback)
+		.then(function(records) {
+			callback(null, records);
+		});
 	};
 	Database.prototype.usedRecord = function(id, callback) {
 		this.pool.query("UPDATE Records SET used = used +1 WHERE id = ?",
@@ -55,13 +75,37 @@ module.exports = function(Database) {
 		);
 	};
 	Database.prototype.getRecord = function(id, callback) {
-		this.pool.query("SELECT id, quote, used, user, submitted FROM Records WHERE id = ?",
-			[id], function(err, rows) {
-				if(this._checkError(err, callback)) {
-					if(callback) { callback(null, rows[0]); }
+		var record;
+		new Promise(function(okay, fail) {
+			this.pool.query("SELECT id, quote, used, user, submitted FROM Records WHERE id = ?", [id], function(err, rows) {
+				if(err) {
+					fail(err);
 				}
-			}.bind(this)
-		);
+				else {
+					okay(rows[0]);
+				}
+			});
+		}.bind(this))
+		.catch(callback)
+		.then(function(_record) {
+			record = _record;
+			var getUser = Promise.denodeify(this.getUserById.bind(this));
+			var getLabels = Promise.denodeify(this.getLabelsOfRecord.bind(this));
+			return Promise.all([getUser(record.user), getLabels(record.id)]);
+		}.bind(this))
+		.catch(callback)
+		.then(function(result) {
+			record.user = result[0];
+			record.labels = result[1];
+			callback(null, record);
+		});
+	};
+	Database.prototype.getLabelsOfRecord = function(recordId, callback) {
+		this.pool.query("SELECT r.id AS id, r.name AS name FROM RecordLabels r LEFT JOIN RecordLabelRelation l ON l.label = r.id WHERE l.record = ?", [recordId], function(err, rows) {
+			if(this._checkError(err, callback)) {
+				if(callback) { callback(null, rows); }
+			}
+		}.bind(this));
 	};
 	Database.prototype.addRecordLabel = function(name, callback) {
 		this.pool.query("INSERT INTO RecordLabels(name) VALUES(?)", [name], function(err, result) {
@@ -85,10 +129,24 @@ module.exports = function(Database) {
 		}.bind(this));
 	};
 	Database.prototype.listRecordsByLabel = function(label, callback) {
-		this.pool.query("SELECT id, quote, used, user, submitted FROM RecordLabelRelation LEFT JOIN RecordLabelRelation ON id = record WHERE label = ? ORDER BY used DESC", [label], function(err, rows) {
-			if(this._checkError(err, callback)) {
-				callback(null, rows);
-			}
-		}.bind(this));
+		new Promise(function(okay, fail) {
+			this.pool.query("SELECT id FROM Records LEFT JOIN RecordLabelRelation ON id = record WHERE label = ? ORDER BY used DESC", [label], function(err, rows) {
+					if(err) {
+						fail(err);
+					}
+					else {
+						okay(rows);
+					}
+				}
+			);
+		}.bind(this))
+		.catch(callback)
+		.then(function(records) {
+			return Promise.denodeify(this._completeRecords.bind(this))(records);
+		}.bind(this))
+		.catch(callback)
+		.then(function(records) {
+			callback(null, records);
+		});
 	};
 };
