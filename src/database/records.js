@@ -23,17 +23,22 @@ module.exports = function(Database) {
 			callback(null, records);
 		});
 	};
+	Database.prototype.getRecordCountByUsers = function(callback) {
+		Promise.denodeify(this.pool.query.bind(this.pool))("SELECT COUNT(r.id) AS amount, u.username AS user FROM Users u LEFT JOIN Records r ON r.user = u.id GROUP BY u.id HAVING COUNT(r.id) > 0 ORDER BY amount DESC")
+		.catch(callback)
+		.then(function(rows) {
+			callback(null, rows);
+		})
+	};
+	Database.prototype.getRecordCountByDays = function(callback) {
+		Promise.denodeify(this.pool.query.bind(this.pool))("SELECT DATE(submitted) AS submitted, COUNT(id) AS amount FROM Records GROUP BY DATE(submitted) ORDER BY submitted DESC")
+		.catch(callback)
+		.then(function(rows) {
+			callback(null, rows);
+		})
+	};
 	Database.prototype.updateRecord = function(id, quote, labels, callback) {
-		new Promise(function(okay, fail) {
-			this.pool.query("UPDATE Records SET quote = ? WHERE id = ?", [quote, id], function(err, rows) {
-				if(err) {
-					fail(err);
-				}
-				else {
-					okay(rows);
-				}
-			});
-		}.bind(this))
+		Promise.denodeify(this.pool.query.bind(this.pool))("UPDATE Records SET quote = ? WHERE id = ?", [quote, id])
 		.catch(callback)
 		.then(function() {
 			return new Promise(function(okay, fail) {

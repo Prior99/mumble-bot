@@ -192,6 +192,7 @@ var Website = function(bot) {
 	});
 	this.app.use(Less('public/'));
 	this.app.use('/', Express.static('public/'));
+	this.app.use('/d3', Express.static('node_modules/d3/'));
 	this.app.use('/bootstrap', Express.static('node_modules/bootstrap/dist/'));
 	this.app.use('/jquery', Express.static('node_modules/jquery/dist/'));
 	this.app.use('/jquery-form', Express.static('node_modules/jquery-form/'));

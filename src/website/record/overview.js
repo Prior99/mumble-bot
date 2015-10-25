@@ -11,7 +11,7 @@ var ViewOverview = function(bot) {
 		.then(function(c) {
 			return c;
 		})
-		.then(function() {
+		.then(function(count) {
 			res.locals.recordAmount = count;
 			res.render("record/overview");
 		});
