@@ -132,6 +132,29 @@ module.exports = function(Database) {
 			callback(null, record);
 		});
 	};
+	Database.prototype.getRandomRecord = function(callback) {
+		new Promise(function(okay, fail) {
+			this.pool.query("SELECT id FROM Records, (SELECT RAND() * (SELECT MAX(id) FROM Records) AS tid) AS Tmp WHERE Records.id >= Tmp.tid ORDER BY id ASC LIMIT 1", function(err, rows) {
+				if(err) {
+					fail(err);
+				}
+				else {
+					okay(rows[0]);
+				}
+			});
+		}.bind(this))
+		.catch(callback)
+		.then(function(record) {
+			if(!record) {
+				callback(null, null);
+			}
+			else return Promise.denodeify(this.getRecord.bind(this))(record.id);
+		}.bind(this))
+		.catch(callback)
+		.then(function(record) {
+			callback(null, record);
+		});
+	};
 	Database.prototype.getLabelsOfRecord = function(recordId, callback) {
 		this.pool.query("SELECT r.id AS id, r.name AS name FROM RecordLabels r LEFT JOIN RecordLabelRelation l ON l.label = r.id WHERE l.record = ?", [recordId], function(err, rows) {
 			if(this._checkError(err, callback)) {
