@@ -162,6 +162,15 @@ module.exports = function(Database) {
 			}
 		}.bind(this));
 	};
+	Database.prototype.getRecordCount = function(callback) {
+		this.pool.query("SELECT COUNT(id) AS amount FROM Records",
+			function(err, rows) {
+				if(this._checkError(err, callback)) {
+					if(callback) { callback(null, rows[0].amount); }
+				}
+			}.bind(this)
+		);
+	};
 	Database.prototype.addRecordLabel = function(name, callback) {
 		this.pool.query("INSERT INTO RecordLabels(name) VALUES(?)", [name], function(err, result) {
 			if(this._checkError(err, callback)) {

@@ -13,12 +13,17 @@ var viewSave = require('./save');
 var viewStored = require("./stored");
 var viewLabels = require("./labels");
 var viewEdit = require("./edit");
+var viewOverview = require("./overview");
 
 /*
  * Code
  */
 var pages = [{
 	url : "/record/",
+	name : "Übersicht",
+	icon : "info"
+},{
+	url : "/record/stored/",
 	name : "Gespeicherte Aufnahmen",
 	icon : "microphone"
 },{
@@ -40,7 +45,8 @@ var RouteRecord = function(bot) {
 	router.get('/save', viewSave(bot));
 	router.get('/labels', viewLabels(bot));
 	router.get('/edit', viewEdit(bot));
-	router.get('/', viewStored(bot));
+	router.get('/stored', viewStored(bot));
+	router.get('/', viewOverview(bot));
 
 	return router;
 };

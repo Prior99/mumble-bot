@@ -1,0 +1,15 @@
+<h1>Aufnahmen</h1>
+<p>Derzeit sind <b>{{recordAmount}}</b> Aufnahmen gespeichert.</p>
+<p>Es können <a href="/record/cached/">neue Aufnahmen</a> hinzugefügt werden und <a href="/record/stored">gespeicherte Aufnahmen</a> wiedergegeben werden.</p>
+<p>Es ist auch möglich, die Aufnahmen <a href="/record/labels/">nach Tags zu durchsuchen</a> oder neue Tags hinzuzufügen.</p>
+<a class="btn btn-ld btn-default" id="random"><span class="fa fa-volume-down" aria-hidden="true"></span> Zufällige Aufnahme Wiedergeben</a>
+
+<h2>Übersicht nach Nutzern</h2>
+
+<h2>Übersicht nach Tagen</h2>
+
+<script>
+$("#random").click(function() {
+	$.ajax("/api/record/random");
+});
+</script>
