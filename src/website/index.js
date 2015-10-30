@@ -190,19 +190,14 @@ var Website = function(bot) {
 			next();
 		}
 	});
-	this.app.use(Less('public/'));
-	this.app.use('/', Express.static('public/'));
-	this.app.use('/d3', Express.static('node_modules/d3/'));
 	this.app.use('/bootstrap', Express.static('node_modules/bootstrap/dist/'));
-	this.app.use('/jquery', Express.static('node_modules/jquery/dist/'));
-	this.app.use('/jquery-form', Express.static('node_modules/jquery-form/'));
 	this.app.use('/fontawesome', Express.static('node_modules/font-awesome/'));
-	this.app.use('/crypto-js', Express.static('node_modules/crypto-js/'));
 	this.app.use('/typeahead', Express.static('node_modules/typeahead.js/dist/'));
 	this.app.use('/bootswatch', Express.static('node_modules/bootswatch/'));
 	this.app.use('/typeahead-bootstrap', Express.static('node_modules/typeahead.js-bootstrap3.less/'));
-	this.app.use('/bootstrap-validator', Express.static('node_modules/bootstrap-validator/dist/'));
 	this.app.use('/tablesorter', Express.static('node_modules/tablesorter/dist/'));
+	this.app.use('/favicon.ico', Express.static('favicon.ico'));
+	this.app.use('/dist/', Express.static('dist/'));
 	this.app.use('/api', routeApi(bot));
 	this.app.use(function(req, res, next) {
 		if(req.session.user) {

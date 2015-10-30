@@ -1,6 +1,5 @@
 <h1>Befehle</h1>
 <p>Derzeit sind dem Bot <b>{{bot.commands.length}}</b> Befehle bekannt.</p>
-<link href="/style/commandbutton.css" rel="stylesheet">
 <div class="container-fluid">
 	<div class="row flush-col">
 	{{#each bot.commands}}
@@ -30,15 +29,4 @@
 	{{/each}}
 	</div>
 </div>
-<script>
-	$(".execute-command").click(function(e) {
-		e.preventDefault();
-		var cmd = $(this).attr("cmdId");
-		var arg = $(this).attr("argument");
-		var string = "/api/command?command=" + cmd;
-		if(arg) {
-			string += "&argument=" + arg;
-		}
-		$.ajax(string);
-	});
-</script>
+<script src="/dist/commands.js"></script>

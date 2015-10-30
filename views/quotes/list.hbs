@@ -20,8 +20,4 @@
 	{{/each}}
 	</tbody>
 </table>
-<script>
-	$("a.quote-btn").click(function() {
-		$.ajax("/api/quotes/speak?id=" + $(this).attr("quoteId"));
-	});
-</script>
+<script src="/dist/quotes/list.js"></script>

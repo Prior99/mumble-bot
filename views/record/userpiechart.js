@@ -1,4 +1,7 @@
 (function() {
+	var d3 = require("d3");
+	var $ = require("jquery");
+
 	var width = $("#perUserPieChart").width();
 	var height = $("#perUserPieChart").height();
 	var radius = Math.min(width - 150, height) / 2;

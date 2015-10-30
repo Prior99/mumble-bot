@@ -1,5 +1,3 @@
-<link href="/style/recordstats.css" rel="stylesheet">
-
 <h1>Aufnahmen</h1>
 <p>Derzeit sind <b>{{recordAmount}}</b> Aufnahmen gespeichert.</p>
 <p>Es können <a href="/record/cached/">neue Aufnahmen</a> hinzugefügt werden und <a href="/record/stored">gespeicherte Aufnahmen</a> wiedergegeben werden.</p>
@@ -15,8 +13,6 @@
 		<svg id="perUserPieChart" height="400"></svg>
 	</div>
 </div>
-<script src="/js/userbarchart.js"></script>
-<script src="/js/userpiechart.js"></script>
 
 <h2>Übersicht nach Tagen</h2>
 <div class="row">
@@ -24,10 +20,5 @@
 		<svg id="perTimeChart" height="400"></svg>
 	</div>
 </div>
-<script src="/js/timechart.js"></script>
 
-<script>
-	$("#random").click(function() {
-		$.ajax("/api/record/random");
-	});
-</script>
+<script src="/dist/record/overview.js"></script>

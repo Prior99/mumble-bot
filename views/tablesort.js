@@ -1,3 +1,7 @@
+var $ = global.jQuery = require("jquery");
+require("tablesorter/dist/js/jquery.tablesorter.js");
+require("tablesorter/dist/js/jquery.tablesorter.widgets.js");
+
 $.tablesorter.themes.custom = {
 	table        : 'table table-striped',
 	caption      : 'caption',
@@ -39,22 +43,21 @@ $.tablesorter.addParser({
 	},
 	type: 'numeric'
 });
-$(function() {
-	var sortingHeaders = {}
-	$('th.no-sort').each(function(i, elem) {
-		sortingHeaders[$(this).index()] = {
-			sorter: false
-		};
-	});
-	/*$('th.sort-date').each(function(i, elem) {
-		sortingHeaders[$(this).index()] = {
-			sorter: 'german-date'
-		};
-	});*/
-	$('table.tablesorter').tablesorter({
-		widgets : ['uitheme', 'columns'],
-		theme : "custom",
-		headers : sortingHeaders,
-		headerTemplate : '{content} {icon}'
-	});
+
+var sortingHeaders = {}
+$('th.no-sort').each(function(i, elem) {
+	sortingHeaders[$(this).index()] = {
+		sorter: false
+	};
+});
+/*$('th.sort-date').each(function(i, elem) {
+	sortingHeaders[$(this).index()] = {
+		sorter: 'german-date'
+	};
+});*/
+$('table.tablesorter').tablesorter({
+	widgets : ['uitheme', 'columns'],
+	theme : "custom",
+	headers : sortingHeaders,
+	headerTemplate : '{content} {icon}'
 });

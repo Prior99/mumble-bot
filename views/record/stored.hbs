@@ -1,33 +1,49 @@
-<h1>Gespeicherte Aufnahmen</h1>
-<table class="table table-condensed table-responsive table-striped tablesorter table-condensed">
-	<thead>
-		<th>Benutzer</th>
-		<th>Zeitpunkt</th>
-		<th>Text</th>
-		<th><i class="fa fa-repeat"></i></th>
-		<th class="no-sort"></th>
-		<th class="no-sort"></th>
-		<th class="no-sort"></th>
-	</thead>
-	<tbody>
-		{{#each records}}
-		<tr>
-			<td><a href="/users/profile/{{this.user.username}}">{{user.username}}</a></td>
-			<td>{{formatDate submitted}} {{formatTime submitted}}</td>
-			<td>
-				<p>{{quote}}</p>
-				<p>
-				{{#each labels}}
-					<a class="label" style="background: {{colorify this.name}};" href="/record/stored/?tag={{this.id}}">{{this.name}}</a>
-				{{/each}}
-				</p>
-			</td>
-			<td>{{used}}</td>
-			<td><a recordId="{{this.id}}" class="playrecord quote-btn btn btn-xs btn-success"><span class="fa fa-volume-down" aria-hidden="true"></span></a></td>
-			<td><a href="/api/record/download?id={{this.id}}" class="quote-btn btn btn-xs btn-default"><span class="fa fa-download" aria-hidden="true"></span></a></td>
-			<td><a href="/record/edit/?id={{this.id}}" class="quote-btn btn btn-xs btn-default"><span class="fa fa-edit" aria-hidden="true"></span></a></td>
-		</tr>
-		{{/each}}
-	</tbody>
-</table>
-<script src="/js/playrecord.js"></script>
+<script id="template-list" type="text/x-handlebars-template">
+\{{#each records}}
+	<tr>
+		<td><a href="/users/profile/\{{user.username}}">\{{user.username}}</a></td>
+		<td>\{{formatDate submitted}} \{{formatTime submitted}}</td>
+		<td>
+			<p>\{{quote}}</p>
+			<p>
+			\{{#each labels}}
+				<a class="label" style="background: \{{colorify this.name}};" href="/record/stored/?tag=\{{this.id}}">\{{this.name}}</a>
+			\{{/each}}
+			</p>
+		</td>
+		<td>\{{used}}</td>
+		<td><a recordId="\{{id}}" class="playrecord quote-btn btn btn-xs btn-success"><span class="fa fa-volume-down" aria-hidden="true"></span></a></td>
+		<td><a href="/api/record/download?id=\{{id}}" class="quote-btn btn btn-xs btn-default"><span class="fa fa-download" aria-hidden="true"></span></a></td>
+		<td><a href="/record/edit/?id=\{{id}}" class="quote-btn btn btn-xs btn-default"><span class="fa fa-edit" aria-hidden="true"></span></a></td>
+	</tr>
+\{{/each}}
+</script>
+<div id="loading">
+	<div class="icon">
+		<i class="fa fa-spin fa-cog"></i>
+	</div>
+	<div class="description">
+		<p>Liste von Aufnahmen wird geladen...</p>
+	</div>
+</div>
+<div id="records">
+	<h1>Gespeicherte Aufnahmen</h1>
+	<p>Im folgenden Feld kann nach Aufnahmen gesucht werden:</p>
+	<input type="text" class="form-control" placeholder="Suchen..." id="search">
+	<h2>Suchergebnisse</h2>
+	<table class="table table-condensed table-responsive table-striped tablesorter table-condensed">
+		<thead>
+			<th>Benutzer</th>
+			<th>Zeitpunkt</th>
+			<th>Text</th>
+			<th><i class="fa fa-repeat"></i></th>
+			<th class="no-sort"></th>
+			<th class="no-sort"></th>
+			<th class="no-sort"></th>
+		</thead>
+		<tbody id="recordsTable">
+
+		</tbody>
+	</table>
+</div>
+<script src="/dist/record/stored.js"></script>

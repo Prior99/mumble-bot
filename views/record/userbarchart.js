@@ -1,4 +1,7 @@
 (function() {
+	var d3 = require("d3");
+	var $ = require("jquery");
+
 	var margin = {
 		top: 20,
 		right: 20,

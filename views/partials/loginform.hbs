@@ -23,28 +23,4 @@
 
 	<button type="submit" id="login-submit" class="btn btn-primary btn-lg btn-block"><i class="fa fa-unlock"></i> Login</button>
 </form>
-<script>
-	$('#login-submit').click(function(e) {
-		e.preventDefault();
-		var username = encodeURIComponent($('#login-username').val());
-		var password = encodeURIComponent(CryptoJS.SHA256($('#login-password').val()));
-		$.ajax("/api/users/login?username=" + username +
-			"&password=" + password)
-		.done(function(response) {
-			if(response.okay) {
-				window.location.reload();
-			}
-			else {
-				if(response.reason === "internal_error") {
-					spawnNotification('error', "Ein interner Fehler ist aufgetreten.");
-				}
-				else if(response.reason === "unknown_username_or_password") {
-					spawnNotification('error', "Anmeldung nicht erfolgreich. Bitte nochmal versuchen.");
-				}
-				else if(response.reason === "insufficient_permission") {
-					spawnNotification('error', "Anmeldung konnte nicht erfolgen, Account muss durch Admin freigeschaltet werden.");
-				}
-			}
-		});
-	});
-</script>
+<script src="/dist/partials/login.js"></script>

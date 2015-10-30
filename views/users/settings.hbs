@@ -21,19 +21,6 @@
 		</div>
 	</div>
 </form>
-<script>
-	$('#submit').click(function() {
-		var record = encodeURI($('#record').val());
-		$.ajax("/api/users/settings" +
-			"?record=" + record)
-		.done(function(res) {
-			spawnNotification('success', "Einstellungen erfolgreich gespeichert.");
-		})
-		.error(function() {
-			spawnNotification('error', "Beim Speichern der Einstellungen ist ein Fehler aufgetreten.");
-		});
-	});
-</script>
 
 <h2>Gelinkte Mumble-Benutzer</h2>
 <p>Bitte weisen Sie Benutzer im Mumble-Server ihrem Account an diesem Bot zu.
@@ -51,23 +38,8 @@
 </button>
 <ul class="dropdown-menu">
 	{{#each freeMumbleUsers}}
-	<li><a mumbleId="{{this.id}}" class="link-mumble">{{this.name}} ({{this.id}})</a></li>
+	<li><a mumbleId="{{this.id}}" class="link-mumble" user="{{../user.username}}">{{this.name}} ({{this.id}})</a></li>
 	{{/each}}
 </ul>
 </div>
-<script>
-	$(".link-mumble").click(function() {
-		var id = $(this).attr('mumbleId');
-		$.ajax("/api/users/linkMumbleUser?id=" + id + "&username={{user.username}}")
-		.done(function(res) {
-			if(res.okay) {
-				$("<li class='list-group-item'>" + id + "</li>").appendTo("#linked-mumble-users");
-				spawnNotification('success', "Link wurde erfolgreich erstellt.");
-				$(this).parent().remove();
-			}
-			else {
-				spawnNotification('error', "Link konnte nicht erstellt werden.");
-			}
-		}.bind(this));
-	});
-</script>
+<script src="/dist/users/settings.js"></script>

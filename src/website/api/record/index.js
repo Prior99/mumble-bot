@@ -18,6 +18,7 @@ var viewAddLabel = require('./addlabel');
 var viewEdit = require('./edit');
 var viewStats = require('./stats');
 var viewRandom = require('./random');
+var viewList = require('./list');
 
 /*
  * Code
@@ -36,6 +37,7 @@ module.exports = function(bot) {
 	router.use('/edit', viewEdit(bot));
 	router.use('/stats', viewStats(bot));
 	router.use('/random', viewRandom(bot));
+	router.use('/list', viewList(bot));
 
 	return router;
 };
