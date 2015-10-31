@@ -32,7 +32,7 @@ function saveHandler(e) {
 	}
 
 	var ids = currentDialog.map(function(record) {
-		return redord.id;
+		return record.id;
 	});
 
 	var jsonIDs = encodeURI(JSON.stringify(ids));
