@@ -1,20 +1,27 @@
 var $ = require("jquery");
 var spawnNotification = require("../notification");
+var Handlebars = require("handlebars");
 
-function tr(s) {
-	return "<tr>" + s + "</tr>";
-}
-function td(s) {
-	return "<td>" + s + "</td>";
-}
-
-var btnclass = " quote-btn btn btn-xs btn-success ";
-
-function mkspan(c) {
-	return '<span class="' + c + '" aria-hidden="true"></span>';
-}
+var DialogTemplate = Handlebars.compile($("#template-dialog").html());
+var SuggestionsTemplate = Handlebars.compile($("#template-record-suggestions").html());
 
 var currentDialog = [];
+
+Handlebars.registerHelper("plusOne", function(i) {
+	return i + 1;
+});
+
+Handlebars.registerHelper("ifFirst", function(i, block) {
+	if(i == 0) {
+		return block.fn(this);
+	}
+});
+
+Handlebars.registerHelper("ifLast", function(i, block) {
+	if(i == currentDialog.length - 1) {
+		return block.fn(this);
+	}
+});
 
 function saveHandler(e) {
 	e.preventDefault();
@@ -24,20 +31,12 @@ function saveHandler(e) {
 		return;
 	}
 
-	function said(record) {
-		return "&lt;" + record.user.username + "&gt; " + record.quote;
-	}
+	var ids = currentDialog.map(function(record) {
+		return redord.id;
+	});
 
-	var ids = [];
-	var quotes = [];
-	for(var pos=0; pos<currentDialog.length; pos++) {
-		ids[pos] = currentDialog[pos].id;
-		quotes[pos] = said(currentDialog[pos]);
-	}
 	var jsonIDs = encodeURI(JSON.stringify(ids));
-	var jsonQuotes = encodeURIComponent(JSON.stringify(quotes));
-
-	$.ajax("/api/record/save_dialog?dialog=" + jsonIDs + "&quotes=" + jsonQuotes)
+	$.ajax("/api/record/save_dialog?dialog=" + jsonIDs)
 	.done(function(res) {
 		if(res.okay) {
 			spawnNotification('success', "Erfolgreich gespeichert.");
@@ -59,12 +58,8 @@ function addrecord(e) {
 	$.ajax("/api/record/get?id=" + encodeURI(id))
 	.done(function(res) {
 		var pos = currentDialog.length;
-		var bspan = mkspan("fa fa-volume-down"); // TODO change to X (delete) icon
-		var button = '<a index="' +pos+ '" class="remrecord' +btnclass+ '">' +bspan+ '</a>';
-		$(tr(td(pos+1) + td(res.record.user.username) + td(res.record.quote) + td(button)))
-			.appendTo($("#table"));
 		currentDialog.push(res.record);
-		setHandlers();
+		refreshDialog();
 	})
 	.error(function(res) {
 		spawnNotification('error', "Konnte Info der ausgewählten Aufnahme nicht laden.");
@@ -73,43 +68,49 @@ function addrecord(e) {
 
 function remrecord(e) {
 	var index = $(this).attr('index');
-	console.log("remrecord! " + index);
+	currentDialog.splice(index, 1);
+	refreshDialog();
 }
 
-function setHandlers() {
-	$('#save').off();
-	$('#search').off();
-	$('a.addrecord').off();
-	$('a.remrecord').off();
-	$('a.playrecord').off();
+function uprecord(e) {
+	var index = +$(this).attr('index');
+	if(index > 0) {
+		var val1 = currentDialog[index];
+		var val2 = currentDialog[index - 1];
+		currentDialog[index] = val2;
+		currentDialog[index - 1] = val1;
+		refreshDialog();
+	}
+}
 
-	$('#save').submit(saveHandler);
-	$('#search').submit(searchHandler);
-	$('a.addrecord').click(addrecord);
-	$('a.remrecord').click(remrecord);
-	$('a.playrecord').click(playrecord);
+function downrecord(e) {
+	var index = +$(this).attr('index');
+	if(index < currentDialog.length - 1) {
+		var val1 = currentDialog[index];
+		var val2 = currentDialog[index + 1];
+		currentDialog[index] = val2;
+		currentDialog[index + 1] = val1;
+		refreshDialog();
+	}
+}
+
+function refreshDialog() {
+	$("#table").html(DialogTemplate({
+		dialog : currentDialog
+	}));
 }
 
 function updateSearchResults() {
-	$("#results").html("");
 	$.ajax("/api/record/lookup?text=" + encodeURI($("#input").val()))
 	.done(function(res) {
-		res.suggestions.map(function(val) {
-			var apan = mkspan("fa fa-plus");
-			var ppan = mkspan("fa fa-volume-down");
-			var autton = '<a recordId="' +val.id+ '" class="addrecord' +btnclass+ '">' +apan+ '</a>';
-			var putton = '<a recordId="' +val.id+ '" class="playrecord' +btnclass+ '">' +ppan+ '</a>';
-			$(tr(td(val.user.username) + td(val.quote) + td(autton) + td(putton)))
-				.appendTo($("#results"));
-		});
-		setHandlers();
+		$("#results").html(SuggestionsTemplate({
+			suggestions : res.suggestions
+		}));
 	})
 	.error(function(res) {
 		spawnNotification('error', "Konnte Suchergebnisse nicht laden.");
 	});
 }
-
-setHandlers();
 
 function playrecord() {
 	var id = $(this).attr('recordId');
@@ -121,4 +122,10 @@ function playrecord() {
 	});
 }
 
-$('a.playrecord').click(playrecord);
+$(document).on('submit', '#save', saveHandler);
+$(document).on('submit', '#search', searchHandler);
+$(document).on('click', 'a.addrecord', addrecord);
+$(document).on('click', 'a.remrecord', remrecord);
+$(document).on('click', 'a.uprecord', uprecord);
+$(document).on('click', 'a.downrecord', downrecord);
+$(document).on('click', 'a.playrecord', playrecord);
