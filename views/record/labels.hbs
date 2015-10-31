@@ -30,7 +30,7 @@
 	<tbody id="tags">
 		{{#each labels}}
 		<tr>
-			<td><a href="/record/stored/?tag={{this.id}}" class="label" style="background: {{colorify this.name}};">{{this.name}}</a></td>
+			<td><a href="/record/stored/?search=tag:{{this.name}}" class="label" style="background: {{colorify this.name}};">{{this.name}}</a></td>
 			<td>{{this.records}}</td>
 		</tr>
 		{{/each}}

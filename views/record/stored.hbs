@@ -2,14 +2,14 @@
 \{{#each records}}
 	<tr>
 		<td width="20" style="border-right: 1px solid #EEE;">
-			<p class="text-center"><a href="/users/profile/\{{user.username}}">\{{user.username}}</a></p>
+			<p class="text-center"><a class="username" userName="\{{user.username}}">\{{user.username}}</a></p>
 			<p class="text-nowrap text-center"><small>\{{formatDate submitted}} \{{formatTime submitted}}</small></p>
 		</td>
 		<td>
 			<p>\{{quote}}</p>
 			<p>
 			\{{#each labels}}
-				<a class="label" style="background: \{{colorify this.name}};" href="/record/stored/?tag=\{{this.id}}">\{{this.name}}</a>
+				<a class="label" style="background: \{{colorify this.name}};" tagName="\{{this.name}}">\{{this.name}}</a>
 			\{{/each}}
 			</p>
 		</td>
@@ -51,7 +51,8 @@
 </div>
 <div id="records">
 	<h1>Gespeicherte Aufnahmen</h1>
-	<p>Im folgenden Feld kann nach Aufnahmen gesucht werden:</p>
+	<p>Im folgenden Feld kann nach Aufnahmen gesucht werden.
+		Es kann mit <b>tag:tagname</b> nach eine bestimmten Tag und mit <b>user:username</b> nach einem bestimmten Benutzer gesucht werden.</p>
 	<input type="text" class="form-control" placeholder="Suchen..." id="search">
 	<h2>Suchergebnisse</h2>
 	<div class=row>

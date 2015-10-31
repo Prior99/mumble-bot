@@ -27,9 +27,9 @@ var hash = {};
 var records;
 var currentList;
 
-location.hash.substr(2).split("&").forEach(function(item) {
+location.search.substr(1).split("&").forEach(function(item) {
 	var kv = item.split("=");
-	hash[kv[0]] = kv[1];
+	hash[kv[0]] = decodeURI(kv[1]);
 });
 var query = hash.search ? hash.search : "";
 var page = +(hash.page ? hash.page : 1);
@@ -75,7 +75,10 @@ function refreshPageination() {
 }
 
 function refreshHash() {
-	location.hash = "?search=" + query + "&page=" + page + "&sort=" + sort + "&order=" + order;
+	history.pushState(null, "", "?search=" + encodeURI(query) +
+		"&page=" + encodeURI(page) +
+		"&sort=" + encodeURI(sort) +
+		"&order=" + encodeURI(order));
 }
 
 function setResultList(list) {
@@ -87,9 +90,25 @@ function setResultList(list) {
 
 function search() {
 	refreshHash();
-	currentList = records.filter(function(record) {
-		return record.quote.toLowerCase().indexOf(query) != -1;
-	})
+	currentList = records;
+	query.split(/\s/).forEach(function(part) {
+		part = part.toLowerCase();
+		currentList = currentList.filter(function(record) {
+			if(part.substr(0, 4) == "tag:") {
+				var tag = part.substr(4);
+				return record.labels.find(function(label) {
+					return label.name.toLowerCase() == tag;
+				});
+			}
+			else if(part.substr(0, 5) == "user:") {
+				var user = part.substr(5);
+				return record.user.username.toLowerCase() == user;
+			}
+			else {
+				return record.quote.toLowerCase().indexOf(part) != -1;
+			}
+		})
+	});
 	setResultList(currentList
 		.sort(sorters[sort][order])
 		.slice((page - 1) * recordsPerPage, page * recordsPerPage));
@@ -132,4 +151,30 @@ $(document).on('click', 'a.playrecord', function() {
 	.error(function() {
 		spawnNotification('error', "Konnte Aufnahme nicht abspielen.");
 	});
+});
+
+$(document).on('click', 'a.label', function() {
+	var label = $(this).attr('tagName').toLowerCase();
+	var sval = $("#search").val();
+	if(sval.length) {
+		$("#search").val($("#search").val() + " tag:" + label)
+	}
+	else {
+		$("#search").val("tag:" + label);
+	}
+	query = $("#search").val();
+	search();
+});
+
+$(document).on('click', 'a.username', function() {
+	var label = $(this).attr('userName').toLowerCase();
+	var sval = $("#search").val();
+	if(sval.length) {
+		$("#search").val($("#search").val() + " user:" + label)
+	}
+	else {
+		$("#search").val("user:" + label);
+	}
+	query = $("#search").val();
+	search();
 });
