@@ -4,6 +4,13 @@ var colorify = require('../../../colorbystring');
 module.exports = function(bot) {
 	return function(req, res) {
 		if(req.query.name && req.query.name.trim().length > 0) {
+			if(req.query.name.indexOf(" ") != -1) {
+				res.status(400).send({
+					okay : false,
+					reason : "invalid_argument"
+				});
+				return;
+			}
 			bot.database.addRecordLabel(req.query.name, function(err, id) {
 				if(err) {
 					Winston.error("Unabled to add new label", err);
