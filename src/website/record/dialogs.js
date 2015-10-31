@@ -1,17 +1,16 @@
 var Winston = require("winston");
+var Promise = require("promise");
 
 var ViewDialogs = function(bot) {
 	return function(req, res) {
-		Winston.info("loading /dialogs");
-		bot.database.listDialogs(function(err, dialogs) {
-			if(err) {
-				Winston.error("Error listing dialogs", err);
-				res.locals.dialogs = [];
-			}
-			else {
-				res.locals.dialogs = dialogs;
-			}
-			Winston.info("rendering");
+		Promise.denodeify(bot.database.listDialogs.bind(bot.database))()
+		.catch(function(err) {
+			Winston.error("Error listing dialogs", err);
+			res.locals.dialogs = [];
+			res.render("record/dialogs");
+		})
+		.then(function(dialogs) {
+			res.locals.dialogs = dialogs;
 			res.render("record/dialogs");
 		});
 	}

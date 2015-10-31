@@ -112,23 +112,22 @@ CREATE TABLE IF NOT EXISTS RecordLabels (
 );
 
 CREATE TABLE IF NOT EXISTS RecordLabelRelation (
-	record				INT NOT NULL,
-	label					INT NOT NULL,
+	record			INT NOT NULL,
+	label			INT NOT NULL,
 	PRIMARY KEY(record, label)
 );
 
 CREATE TABLE IF NOT EXISTS Dialogs (
 	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	quote			TEXT,
-	submitted DATETIME,
+	submitted 		DATETIME NOT NULL,
 	used			INT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS DialogParts (
 	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	dialogId	INT NOT NULL,
-	position	INT,
-	recordId	INT NOT NULL,
+	dialogId		INT NOT NULL,
+	position		INT NOT NULL,
+	recordId		INT NOT NULL,
 	FOREIGN KEY(dialogId) REFERENCES Dialogs(id),
 	FOREIGN KEY(recordId) REFERENCES Records(id)
 );

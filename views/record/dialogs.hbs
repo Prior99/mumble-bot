@@ -10,7 +10,11 @@
 		{{#each dialogs}}
 		<tr>
 			<td>{{formatDate submitted}} {{formatTime submitted}}</td>
-			<td>{{{quote}}}</td>
+			<td>
+				{{#each records}}
+				<p><a href="/users/profile/{{user.username}}">&lt;{{user.username}}&gt;</a> {{quote}}</p>
+				{{/each}}
+			</td>
 			<td>{{used}}</td>
 			<td><a dialogId="{{id}}" class="playdialog quote-btn btn btn-xs btn-success"><span class="fa fa-volume-down" aria-hidden="true"></span></a></td>
 		</tr>
