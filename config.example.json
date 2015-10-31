@@ -18,6 +18,9 @@
 		"host" : "localhost",
 		"directory" : "path/to/music"
 	},
+	"rss" : {
+		"rssFetchInterval" : 600
+	},
 	"website" : {
 		"port" : 23278,
 		"tmp" : "tmp/",

@@ -1,9 +1,9 @@
 var Winston = require("winston");
 
-var ViewCached= function(bot) {
+var ViewStored = function(bot) {
 	return function(req, res) {
 		res.render("record/stored");
 	}
 };
 
-module.exports = ViewCached;
+module.exports = ViewStored;

@@ -21,6 +21,8 @@ module.exports = function(grunt) {
 					"dist/quotes/home.js" : "views/quotes/home.js",
 					"dist/quotes/list.js" : "views/quotes/list.js",
 					"dist/record/cached.js" : "views/record/cached.js",
+					"dist/record/create_dialog.js" : "views/record/create_dialog.js",
+					"dist/record/dialogs.js" : "views/record/dialogs.js",
 					"dist/record/edit.js" : "views/record/edit.js",
 					"dist/record/labels.js" : "views/record/labels.js",
 					"dist/record/overview.js" : "views/record/overview.js",

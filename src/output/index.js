@@ -142,8 +142,17 @@ Output.prototype.playSound = function(file, callback) {
 	this._enqueue({
 		type : "sound",
 		file : file,
-		callback :callback
+		callback : callback
 	});
+};
+
+Output.prototype.playSounds = function(filelist, callback) { // callback?
+	for(var i=0; i<filelist.length; i++) {
+		this._enqueue({
+			type : "sound",
+			file : filelist[i]
+		});
+	}
 };
 
 /**
@@ -156,7 +165,7 @@ Output.prototype.say = function(text, callback) {
 		type : "speech",
 		print : true,
 		text : text,
-		callback :callback
+		callback : callback
 	});
 };
 

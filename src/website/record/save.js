@@ -1,6 +1,6 @@
 var Winston = require("winston");
 
-var ViewCached= function(bot) {
+var ViewSave = function(bot) {
 	return function(req, res) {
 		bot.database.listLabels(function(err, labels) {
 			if(err) {
@@ -33,4 +33,4 @@ var ViewCached= function(bot) {
 	}
 };
 
-module.exports = ViewCached;
+module.exports = ViewSave;

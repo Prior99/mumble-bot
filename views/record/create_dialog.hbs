@@ -1,0 +1,47 @@
+<h1>Dialog erstellen</h1>
+<p>Hier kannst du aus den bereits gespeicherten Aufnahmen einen dialog zusammenstellen und Sinn entfremden.</p>
+
+<h2>Dein Dialog</h2>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>User</th>
+			<th>Text</th>
+			<th>Remove</th> <!-- TODO better inerface for modifying order -->
+		</tr>
+	</thead>
+	<tbody id="table">
+	</tbody>
+</table>
+<form id="save">
+	<span class="input-group-btn">
+		<input class="btn btn-default" type="submit" value="Speichern">
+	</span>
+</form>
+
+<h2>Zitatsuche</h2>
+<form id="search">
+	<div class="input-group">
+		<span class="input-group-addon" id="sizing-addon2"><i class="fa fa-comment"></i></span>
+		<input type="text" class="form-control typeahead" placeholder="Kontextphallus" id="input">
+		<span class="input-group-btn">
+			<input class="btn btn-default" type="submit" value="Suchen">
+		</span>
+	</div>
+</form>
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>User</th>
+			<th>Text</th>
+			<th>Add</th>
+			<th>Play</th>
+		</tr>
+	</thead>
+	<tbody id="results">
+	</tbody>
+</table>
+
+<script src="/dist/record/create_dialog.js"></script>

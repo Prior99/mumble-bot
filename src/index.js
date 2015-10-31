@@ -76,7 +76,9 @@ var Bot = function(mumble, options, database) {
 		this.minecraft = new Minecraft(options.minecraft, this);
 	}
 
-	this.rss = new RSS(this);
+	if(options.rss) {
+		this.rss = new RSS(this);
+	}
 
 	this.afkObserver = new AFKObserver(this);
 
