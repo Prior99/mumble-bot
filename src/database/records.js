@@ -140,7 +140,7 @@ module.exports = function(Database) {
 	};
 	Database.prototype.getRandomRecord = function(callback) {
 		new Promise(function(okay, fail) {
-			this.pool.query("SELECT id FROM Records, (SELECT RAND() * (SELECT MAX(id) FROM Records) AS tid) AS Tmp WHERE Records.id >= Tmp.tid ORDER BY id ASC LIMIT 1", function(err, rows) {
+			this.pool.query("SELECT id FROM Records ORDER BY RAND() LIMIT 1,1", function(err, rows) {
 				if(err) {
 					fail(err);
 				}
@@ -219,8 +219,8 @@ module.exports = function(Database) {
 			callback(null, records);
 		});
 	};
-	
-	
+
+
 	Database.prototype.lookupRecord = function(part, callback) {
 		var q = "SELECT id, quote, user, used, submitted FROM Records WHERE quote LIKE ? ORDER BY used DESC LIMIT 20";
 		this.queryAndCheck(q, ["%" + part + "%"],	callback, function(err, records) {
@@ -235,12 +235,12 @@ module.exports = function(Database) {
 					}.bind(this));
 				}
 			}.bind(this);
-			
+
 			next();
-			
+
 		}.bind(this));
 	};
-	
+
 	/**
 	 * Adds userinfo and labels to the given record.
 	 */
@@ -257,6 +257,5 @@ module.exports = function(Database) {
 			}
 		}.bind(this));
 	};
-	
-};
 
+};
