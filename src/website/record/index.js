@@ -39,11 +39,11 @@ var pages = [{
 },{
 	url : "/record/dialogs/",
 	name: "Gespeicherte Dialoge",
-	icon : "commenting"
+	icon : "comments"
 },{
 	url : "/record/create_dialog/",
 	name: "Dialog erstellen",
-	icon : "commenting"
+	icon : "comments-o"
 }];
 var RouteRecord = function(bot) {
 	var router = Express.Router();
@@ -64,4 +64,3 @@ var RouteRecord = function(bot) {
 };
 
 module.exports = RouteRecord;
-

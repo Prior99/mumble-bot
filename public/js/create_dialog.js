@@ -20,11 +20,11 @@ function saveHandler(e) {
 		spawnNotification('error', "Dialog ist zu kurz.");
 		return;
 	}
-	
+
 	function said(record) {
 		return "&lt;" + record.user.username + "&gt; " + record.quote;
 	}
-	
+
 	var ids = [];
 	var quotes = [];
 	for(var pos=0; pos<currentDialog.length; pos++) {
@@ -33,7 +33,7 @@ function saveHandler(e) {
 	}
 	var jsonIDs = encodeURI(JSON.stringify(ids));
 	var jsonQuotes = encodeURIComponent(JSON.stringify(quotes));
-	
+
 	$.ajax("/api/record/save_dialog?dialog=" + jsonIDs + "&quotes=" + jsonQuotes)
 	.done(function(res) {
 		if(res.okay) {
@@ -92,7 +92,7 @@ function updateSearchResults() {
 	$.ajax("/api/record/lookup?text=" + encodeURI($("#input").val()))
 	.done(function(res) {
 		res.suggestions.map(function(val) {
-			var apan = mkspan("fa fa-volume-down"); // TODO change to plus icon
+			var apan = mkspan("fa fa-plus");
 			var ppan = mkspan("fa fa-volume-down");
 			var autton = '<a recordId="' +val.id+ '" class="addrecord' +btnclass+ '">' +apan+ '</a>';
 			var putton = '<a recordId="' +val.id+ '" class="playrecord' +btnclass+ '">' +ppan+ '</a>';
