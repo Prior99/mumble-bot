@@ -1,7 +1,7 @@
 <script id="template-list" type="text/x-handlebars-template">
 \{{#each records}}
 	<tr>
-		<td>
+		<td width="20" style="border-right: 1px solid #EEE;">
 			<p class="text-center"><a href="/users/profile/\{{user.username}}">\{{user.username}}</a></p>
 			<p class="text-nowrap text-center"><small>\{{formatDate submitted}} \{{formatTime submitted}}</small></p>
 		</td>
@@ -13,14 +13,14 @@
 			\{{/each}}
 			</p>
 		</td>
-		<td><strong>\{{used}}</strong></td>
-		<td>
-			<div class="btn-group-vertical" role="group">
-				<a recordId="\{{id}}" class="playrecord quote-btn btn btn-xs btn-success"><i class="fa fa-volume-down" aria-hidden="true"></i></a>
-				<a href="/api/record/download?id=\{{id}}" class="quote-btn btn btn-xs btn-info"><i class="fa fa-download" aria-hidden="true"></i></a>
-				<a href="/record/edit/?id=\{{id}}" class="quote-btn btn btn-xs btn-warning"><i class="fa fa-edit" aria-hidden="true"></i></a>
+		<td width="5">
+			<div class="btn-group-vertical buttons" role="group">
+				<a recordId="\{{id}}" class="playrecord quote-btn btn btn-xs btn-success"> <i class="fa fa-volume-down" aria-hidden="true"></i> </a>
+				<a href="/api/record/download?id=\{{id}}" class="quote-btn btn btn-xs btn-info"> <i class="fa fa-download" aria-hidden="true"></i> </a>
+				<a href="/record/edit/?id=\{{id}}" class="quote-btn btn btn-xs btn-warning"> <i class="fa fa-edit" aria-hidden="true"></i> </a>
 			</div>
 		</td>
+		<td width="5" style="border-left: 1px solid #EEE;"><strong>\{{used}}</strong></td>
 	</tr>
 \{{/each}}
 </script>
@@ -79,10 +79,10 @@
 	</div>
 	<table class="table table-responsive table-striped">
 		<thead>
-			<th></th>
+			<th>Benutzer</th>
 			<th>Text</th>
+			<th><i class="fa fa-hand-spock-o"></i></th>
 			<th><i class="fa fa-repeat"></i></th>
-			<th></th>
 		</thead>
 		<tbody id="recordsTable">
 

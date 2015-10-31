@@ -124,7 +124,7 @@ $(document).on('click', 'a.pageinate', function() {
 	search();
 });
 
-$("a.playrecord").click(function() {
+$(document).on('click', 'a.playrecord', function() {
 	var id = $(this).attr('recordId');
 	$.ajax("/api/record/play?id=" + id).done(function(res) {
 		spawnNotification('success', "Aufnahme erfolgreich wiedergegeben.");
