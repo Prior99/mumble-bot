@@ -116,6 +116,23 @@ CREATE TABLE IF NOT EXISTS RecordLabelRelation (
 	label					INT NOT NULL,
 	PRIMARY KEY(record, label)
 );
+
+CREATE TABLE IF NOT EXISTS Dialogs (
+	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	quote			TEXT,
+	submitted DATETIME,
+	used			INT NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS DialogParts (
+	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	dialogId	INT NOT NULL,
+	position	INT,
+	recordId	INT NOT NULL,
+	FOREIGN KEY(dialogId) REFERENCES Dialogs(id),
+	FOREIGN KEY(recordId) REFERENCES Records(id)
+);
+
 INSERT IGNORE INTO Permissions (id, name, description, icon) VALUES
 ("login", "Anmelden", "Erlaubt einem Benutzer, sich im System anzumelden.", "sign-in"),
 ("add-quote", "Zitat Eintragen", "Erlaubt das Eintragen neuer Zitate.", "quote-left"),

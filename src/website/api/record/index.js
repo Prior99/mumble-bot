@@ -18,8 +18,12 @@ var viewAddLabel = require('./addlabel');
 var viewEdit = require('./edit');
 var viewStats = require('./stats');
 var viewRandom = require('./random');
+var viewLookup = require('./lookup');
+var viewSaveDialog = require('./save_dialog');
+var viewGet = require('./get');
+var viewPlayDialog = require('./play_dialog');
 
-/*
+/**
  * Code
  */
 
@@ -36,6 +40,11 @@ module.exports = function(bot) {
 	router.use('/edit', viewEdit(bot));
 	router.use('/stats', viewStats(bot));
 	router.use('/random', viewRandom(bot));
+	router.use('/lookup', viewLookup(bot));
+	router.use('/save_dialog', viewSaveDialog(bot));
+	router.use('/get', viewGet(bot));
+	router.use('/play_dialog', viewPlayDialog(bot));
 
 	return router;
 };
+

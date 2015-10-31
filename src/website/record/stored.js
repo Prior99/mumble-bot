@@ -1,6 +1,6 @@
 var Winston = require("winston");
 
-var ViewCached= function(bot) {
+var ViewStored = function(bot) {
 	return function(req, res) {
 		if(req.query.tag) {
 			bot.database.listRecordsByLabel(req.query.tag, function(err, records) {
@@ -29,4 +29,4 @@ var ViewCached= function(bot) {
 	}
 };
 
-module.exports = ViewCached;
+module.exports = ViewStored;

@@ -114,7 +114,8 @@ module.exports = function(Database) {
 	Database.prototype.getRecord = function(id, callback) {
 		var record;
 		new Promise(function(okay, fail) {
-			this.pool.query("SELECT id, quote, used, user, submitted FROM Records WHERE id = ?", [id], function(err, rows) {
+			var query = "SELECT id, quote, used, user, submitted FROM Records WHERE id = ?";
+			this.pool.query(query, [id], function(err, rows) {
 				if(err) {
 					fail(err);
 				}
@@ -218,4 +219,44 @@ module.exports = function(Database) {
 			callback(null, records);
 		});
 	};
+	
+	
+	Database.prototype.lookupRecord = function(part, callback) {
+		var q = "SELECT id, quote, user, used, submitted FROM Records WHERE quote LIKE ? ORDER BY used DESC LIMIT 20";
+		this.queryAndCheck(q, ["%" + part + "%"],	callback, function(err, records) {
+			var pos = 0;
+			var next = function() {
+				if(pos >= records.length) {
+					callback(null, records);
+				} else {
+					this._getUserAndLabels(records[pos], callback, function(err, res) {
+						pos++;
+						next();
+					}.bind(this));
+				}
+			}.bind(this);
+			
+			next();
+			
+		}.bind(this));
+	};
+	
+	/**
+	 * Adds userinfo and labels to the given record.
+	 */
+	Database.prototype._getUserAndLabels = function(record, cb1, cb2) {
+		this.getUserById(record.user, function(err, userInfo) {
+			if(this._checkError(err, cb1)) {
+				this.getLabelsOfRecord(record.id, function(err2, labels) {
+					if(this._checkError(err2, cb1)) {
+						record.user = userInfo;
+						record.labels = labels;
+						cb2(null, record);
+					}
+				}.bind(this))
+			}
+		}.bind(this));
+	};
+	
 };
+
