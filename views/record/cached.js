@@ -79,7 +79,6 @@ function protect(id) {
 
 ws.onmessage = function(msg) {
 	var obj = JSON.parse(msg.data);
-	console.log(obj);
 	if(obj.type === 'init') {
 		init(obj);
 	}
@@ -106,9 +105,6 @@ $(document).on('click', 'a.protectbutton', function() {
 	var t = $(this);
 	$.ajax("/api/record/protect?id=" + id).done(function(response) {
 		spawnNotification('success', "Aufnahme geschützt.");
-		//console.log($(this).parent().parent());
-		//t.parent().parent().addClass('warning');
-		//t.parent().parent().find('td.protectindicate').html('').append('<i class="fa fa-check" aria-hidden="true"></i><span style="display: none">1</div>');
 	}).error(function() {
 		spawnNotification('error', "Schützen fehlgeschlagen.");
 	});
@@ -118,7 +114,6 @@ $(document).on('click', 'a.deletebutton', function() {
 	var t = $(this);
 	$.ajax("/api/record/deletecached?id=" + id).done(function(response) {
 		spawnNotification('success', "Aufnahme gelöscht.");
-		//t.parent().parent().remove();
 	}).error(function() {
 		spawnNotification('error', "Konnte Aufnahme nicht löschen.");
 	});
