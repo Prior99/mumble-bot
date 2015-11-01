@@ -18,6 +18,7 @@
 		"host" : "localhost",
 		"directory" : "path/to/music"
 	},
+	"responsiveTTS" : false,
 	"rss" : {
 		"rssFetchInterval" : 600
 	},

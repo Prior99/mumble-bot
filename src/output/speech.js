@@ -11,6 +11,7 @@ var EventEmitter = require("events").EventEmitter;
 var Winston = require("winston");
 var GoogleTTS = require("./googletranslatetts");
 var BingTTS = require("./bingtranslatetts");
+var ResponsiveTTS = require("./responsivetts");
 var Sox = require("sox-audio");
 var PassThroughStream = require('stream').PassThrough;
 var FS = require("fs");
@@ -72,6 +73,14 @@ var Speech = function(stream, espeakData, channel, database, bot) {
 			this._speakingStopped();
 		}.bind(this));
 		this.engine = "bing";
+	}
+	if(bot.options.responsiveTTS) {
+		this._responsiveEngine = ResponsiveTTS(database);
+		this._responsiveEngine.on('data', this._onTTSData.bind(this));
+		this._responsiveEngine.on('speechDone', function() {
+			this._speakingStopped();
+		}.bind(this));
+		this.engine = "responsive";
 	}
 	this._googleEngine = GoogleTTS(database);
 	this._googleEngine.on('data', this._onTTSData.bind(this));
@@ -177,7 +186,9 @@ Speech.prototype.changeGender = function() {
 	else {
 		this.gender = "male";
 	}
-	this._bingEngine.setGender(this.gender);
+	if(this._bingEngine) {
+		this._bingEngine.setGender(this.gender);
+	}
 	ESpeak.setGender(this.gender);
 };
 
@@ -193,6 +204,11 @@ Speech.prototype.speakUsingESpeak = function(text) {
 Speech.prototype._onGoogleTTSError = function(err, text) {
 	Winston.error("Received error from google tts. Using ESpeak instead. " + err);
 	this.speakUsingESpeak(text);
+};
+
+Speech.prototype._onResponsiveTTSError = function(err, text) {
+	Winston.error("Received error from responsive tts. Using Google instead. " + err);
+	this.speakUsingGoogle(text);
 };
 
 Speech.prototype._onBingTTSError = function(err, text) {
@@ -211,6 +227,15 @@ Speech.prototype.speakUsingGoogle = function(text) {
 		this._onGoogleTTSError(err, text);
 	}.bind(this));
 	this._googleEngine.tts(text);
+};
+
+Speech.prototype.speakUsingResponsive = function(text) {
+	this._currentEngine = this._responsiveEngine;
+	this._responsiveEngine.removeAllListeners('error'); //TODO: This is a nasty dirty piece of shit code line
+	this._responsiveEngine.on('error', function(err) {
+		this._responsiveTTSError(err, text);
+	}.bind(this));
+	this._responsiveEngine.tts(text);
 };
 
 Speech.prototype.speakUsingBing = function(text) {
@@ -233,6 +258,9 @@ Speech.prototype._next = function() {
 		}
 		else if(this.engine == "bing") {
 			this.speakUsingBing(this.current.text);
+		}
+		else if(this.engine == "responsive") {
+			this.speakUsingResponsive(this.current.text);
 		}
 		Winston.info("Speaking:\"" + this.current.text + "\"");
 		if(this.current.print) {
