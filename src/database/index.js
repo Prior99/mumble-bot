@@ -52,6 +52,7 @@ require("./settings.js")(Database);
 require("./log.js")(Database);
 require("./rss.js")(Database);
 require("./dialogs.js")(Database);
+require("./userstats.js")(Database);
 
 /**
  * Executes the query and checks for errors.
@@ -64,10 +65,10 @@ Database.prototype.queryAndCheck = function(query, params, callErr, callSucc) {
 		if(err) {
 			if(callErr) { callErr(err); }
 			else { throw err; }
-		} 
+		}
 		else if(callSucc) {	callSucc(null, result);	}
 		else if(callErr) { callErr(null, result); }
-		
+
 	}.bind(this));
 };
 

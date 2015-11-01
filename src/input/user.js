@@ -47,6 +47,8 @@ var VoiceInputUser = function(user, databaseUser, bot) {
 	this.speaking = false;
 	Stream.Writable.call(this);
 	this._createNewRecordFile();
+	this._connectTime = new Date();
+	this._user.on('disconnect', this._onDisconnect.bind(this));
 };
 
 Util.inherits(VoiceInputUser, Stream.Writable);
@@ -63,6 +65,10 @@ VoiceInputUser.prototype._write = function(chunk, encoding, done) {
 	done();
 };
 
+VoiceInputUser.prototype._onDisconnect = function() {
+	this.bot.database.writeUserStatsOnline(this._databaseUser, this._connectTime, new Date());
+};
+
 VoiceInputUser.prototype._refreshTimeout = function() {
 	if(this._timeout) {
 		clearTimeout(this._timeout);
@@ -72,36 +78,43 @@ VoiceInputUser.prototype._refreshTimeout = function() {
 
 VoiceInputUser.prototype._speechStarted = function() {
 	this.speaking = true;
-	this._speakStartTime = Date.now();
+	this._speakStartTime = new Date();
 };
 
 VoiceInputUser.prototype._createNewRecordFile = function() {
-	try { FS.mkdirSync('tmp'); } catch(err) { }
-	try { FS.mkdirSync('tmp/useraudio'); } catch(err) { }
-	try { FS.mkdirSync('tmp/useraudio/' + this._user.id); } catch(err) { }
-	this._filename = 'tmp/useraudio/' + this._user.id + '/' + Date.now() + '.mp3';
-	this._encoder = new Lame.Encoder({
-		channels : 1,
-		bitDepth : 16,
-		sampleRate : 48000,
-		bitRate : 128,
-		outSampleRate : 44100,
-		mode : Lame.MONO
-	});
-	this._recordStream = FS.createWriteStream(this._filename);
-	this._encoder.pipe(this._recordStream);
+	if(this._databaseUser.settings.record === true) {
+		try { FS.mkdirSync('tmp'); } catch(err) { }
+		try { FS.mkdirSync('tmp/useraudio'); } catch(err) { }
+		try { FS.mkdirSync('tmp/useraudio/' + this._user.id); } catch(err) { }
+		this._filename = 'tmp/useraudio/' + this._user.id + '/' + Date.now() + '.mp3';
+		this._encoder = new Lame.Encoder({
+			channels : 1,
+			bitDepth : 16,
+			sampleRate : 48000,
+			bitRate : 128,
+			outSampleRate : 44100,
+			mode : Lame.MONO
+		});
+		this._recordStream = FS.createWriteStream(this._filename);
+		this._encoder.pipe(this._recordStream);
+	}
 };
 
 VoiceInputUser.prototype._speechStopped = function() {
 	this.speaking = false;
 	this.started = false;
-	this._encoder.end();
-	this.bot.addCachedAudio(this._filename, this._databaseUser, (Date.now() - this._speakStartTime)/1000);
-	this._createNewRecordFile();
+	if(this._databaseUser.settings.record === true) {
+		this._encoder.end();
+		this.bot.addCachedAudio(this._filename, this._databaseUser, (Date.now() - this._speakStartTime.getTime())/1000);
+		this._createNewRecordFile();
+	}
+	this.bot.database.writeUserStatsSpeak(this._databaseUser, this._speakStartTime, new Date());
 };
 
 VoiceInputUser.prototype._speechContinued = function(chunk) {
-	this._encoder.write(chunk);
+	if(this._databaseUser.settings.record === true) {
+		this._encoder.write(chunk);
+	}
 	this._refreshTimeout();
 };
 

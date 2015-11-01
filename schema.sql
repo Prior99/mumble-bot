@@ -132,6 +132,22 @@ CREATE TABLE IF NOT EXISTS DialogParts (
 	FOREIGN KEY(recordId) REFERENCES Records(id)
 );
 
+CREATE TABLE IF NOT EXISTS UserStatsOnline (
+	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	user			INT NOT NULL,
+	started			DATETIME NOT NULL,
+	ended			DATETIME NOT NULL,
+	FOREIGN KEY(user) REFERENCES Users(id)
+);
+
+CREATE TABLE IF NOT EXISTS UserStatsSpeaking (
+	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	user			INT NOT NULL,
+	started			DATETIME NOT NULL,
+	ended			DATETIME NOT NULL,
+	FOREIGN KEY(user) REFERENCES Users(id)
+);
+
 INSERT IGNORE INTO Permissions (id, name, description, icon) VALUES
 ("login", "Anmelden", "Erlaubt einem Benutzer, sich im System anzumelden.", "sign-in"),
 ("add-quote", "Zitat Eintragen", "Erlaubt das Eintragen neuer Zitate.", "quote-left"),

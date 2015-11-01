@@ -65,6 +65,14 @@ var Speech = function(stream, espeakData, channel, database, bot) {
 	}
 	this._sox.run();
 	this.engine = "google";
+	if(bot.options.responsiveTTS) {
+		this._responsiveEngine = ResponsiveTTS(database);
+		this._responsiveEngine.on('data', this._onTTSData.bind(this));
+		this._responsiveEngine.on('speechDone', function() {
+			this._speakingStopped();
+		}.bind(this));
+		this.engine = "responsive";
+	}
 	if(bot.options.bingTTS) {
 		this._bingEngine = BingTTS(bot.options.bingTTS.clientID, bot.options.bingTTS.clientSecret, database);
 		this._bingEngine.on('data', this._onTTSData.bind(this));
@@ -73,14 +81,6 @@ var Speech = function(stream, espeakData, channel, database, bot) {
 			this._speakingStopped();
 		}.bind(this));
 		this.engine = "bing";
-	}
-	if(bot.options.responsiveTTS) {
-		this._responsiveEngine = ResponsiveTTS(database);
-		this._responsiveEngine.on('data', this._onTTSData.bind(this));
-		this._responsiveEngine.on('speechDone', function() {
-			this._speakingStopped();
-		}.bind(this));
-		this.engine = "responsive";
 	}
 	this._googleEngine = GoogleTTS(database);
 	this._googleEngine.on('data', this._onTTSData.bind(this));
