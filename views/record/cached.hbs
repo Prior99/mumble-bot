@@ -1,38 +1,52 @@
-<h1>Temporäre Aufnahmen</h1>
-<p>Es wird nur eine gewisse Anzahl an Aufnahmen temporär gecached, danach werden alte Aufnahmen gelöscht.</p>
-<p>Sollen Aufnahmen gespeichert werden, kann dies hier erfolgen.</p>
-<table class="table table-striped table-responsive tablesorter table-condensed">
-	<thead>
-		<th>Benutzer</th>
-		<th>Zeitpunkt</th>
-		<th>Länge</th>
-		<th><i class="fa fa-lock" aria-hidden="true"></i></th>
-		<th class="no-sort"></th>
-		<th class="no-sort"></th>
-		<th class="no-sort"></th>
-		<th class="no-sort"></th>
-	</thead>
-	<tbody>
-	{{#each cached}}
-		<tr class="{{bootstrapClassIfProtected this}}">
-			<td><a href="/users/profile/{{this.user.username}}">{{this.user.username}}</a></td>
-			<td>{{formatDate this.date}} {{formatTime this.date}}</td>
-			<td>{{this.duration}}s</td>
-			<td class="protectindicate">
-			{{#if this.protected}}
-				<i class="fa fa-check" aria-hidden="true"></i>
-				<span style="display: none">1</div>
-			{{else}}
-				<i class="fa fa-remove" aria-hidden="true"></i>
-				<span style="display: none">0</div>
-			{{/if}}
-			</td>
-			<td><a soundId="{{this.id}}" class="deletebutton btn btn-danger btn-xs"><span class="fa fa-remove" aria-hidden="true"></span> Löschen</a></td>
-			<td><a soundId="{{this.id}}" class="protectbutton btn btn-warning btn-xs"><span class="fa fa-lock" aria-hidden="true"></span> Schützen</a></td>
-			<td><a soundId="{{this.id}}" class="playbutton btn btn-info btn-xs"><span class="fa fa-volume-down" aria-hidden="true"></span> Play</a></td>
-			<td><a href="/record/save?id={{this.id}}" class="btn btn-success btn-xs"><span class="fa fa-save" aria-hidden="true"></span> Save</a></td>
-		</tr>
-	{{/each}}
-	</tbody>
-</table>
+<script id="template-cached" type="text/x-handlebars-template">
+\{{#each cached}}
+	<tr class="\{{bootstrapClassIfProtected this}}">
+		<td><a href="/users/profile/\{{this.user.username}}">\{{this.user.username}}</a></td>
+		<td>\{{formatDate this.date}} \{{formatTime this.date}}</td>
+		<td>\{{this.duration}}s</td>
+		<td class="protectindicate">
+		\{{#if this.protected}}
+			<i class="fa fa-check" aria-hidden="true"></i>
+			<span style="display: none">1</div>
+		\{{else}}
+			<i class="fa fa-remove" aria-hidden="true"></i>
+			<span style="display: none">0</div>
+		\{{/if}}
+		</td>
+		<td>
+			<div class="btn-group">
+				<a soundId="\{{this.id}}" class="deletebutton btn btn-danger btn-xs"><i class="fa fa-remove" aria-hidden="true"></i></a>
+				<a soundId="\{{this.id}}" class="protectbutton btn btn-warning btn-xs"><i class="fa fa-lock" aria-hidden="true"></i></a>
+				<a soundId="\{{this.id}}" class="playbutton btn btn-info btn-xs"><i class="fa fa-volume-down" aria-hidden="true"></i></a>
+				<a href="/record/save?id=\{{this.id}}" class="btn btn-success btn-xs"><i class="fa fa-save" aria-hidden="true"></i></a>
+			</div>
+		</td>
+	</tr>
+\{{/each}}
+</script>
+<div id="loading">
+	<div class="icon">
+		<i class="fa fa-spin fa-cog"></i>
+	</div>
+	<div class="description">
+		<p id="description">Verbinde zu Websocket...</p>
+	</div>
+</div>
+<div id="cached">
+	<h1>Temporäre Aufnahmen</h1>
+	<p>Es wird nur eine gewisse Anzahl an Aufnahmen temporär gecached, danach werden alte Aufnahmen gelöscht.</p>
+	<p>Sollen Aufnahmen gespeichert werden, kann dies hier erfolgen.</p>
+
+	<table class="table table-striped table-responsive">
+		<thead>
+			<th>Benutzer</th>
+			<th>Zeitpunkt</th>
+			<th>Länge</th>
+			<th><i class="fa fa-lock" aria-hidden="true"></i></th>
+			<th class="no-sort"></th>
+		</thead>
+		<tbody id="cachedtable">
+		</tbody>
+	</table>
+</div>
 <script src="/dist/record/cached.js"></script>

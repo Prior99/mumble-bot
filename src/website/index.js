@@ -9,6 +9,7 @@ var Less = require('less-middleware');
 var Session = require('express-session');
 var FileStore = require('session-file-store')(Session);
 var Moment = require('moment');
+var ExpressWS = require('express-ws');
 var colorify = require('../colorbystring');
 /*
  * Views
@@ -20,6 +21,8 @@ var viewRegisterLogin = require('./users/registerLogin');
 var viewLog = require('./log');
 var viewQueue = require('./queue');
 var viewRSS = require('./rss');
+
+var websocketCached = require("./record/websocketcached");
 
 /*
  * Routes
@@ -118,6 +121,7 @@ var Website = function(bot) {
 		});
 	}
 	this.app = Express();
+	ExpressWS(this.app);
 	this.app.engine('.hbs', ExpHbs({
 		defaultLayout : 'main',
 		extname: '.hbs',
@@ -211,6 +215,7 @@ var Website = function(bot) {
 	this.app.use('/users', routeUsers(bot));
 	this.app.use('/bass', routeBass(bot));
 	this.app.use('/record', routeRecord(bot));
+	this.app.ws('/record/cached', websocketCached(bot));
 	this.app.use('/quotes', routeQuotes(bot));
 	this.app.use('/sounds', routeSounds(bot));
 	this.app.use('/commands', viewDefault("commands"));

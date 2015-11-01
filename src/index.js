@@ -388,14 +388,16 @@ Bot.prototype.join = function(cname) {
 };
 
 Bot.prototype.addCachedAudio = function(filename, user, duration) {
-	this.cachedAudios.push({
+	var obj = {
 		file : filename,
 		date : new Date(),
 		user : user,
 		id : this._audioId++,
 		duration : duration,
 		protected : false
-	});
+	};
+	this.cachedAudios.push(obj);
+	this.emit('cached-audio', obj);
 	this._clearUpCachedAudio();
 };
 
@@ -416,6 +418,7 @@ Bot.prototype.protectCachedAudio = function(id) {
 	}
 	else {
 		elem.protected = true;
+		this.emit('protect-cached-audio', elem);
 		return true;
 	}
 };
@@ -435,6 +438,7 @@ Bot.prototype.removeCachedAudio = function(audio) {
 	var index = this.cachedAudios.indexOf(audio);
 	if(index !== -1) {
 		this.cachedAudios.splice(index, 1);
+		this.emit('removed-cached-audio', audio);
 		return true;
 	}
 	else {
@@ -457,6 +461,7 @@ Bot.prototype._deleteAllCachedAudio = function(amount) {
 		else {
 			try {
 				FS.unlinkSync(elem.file);
+				this.emit('removed-cached-audio', elem);
 				Winston.info("Deleted cached audio file " + elem.file + ".");
 			}
 			catch(err) {
