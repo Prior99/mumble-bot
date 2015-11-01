@@ -3,7 +3,6 @@
  */
 
 var CachedWebTTS = require('./cachedwebtts');
-
 /*
  * Code
  */
@@ -12,7 +11,7 @@ module.exports = function(database) {
 	return new CachedWebTTS({
 		url : "https://code.responsivevoice.org/getvoice.php?tl=de&sv=&vn=&pitch=0.5&rate=0.5&vol=1&t=",
 		cacheDir : "rsponsive-tts-cache",
-		splitAfter : 200,
+		splitAfter : 90,
 		header : {
 			'Host' : "code.responsivevoice.org",
 			'Referer' : "http://responsivevoice.org/",
