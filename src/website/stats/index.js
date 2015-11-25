@@ -22,8 +22,8 @@ var pages = [{
 	icon : "group"
 },{
 	url : "/stats/recordspertime/",
-	name : "Aufnahmen/Benutzer",
-	icon : "user"
+	name : "Aufnahmen/Zeit",
+	icon : "calendar"
 },{
 	url : "/stats/recordplaybacksperuser/",
 	name : "Wiedergaben/Benutzer",
@@ -59,7 +59,7 @@ var RouteStats = function(bot) {
 	router.get('/spokenperuser', viewDefault("stats/spokenperuser"));
 	router.get('/spokenperhour', viewDefault("stats/spokenperhour"));
 	router.get('/spokenperweekday', viewDefault("stats/spokenperweekday"));
-	router.get('/', viewDefault("stats/index"));
+	router.get('/', viewDefault("stats/"));
 
 	return router;
 };

@@ -1,0 +1,2 @@
+require("./userbarchart");
+require("./userpiechart");
