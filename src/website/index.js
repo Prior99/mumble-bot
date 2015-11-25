@@ -34,6 +34,7 @@ var routeUsers = require('./users');
 var routeBass = require('./bass');
 var routeRecord = require('./record');
 var routeSounds = require('./sounds');
+var routeStats = require('./stats');
 
 /*
  * Code
@@ -68,6 +69,11 @@ var pages = [{
 	url : "/",
 	name : "Sonstiges",
 	icon : "dashboard"
+},
+{
+	url : "/stats",
+	name : "Statistiken",
+	icon : "pie-chart"
 }];
 
 var subpages = [{
@@ -218,6 +224,7 @@ var Website = function(bot) {
 	this.app.ws('/record/cached', websocketCached(bot));
 	this.app.use('/quotes', routeQuotes(bot));
 	this.app.use('/sounds', routeSounds(bot));
+	this.app.use('/stats', routeStats(bot));
 	this.app.use('/commands', viewDefault("commands"));
 	this.app.get('/tree', viewDefault("channeltree"));
 	this.app.get('/', viewDefault("home"));
