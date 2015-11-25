@@ -8,9 +8,6 @@ module.exports = function(bot) {
 			Winston.error("Could not get record count by users.", err);
 			return [];
 		})
-		.then(function(records) {
-			return records;
-		})
 		.then(function(arr) {
 			res.status(200).send(arr);
 		});

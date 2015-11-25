@@ -16,7 +16,6 @@ var viewDeleteCached = require('./deletecached');
 var viewProtect = require('./protect');
 var viewAddLabel = require('./addlabel');
 var viewEdit = require('./edit');
-var viewStats = require('./stats');
 var viewRandom = require('./random');
 var viewList = require('./list');
 var viewSaveDialog = require('./save_dialog');
@@ -39,7 +38,6 @@ module.exports = function(bot) {
 	router.use('/deletecached', viewDeleteCached(bot));
 	router.use('/addlabel', viewAddLabel(bot));
 	router.use('/edit', viewEdit(bot));
-	router.use('/stats', viewStats(bot));
 	router.use('/random', viewRandom(bot));
 	router.use('/list', viewList(bot));
 	router.use('/lookup', viewLookup(bot));

@@ -258,4 +258,12 @@ module.exports = function(Database) {
 		}.bind(this));
 	};
 
+
+	Database.prototype.getRecordPlaybackCountPerUser = function(callback) {
+		Promise.denodeify(this.pool.query.bind(this.pool))("SELECT username AS user, SUM(used) AS playbacks, SUM(used)/COUNT(r.id) AS playbacksRelative FROM Records r LEFT JOIN Users u ON u.id = user GROUP BY user")
+		.catch(callback)
+		.then(function(rows) {
+			callback(null, rows);
+		});
+	};
 };

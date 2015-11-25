@@ -24,7 +24,7 @@
 	var perUserPie = d3.select("#perUserPieChart")
 		.append("g")
 		.attr("transform", "translate(" + ((width - 150) / 2) + "," + (height / 2) + ")");
-	d3.json('/api/record/stats/peruser', function(err, data) {
+	d3.json('/api/stats/recordsperuser', function(err, data) {
 		if(err) {
 			throw err;
 		}

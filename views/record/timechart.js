@@ -33,7 +33,7 @@
 		.append("g")
 			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	var formatTime = d3.time.format("%d.%m.%y");
-	d3.json("/api/record/stats/pertime", function(err, data) {
+	d3.json("/api/stats/recordspertime", function(err, data) {
 		var tooltip;
 		if(err) {
 			throw err;

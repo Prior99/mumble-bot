@@ -27,7 +27,7 @@
 		.append("g")
 			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	d3.json('/api/record/stats/peruser', function(err, data) {
+	d3.json('/api/stats/recordsperuser', function(err, data) {
 		if(err) {
 			throw err;
 		}

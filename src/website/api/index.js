@@ -23,6 +23,7 @@ var routeSpeak = require('./speak');
 var routeSounds = require('./sounds');
 var routeRecord = require('./record');
 var routeRSS = require('./rss');
+var routeStats = require('./stats');
 
 
 /*
@@ -100,6 +101,7 @@ var RouteAPI = function(bot) {
 	router.use('/google', viewGoogleLookup(bot));
 	router.use('/record', routeRecord(bot));
 	router.use('/rss', routeRSS(bot));
+	router.use('/stats', routeStats(bot));
 
 	return router;
 };
