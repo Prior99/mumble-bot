@@ -24,7 +24,7 @@
 		.orient("left")
 		.ticks(d3.time.hours, 2)
 		.tickFormat(function(d) {
-			return Math.round((d / (1000 * 60 * 60)) * 100) / 100;
+			return Math.round((d / (1000 * 60 * 60)) * 100) / 100 + "h";
 		});
 	var chart = d3.select("#chart")
 		.append("g")
