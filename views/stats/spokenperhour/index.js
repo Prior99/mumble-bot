@@ -5,7 +5,6 @@
 	var width = $("#chart").width();
 	var height = $("#chart").height();
 	var maxRadius = Math.min(width, height) / 2;
-	var color = d3.scale.category20c();
 	var pie = d3.layout.pie()
 		.sort(null)
 		.value(function(d) {
@@ -45,9 +44,7 @@
 					return (dat[i].amount/maxDate) * maxRadius * 0.7 + maxRadius * 0.3;
 				})
 				.innerRadius(maxRadius * 0.3))
-			.style("fill", function(d) {
-				return color(d.data.user);
-			});
+			.style("fill", "#3182BD");
 		g.append("text")
 			.attr("transform", function(d, i) {
 				d.innerRadius = 0.2 * maxRadius;
