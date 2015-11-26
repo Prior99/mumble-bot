@@ -8,7 +8,9 @@ var Winston = require('winston');
 var Less = require('less-middleware');
 var Session = require('express-session');
 var FileStore = require('session-file-store')(Session);
-
+var Moment = require('moment');
+var ExpressWS = require('express-ws');
+var colorify = require('../colorbystring');
 /*
  * Views
  */
@@ -18,6 +20,9 @@ var viewSpeak = require('./speak');
 var viewRegisterLogin = require('./users/registerLogin');
 var viewLog = require('./log');
 var viewQueue = require('./queue');
+var viewRSS = require('./rss');
+
+var websocketCached = require("./record/websocketcached");
 
 /*
  * Routes
@@ -29,6 +34,7 @@ var routeUsers = require('./users');
 var routeBass = require('./bass');
 var routeRecord = require('./record');
 var routeSounds = require('./sounds');
+var routeStats = require('./stats');
 
 /*
  * Code
@@ -63,6 +69,11 @@ var pages = [{
 	url : "/",
 	name : "Sonstiges",
 	icon : "dashboard"
+},
+{
+	url : "/stats",
+	name : "Statistiken",
+	icon : "pie-chart"
 }];
 
 var subpages = [{
@@ -94,6 +105,11 @@ var subpages = [{
 	url : "/queue/",
 	name : "Queue",
 	icon : "road"
+},
+{
+	url : "/rss/",
+	name : "RSS Feeds",
+	icon : "rss"
 }];
 /**
  * Handles the whole website stuff for the bot. Using express and handlebars
@@ -111,15 +127,19 @@ var Website = function(bot) {
 		});
 	}
 	this.app = Express();
+	ExpressWS(this.app);
 	this.app.engine('.hbs', ExpHbs({
 		defaultLayout : 'main',
 		extname: '.hbs',
 		helpers : {
+			"colorify" : function(string) {
+				return colorify(string);
+			},
 			"formatDate" : function(date) {
-				return date.toLocaleDateString('de-DE');
+				return Moment(date).format("DD.MM.YY");
 			},
 			"formatTime" : function(date) {
-				return date.toLocaleTimeString('de-DE');
+				return Moment(date).format("HH:mm");
 			},
 			"isSpeech" : function(a, block) {
 				return a.type == "speech" ? block.fn(this) : undefined;
@@ -136,6 +156,14 @@ var Website = function(bot) {
 				}
 				else if(level === "error") {
 					return 'danger';
+				}
+				else {
+					return '';
+				}
+			},
+			"bootstrapClassIfProtected" : function(audio) {
+				if(audio.protected) {
+					return 'warning';
 				}
 				else {
 					return '';
@@ -172,18 +200,14 @@ var Website = function(bot) {
 			next();
 		}
 	});
-	this.app.use(Less('public/'));
-	this.app.use('/', Express.static('public/'));
 	this.app.use('/bootstrap', Express.static('node_modules/bootstrap/dist/'));
-	this.app.use('/jquery', Express.static('node_modules/jquery/dist/'));
-	this.app.use('/jquery-form', Express.static('node_modules/jquery-form/'));
 	this.app.use('/fontawesome', Express.static('node_modules/font-awesome/'));
-	this.app.use('/crypto-js', Express.static('node_modules/crypto-js/'));
 	this.app.use('/typeahead', Express.static('node_modules/typeahead.js/dist/'));
 	this.app.use('/bootswatch', Express.static('node_modules/bootswatch/'));
 	this.app.use('/typeahead-bootstrap', Express.static('node_modules/typeahead.js-bootstrap3.less/'));
-	this.app.use('/bootstrap-validator', Express.static('node_modules/bootstrap-validator/dist/'));
 	this.app.use('/tablesorter', Express.static('node_modules/tablesorter/dist/'));
+	this.app.use('/favicon.ico', Express.static('favicon.ico'));
+	this.app.use('/dist/', Express.static('dist/'));
 	this.app.use('/api', routeApi(bot));
 	this.app.use(function(req, res, next) {
 		if(req.session.user) {
@@ -197,8 +221,10 @@ var Website = function(bot) {
 	this.app.use('/users', routeUsers(bot));
 	this.app.use('/bass', routeBass(bot));
 	this.app.use('/record', routeRecord(bot));
+	this.app.ws('/record/cached', websocketCached(bot));
 	this.app.use('/quotes', routeQuotes(bot));
 	this.app.use('/sounds', routeSounds(bot));
+	this.app.use('/stats', routeStats(bot));
 	this.app.use('/commands', viewDefault("commands"));
 	this.app.get('/tree', viewDefault("channeltree"));
 	this.app.get('/', viewDefault("home"));
@@ -206,6 +232,7 @@ var Website = function(bot) {
 	this.app.get('/google', viewDefault("googlelookup"));
 	this.app.get('/log', viewLog(bot));
 	this.app.get('/queue', viewQueue(bot));
+	this.app.get('/rss', viewRSS(bot));
 	var port = this.bot.options.website.port;
 	this.server = this.app.listen(port);
 	this.server.setTimeout(5000);

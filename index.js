@@ -1,6 +1,7 @@
 /*
  * Imports
  */
+require('array.prototype.find');
 var Mumble = require("mumble");
 var Bot = require("./src");
 var Winston = require('winston');
@@ -67,7 +68,7 @@ Mumble.connect("mumble://" + options.url, mumbleOptions, function(err, connectio
 			Winston.error("An error with the mumble connection has occured:", data);
 		});
 
-		connection.authenticate(options.name);
+		connection.authenticate(options.name, options.password);
 		connection.on('ready', function() {
 			startup(connection);
 		});

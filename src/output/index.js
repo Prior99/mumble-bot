@@ -19,6 +19,7 @@ var Stream = require('stream');
  * @param {Bot} bot - Bot this belongs to.
  */
 var Output = function(bot) {
+	Stream.Writable.call(this);
 	this.bot = bot;
 	this.stream = bot.mumble.inputStream();
 	this.speech = new Speech(this, bot.options.espeakData, bot.mumble.user.channel, bot.database, bot);
@@ -26,10 +27,9 @@ var Output = function(bot) {
 	this.busy = false;
 	this.queue = [];
 	this.current = null;
-	Stream.Writable.call(this);
 	this._bufferQueue = [];
 	this._playbackAhead = 0;
-	this.bot.newCommand("change voice", this.changeGender.bind(this), "Deprecated. Wechselt das Geschlecht der Stimme.", "venus-mars");
+	this.bot.newCommand("change voice", this.changeGender.bind(this), "Deprecated. Changes the gender of the voice.", "venus-mars");
 };
 
 Util.inherits(Output, Stream.Writable);
@@ -100,6 +100,7 @@ Output.prototype._process = function() {
 	if(this.current.type === "speech") {
 		this.speech.enqueue({
 			text : this.current.text,
+			print : this.current.print,
 			callback : this._processStopped.bind(this)
 		});
 	}
@@ -141,8 +142,17 @@ Output.prototype.playSound = function(file, callback) {
 	this._enqueue({
 		type : "sound",
 		file : file,
-		callback :callback
+		callback : callback
 	});
+};
+
+Output.prototype.playSounds = function(filelist, callback) { // callback?
+	for(var i=0; i<filelist.length; i++) {
+		this._enqueue({
+			type : "sound",
+			file : filelist[i]
+		});
+	}
 };
 
 /**
@@ -153,10 +163,26 @@ Output.prototype.playSound = function(file, callback) {
 Output.prototype.say = function(text, callback) {
 	this._enqueue({
 		type : "speech",
+		print : true,
+		text : text,
+		callback : callback
+	});
+};
+
+/**
+ * Say something using TTS, don't print it to the chat.
+ * @param {string} text -  Text to say viw TTS.
+ * @param callback - Called after the text was spoken.
+ */
+Output.prototype.sayOnlyVoice = function(text, callback) {
+	this._enqueue({
+		type : "speech",
+		print : false,
 		text : text,
 		callback :callback
 	});
 };
+
 
 Output.prototype._enqueue = function(workitem) {
 	this.queue.push(workitem);

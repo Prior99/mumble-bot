@@ -1,3 +1,40 @@
+v0.3.0
+======
+Bugfixes:
+---------
+* AFK Observer is fixed
+* Fixed crash on uploading sounds
+* Fixed several typos in both documentation and website
+* Fixed broken URLs
+* Fixed critical security vulnerability where the password hashes of the users could be obtained via the api
+
+Relevant Changes:
+-----------------
+* Added ability for downloading records.
+* Can now protect and delete cached records.
+* Display time of cached records.
+* Added SOX for cool sound effects.
+* Added possibility to subscribe to an RSS feed.
+* Added support for mumble server using password protection.
+* Added labels to records.
+* Steam login no longer required for registering.
+* Can now edit records.
+* Can now activate and deactivate announcing of user activities in the server.
+* Add ability to play back random record.
+* Added statistics. Statistics will be recorded after migrating to this version.
+* Increased performance rapidly by using browserify.
+* Added ability to create dialogs.
+* Cached records now updating via websocket.
+* Stored records now use AJAX for loading.
+* Added new front-end for browsing stored records.
+* Added responsive voice TTS.
+* Internal: Migrated database to promises.
+
+Contributors:
+------------
+* Prior
+* Sascha
+
 v0.2.1
 ======
 Bugfixes:

@@ -63,15 +63,33 @@ function check_env {
 	if ! [ -e addons ]; then
 		mkdir addons
 	fi
+
+	echo -n "  Checking for compiled client scripts ... "
+	if ! [ -e dist ]; then
+		echo -ne "\033[31mnot found!\033[0m Please run the setup."
+		echo -e "\r\033[31m\xe2\x9d\xa2\033[0m"
+		exit 1
+	else
+		echo -ne "\033[32mfound.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+	fi
 }
 
 function setup {
 
 	#
+	# Check for compiled client scripts
+	#
+
+	if ! [ -e dist ]; then
+		node_modules/grunt-cli/bin/grunt
+	fi
+
+	#
 	# Check for OpenSSL
 	#
 
-	echo -n "  Checking for OpenSSL ... "
+	echo -n "  Checking for NPM ... "
 	if ! type npm &> /dev/null ; then
 		echo -ne "\033[31mnot found!\033[0m"
 		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
@@ -116,6 +134,11 @@ function setup {
 		echo -ne "\033[32mokay.\033[0m"
 		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
 	fi
+}
+
+function dev {
+	start &
+	node_modules/grunt-cli/bin/grunt watch
 }
 
 function start {
@@ -177,10 +200,13 @@ case $1 in
 	setup)
 		setup
 	;;
+	dev)
+		dev
+	;;
 	editconfig)
 		editconfig
 	;;
 	*)
-		echo "Usage: $0 {setup|start|editconfig|help}"
+		echo "Usage: $0 {setup|start|editconfig|help|dev}"
 	;;
 esac

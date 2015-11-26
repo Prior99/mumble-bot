@@ -17,8 +17,9 @@ var Minecraft = require('./minecraft');
 var EventEmitter = require("events").EventEmitter;
 var Permissions = require("./permissions");
 var AFKObserver = require("./afkobserver");
+var RSS = require("./rss");
 
-var AUDIO_CACHE_AMOUNT = 100;
+var AUDIO_CACHE_AMOUNT = 4;
 
 /*
  * Code
@@ -27,7 +28,7 @@ var AUDIO_CACHE_AMOUNT = 100;
 /**
  * This is the constructor of the bot.
  * @constructor
- * @param mumble - already set up mumble connection
+ * @param mumble - already set up mumble connection (MumbleClient)
  * @param options - Options read from the config.json
  * @param {Database} database - Started connection to database.
  */
@@ -75,6 +76,10 @@ var Bot = function(mumble, options, database) {
 		this.minecraft = new Minecraft(options.minecraft, this);
 	}
 
+	if(options.rss) {
+		this.rss = new RSS(this);
+	}
+
 	this.afkObserver = new AFKObserver(this);
 
 	this._loadAddons("addons/", function() {
@@ -104,6 +109,7 @@ var Bot = function(mumble, options, database) {
 	}.bind(this), "Gibt eine Liste aller Kommandos aus.", "list-ul");
 	this.newCommand("be quiet", this.beQuiet.bind(this), "Sofort alles, was Geräusche verursacht abschalten.", "bell-slash", null, 'be-quiet');
 	this.newCommand("shutdown", this.shutdown.bind(this), "Fährt den bot herunter.", "power-off", null, 'shutdown');
+	this.mumble.users().forEach(this._addEventListenersToMumbleUser.bind(this));
 };
 
 Util.inherits(Bot, EventEmitter);
@@ -130,14 +136,34 @@ Bot.prototype.handleUserConnect = function(user) {
 		}
 		else {
 			if(dbUser) {
-				this.sayImportant(dbUser.username + " hat als " + user.name + " Mumble betreten.");
+				if(!this.options.announce || (this.options.announce.connect != false && this.options.announce.connect != "false")) {
+					this.sayImportant(dbUser.username + " hat als " + user.name + " Mumble betreten.");
+				}
 			}
 			else {
-				this.sayImportant("Unbekannter Nutzer \"" + user.name + "\" hat Mumble betreten.");
-				user.moveToChannel(this.options.kickChannel);
-				user.sendMessage("Herzlich Willkommen. Ich bin " + this.options.name + ". Es sollte ein Administrator kommen und dich begrüßen. In der Zwischenzeit kannst du dir unter " + this.options.webpageurl + " einen Account anlegen.");
-				this.notifyOnlineUsersWithPermission('grant', "Ein unbekannter Nutzer mit Namen \"" + user.name + "\" hat soeben Mumble betreten.");
+				if(!this.options.announce || (this.options.announce.connect != false && this.options.announce.connect != "false")) {
+					this.sayImportant("Unbekannter Nutzer \"" + user.name + "\" hat Mumble betreten.");
+					this.notifyOnlineUsersWithPermission('grant', "Ein unbekannter Nutzer mit Namen \"" + user.name + "\" hat soeben Mumble betreten.");
+					user.sendMessage("Herzlich Willkommen. Ich bin " + this.options.name + ". Es sollte ein Administrator kommen und dich begrüßen. In der Zwischenzeit kannst du dir unter " + this.options.webpageurl + " einen Account anlegen.");
+				}
+				if(this.options.kickChannel) {
+					user.moveToChannel(this.options.publicChannel);
+				}
 			}
+		}
+	}.bind(this));
+	this._addEventListenersToMumbleUser(user);
+};
+
+Bot.prototype._addEventListenersToMumbleUser = function(user) {
+	user.on('disconnect', function() {
+		if(!this.options.announce || (this.options.announce.disconnect != false && this.options.announce.disconnect != "false")) {
+			this.sayImportant(user.name + " hat Mumble verlassen");
+		}
+	}.bind(this));
+	user.on('move', function(oldChan, newChan, actor) {
+		if(!this.options.announce || (this.options.announce.move != false && this.options.announce.move != "false")) {
+			this.sayImportant(user.name + " ging von Channel " + oldChan.name + " nach " + newChan.name);
 		}
 	}.bind(this));
 };
@@ -240,32 +266,40 @@ Bot.prototype._initChatInput = function() {
 };
 
 Bot.prototype._loadAddons = function(dir, callback) {
-	FS.readdir(dir, function(err, files) {
-		if(err) {
-			Winston.error("Error loading addons!");
-			throw err;
+	FS.stat(dir, function(err, stats) {
+		if(err || !stats.isDirectory()) {
+			Winston.warn("Cannot access directory " + dir);
+			return;
 		}
 		else {
-			var next = function() {
-				if(files.length > 0) {
-					var file = files.shift()
-					var filename = dir + file;
-					if(FS.lstatSync(filename).isDirectory() && file.substr(0, 1) != ".") {
-					Winston.info("Loading addon " + filename + " ...");
-						var isAsync = require("../" + filename)(this, next);
-						if(!isAsync) {
-							next();
-						}
-					}
-					else {
-						next();
-					}
+			FS.readdir(dir, function(err, files) {
+				if(err) {
+					Winston.error("Error loading addons!");
+					throw err;
 				}
 				else {
-					callback();
+					var next = function() {
+						if(files.length > 0) {
+							var file = files.shift()
+							var filename = dir + file;
+							if(FS.lstatSync(filename).isDirectory() && file.substr(0, 1) != ".") {
+							Winston.info("Loading addon " + filename + " ...");
+								var isAsync = require("../" + filename)(this, next);
+								if(!isAsync) {
+									next();
+								}
+							}
+							else {
+								next();
+							}
+						}
+						else {
+							callback();
+						}
+					}.bind(this);
+					next();
 				}
-			}.bind(this);
-			next();
+			}.bind(this));
 		}
 	}.bind(this));
 };
@@ -321,12 +355,9 @@ Bot.prototype.stopPipingUser = function() {
 
 /**
  * This is one of the most important methods in the bot.
- * This will define a new command in the bot. Pleas note that all commands have
- * to be defined before the bot has finished starting up (e.g. as addon or
- * defined in the constructor), as the grammar for the speech recognition has to
- * be generated and will not work otherwise.
+ * This method registers a new command in the bot.
  * @param {string} commandName - Name of the command to create
- * @param method - Method which will be called when the command was called
+ * @param method - Method which will be executed when the command was called
  * @param {string} description - Description of the command as displayed on the website
  * @param {string} icon - [Name of a Fontawesome-icon to display.](http://fortawesome.github.io/Font-Awesome/icons/)
  * @param {string[]} arguments - (Optional) Array of possible arguments.
@@ -357,13 +388,16 @@ Bot.prototype.join = function(cname) {
 };
 
 Bot.prototype.addCachedAudio = function(filename, user, duration) {
-	this.cachedAudios.push({
+	var obj = {
 		file : filename,
 		date : new Date(),
 		user : user,
 		id : this._audioId++,
-		duration : duration
-	});
+		duration : duration,
+		protected : false
+	};
+	this.cachedAudios.push(obj);
+	this.emit('cached-audio', obj);
 	this._clearUpCachedAudio();
 };
 
@@ -377,10 +411,34 @@ Bot.prototype.getCachedAudioById = function(id) {
 	return null;
 };
 
+Bot.prototype.protectCachedAudio = function(id) {
+	var elem = this.getCachedAudioById(id);
+	if(!elem) {
+		return false;
+	}
+	else {
+		elem.protected = true;
+		this.emit('protect-cached-audio', elem);
+		return true;
+	}
+};
+
+Bot.prototype.removeCachedAudioById = function(id) {
+	var elem = this.getCachedAudioById(id);
+	if(!elem) {
+		return false;
+	}
+	else {
+		this.removeCachedAudio(elem);
+		return true;
+	}
+};
+
 Bot.prototype.removeCachedAudio = function(audio) {
 	var index = this.cachedAudios.indexOf(audio);
 	if(index !== -1) {
 		this.cachedAudios.splice(index, 1);
+		this.emit('removed-cached-audio', audio);
 		return true;
 	}
 	else {
@@ -393,16 +451,37 @@ Bot.prototype._clearUpCachedAudio = function() {
 };
 
 Bot.prototype._deleteAllCachedAudio = function(amount) {
+	var prot = [];
 	while(this.cachedAudios.length > amount) {
 		var elem = this.cachedAudios.shift();
-		try {
-			FS.unlinkSync(elem.file);
-			Winston.info("Deleted cached audio file " + elem.file + ".");
+		if(elem.protected) {
+			amount --;
+			prot.push(elem);
 		}
-		catch(err) {
-			Winston.error("Error when cleaning up cached audios!", err);
+		else {
+			try {
+				FS.unlinkSync(elem.file);
+				this.emit('removed-cached-audio', elem);
+				Winston.info("Deleted cached audio file " + elem.file + ".");
+			}
+			catch(err) {
+				Winston.error("Error when cleaning up cached audios!", err);
+			}
 		}
 	}
+	while(prot.length > 0) {
+		this.cachedAudios.unshift(prot.pop());
+	}
+};
+
+/**
+ * Will say something. The text will be played in mumble using TTS, written to
+ * the bots current channel (theoretically) and written in minecraft.
+ * @param {string} text - Text to say.
+ * @param cb - Callback, will be called *after playback of TTS has finished*.
+ */
+Bot.prototype.sayOnlyVoice = function(text, cb) {
+	return this.output.sayOnlyVoice(text, cb);
 };
 
 /**
@@ -436,7 +515,7 @@ Bot.prototype.sayImportant = function(text, cb) {
  * @param {string} text - Message of the error to report.
  */
 Bot.prototype.sayError = function(text) {
-	return this.output.say("Fehler:    " + text);
+	return this.output.say("Error:    " + text);
 };
 
 /**

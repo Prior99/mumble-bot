@@ -17,40 +17,9 @@
 		</div>
 	</div>
 </form>
-<script>
-	$("#submit").click(function() {
-		var quote = $("#effect").val();
-		$.ajax("/api/bass/addEffect?effect=" + encodeURI(quote)).done(function(res) {
-			if(res.okay) {
-				spawnNotification('success', "Effekt erfolgreich ergänzt.");
-				refreshList();
-			}
-		})
-		.error(function() {
-			spawnNotification('error', "Konnte Effekt nicht hinzufügen.");
-		});
-	});
-</script>
 <h2>Effekte</h2>
 <p>Aktuell sind folgende "Effekte" bekannt:</p>
 <ul class="list-group" id="effect-list">
 
 </ul>
-<script>
-	function refreshList() {
-		$.ajax("/api/bass/effects").done(function(res) {
-			if(res.okay) {
-				$("#effect-list").html("");
-				var effects = res.effects;
-				for(var i in effects) {
-					var e = effects[i];
-					$("#effect-list").append("<li class='list-group-item'>" + e + "</li>");
-				}
-			}
-		})
-		.error(function() {
-			spawnNotification('error', "Konnte Liste von Effekten nicht abrufen.");
-		});
-	}
-	refreshList();
-</script>
+<script src="/dist/bass/effects.js"></script>

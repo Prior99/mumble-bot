@@ -63,7 +63,7 @@ module.exports = function(Database) {
 	 * @param callback - Called when the details are retrieved.
 	 */
 	Database.prototype.getUserById = function(id, callback) {
-		this.pool.query("SELECT u.minecraft AS minecraft, u.id AS id, u.username as username, u.password AS password, i.identifier AS identifier, u.steamid AS steamid FROM Users u LEFT JOIN Identifiers i ON u.identifier = i.id WHERE u.id = ?",
+		this.pool.query("SELECT u.minecraft AS minecraft, u.id AS id, u.username as username, i.identifier AS identifier, u.steamid AS steamid FROM Users u LEFT JOIN Identifiers i ON u.identifier = i.id WHERE u.id = ?",
 			[id], function(err, rows) {
 				if(this._checkError(err, callback)) {
 					var user = rows[0];
@@ -181,7 +181,7 @@ module.exports = function(Database) {
 	 * @param callback - Called after the query was done.
 	 */
 	Database.prototype.listUsers = function(callback) {
-		this.pool.query("SELECT u.minecraft AS minecraft, u.id AS id, u.username as username, u.password AS password, i.identifier AS identifier, u.steamid AS steamid FROM Users u LEFT JOIN Identifiers i ON u.identifier = i.id ORDER BY u.username DESC",
+		this.pool.query("SELECT u.minecraft AS minecraft, u.id AS id, u.username as username, i.identifier AS identifier, u.steamid AS steamid FROM Users u LEFT JOIN Identifiers i ON u.identifier = i.id ORDER BY u.username DESC",
 			function(err, rows) {
 				if(this._checkError(err, callback)) {
 					callback(null, rows);

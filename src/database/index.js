@@ -50,6 +50,27 @@ require("./sounds.js")(Database);
 require("./records.js")(Database);
 require("./settings.js")(Database);
 require("./log.js")(Database);
+require("./rss.js")(Database);
+require("./dialogs.js")(Database);
+require("./userstats.js")(Database);
+
+/**
+ * Executes the query and checks for errors.
+ * If an error occured, then throw it, of use callback (if supplied).
+ * If no error occured, then continue with callback, or, if a dedicated
+ * success handler has been passed, use that one.
+ */
+Database.prototype.queryAndCheck = function(query, params, callErr, callSucc) {
+	this.pool.query(query, params, function(err, result) {
+		if(err) {
+			if(callErr) { callErr(err); }
+			else { throw err; }
+		}
+		else if(callSucc) {	callSucc(null, result);	}
+		else if(callErr) { callErr(null, result); }
+
+	}.bind(this));
+};
 
 Database.prototype._checkError = function(err, callback) {
 	if(err) {

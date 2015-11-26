@@ -3,7 +3,8 @@ var FS = require('fs');
 
 module.exports = function(bot) {
 	return function(req, res) {
-		if(req.query.id && req.query.quote) {
+		if(req.query.id && req.query.quote && req.query.labels) {
+			var labels = JSON.parse(req.query.labels);
 			var sound = bot.getCachedAudioById(req.query.id);
 			var quote = req.query.quote;
 				try {
@@ -14,7 +15,7 @@ module.exports = function(bot) {
 						throw e;
 					}
 				}
-			bot.database.addRecord(quote, sound.user, sound.date, function(err, id) {
+			bot.database.addRecord(quote, sound.user, sound.date, labels, function(err, id) {
 				if(err) {
 					Winston.error("Could not add record to database.", err);
 					res.status(500).send({

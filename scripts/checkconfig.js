@@ -14,12 +14,13 @@ check("name", config);
 //check("cert", config);
 check("channel", config);
 check("afkChannel", config);
-check("kickChannel", config);
+//check("kickChannel", config);
 check("website", config);
 check("database", config);
 check("webpageurl", config);
 check("afkWarnTimeout", config);
 check("afkTimeout", config);
+check("rssFetchInterval", config);
 
 if(config.mpd) {
 	//check("fifo", config.mpd);

@@ -11,6 +11,10 @@ var EventEmitter = require("events").EventEmitter;
 var Winston = require("winston");
 var GoogleTTS = require("./googletranslatetts");
 var BingTTS = require("./bingtranslatetts");
+var ResponsiveTTS = require("./responsivetts");
+var Sox = require("sox-audio");
+var PassThroughStream = require('stream').PassThrough;
+var FS = require("fs");
 
 /*
  * Code
@@ -39,8 +43,36 @@ var Speech = function(stream, espeakData, channel, database, bot) {
 		gap: 1.5
 	}, espeakData);
 	ESpeak.onVoice(this._onESpeakData.bind(this));
-	this.stream = stream;
+
+	this.stream = new PassThroughStream();
+	this._sox = new Sox(this.stream)
+		.inputSampleRate('48k')
+		.inputBits(16)
+		.inputChannels(1)
+		.inputFileType('raw')
+		.inputEncoding('signed')
+	var output = this._sox.output(stream)
+		.outputSampleRate('48k')
+		.outputEncoding('signed')
+		.outputBits(16)
+		.outputChannels(1)
+		.outputFileType('raw');
+	if(bot.options.audioEffects) {
+		bot.options.audioEffects.forEach(function(effect) {
+			output.addEffect(effect.effect, effect.options);
+			Winston.info("Adding sox effect to output: " + effect.effect + ", " + effect.options.join(" "));
+		});
+	}
+	this._sox.run();
 	this.engine = "google";
+	if(bot.options.responsiveTTS) {
+		this._responsiveEngine = ResponsiveTTS(database);
+		this._responsiveEngine.on('data', this._onTTSData.bind(this));
+		this._responsiveEngine.on('speechDone', function() {
+			this._speakingStopped();
+		}.bind(this));
+		this.engine = "responsive";
+	}
 	if(bot.options.bingTTS) {
 		this._bingEngine = BingTTS(bot.options.bingTTS.clientID, bot.options.bingTTS.clientSecret, database);
 		this._bingEngine.on('data', this._onTTSData.bind(this));
@@ -154,7 +186,9 @@ Speech.prototype.changeGender = function() {
 	else {
 		this.gender = "male";
 	}
-	this._bingEngine.setGender(this.gender);
+	if(this._bingEngine) {
+		this._bingEngine.setGender(this.gender);
+	}
 	ESpeak.setGender(this.gender);
 };
 
@@ -170,6 +204,11 @@ Speech.prototype.speakUsingESpeak = function(text) {
 Speech.prototype._onGoogleTTSError = function(err, text) {
 	Winston.error("Received error from google tts. Using ESpeak instead. " + err);
 	this.speakUsingESpeak(text);
+};
+
+Speech.prototype._onResponsiveTTSError = function(err, text) {
+	Winston.error("Received error from responsive tts. Using Google instead. " + err);
+	this.speakUsingGoogle(text);
 };
 
 Speech.prototype._onBingTTSError = function(err, text) {
@@ -188,6 +227,15 @@ Speech.prototype.speakUsingGoogle = function(text) {
 		this._onGoogleTTSError(err, text);
 	}.bind(this));
 	this._googleEngine.tts(text);
+};
+
+Speech.prototype.speakUsingResponsive = function(text) {
+	this._currentEngine = this._responsiveEngine;
+	this._responsiveEngine.removeAllListeners('error'); //TODO: This is a nasty dirty piece of shit code line
+	this._responsiveEngine.on('error', function(err) {
+		this._responsiveTTSError(err, text);
+	}.bind(this));
+	this._responsiveEngine.tts(text);
 };
 
 Speech.prototype.speakUsingBing = function(text) {
@@ -211,8 +259,13 @@ Speech.prototype._next = function() {
 		else if(this.engine == "bing") {
 			this.speakUsingBing(this.current.text);
 		}
+		else if(this.engine == "responsive") {
+			this.speakUsingResponsive(this.current.text);
+		}
 		Winston.info("Speaking:\"" + this.current.text + "\"");
-		this.channel.sendMessage(this.current.text);
+		if(this.current.print) {
+			this.channel.sendMessage(this.current.text);
+		}
 	}
 };
 

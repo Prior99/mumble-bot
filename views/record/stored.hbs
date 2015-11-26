@@ -1,22 +1,93 @@
-<h1>Gespeicherte Aufnahmen</h1>
-<table class="table-responsive table-striped tablesorter">
-	<thead>
-		<th>Benutzer</th>
-		<th>Zeitpunkt</th>
-		<th>Text</th>
-		<th>Benutzt</th>
-		<th class="no-sort"></th>
-	</thead>
-	<tbody>
-		{{#each records}}
-		<tr>
-			<td><a href="/users/profile/{{this.user.username}}">{{user.username}}</a></td>
-			<td>{{formatDate submitted}}</td>
-			<td>{{quote}}</td>
-			<td>{{used}}</td>
-			<td><a recordId="{{this.id}}" class="playrecord quote-btn btn btn-xs btn-success"><span class="fa fa-volume-down" aria-hidden="true"></span> Play</a></td>
-		</tr>
-		{{/each}}
-	</tbody>
-</table>
-<script src="/js/playrecord.js"></script>
+<script id="template-list" type="text/x-handlebars-template">
+\{{#each records}}
+	<tr>
+		<td width="20" style="border-right: 1px solid #EEE;">
+			<p class="text-center"><a class="username" userName="\{{user.username}}">\{{user.username}}</a></p>
+			<p class="text-nowrap text-center"><small>\{{formatDate submitted}} \{{formatTime submitted}}</small></p>
+		</td>
+		<td>
+			<p>\{{quote}}</p>
+			<p>
+			\{{#each labels}}
+				<a class="label" style="background: \{{colorify this.name}};" tagName="\{{this.name}}">\{{this.name}}</a>
+			\{{/each}}
+			</p>
+		</td>
+		<td width="5">
+			<div class="btn-group-vertical buttons" role="group">
+				<a recordId="\{{id}}" class="playrecord quote-btn btn btn-xs btn-success"> <i class="fa fa-volume-down" aria-hidden="true"></i> </a>
+				<a href="/api/record/download?id=\{{id}}" class="quote-btn btn btn-xs btn-info"> <i class="fa fa-download" aria-hidden="true"></i> </a>
+				<a href="/record/edit/?id=\{{id}}" class="quote-btn btn btn-xs btn-warning"> <i class="fa fa-edit" aria-hidden="true"></i> </a>
+			</div>
+		</td>
+		<td width="5" style="border-left: 1px solid #EEE;"><strong>\{{used}}</strong></td>
+	</tr>
+\{{/each}}
+</script>
+<script id="template-pageination" type="text/x-handlebars-template">
+\{{#paginate pagination type="previous"}}
+	<li \{{#if disabled}}class="disabled"\{{/if}}>
+		<a class="pageinate" pageNumber="\{{n}}"><span aria-hidden="true">&laquo;</span></a>
+	</li>
+\{{/paginate}}
+\{{#paginate pagination type="middle" limit="10"}}
+	<li \{{#if active}}class="active"\{{/if}}>
+		<a class="pageinate" pageNumber="\{{n}}">\{{n}}</a>
+	</li>
+\{{/paginate}}
+\{{#paginate pagination type="next"}}
+	<li \{{#if disabled}}class="disabled"\{{/if}}>
+		<a class="pageinate" pageNumber="\{{n}}"><span aria-hidden="true">&raquo;</span></a>
+	</li>
+\{{/paginate}}
+</script>
+<div id="loading">
+	<div class="icon">
+		<i class="fa fa-spin fa-cog"></i>
+	</div>
+	<div class="description">
+		<p>Liste von Aufnahmen wird geladen...</p>
+	</div>
+</div>
+<div id="records">
+	<h1>Gespeicherte Aufnahmen</h1>
+	<p>Im folgenden Feld kann nach Aufnahmen gesucht werden.
+		Es kann mit <b>tag:tagname</b> nach eine bestimmten Tag und mit <b>user:username</b> nach einem bestimmten Benutzer gesucht werden.</p>
+	<input type="text" class="form-control" placeholder="Suchen..." id="search">
+	<h2>Suchergebnisse</h2>
+	<div class=row>
+		<div class="col-md-8">
+			<ul style="margin : 0;" class="pagination" id="pagination">
+			</ul>
+		</div>
+		<div class="col-md-4">
+			<div class="btn-group">
+				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					Sortieren <i class="fa fa-caret-down"></i>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a sortType="time" sortOrder="asc" class="recordsort"><i class="fa fa-sort-numeric-asc"></i> Zeitpunkt</a></li>
+					<li><a sortType="time" sortOrder="desc" class="recordsort"><i class="fa fa-sort-numeric-desc"></i> Zeitpunkt</a></li>
+					<li role="separator" class="divider"></li>
+					<li><a sortType="amount" sortOrder="asc" class="recordsort"><i class="fa fa-sort-amount-asc"></i> Aufrufe</a></li>
+					<li><a sortType="amount" sortOrder="desc" class="recordsort"><i class="fa fa-sort-amount-desc"></i> Aufrufe</a></li>
+					<li role="separator" class="divider"></li>
+					<li><a sortType="user" sortOrder="asc" class="recordsort"><i class="fa fa-sort-alpha-asc"></i> Benutzer</a></li>
+					<li><a sortType="user" sortOrder="desc" class="recordsort"><i class="fa fa-sort-alpha-desc"></i> Benutzer</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<table class="table table-responsive table-striped">
+		<thead>
+			<th>Benutzer</th>
+			<th>Text</th>
+			<th><i class="fa fa-hand-spock-o"></i></th>
+			<th><i class="fa fa-repeat"></i></th>
+		</thead>
+		<tbody id="recordsTable">
+
+		</tbody>
+	</table>
+</div>
+<script src="/dist/record/stored.js"></script>

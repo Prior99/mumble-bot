@@ -4,8 +4,4 @@
 <p>Es können <a href="/quotes/add/">neue Zitate eingetragen werden</a> oder <a href="/quotes/list/">eine Liste aller Zitate abgerufen werden</a>, die dann wiedergegeben werden können.</p>
 <br>
 <a class="btn btn-ld btn-default" id="speak"><span class="fa fa-comment" aria-hidden="true"></span> Zufälliges Zitat Wiedergeben</a>
-<script>
-$("#speak").click(function() {
-	$.ajax("/api/quotes/speak");
-});
-</script>
+<script src="/dist/quotes/home.js"></script>

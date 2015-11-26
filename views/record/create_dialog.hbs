@@ -1,0 +1,76 @@
+<h1>Dialog erstellen</h1>
+<p>Hier kannst du aus den bereits gespeicherten Aufnahmen einen dialog zusammenstellen und Sinn entfremden.</p>
+
+<script id="template-dialog" type="text/x-handlebars-template">
+	\{{#each dialog}}
+	<tr>
+		<td>\{{plusOne @index}}</td>
+		<td><a href="/users/profile/\{{record.user.username}}">\{{user.username}}</a></td>
+		<td>\{{quote}}</td>
+		<td><a index="\{{@index}}" class="remrecord btn btn-xs btn-danger"><i class="fa fa-minus"></i></a></td>
+		<td>
+			<div class="btn-group">
+				<a index="\{{@index}}" class="uprecord btn btn-xs btn-default" \{{#ifFirst @index}}disabled\{{/ifFirst}}><i class="fa fa-arrow-up"></i></a>
+				<a index="\{{@index}}" class="downrecord btn btn-xs btn-default" \{{#ifLast @index}}disabled\{{/ifLast}}><i class="fa fa-arrow-down"></i></a>
+			</div>
+		</td>
+	</tr>
+	\{{/each}}
+</script>
+
+<script id="template-record-suggestions" type="text/x-handlebars-template">
+	\{{#each suggestions}}
+	<tr>
+		<td><a href="/users/profile/\{{user.username}}">\{{user.username}}</a></td>
+		<td>\{{quote}}</td>
+		<td><a recordId="\{{id}}" class="addrecord btn btn-xs btn-success"><i class="fa fa-plus"></i></a></td>
+		<td><a recordId="\{{id}}" class="playrecord btn btn-xs btn-default"><i class="fa fa-volume-down"></i></a></td>
+	</tr>
+	\{{/each}}
+</script>
+
+<h2>Dein Dialog</h2>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>User</th>
+			<th>Text</th>
+			<th></th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody id="table">
+	</tbody>
+</table>
+<form id="save">
+	<span class="input-group-btn">
+		<input class="btn btn-default" type="submit" value="Speichern">
+	</span>
+</form>
+
+<h2>Zitatsuche</h2>
+<form id="search">
+	<div class="input-group">
+		<span class="input-group-addon" id="sizing-addon2"><i class="fa fa-comment"></i></span>
+		<input type="text" class="form-control typeahead" placeholder="Kontextphallus" id="input">
+		<span class="input-group-btn">
+			<input class="btn btn-default" type="submit" value="Suchen">
+		</span>
+	</div>
+</form>
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>User</th>
+			<th>Text</th>
+			<th>Add</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody id="results">
+	</tbody>
+</table>
+
+<script src="/dist/record/create_dialog.js"></script>
