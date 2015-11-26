@@ -33,19 +33,21 @@ if(url.substr(-1) === '/') {
 var ws = new WebSocket(url);
 
 function refreshList() {
-	$("#cachedtable").html(ListTemplate({
-		cached : list.sort(function(a, b) {
-			if(a.protected && !b.protected) {
-				return -1;
-			}
-			else if(!a.protected && b.protected) {
-				return 1;
-			}
-			else {
-				return new Date(b.date) - new Date(a.date);
-			}
-		})
-	}));
+	if(!paused) {
+		$("#cachedtable").html(ListTemplate({
+			cached : list.sort(function(a, b) {
+				if(a.protected && !b.protected) {
+					return -1;
+				}
+				else if(!a.protected && b.protected) {
+					return 1;
+				}
+				else {
+					return new Date(b.date) - new Date(a.date);
+				}
+			})
+		}));
+	}
 }
 
 function init(obj) {
@@ -77,6 +79,21 @@ function protect(id) {
 	refreshList();
 }
 
+var paused = false;
+
+function pause() {
+	paused = true;
+	$(".pauseicon").find("i").removeClass("fa-play");
+	$(".pauseicon").find("i").addClass("fa-pause");
+}
+
+function unpause() {
+	paused = false;
+	$(".pauseicon").find("i").removeClass("fa-pause");
+	$(".pauseicon").find("i").addClass("fa-play");
+	refreshList();
+}
+
 ws.onmessage = function(msg) {
 	var obj = JSON.parse(msg.data);
 	if(obj.type === 'init') {
@@ -95,6 +112,14 @@ ws.onmessage = function(msg) {
 		console.error("Received packet of invalid type", obj);
 	}
 };
+
+$("#cachedtable").mouseenter(function() {
+	pause();
+});
+
+$("#cachedtable").mouseleave(function() {
+	unpause();
+});
 
 ws.onopen = function() {
 	$("#description").html("Warte auf Liste von Aufnahmen...");
