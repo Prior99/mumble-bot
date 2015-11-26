@@ -19,13 +19,6 @@
 		.scale(x)
 		.orient("bottom");
 
-	var yAxis = d3.svg.axis()
-		.scale(y)
-		.orient("left")
-		.ticks(d3.time.hours, 2)
-		.tickFormat(function(d) {
-			return Math.round((d / (1000 * 60 * 60)) * 100) / 100 + "h";
-		});
 	var chart = d3.select("#chart")
 		.append("g")
 			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -37,6 +30,16 @@
 		if(err) {
 			throw err;
 		}
+
+		var yAxis = d3.svg.axis()
+			.scale(y)
+			.orient("left")
+			.ticks(d3.time.hours, Math.round((d3.max(data, function(d) {
+				return new Date(d.amount);
+			}).getTime() / (1000 * 60 * 60)) / 10))
+			.tickFormat(function(d) {
+				return Math.round((d / (1000 * 60 * 60)) * 100) / 100 + "h";
+			});
 		x.domain(data.map(function(d) {
 			return d.user;
 		}));
