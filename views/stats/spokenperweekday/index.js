@@ -34,7 +34,7 @@
 		g.append("path")
 			.attr("d", d3.svg.arc()
 				.outerRadius(function(d, i) {
-					return (d.data.amount/maxDate) * maxRadius * 0.7 + maxRadius * 0.3;
+					return (d.data.amount/maxDate) * maxRadius * 0.6 + maxRadius * 0.3;
 				})
 				.innerRadius(maxRadius * 0.3))
 			.style("fill", "#3182BD");
@@ -49,5 +49,21 @@
 			.text(function(d, i) {
 				return d.data.day;
 			});
+		g.append("text")
+			.attr("transform", function(d, i) {
+				d.innerRadius = (d.data.amount/maxDate) * maxRadius * 0.6 + maxRadius * 0.3;
+				d.outerRadius = (d.data.amount/maxDate + 0.1) * maxRadius * 0.6 + maxRadius * 0.3;
+				d.innerRadius = Math.max(d.innerRadius, maxRadius * 0.3);
+				d.outerRadius = Math.max(d.outerRadius, maxRadius * 0.4);
+				return "translate(" + d3.svg.arc().centroid(d) + "), rotate(" + (360 * (d.data.num / 7) + (360 / 7) / 2) + ")";
+			})
+			.style("fill", "#FD8D3C")
+			.style("font", "12px sans-serif")
+			.style("font-weight", "bold")
+			.attr("text-anchor", "middle")
+			.text(function(d, i) {
+				return Math.round((d.data.amount / (1000 * 60 * 60)) * 10) / 10 + "h";
+			})
+			.attr("class", "radius-value");
 	});
 })();
