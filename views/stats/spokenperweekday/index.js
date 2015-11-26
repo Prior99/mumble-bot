@@ -10,7 +10,7 @@
 		.value(function(d) {
 			return 1;
 		});
-	var perUserPie = d3.select("#chart")
+	var chartPie = d3.select("#chart")
 		.append("g")
 		.attr("transform", "translate(" + (width / 2) + "," + (height / 2) + ")");
 	d3.json('/api/stats/spokenperweekday', function(err, data) {
@@ -24,7 +24,7 @@
 			data[i].num = i;
 			data[i].amount = new Date(data[i].amount).getTime();
 		}
-		var d = perUserPie.append("g")
+		var d = chartPie.append("g")
 			.attr("class", "dat");
 		var g = d.selectAll(".arc")
 			.data(pie(data))
