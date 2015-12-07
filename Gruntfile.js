@@ -76,12 +76,19 @@ module.exports = function(grunt) {
 					"dist/bundle.css": "style/*.less"
 				}
 			}
+		},
+		eslint: {
+			options: {
+				configFile: 'eslint.json'
+			},
+			target: ['src/**/*.js', 'views/**/*.js']
 		}
 	});
 
+	grunt.loadNpmTasks('grunt-eslint');
 	grunt.loadNpmTasks('grunt-browserify');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-less');
 
-	grunt.registerTask("default", ["browserify", "less"]);
+	grunt.registerTask("default", ["eslint", "browserify", "less"]);
 };

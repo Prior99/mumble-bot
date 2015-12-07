@@ -34,6 +34,7 @@
     "grunt-cli": "^0.1.13",
     "grunt-contrib-less": "^1.0.1",
     "grunt-contrib-watch": "^0.6.1",
+    "grunt-eslint": "^17.3.1",
     "handlebars": "^4.0.4",
     "handlebars-paginate": "^0.1.0",
     "html-entities": "^1.1.3",
