@@ -8,7 +8,7 @@ import * as spawnNotification from "../notification";
  * @param {Number} user - The id of the user to revoke the permission from.
  * @return {undefined}
  */
-function revoke(checkbox, user) {
+const revoke = function(checkbox, user) {
 	$.ajax("/api/users/revokePermission?user=" + user + "&permission=" + checkbox.attr("permission"))
 	.done((res) => {
 		if(res.okay) {
@@ -29,7 +29,7 @@ function revoke(checkbox, user) {
  * @param {Number} user - The id of the user to grant the permission to.
  * @return {undefined}
  */
-function grant(checkbox, user) {
+const grant = function(checkbox, user) {
 	$.ajax("/api/users/grantPermission?user=" + user + "&permission=" + checkbox.attr("permission"))
 	.done((res) => {
 		if(res.okay) {
