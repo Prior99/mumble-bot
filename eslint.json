@@ -39,7 +39,7 @@
 		"guard-for-in": 1,
 		"prefer-spread": 1,
 		"arrow-body-style": 2,
-		"const": 1,
+		"prefer-const": 1,
 		"no-undef-init": 2,
 		"no-new-wrappers": 1,
 		"require-yield": 1,
