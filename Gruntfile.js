@@ -48,7 +48,11 @@ module.exports = function(grunt) {
 				},
 				options: {
 					transform: [
-						["babelify", { "presets": [ "es2015" ],  plugins : ["transform-runtime"]}]
+						["babelify", {
+							"presets": [ "es2015" ],
+							"plugins" : [],
+							"compact": false
+						}]
 					],
 					exclude : ["grunt", "grunt-browserify", "mumble",
 						"array.prototype.find", "cheerio", "express",
@@ -57,10 +61,12 @@ module.exports = function(grunt) {
 						"mineflayer", "multer", "musicmetadata", "mysql",
 						"node-espeak", "node-mpd", "node-samplerate", "prompt",
 						"request", "session-file-store", "sox-audio", "steam",
-						"wav", "winston", "winston-mysql-transport", "youtube-dl"],
-					browserifyOptions: {
-						debug: true
-					}
+						"wav", "winston", "winston-mysql-transport", "youtube-dl"]
+				}
+			},
+			options: {
+				browserifyOptions: {
+					debug: true
 				}
 			}
 		},

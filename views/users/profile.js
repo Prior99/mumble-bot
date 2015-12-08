@@ -1,12 +1,12 @@
-var $ = require("jquery");
-var spawnNotification = require("../notification");
+import $ from "jquery";
+import * as spawnNotification from "../notification";
 
-$("a.playrecord").click(function() {
-	var id = $(this).attr('recordId');
-	$.ajax("/api/record/play?id=" + id).done(function(res) {
-		spawnNotification('success', "Aufnahme erfolgreich wiedergegeben.");
+$("a.playrecord").click(() => {
+	const id = $(this).attr("recordId");
+	$.ajax("/api/record/play?id=" + id).done((res) => {
+		spawnNotification("success", "Aufnahme erfolgreich wiedergegeben.");
 	})
-	.error(function() {
-		spawnNotification('error', "Konnte Aufnahme nicht abspielen.");
+	.error(() => {
+		spawnNotification("error", "Konnte Aufnahme nicht abspielen.");
 	});
 });
