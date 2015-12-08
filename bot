@@ -190,7 +190,7 @@ function start {
 	echo -e "\033[32mStarting bot now.\033[0m"
 	echo
 
-	node index.js
+	node server
 }
 
 case $1 in

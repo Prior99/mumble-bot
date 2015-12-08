@@ -2,8 +2,8 @@
  * Imports
  */
 require('array.prototype.find');
-var Mumble = require("mumble");
-var Bot = require("./src");
+import Mumble from "mumble";
+import Bot from "./src";
 var Winston = require('winston');
 var FS = require('fs');
 var Database = require("./src/database");
@@ -46,7 +46,7 @@ Winston.add(Winston.transports.File, {
 /*
  * Code
  */
-var options = require("./config.json");
+var options = require("../config.json");
 
 var mumbleOptions = {};
 

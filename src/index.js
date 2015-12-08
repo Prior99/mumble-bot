@@ -2,7 +2,7 @@
  * Imports
  */
 var Util = require("util");
-var Input = require("./input");
+import Input from "./input";
 var Command = require("./command");
 var Output = require("./output");
 var Music = require("./music");
@@ -360,21 +360,21 @@ Bot.prototype.stopPipingUser = function() {
  * @param method - Method which will be executed when the command was called
  * @param {string} description - Description of the command as displayed on the website
  * @param {string} icon - [Name of a Fontawesome-icon to display.](http://fortawesome.github.io/Font-Awesome/icons/)
- * @param {string[]} arguments - (Optional) Array of possible arguments.
+ * @param {string[]} args - (Optional) Array of possible arguments.
  * @param {string} permission - (Optional) permission needed to execute this command.
  */
-Bot.prototype.newCommand = function(commandName, method, description, icon, arguments, permission) {
-	if(!arguments) {
-		arguments = [];
+Bot.prototype.newCommand = function(commandName, method, description, icon, args, permission) {
+	if(!args) {
+		args = [];
 	}
-	this.command.newCommand(commandName, method, arguments, permission);
+	this.command.newCommand(commandName, method, args, permission);
 	this.commands.push({
 		name : commandName,
 		description : description,
 		icon : icon,
-		arguments : arguments,
+		arguments : args,
 		permission : permission,
-		hasArguments : arguments.length > 0
+		hasArguments : args.length > 0
 	});
 };
 

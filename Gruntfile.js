@@ -82,13 +82,28 @@ module.exports = function(grunt) {
 				configFile: 'eslint.json'
 			},
 			target: ['src/**/*.js', 'views/**/*.js']
+		},
+		babel: {
+			options: {
+				sourceMap: true,
+				presets: ['babel-preset-es2015']
+			},
+			dist: {
+				files: [{
+					expand: true,
+					src: ['src/**/*.js', 'index.js'],
+					dest: 'server',
+					ext: '.js'
+				}]
+			}
 		}
 	});
 
 	grunt.loadNpmTasks('grunt-eslint');
+	grunt.loadNpmTasks('grunt-babel');
 	grunt.loadNpmTasks('grunt-browserify');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-less');
 
-	grunt.registerTask("default", ["eslint", "browserify", "less"]);
+	grunt.registerTask("default", ["eslint", "babel", "browserify", "less"]);
 };

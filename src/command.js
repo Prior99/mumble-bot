@@ -56,18 +56,18 @@ Command.prototype.process = function(text, via, user) {
 		if(key === text.substring(0, key.length)) {
 			text = text.substring(key.length + 1, text.length);
 			var method = this.commands[key];
-			var arguments;
+			var args;
 			if(text.length == 0) {
-				arguments = [];
+				args = [];
 			}
 			else {
-				arguments = text.split(" ");
+				args = text.split(" ");
 			}
 			if(typeof method === "function") {
-				this._logCommand(key, arguments, via, user);
-				arguments.unshift(via);
-				arguments.unshift(user);
-				method.apply(this, arguments);
+				this._logCommand(key, args, via, user);
+				args.unshift(via);
+				args.unshift(user);
+				method.apply(this, args);
 			}
 			found = true;
 			break;
@@ -78,7 +78,7 @@ Command.prototype.process = function(text, via, user) {
 	}
 };
 
-Command.prototype._logCommand = function(command, arguments, via, user) {
+Command.prototype._logCommand = function(command, args, via, user) {
 	var username;
 	if(user) {
 		username = user.username;
@@ -88,8 +88,8 @@ Command.prototype._logCommand = function(command, arguments, via, user) {
 	}
 	Winston.info("Issued command by user \"" + username +
 		"\" via " + via +
-		": \"" + command + (arguments.length > 0 ? " " : "") +
-		arguments.join(" ") + "\""
+		": \"" + command + (args.length > 0 ? " " : "") +
+		args.join(" ") + "\""
 	);
 };
 
@@ -100,11 +100,11 @@ Command.prototype._logCommand = function(command, arguments, via, user) {
  * @param {string[]} arguments - (Optional) Array of possible arguments.
  * @param {string} permission - (Optional) Permission needed to execute this command.
  */
-Command.prototype.newCommand = function(name, command, arguments, permission) {
+Command.prototype.newCommand = function(name, command, args, permission) {
 	if(permission) {
 		this.commands[name] = function(user, via, arg) {
 			if(via == 'terminal') {
-				command.apply(this, arguments);
+				command.apply(this, args);
 			}
 			else if(!user) {
 				Winston.warn("Unknown user tried to execute command \"" + name + "\" which needs permission \"" + permission + "\".");
