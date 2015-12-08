@@ -47,6 +47,9 @@ module.exports = function(grunt) {
 						"node_modules/tablesorter/dist/js/jquery.tablesorter.widgets.min.js"],
 				},
 				options: {
+					transform: [
+						["babelify", { "presets": [ "es2015" ],  plugins : ["transform-runtime"]}]
+					],
 					exclude : ["grunt", "grunt-browserify", "mumble",
 						"array.prototype.find", "cheerio", "express",
 						"express-handlebars", "express-session", "feed-read",
