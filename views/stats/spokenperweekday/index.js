@@ -10,7 +10,7 @@ const marginSize = 0.3;
 const textMarginSize = 0.2;
 const daysPerWeek = 7;
 const maxDegree = 360;
-const secondsPerHour = 3600000;
+const millisecondsPerHour = 3600000;
 const outerTextMarginSize = 0.4;
 const outerTextPaddingSize = 0.1;
 
@@ -67,6 +67,6 @@ d3.json("/api/stats/spokenperweekday", (err, data) => {
 		.style("font", "12px sans-serif")
 		.style("font-weight", "bold")
 		.attr("text-anchor", "middle")
-		.text((d, i) => Math.round((d.data.amount / secondsPerHour) * 10) / 10 + "h")
+		.text((d, i) => Math.round((d.data.amount / millisecondsPerHour) * 10) / 10 + "h")
 		.attr("class", "radius-value");
 });
