@@ -44,7 +44,7 @@ module.exports = function(grunt) {
 
 					"dist/bundle.js": ["views/index.js",
 						"node_modules/tablesorter/dist/js/jquery.tablesorter.min.js",
-						"node_modules/tablesorter/dist/js/jquery.tablesorter.widgets.min.js"],
+						"node_modules/tablesorter/dist/js/jquery.tablesorter.widgets.min.js"]
 				},
 				options: {
 					transform: [
@@ -72,12 +72,12 @@ module.exports = function(grunt) {
 		},
 		watch: {
 			scripts: {
-				files: ['style/**/*.less', 'views/**/*', 'Gruntfile.js'],
-				tasks: ['default'],
+				files: ["style/**/*.less", "views/**/*", "Gruntfile.js"],
+				tasks: ["default"],
 				options: {
-					spawn: false,
-				},
-			},
+					spawn: false
+				}
+			}
 		},
 		less: {
 			development: {
@@ -88,31 +88,31 @@ module.exports = function(grunt) {
 		},
 		eslint: {
 			options: {
-				configFile: 'eslint.json'
+				configFile: ".eslintrc"
 			},
-			target: ['src/**/*.js', 'views/**/*.js']
+			target: ["src/**/*.js", "views/**/*.js"]
 		},
 		babel: {
 			options: {
 				sourceMap: true,
-				presets: ['babel-preset-es2015']
+				presets: ["babel-preset-es2015"]
 			},
 			dist: {
 				files: [{
 					expand: true,
-					src: ['src/**/*.js', 'index.js'],
-					dest: 'server',
-					ext: '.js'
+					src: ["src/**/*.js", "index.js"],
+					dest: "server",
+					ext: ".js"
 				}]
 			}
 		}
 	});
 
-	grunt.loadNpmTasks('grunt-eslint');
-	grunt.loadNpmTasks('grunt-babel');
-	grunt.loadNpmTasks('grunt-browserify');
-	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('grunt-contrib-less');
+	grunt.loadNpmTasks("grunt-eslint");
+	grunt.loadNpmTasks("grunt-babel");
+	grunt.loadNpmTasks("grunt-browserify");
+	grunt.loadNpmTasks("grunt-contrib-watch");
+	grunt.loadNpmTasks("grunt-contrib-less");
 
 	grunt.registerTask("default", ["eslint", "babel", "browserify", "less"]);
 };
