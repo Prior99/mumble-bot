@@ -47,6 +47,34 @@ const saveHandler = function(e) {
 }
 
 /**
+ * Refresh the table with the search results. Recompile the template with the new results and
+ * update the view.
+ * @return {undefined}
+ */
+const updateSearchResults = function() {
+	$.ajax("/api/record/lookup?text=" + encodeURI($("#input").val()))
+	.done((res) => {
+		$("#results").html(SuggestionsTemplate({
+			suggestions : res.suggestions
+		}));
+	})
+	.error((res) => {
+		spawnNotification("error", "Konnte Suchergebnisse nicht laden.");
+	});
+}
+
+/**
+ * Refresh the table with the current dialog. Recompile the template with the new entries and
+ * update the view.
+ * @return {undefined}
+ */
+const refreshDialog = function() {
+	$("#table").html(DialogTemplate({
+		dialog : currentDialog
+	}));
+}
+
+/**
  * Handler called when the search should update.
  * @param {event} e - Event from the caller.
  * @return {undefined}
@@ -56,78 +84,82 @@ const searchHandler = function(e) {
 	updateSearchResults();
 }
 
-function addrecord(e) {
-	const id = $(this).attr('recordId');
+/**
+ * Add a record to the current dialog.
+ * @param {event} e - Event from the caller.
+ * @return {undefined}
+ */
+const addrecord = function(e) {
+	const id = $(e.currentTarget).attr("recordId");
 	$.ajax("/api/record/get?id=" + encodeURI(id))
 	.done((res) => {
 		currentDialog.push(res.record);
 		refreshDialog();
 	})
 	.error((res) => {
-		spawnNotification('error', "Konnte Info der ausgewählten Aufnahme nicht laden.");
+		spawnNotification("error", "Konnte Info der ausgewählten Aufnahme nicht laden.");
 	});
 }
 
-function remrecord(e) {
-	var index = $(this).attr('index');
+/**
+ * delete a record from the current dialog.
+ * @param {event} e - Event from the caller.
+ * @return {undefined}
+ */
+const remrecord = function(e) {
+	const index = $(e.currentTarget).attr("index");
 	currentDialog.splice(index, 1);
 	refreshDialog();
 }
 
-function uprecord(e) {
-	var index = +$(this).attr('index');
+/**
+ * Move a record up in the current dialog.
+ * @param {event} e - Event from the caller.
+ * @return {undefined}
+ */
+const uprecord = function(e) {
+	const index = +$(e.currentTarget).attr("index");
 	if(index > 0) {
-		var val1 = currentDialog[index];
-		var val2 = currentDialog[index - 1];
+		const val1 = currentDialog[index];
+		const val2 = currentDialog[index - 1];
 		currentDialog[index] = val2;
 		currentDialog[index - 1] = val1;
 		refreshDialog();
 	}
 }
 
-function downrecord(e) {
-	var index = +$(this).attr('index');
+/**
+ * Move a record down in the current dialog.
+ * @param {event} e - Event from the caller.
+ * @return {undefined}
+ */
+const downrecord = function(e) {
+	const index = +$(e.currentTarget).attr("index");
 	if(index < currentDialog.length - 1) {
-		var val1 = currentDialog[index];
-		var val2 = currentDialog[index + 1];
+		const val1 = currentDialog[index];
+		const val2 = currentDialog[index + 1];
 		currentDialog[index] = val2;
 		currentDialog[index + 1] = val1;
 		refreshDialog();
 	}
 }
 
-function refreshDialog() {
-	$("#table").html(DialogTemplate({
-		dialog : currentDialog
-	}));
+/**
+ * Playback a record.
+ * @param {event} e - Event from the caller.
+ * @return {undefined}
+ */
+const playrecord = function(e) {
+	const id = $(e.currentTarget).attr("recordId");
+	$.ajax("/api/record/play?id=" + id)
+		.done((res) => spawnNotification("success", "Aufnahme erfolgreich wiedergegeben."))
+		.error(() => spawnNotification("error", "Konnte Aufnahme nicht abspielen."));
 }
 
-function updateSearchResults() {
-	$.ajax("/api/record/lookup?text=" + encodeURI($("#input").val()))
-	.done(function(res) {
-		$("#results").html(SuggestionsTemplate({
-			suggestions : res.suggestions
-		}));
-	})
-	.error(function(res) {
-		spawnNotification('error', "Konnte Suchergebnisse nicht laden.");
-	});
-}
-
-function playrecord() {
-	var id = $(this).attr('recordId');
-	$.ajax("/api/record/play?id=" + id).done(function(res) {
-		spawnNotification('success', "Aufnahme erfolgreich wiedergegeben.");
-	})
-	.error(function() {
-		spawnNotification('error', "Konnte Aufnahme nicht abspielen.");
-	});
-}
-
-$(document).on('submit', '#save', saveHandler);
-$(document).on('submit', '#search', searchHandler);
-$(document).on('click', 'a.addrecord', addrecord);
-$(document).on('click', 'a.remrecord', remrecord);
-$(document).on('click', 'a.uprecord', uprecord);
-$(document).on('click', 'a.downrecord', downrecord);
-$(document).on('click', 'a.playrecord', playrecord);
+$(document).on("submit", "#save", saveHandler);
+$(document).on("submit", "#search", searchHandler);
+$(document).on("click", "a.addrecord", addrecord);
+$(document).on("click", "a.remrecord", remrecord);
+$(document).on("click", "a.uprecord", uprecord);
+$(document).on("click", "a.downrecord", downrecord);
+$(document).on("click", "a.playrecord", playrecord);
