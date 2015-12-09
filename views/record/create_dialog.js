@@ -1,67 +1,69 @@
-var $ = require("jquery");
-var spawnNotification = require("../notification");
-var Handlebars = require("handlebars");
+import $ from "jquery";
+import * as spawnNotification from "../notification";
+import Handlebars from "handlebars";
 
-var DialogTemplate = Handlebars.compile($("#template-dialog").html());
-var SuggestionsTemplate = Handlebars.compile($("#template-record-suggestions").html());
+const DialogTemplate = Handlebars.compile($("#template-dialog").html());
+const SuggestionsTemplate = Handlebars.compile($("#template-record-suggestions").html());
 
-var currentDialog = [];
+const currentDialog = [];
 
-Handlebars.registerHelper("plusOne", function(i) {
-	return i + 1;
+Handlebars.registerHelper("plusOne", (i) => i + 1);
+Handlebars.registerHelper("ifFirst", (i, block) => {
+	if(i === 0) {
+		return block.fn(this);
+	}
 });
-
-Handlebars.registerHelper("ifFirst", function(i, block) {
-	if(i == 0) {
+Handlebars.registerHelper("ifLast", (i, block) => {
+	if(i === currentDialog.length - 1) {
 		return block.fn(this);
 	}
 });
 
-Handlebars.registerHelper("ifLast", function(i, block) {
-	if(i == currentDialog.length - 1) {
-		return block.fn(this);
-	}
-});
-
-function saveHandler(e) {
+/**
+ * Handle for the save event.
+ * @param {event} e - Event emitted from the caller.
+ * @return {undefined}
+ */
+const saveHandler = function(e) {
 	e.preventDefault();
 
 	if(currentDialog.length < 2) {
-		spawnNotification('error', "Dialog ist zu kurz.");
+		spawnNotification("error", "Dialog ist zu kurz.");
 		return;
 	}
 
-	var ids = currentDialog.map(function(record) {
-		return record.id;
-	});
-
-	var jsonIDs = encodeURI(JSON.stringify(ids));
+	const ids = currentDialog.map((record) => record.id);
+	const jsonIDs = encodeURI(JSON.stringify(ids));
 	$.ajax("/api/record/save_dialog?dialog=" + jsonIDs)
-	.done(function(res) {
+	.done((res) => {
 		if(res.okay) {
-			spawnNotification('success', "Erfolgreich gespeichert.");
+			spawnNotification("success", "Erfolgreich gespeichert.");
 			location.href = "/record/dialogs/";
 		}
 	})
-	.error(function(res) {
-		spawnNotification('error', "Konnte Dialog nicht speichern.");
+	.error((res) => {
+		spawnNotification("error", "Konnte Dialog nicht speichern.");
 	});
 }
 
-function searchHandler(e) {
+/**
+ * Handler called when the search should update.
+ * @param {event} e - Event from the caller.
+ * @return {undefined}
+ */
+const searchHandler = function(e) {
 	e.preventDefault();
 	updateSearchResults();
 }
 
 function addrecord(e) {
-	var id = $(this).attr('recordId');
+	const id = $(this).attr('recordId');
 	$.ajax("/api/record/get?id=" + encodeURI(id))
-	.done(function(res) {
-		var pos = currentDialog.length;
+	.done((res) => {
 		currentDialog.push(res.record);
 		refreshDialog();
 	})
-	.error(function(res) {
+	.error((res) => {
 		spawnNotification('error', "Konnte Info der ausgewählten Aufnahme nicht laden.");
 	});
 }

@@ -1,22 +1,20 @@
-var $ = require("jquery");
-var spawnNotification = require("../notification");
+import $ from "jquery";
+import * as spawnNotification from "../notification";
 
-$("#submit").click(function() {
-	var quote = encodeURI($("#description").val());
-	var id = $(this).attr('recordId');
-	var labels = [];
+$("#submit").click((e) => {
+	const quote = encodeURI($("#description").val());
+	const id = $(e.currentTarget).attr("recordId");
+	const labels = [];
 	$(".tag-checkbox").each(function() {
-		if($(this).prop('checked')) {
-			labels.push($(this).attr('tagId'));
+		if($(this).prop("checked")) {
+			labels.push($(e.currentTarget).attr("tagId"));
 		}
 	});
-	var jsonLabels = encodeURI(JSON.stringify(labels));
-	$.ajax("/api/record/edit?id=" + id + "&quote=" + quote + "&labels=" + jsonLabels).done(function(res) {
+	const jsonLabels = encodeURI(JSON.stringify(labels));
+	$.ajax("/api/record/edit?id=" + id + "&quote=" + quote + "&labels=" + jsonLabels).done((res) => {
 		if(res.okay) {
 			window.location.href = "/record/";
 		}
 	})
-	.error(function() {
-		spawnNotification('error', "Konnte Aufnahme nicht editieren.");
-	});
+	.error(() => spawnNotification("error", "Konnte Aufnahme nicht editieren."));
 });

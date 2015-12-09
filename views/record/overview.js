@@ -1,5 +1,3 @@
-var $ = require("jquery");
+import $ from "jquery";
 
-$("#random").click(function() {
-	$.ajax("/api/record/random");
-});
+$("#random").click(() => $.ajax("/api/record/random"));

@@ -1,14 +1,10 @@
-var $ = require("jquery");
-var spawnNotification = require("../notification");
+import $ from "jquery";
+import * as spawnNotification from "../notification";
 
-function playdialog() {
-	var id = $(this).attr('dialogId');
-	$.ajax("/api/record/play_dialog?id=" + id).done(function(res) {
-		spawnNotification('success', "Dialog erfolgreich wiedergegeben.");
+$("a.playdialog").click((e) => {
+	const id = $(e.currentTarget).attr("dialogId");
+	$.ajax("/api/record/play_dialog?id=" + id).done((res) => {
+		spawnNotification("success", "Dialog erfolgreich wiedergegeben.");
 	})
-	.error(function() {
-		spawnNotification('error', "Konnte Dialog nicht abspielen.");
-	});
-}
-
-$("a.playdialog").click(playdialog);
+	.error(() => spawnNotification("error", "Konnte Dialog nicht abspielen."));
+});

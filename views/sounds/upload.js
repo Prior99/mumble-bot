@@ -1,23 +1,29 @@
-var $ = require("jquery");
-var spawnNotification = require("../notification");
+import $ from "jquery";
+import * as spawnNotification from "../notification";
 
-function updateProgress(e) {
+/**
+ * Update the progressbar with an event emitted from the upload.
+ * @param {object} e - Event emitted from XHR.
+ * @return {undefined}
+ */
+const updateProgress = function(e) {
+	const percent = 100;
 	if(e.lengthComputable) {
-		var percent = parseInt((e.loaded/e.total)*100) +"%";
+		const percent = parseInt((e.loaded / e.total) * percent) + "%";
 		$(".progress-bar").css({"width" : percent});
 	}
 }
 
 $("#progress_wrapper").hide();
-$(":file").change(function() {
+$(":file").change(() => {
 	$("#progress_wrapper").show();
 	$("form").hide();
-	var formdata = new FormData($("form")[0]);
+	const formdata = new FormData($("form")[0]);
 	$.ajax({
 		url : "/api/sounds/add",
 		type : "POST",
-		xhr : function() {
-			var xhr = $.ajaxSettings.xhr();
+		xhr() {
+			const xhr = $.ajaxSettings.xhr();
 			if(xhr.upload) {
 				xhr.upload.addEventListener("progress", updateProgress, false);
 			}
@@ -28,15 +34,15 @@ $(":file").change(function() {
 		processData: false,
 		contentType : false
 	})
-	.done(function(res) {
+	.done((res) => {
 		if(res) {
 			$("form").show();
 			$("#progress_wrapper").hide();
-			spawnNotification('success', "Sound was uploaded.");
+			spawnNotification("success", "Sound was uploaded.");
 		}
 	})
-	.error(function(res) {
+	.error((res) => {
 		$("form").show();
-		spawnNotification('error', "Failed to upload sound.");
+		spawnNotification("error", "Failed to upload sound.");
 	});
 });
