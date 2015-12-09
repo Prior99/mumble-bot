@@ -71,11 +71,11 @@ d3.json("/api/stats/recordplaybacksperuser", (err, data) => {
 		.attr("x", (d) => 0)
 		.attr("width", (d) => x(d.playbacks))
 		.style("fill", (d) => color(d.user));
-	const xOffset = x(d.playbacks) + 10;
-	const yOffset = y(d.user) + y.rangeBand() / 2;
+	const xOffset = (d) => x(d.playbacks) + 10;
+	const yOffset = (d) => y(d.user) + y.rangeBand() / 2;
 	bar.append("text")
 		.attr("text-anchor", "middle")
-		.attr("transform", (d) => "translate(" + xOffset + ", " + yOffset + "), rotate(90)")
+		.attr("transform", (d) => "translate(" + xOffset(d) + ", " + yOffset(d) + "), rotate(90)")
 		.text((d) => d.playbacks)
 		.style("fill", "black");
 });

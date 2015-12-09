@@ -61,9 +61,9 @@ d3.json("/api/stats/recordsperuser", (err, data) => {
 		.data(pie(data))
 		.enter().append("g")
 		.attr("class", "arc")
-		.on("mouseover", (d) => {
+		.on("mouseover", function(d) {
 			d3.select(this).select("path").transition()
-				.duration(transitionDuration)
+				.duration(transitionDurationSlow)
 				.attr("d", arcOver);
 			textTop.text(d3.select(this).datum().data.user)
 				.attr("y", -10);

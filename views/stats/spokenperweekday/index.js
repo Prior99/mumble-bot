@@ -61,7 +61,7 @@ d3.json("/api/stats/spokenperweekday", (err, data) => {
 			d.outerRadius = (d.data.amount/maxDate + outerTextPaddingSize) * dataSizeInPixel + marginSizeInPixel;
 			d.innerRadius = Math.max(d.innerRadius, marginSizeInPixel);
 			d.outerRadius = Math.max(d.outerRadius, maxRadius * outerTextMarginSize);
-			return "translate(" + d3.svg.arc().centroid(d) + "), rotate(" + alngle + ")";
+			return "translate(" + d3.svg.arc().centroid(d) + "), rotate(" + angle + ")";
 		})
 		.style("fill", "#FD8D3C")
 		.style("font", "12px sans-serif")
