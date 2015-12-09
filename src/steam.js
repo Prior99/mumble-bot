@@ -3,7 +3,7 @@
  */
 import * as Steam from "steam";
 import * as Util from "util";
-const EventEmitter = require("events").EventEmitter; // TODO
+import EventEmitter from "events";
 import Winston from "winston";
 import * as FS from "fs";
 import * as Readline from "readline";
@@ -18,8 +18,9 @@ import * as Readline from "readline";
  * @param {Bot} bot - Bot this instance was created in.
  * @param {object} options - Options to connect with, read from configfile.
  */
-class SteamBot {
+class SteamBot extends EventEmitter {
 	constructor(bot, options) {
+		super();
 		this.bot = bot;
 		this.options = {
 			accountName : options.user,
@@ -40,8 +41,6 @@ class SteamBot {
 			}
 		});
 	}
-
-	// TODO Util.inherits(SteamBot, EventEmitter);
 
 	_startUpSteamGuard() {
 		const rl = Readline.createInterface({
@@ -110,11 +109,14 @@ class SteamBot {
 	/**
 	 * Sends a message to all friends of this bot.
 	 * @param {string} message - Message to send to all friends.
+	 * @return {undefined}
 	 */
 	broadcast(message) {
 		if(this._hasFriends) {
 			for(const id in this.client.friends) {
-				this.client.sendMessage(id, message, Steam.EChatEntryType.ChatMsg);
+				if(this.client.friends.hasOwnProperty(id)) {
+					this.client.sendMessage(id, message, Steam.EChatEntryType.ChatMsg);
+				}
 			}
 		}
 	}
@@ -136,6 +138,7 @@ class SteamBot {
 
 	/**
 	 * Disconnect from steam gently.
+	 * @return {undefined}
 	 */
 	stop() {
 		this.client.setPersonaState(Steam.EPersonaState.Offline);

@@ -22,10 +22,16 @@ class Permissions {
 	}
 
 	/**
+	 * Callback from hasPermission(). The first parameter indicates whether the permission is granted
+	 * or whether not.
+	 * @callback PermissionCallback
+	 * @param {boolean} has - Whether the permission was granted or whether not.
+	 */
+	/**
 	 * Checks whether a user has the given permission.
 	 * @param {User} user - User to check the permission of.
 	 * @param {string} permission - Permission to check.
-	 * @param {function} callback - This callback is called when the data was fetched.
+	 * @param {PermissionCallback} callback - This callback is called when the data was fetched.
 	 * @returns {undefined}
 	 */
 	hasPermission(user, permission, callback) {
@@ -46,7 +52,7 @@ class Permissions {
 	 * does. Otherwise logs a warning.
 	 * @param {User} user - User to check the permission of.
 	 * @param {string} permission - Permission to check.
-	 * @param {function} callback - This callback is called when the permission was available.
+	 * @param {VoidCallback} callback - This callback is only called when the permission was available.
 	 * @returns {undefined}
 	 */
 	requirePermission(user, permission, callback) {
@@ -68,13 +74,18 @@ class Permissions {
 	}
 
 	/**
+	 * Called when a permission was granted or revoked.
+	 * @callback GrantPermissionCallback
+	 * @param {boolean} - True when the permission was granted and false otherwise.
+	 */
+	/**
 	 * Grants the permission to a user. If the issuer is null or undefined, no
 	 * checks will be performed. If the issuer is defined, a check will be performed
 	 * whether the issuer can grant the requested permission at all.
 	 * @param {User} issuer - User that issues this command.
 	 * @param {User} user - User to grant the permission to.
 	 * @param {string} permission - Permission to grant to the user.
-	 * @param {function} callback - Will be called after the permission was granted.
+	 * @param {GrantPermissionCallback} callback - Will be called after the permission was granted.
 	 * @returns {undefined}
 	 */
 	grantPermission(issuer, user, permission, callback) {
@@ -110,7 +121,7 @@ class Permissions {
 	 * @param {User} issuer - User that issues this command.
 	 * @param {User} user - User to revoke the permission from.
 	 * @param {string} permission - Permission to grant to the user.
-	 * @param {function} callback - Will be called after the permission was revoked.
+	 * @param {GrantPermissionCallback} callback - Will be called after the permission was revoked.
 	 * @returns {undefined}
 	 */
 	revokePermission(issuer, user, permission, callback) {
@@ -138,11 +149,23 @@ class Permissions {
 			});
 		});
 	}
-
+	/**
+	 * This object holds all information about a specific permission.
+	 * @typedef Permission
+	 * @property {number} id - Unique id of the permission.
+	 * @property {string} name - Name of the permission.
+	 * @property {string} description - Human readable description.
+	 * @property {string} icon - Fontawesome icon class for this permission.
+	 */
+	/**
+	 * Called from getPermission() when a permission was read from the database.
+	 * @callback GetPermissionCallback
+	 * @param {Permission} permission - An object holding information about the permission that was requested.
+	 */
 	/**
 	 * Retrieve information about a given permission.
 	 * @param {string} permission - Permission to gather information about.
-	 * @param {function} callback - Called once the inforamtion was retrieved.
+	 * @param {GetPermissionCallback} callback - Called once the inforamtion was retrieved.
 	 * @returns {undefined}
 	 */
 	getPermission(permission, callback) {
@@ -157,10 +180,14 @@ class Permissions {
 		});
 	}
 
-
+	/**
+	 * Called from listPermissions() when a permission was read from the database.
+	 * @callback GetPermissionCallback
+	 * @param {Permission[]} permission - An array holding objects holding information about the permissions.
+	 */
 	/**
 	 * Retrieve an array containing all permissions known to this bot.
-	 * @param {function} callback - Called once the list was retrieved.
+	 * @param {ListPermissionsCallback} callback - Called once the list was retrieved.
 	 * @returns {undefined}
 	 */
 	listPermissions(callback) {
@@ -182,7 +209,7 @@ class Permissions {
 	 * granted.
 	 * @param {User} issuer - User that issued this command.
 	 * @param {User} user - User to grant the permissions to.
-	 * @param {function} callback - Called once all permissions were processed.
+	 * @param {GrantPermissionCallback} callback - Called once all permissions were processed.
 	 * @returns {undefined}
 	 */
 	grantAllPermissions(issuer, user, callback) {
@@ -215,7 +242,7 @@ class Permissions {
 	 * @param {User} issuer - User that issued the command and of which it should be
 	 *  			   checked whether he can grant the permissions.
 	 * @param {User} user - User of which it should be checked whether he has the permissions.
-	 * @param {function} callback - Called once the list was retrieved.
+	 * @param {ListPermissionsCallback} callback - Called once the list was retrieved.
 	 * @returns {undefined}
 	 */
 	listPermissionsForUser(issuer, user, callback) {
@@ -246,9 +273,19 @@ class Permissions {
 	}
 
 	/**
-	 * TODO
-	 * @param {User} user TODO
-	 * @param {function} callback TODO
+	 * Called from listPermissionsAssocForUser().
+	 * Is given an object containing the permission association for one user.
+	 * @callback PermissionAssocCallback
+	 * @param {object} obj - The permission association for the user.
+	 * @see Permissions~listPermissionsAssocForUser
+	 */
+
+	/**
+	 * Returns an object with the permissions as keys and a boolean designating whether
+	 * the user has or does not have the permission.
+	 * (for example: { "permissionA" : true, "permissionB" : false, ... })
+	 * @param {User} user - The user to fetch the object for.
+	 * @param {PermissionAssocCallback} callback - Will be called when the object is successfully created.
 	 * @returns {undefined}
 	 */
 	listPermissionsAssocForUser(user, callback) {

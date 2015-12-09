@@ -231,7 +231,7 @@ class Website {
 
 	/**
 	 * Stop the webpage immediatly.
-	 * @param {function} callback - Will be called once the webpage came to a full stop.
+	 * @param {VoidCallback} callback - Will be called once the webpage came to a full stop.
 	 * @return {undefined}
 	 */
 	shutdown(callback) {

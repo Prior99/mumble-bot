@@ -57,7 +57,7 @@ class MPDControl {
 	/**
 	 * Start playback of music or resume. If the current playlist is empty, it will
 	 * be filled with random tracks.
-	 * @param {function} cb - Callback which will be called after playback has started.
+	 * @param {VoidCallback} cb - Callback which will be called after playback has started.
 	 * @returns {undefined}
 	 */
 	play(cb) {
@@ -79,9 +79,9 @@ class MPDControl {
 
 	/**
 	 * Pause the current playback.
-	 * @param {User} user User? TODO
-	 * @param {TODO} via ???
-	 * @param {function} cb - Callback which will be called after playback has paused.
+	 * @param {DatabaseUser} user - The user that invoked the pause.
+	 * @param {string} via - The way the user invoked the command (steam, minecraft, chat, console, webinterface, ...).
+	 * @param {VoidCallback} cb - Callback which will be called after playback has paused.
 	 * @returns {undefined}
 	 */
 	pause(user, via, cb) {
@@ -98,9 +98,9 @@ class MPDControl {
 	/**
 	 * Skip the currently playing song and playback the next one. If no more tracks
 	 * are in the playlist, a random one will be added.
-	 * @param {User} user User? TODO
-	 * @param {TODO} via ???
-	 * @param {function} cb - Callback which will be called after the next song has started playing.
+	 * @param {DatabaseUser} user - The user that invoked the command.
+	 * @param {string} via - The way the user invoked the command (steam, minecraft, chat, console, webinterface, ...).
+	 * @param {VoidCallback} cb - Callback which will be called after the next song has started playing.
 	 * @returns {undefined}
 	 */
 	next(user, via, cb) {
@@ -178,9 +178,9 @@ class MPDControl {
 
 	/**
 	 * Adds a random track to the playlist.
-	 * @param {user} user The user.... TODO.
-	 * @param {TODO} via What is this?
-	 * @param {function} cb Callback which will be called after the track was added.
+	 * @param {DatabaseUser} user - The user that invoked the command.
+	 * @param {string} via - The way the user invoked the command (steam, minecraft, chat, console, webinterface, ...).
+	 * @param {VoidCallback} cb Callback which will be called after the track was added.
 	 * @returns {undefined}
 	 */
 	addRandomTrack(user, via, cb) {

@@ -34,7 +34,7 @@ class Music {
 
 	/**
 	 * Data listener
-	 * @param {TODO} chunk The incomming data.
+	 * @param {buffer} chunk - The incomming data.
 	 * @returns {undefined}
 	 */
 	_onData(chunk) {
