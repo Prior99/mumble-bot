@@ -292,10 +292,10 @@ class Bot extends EventEmitter {
 			input: process.stdin,
 			output: process.stdout
 		});
-		this._rlStdin.on("SIGINT", function() {
+		this._rlStdin.on("SIGINT", () => {
 			this.emit("SIGINT");
 		});
-		this._rlStdin.on("line", function(line) {
+		this._rlStdin.on("line", (line) => {
 			this.command.process(line, "terminal", null);
 		});
 	}
@@ -305,8 +305,8 @@ class Bot extends EventEmitter {
 	 * @return {undefined}
 	 */
 	_initChatInput() {
-		this.mumble.on("message", function(message, mumbleUser, scope) {
-			this.database.getLinkedUser(mumbleUser.id, function(err, user) {
+		this.mumble.on("message", (message, mumbleUser, scope) => {
+			this.database.getLinkedUser(mumbleUser.id, (err, user) => {
 				if(err) {
 					Winston.error("Error fetching user by mumble user id.", err);
 				}
@@ -335,7 +335,7 @@ class Bot extends EventEmitter {
 						throw err;
 					}
 					else {
-						const next = function() {
+						const next = () => {
 							if(files.length > 0) {
 								const file = files.shift()
 								const filename = dir + file;
@@ -391,7 +391,7 @@ class Bot extends EventEmitter {
 		if(this.music) {
 			this.music.mute();
 		}
-		this._pipeUserEvent = function(chunk) {
+		this._pipeUserEvent = (chunk) => {
 			this._inputStream.write(chunk);
 		};
 		this._pipeUserStream = user.outputStream(true);

@@ -1,17 +1,24 @@
 /*
  * Imports
  */
-require('array.prototype.find');
+import "array.prototype.find";
 import Mumble from "mumble";
 import Bot from "./src";
-var Winston = require('winston');
-var FS = require('fs');
-var Database = require("./src/database");
+import Winston from "winston";
+import * as FS from "fs";
+import Database from "./src/database";
 /*
  * Winston
  */
-require('winston-mysql-transport').Mysql;
-function fillZero(number, len) {
+import Mysql from "winston-mysql-transport";
+
+/**
+ * Pads the given number with zeros in front.
+ * @param {number} number - Number to pad with zeros.
+ * @param {number} len - Amount of digits the final string should have.
+ * @return {string} - The zero padded number.
+ */
+const fillZero = function(number, len) {
 	number = "" + number;
 	while(number.length < len) {
 		number = "0" + number;
@@ -19,36 +26,40 @@ function fillZero(number, len) {
 	return number;
 }
 
+/**
+ * Returns the timestamp formatted as yyyy-mm-dd hh:mm:ss
+ * @return {String} - the formatted timestamp.
+ */
+const timestampFunction = () => {
+	const d = new Date();
+	const javascriptYearZero = 1900;
+	const actualYear = d.getYear() + javascriptYearZero;
+	return actualYear + "-" + fillZero(d.getMonth() + 1, 2) + "-" + fillZero(d.getDate(), 2) + " " +
+		fillZero(d.getHours(), 2) + ":" + fillZero(d.getMinutes(), 2) + ":" + fillZero(d.getSeconds(), 2);
+};
+
 Winston.remove(Winston.transports.Console);
 Winston.add(Winston.transports.Console, {
-	colorize: true,
-	timestamp: function() {
-		var d = new Date();
-		return d.getYear() + 1900 + "-" + fillZero(d.getMonth() + 1, 2) + "-" + fillZero(d.getDate(), 2) + " " +
-		fillZero(d.getHours(), 2) + ":" + fillZero(d.getMinutes(), 2) + ":" + fillZero(d.getSeconds(),2);
-	},
-	level : 'verbose'
+	"colorize": true,
+	timestamp: timestampFunction,
+	"level" : "verbose"
 });
 
 Winston.add(Winston.transports.File, {
-	filename : 'bot.log',
-	maxsize : '64000',
+	filename : "bot.log",
+	maxsize : "64000",
 	maxFiles : 7,
 	json: false,
-	level : 'verbose',
+	level : "verbose",
 	colorize: true,
-	timestamp: function() {
-		var d = new Date();
-		return d.getYear() + 1900 + "-" + fillZero(d.getMonth() + 1, 2) + "-" + fillZero(d.getDate(), 2) + " " +
-		fillZero(d.getHours(), 2) + ":" + fillZero(d.getMinutes(), 2) + ":" + fillZero(d.getSeconds(),2);
-	}
+	timestamp: timestampFunction
 });
 /*
  * Code
  */
-var options = require("../config.json");
+const options = require("../config.json");
 
-var mumbleOptions = {};
+const mumbleOptions = {};
 
 if(options.key && options.cert) {
 	mumbleOptions.key = FS.readFileSync(options.key);
@@ -58,46 +69,48 @@ else {
 	Winston.warn("Connecting without certificate. Connection will be unsecured, bot will not be able to register!");
 }
 
-Mumble.connect("mumble://" + options.url, mumbleOptions, function(err, connection) {
-	if(err) {
-		throw err;
-	}
-	else {
-
-		connection.on('error', function(data) {
-			Winston.error("An error with the mumble connection has occured:", data);
-		});
-
-		connection.authenticate(options.name, options.password);
-		connection.on('ready', function() {
-			startup(connection);
-		});
-	}
-});
-
-function stopDatabase(database, callback) {
+/**
+ * Stops the database connection.
+ * @param {object} database - Connection to the database to close.
+ * @param {VoidCallback} callback - Called once the connection to the database is closed.
+ * @return {undefined}
+ */
+const stopDatabase = function(database, callback) {
 	Winston.info("Stopping database ... ");
-	database.stop(function() {
+	database.stop(() => {
 		Winston.info("Database stopped.");
 		callback();
 	});
 }
 
-function stopMumble(connection, callback) {
+/**
+ * Stops the mumble connection.
+ * @param {object} connection - Connection to the mumble server.
+ * @param {VoidCallback} callback - Called once the connection is closed.
+ * @return {undefined}
+ */
+const stopMumble = function(connection, callback) {
 	Winston.info("Stopping connection to mumble ... ");
-	connection.on("disconnect", function() {
+	connection.on("disconnect", () => {
 		Winston.info("Connection to mumble stopped. ");
 		callback();
 	});
 	connection.disconnect();
 }
 
-function databaseStarted(err, connection, database) {
+/**
+ * Called once the database was started.
+ * @param {Error} err - If an error occurred during database initialization this contains the error.
+ * @param {object} connection - Connection to the mumble server.
+ * @param {object} database - Initialized instance of database.
+ * @return {undefined}
+ */
+const databaseStarted = function(err, connection, database) {
 	if(err) {
 		throw err;
 	}
 	else {
-		Winston.transports.Mysql.prototype.level = 'verbose';
+		Winston.transports.Mysql.prototype.level = "verbose";
 		Winston.add(Winston.transports.Mysql, {
 			host : options.database.host,
 			user : options.database.user,
@@ -105,21 +118,25 @@ function databaseStarted(err, connection, database) {
 			database : options.database.database,
 			table : "Log"
 		});
-		var bot = new Bot(connection, options, database);
+		const bot = new Bot(connection, options, database);
 		Winston.info("Joining channel: " + options.channel);
 		bot.join(options.channel);
 		bot.say("Ich grüße euch!");
-		bot.on("shutdown", function() {
-			stopDatabase(database, function() {
-				stopMumble(connection, function() {
+		bot.on("shutdown", () => {
+			stopDatabase(database, () => {
+				stopMumble(connection, () => {
 					process.exit();
 				});
 			});
 		});
 
-		var killed = false;
+		let killed = false;
 
-		function sigint() {
+		/**
+		 * Called when SIGINT is received either through CTRL+C or through the bot.
+		 * @return {undefined}
+		 */
+		const sigint = function() {
 			if(killed) {
 				Winston.error("CTRL^C detected. Terminating!");
 				process.exit(1);
@@ -132,13 +149,29 @@ function databaseStarted(err, connection, database) {
 			}
 		}
 
-		process.on('SIGINT', sigint);
-		bot.on('SIGINT', sigint);
+		process.on("SIGINT", sigint);
+		bot.on("SIGINT", sigint);
 	}
 }
 
-function startup(connection) {
-	var database = new Database(options.database, function(err) {
+/**
+ * Starts the bot using the passed already initialized mumble connection.
+ * @param {object} connection - Already initialized mumble connection.
+ * @return {undefined}
+ */
+const startup = function(connection) {
+	const database = new Database(options.database, (err) => {
 		databaseStarted(err, connection, database);
 	});
 }
+
+Mumble.connect("mumble://" + options.url, mumbleOptions, (err, connection) => {
+	if(err) {
+		throw err;
+	}
+	else {
+		connection.on("error", (data) => Winston.error("An error with the mumble connection has occured:", data));
+		connection.authenticate(options.name, options.password);
+		connection.on("ready", () => startup(connection));
+	}
+});
