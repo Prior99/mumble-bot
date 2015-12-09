@@ -16,7 +16,7 @@ const FS = require("fs");
  * @param callback - Called once the connection is up and running.
  */
 class Database {
-	
+
 	constructor(options, callback) {
 		this.pool = MySQL.createPool({
 			host : options.host,
@@ -41,28 +41,13 @@ class Database {
 		}.bind(this));
 	}
 
-	require("./quotes.js")(Database);
-	require("./ttscache.js")(Database);
-	require("./users.js")(Database);
-	require("./permissions.js")(Database);
-	require("./mumbleUsers.js")(Database);
-	require("./bass.js")(Database);
-	require("./autocomplete.js")(Database);
-	require("./sounds.js")(Database);
-	require("./records.js")(Database);
-	require("./settings.js")(Database);
-	require("./log.js")(Database);
-	require("./rss.js")(Database);
-	require("./dialogs.js")(Database);
-	require("./userstats.js")(Database);
-
 	/**
 	 * Executes the query and checks for errors.
 	 * If an error occured, then throw it, of use callback (if supplied).
 	 * If no error occured, then continue with callback, or, if a dedicated
 	 * success handler has been passed, use that one.
 	 */
-	Database.prototype.queryAndCheck = function(query, params, callErr, callSucc) {
+	queryAndCheck(query, params, callErr, callSucc) {
 		this.pool.query(query, params, function(err, result) {
 			if(err) {
 				if(callErr) { callErr(err); }
@@ -72,9 +57,9 @@ class Database {
 			else if(callErr) { callErr(null, result); }
 
 		}.bind(this));
-	};
+	}
 
-	Database.prototype._checkError = function(err, callback) {
+	_checkError(err, callback) {
 		if(err) {
 			if(callback) { callback(err); }
 			else { throw err; }
@@ -83,9 +68,9 @@ class Database {
 		else {
 			return true;
 		}
-	};
+	}
 
-	Database.prototype._setupDatabase = function(callback) {
+	_setupDatabase(callback) {
 		FS.readFile("schema.sql", {encoding : "utf8"}, function(err, data) {
 			if(err) {
 				throw err;
@@ -101,15 +86,30 @@ class Database {
 				});
 			}
 		}.bind(this));
-	};
+	}
 
 	/**
 	 * Stops the database by disconnecting gently.
 	 * @param callback - Called once disconnected.
 	 */
-	Database.prototype.stop = function(callback) {
+	stop(callback) {
 		this.pool.end(callback);
 	}
 }
 
-module.exports = Database;
+require("./quotes.js")(Database);
+require("./ttscache.js")(Database);
+require("./users.js")(Database);
+require("./permissions.js")(Database);
+require("./mumbleUsers.js")(Database);
+require("./bass.js")(Database);
+require("./autocomplete.js")(Database);
+require("./sounds.js")(Database);
+require("./records.js")(Database);
+require("./settings.js")(Database);
+require("./log.js")(Database);
+require("./rss.js")(Database);
+require("./dialogs.js")(Database);
+require("./userstats.js")(Database);
+
+export default Database;

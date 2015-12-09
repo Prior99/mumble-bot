@@ -58,6 +58,16 @@ module.exports = function(Database) {
 	};
 
 	/**
+	 * A user from the database.
+	 * @typedef {object} DatabaseUser
+	 * @property {string} minecraft - The minecraft username of the user.
+	 * @property {string} username - The username of this user.
+	 * @property {string} identifier - The identifier of the user.
+	 * @property {string} steamid - The Steam64 id of the user.
+	 * @property {object} settings - The custom settings of the user are stored key-value-wise in this object.
+	 */
+
+	/**
 	 * Retrieves details about a user by his id.
 	 * @param {number} id - The id of the user to retrieve.
 	 * @param callback - Called when the details are retrieved.

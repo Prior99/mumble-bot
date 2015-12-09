@@ -1,37 +1,49 @@
 /*
  * Imports
  */
-const Util = require("util");
+import Util from "util";
 import Input from "./input";
-const Command = require("./command");
-const Output = require("./output");
-const Music = require("./music");
-const MPDControl = require("./mpdcontrol");
-const Winston = require("winston");
-const Website = require("./website");
-const Readline = require("readline");
-const Quotes = require("./quotes");
-const FS = require("fs");
-const Steam = require("./steam");
-const EventEmitter = require("events").EventEmitter;
-const Permissions = require("./permissions");
-const AFKObserver = require("./afkobserver");
-const RSS = require("./rss");
+import Command from "./command";
+import Output from "./output";
+import Music from "./music";
+import MPDControl from "./mpdcontrol";
+import Winston from "winston";
+import Website from "./website";
+import Readline from "readline";
+import Quotes from "./quotes";
+import FS from "fs";
+import Steam from "./steam";
+import EventEmitter from "events";
+import Permissions from "./permissions";
+import AFKObserver from "./afkobserver";
+import RSS from "./rss";
 
 const AUDIO_CACHE_AMOUNT = 4;
 
 /**
- * TODO
+ * A callback without any parameters.
+ * @callback VoidCallback
  */
-class Bot {
+
+/**
+ * A user from the Mumble server. Refer to documentation of node-mumble.
+ * @typedef {object} MumbleUser
+ */
+
+/**
+ * This is the main class of the bot instanciated from the loader and holding all relevant data,
+ * systems and connections.
+ */
+class Bot extends EventEmitter {
 	/**
 	 * This is the constructor of the bot.
 	 * @constructor
-	 * @param mumble - already set up mumble connection (MumbleClient)
-	 * @param options - Options read from the config.json
+	 * @param {MumbleConnection} mumble - already set up mumble connection (MumbleClient)
+	 * @param {Config} options - Options read from the config.json
 	 * @param {Database} database - Started connection to database.
 	 */
 	constructor(mumble, options, database) {
+		super();
 		this.options = options;
 		this.mumble = mumble;
 		this.database = database;
@@ -96,8 +108,10 @@ class Bot {
 			let cmdSay = "Ich kenne die folgenden Kommandos ";
 			let cmdWrite = "Ich kenne die folgenden Kommandos:<br>";
 			for(const key in this.command.commands) {
-				cmdSay += key + ",";
-				cmdWrite += "  * " + key + "<br>";
+				if(this.command-commands.hasOwnProperty(key)) {
+					cmdSay += key + ",";
+					cmdWrite += "  * " + key + "<br>";
+				}
 			}
 			this.say(cmdSay + ". Ich habe diese Liste auch in den Chat geschrieben.");
 			this.mumble.user.channel.sendMessage(cmdWrite.substring(0, cmdWrite.length - 4));
@@ -124,6 +138,12 @@ class Bot {
 		return result;
 	}
 
+	/**
+	 * Handles the connection for a user in the mumble server.
+	 * Looks up the user in the database and registers the respective handlers.
+	 * @param {MumbleUser} user - The user connected to the server.
+	 * @return {undefined}
+	 */
 	handleUserConnect(user) {
 		this.database.getLinkedUser(user.id, (err, dbUser) => {
 			if(err) {
@@ -157,6 +177,11 @@ class Bot {
 		this._addEventListenersToMumbleUser(user);
 	}
 
+	/**
+	 * Registers the event listeners for one mumble user.
+	 * @param {MumbleUser} user - The user to register the event listeners for.
+	 * @return {undefined}
+	 */
 	_addEventListenersToMumbleUser(user) {
 		user.on("disconnect", () => {
 			const announce = this.options.announce;
@@ -166,12 +191,18 @@ class Bot {
 		});
 		user.on("move", (oldChan, newChan, actor) => {
 			if(!announce || (announce.move !== false && announce.move !== "false")) {
-				this.sayImportant(user.name + " ging von Channel " + oldChan.name 
+				this.sayImportant(user.name + " ging von Channel " + oldChan.name
 					+ " nach " + newChan.name);
 			}
 		});
 	}
 
+	/**
+	 * Sends a notification to users in the mumble that have the required permission.
+	 * @param {string} permission - The permission required to receive the message.
+	 * @param {string} message - The message to send.
+	 * @return {undefined}
+	 */
 	notifyOnlineUsersWithPermission(permission, message) {
 		this.database.listUsers((err, users) => {
 			if(err) {
@@ -202,6 +233,12 @@ class Bot {
 		});
 	}
 
+	/**
+	 * Callback method called when voice (speech recognition) is emitted from a user in the mumble.
+	 * @param {string} text - The text from the speech recognition parsed from what the user said.
+	 * @param {MumbleUser} mumbleUser - The user the speech came from.
+	 * @return {undefined}
+	 */
 	_onVoiceInput(text, mumbleUser) {
 		this.database.getLinkedUser(mumbleUser.id, (err, user) => {
 			if(err) {
@@ -214,7 +251,8 @@ class Bot {
 	}
 
 	/**
-	 * Instant shutdown everything which could cause noises.
+	 * Instantly shutdown everything which could cause noises.
+	 * @return {undefined}
 	 */
 	beQuiet() {
 		this.output.clear();
@@ -222,6 +260,7 @@ class Bot {
 
 	/**
 	 * Gently shutdown the whole bot.
+	 * @return {undefined}
 	 */
 	shutdown() {
 		this.say("Herunterfahren initiiert.", () => {
@@ -244,6 +283,10 @@ class Bot {
 		});
 	}
 
+	/**
+	 * Initializes the input from the prompt.
+	 * @return {undefined}
+	 */
 	_initPromptInput() {
 		this._rlStdin = Readline.createInterface({
 			input: process.stdin,
@@ -257,6 +300,10 @@ class Bot {
 		});
 	}
 
+	/**
+	 * Initializes the input from the chat of the mumble server.
+	 * @return {undefined}
+	 */
 	_initChatInput() {
 		this.mumble.on("message", function(message, mumbleUser, scope) {
 			this.database.getLinkedUser(mumbleUser.id, function(err, user) {
@@ -270,6 +317,12 @@ class Bot {
 		});
 	}
 
+	/**
+	 * Loads the addons from a specified directory.
+	 * @param {string} dir - Directory to load the addons from.
+	 * @param {VoidCallback} callback - Called when all addons were loaded.
+	 * @return {undefined}
+	 */
 	_loadAddons(dir, callback) {
 		FS.stat(dir, (err, stats) => {
 			if(err || !stats.isDirectory()) {
@@ -310,7 +363,7 @@ class Bot {
 
 	/**
 	 * Will return whether the bot is busy speaking or listening to anyone.
-	 * @return If the bot is busy speaking or listening
+	 * @return {Boolean} - If the bot is busy speaking or listening
 	 */
 	busy() {
 		return this.output.busy || this.input.busy;
@@ -319,7 +372,8 @@ class Bot {
 	/**
 	 * Plays a sound in the mumble server.
 	 * @param {string} filename - Filename of the soundfile to play. Must be a mono-channel 48,000Hz WAV-File
-	 * @param cb - Callback will be called when sound has finished playing
+	 * @param {VoidCallback} cb - Callback will be called when sound has finished playing
+	 * @return {undefined}
 	 */
 	playSound(filename, cb) {
 		this.output.playSound(filename, cb);
@@ -329,7 +383,8 @@ class Bot {
 	 * Will start echoing everything a user says.
 	 * This method is used so that anyone can hear which voice-command
 	 * is currently given to the bot and not just the bleeep and bloop sounds.
-	 * @param user - mumble user to start piping.
+	 * @param {MumbleUser} user - mumble user to start piping.
+	 * @return {undefined}
 	 */
 	startPipingUser(user) {
 		//console.log("Piping started");
@@ -345,6 +400,7 @@ class Bot {
 
 	/**
 	 * Stop echoing the user which is currently being echoed.
+	 * @return {undefined}
 	 */
 	stopPipingUser() {
 		//console.log("Piping stopped");
@@ -356,16 +412,22 @@ class Bot {
 		this._pipeUserEvent = undefined;
 	}
 
-
+	/**
+	 * Called when a registered command was executed. The arguments are the arguments passwd to the
+	 * command when called as well as the way the command was received (console, chat, steam, etc...) and
+	 * the user that invoked the command.
+	 * @callback CommandCallback
+	 */
 	/**
 	 * This is one of the most important methods in the bot.
 	 * This method registers a new command in the bot.
 	 * @param {string} commandName - Name of the command to create
-	 * @param method - Method which will be executed when the command was called
+	 * @param {CommandCallback} method - Method which will be executed when the command was called
 	 * @param {string} description - Description of the command as displayed on the website
 	 * @param {string} icon - [Name of a Fontawesome-icon to display.](http://fortawesome.github.io/Font-Awesome/icons/)
 	 * @param {string[]} args - (Optional) Array of possible arguments.
 	 * @param {string} permission - (Optional) permission needed to execute this command.
+	 * @return {undefined}
 	 */
 	newCommand(commandName, method, description, icon, args, permission) {
 		if(!args) {
@@ -374,30 +436,38 @@ class Bot {
 		this.command.newCommand(commandName, method, args, permission);
 		this.commands.push({
 			name : commandName,
-			description : description,
-			icon : icon,
+			description,
+			icon,
 			arguments : args,
-			permission : permission,
+			permission,
 			hasArguments : args.length > 0
 		});
 	}
 
 	/**
 	 * Makes the bot join a specific channel in mumble.
-	 * @param cname - Name of the channel to join.
+	 * @param {string} cname - Name of the channel to join.
+	 * @return {undefined}
 	 */
 	join(cname) {
 		const channel = this.mumble.channelByName(cname);
 		channel.join();
 	}
 
+	/**
+	 * Add an audio file to the list of cached audios.
+	 * @param {string} filename - Filename of the cached audio file.
+	 * @param {DatabaseUser} user - User that emitted the audio.
+	 * @param {number} duration - Duration of the audio.
+	 * @return {undefined}
+	 */
 	addCachedAudio(filename, user, duration) {
-		var obj = {
+		const obj = {
 			file : filename,
 			date : new Date(),
-			user : user,
+			user,
 			id : this._audioId++,
-			duration : duration,
+			duration,
 			protected : false
 		};
 		this.cachedAudios.push(obj);
@@ -405,18 +475,42 @@ class Bot {
 		this._clearUpCachedAudio();
 	}
 
+	/**
+	 * A cached audio.
+	 * @typedef {object} CachedAudio
+	 * @property {string} file - The filename of the audio.
+	 * @property {date} date - The date the audio was recorded.
+	 * @property {DatabaseUser} user - The user from which the audio was recorded.
+	 * @property {number} id - The id of the cached audio.
+	 * @property {number} duration - The duration of the audio in seconds.
+	 * @property {boolean} protected - Whether the audio was protected by someone or not.
+	 */
+
+	/**
+	 * Retrieve the cached audio by its id. Returns the audio when the id was valid
+	 * and null otherwise.
+	 * @param {number} id - Id of the audio to look up.
+	 * @return {CachedAudio} - The cached audio or null when the id was invalid.
+	 */
 	getCachedAudioById(id) {
-		for(var key in this.cachedAudios) {
-			var audio = this.cachedAudios[key];
-			if(audio.id === id) {
-				return audio;
+		for(const key in this.cachedAudios) {
+			if(this.cachedAudios.hasOwnProperty(key)) {
+				const audio = this.cachedAudios[key];
+				if(audio.id === id) {
+					return audio;
+				}
 			}
 		}
 		return null;
 	}
 
+	/**
+	 * Protected the cached audio with the given id.
+	 * @param {number} id - Id of the audio to protect.
+	 * @return {boolean} - False when the id was invalid.
+	 */
 	protectCachedAudio(id) {
-		var elem = this.getCachedAudioById(id);
+		const elem = this.getCachedAudioById(id);
 		if(!elem) {
 			return false;
 		}
@@ -427,8 +521,13 @@ class Bot {
 		}
 	}
 
+	/**
+	 * Removes the cached audio with the given id.
+	 * @param {number} id - Id of the audio to remove.
+	 * @return {boolean} - False when the id was invalid.
+	 */
 	removeCachedAudioById(id) {
-		var elem = this.getCachedAudioById(id);
+		const elem = this.getCachedAudioById(id);
 		if(!elem) {
 			return false;
 		}
@@ -438,8 +537,13 @@ class Bot {
 		}
 	}
 
+	/**
+	 * Removes the cached audio by audio object.
+	 * @param {CachedAudio} audio - audio object to remove.
+	 * @return {boolean} - False when the id was invalid.
+	 */
 	removeCachedAudio(audio) {
-		var index = this.cachedAudios.indexOf(audio);
+		const index = this.cachedAudios.indexOf(audio);
 		if(index !== -1) {
 			this.cachedAudios.splice(index, 1);
 			this.emit("removed-cached-audio", audio);
@@ -448,14 +552,24 @@ class Bot {
 		else {
 			return false;
 		}
-	};
+	}
 
+	/**
+	 * Clears up the list of cached audios and keeps it to the specified maximum size.
+	 * @return {undefined}
+	 */
 	_clearUpCachedAudio() {
 		this._deleteAllCachedAudio(this.audioCacheAmount);
 	}
 
+	/**
+	 * Delete the specified amount of audios from the list of cached audios starting with the oldest
+	 * and skipping protected audios.
+	 * @param {number} amount - AMount of audios to remove.
+	 * @return {undefined}
+	 */
 	_deleteAllCachedAudio(amount) {
-		let prot = [];
+		const prot = [];
 		while(this.cachedAudios.length > amount) {
 			const elem = this.cachedAudios.shift();
 			if(elem.protected) {
@@ -482,7 +596,8 @@ class Bot {
 	 * Will say something. The text will be played in mumble using TTS, written to
 	 * the bots current channel (theoretically) and written in minecraft.
 	 * @param {string} text - Text to say.
-	 * @param cb - Callback, will be called *after playback of TTS has finished*.
+	 * @param {VoidCallback} cb - Callback, will be called *after playback of TTS has finished.
+	 * @return {undefined}
 	 */
 	sayOnlyVoice(text, cb) {
 		return this.output.sayOnlyVoice(text, cb);
@@ -492,7 +607,8 @@ class Bot {
 	 * Will say something. The text will be played in mumble using TTS, written to
 	 * the bots current channel (theoretically) and written in minecraft.
 	 * @param {string} text - Text to say.
-	 * @param cb - Callback, will be called *after playback of TTS has finished*.
+	 * @param {VoidCallback} cb - Callback, will be called *after playback of TTS has finished.
+	 * @return {undefined}
 	 */
 	say(text, cb) {
 		return this.output.say(text, cb);
@@ -502,7 +618,8 @@ class Bot {
 	 * Say something important. Other than the normal say method this will also say
 	 * the shit in steam.
 	 * @param {string} text - Text to say.
-	 * @param cb - Callback, will be called *after playback of TTS has finished*.
+	 * @param {VoidCallback} cb - Callback, will be called *after playback of TTS has finished.
+	 * @return {undefined}
 	 */
 	sayImportant(text, cb) {
 		if(this.steam) {
@@ -514,6 +631,7 @@ class Bot {
 	/**
 	 * Report an error by saying it.
 	 * @param {string} text - Message of the error to report.
+	 * @return {undefined}
 	 */
 	sayError(text) {
 		return this.output.say("Error:    " + text);
@@ -524,21 +642,22 @@ class Bot {
 	 * For example: ```bot.findUsers("merlin");``` will find "Merlin | LÖML | Mörrrlin".
 	 * This method is used in *certain* methods.
 	 * @param {string} namePart - Text to search for.
+	 * @return {undefined}
 	 */
 	findUsers(namePart) {
 		namePart = namePart.toLowerCase();
-		var users = this.mumble.users();
-		var found = [];
-		for(var key in users) {
-			var user = users[key];
-			if(user.name.toLowerCase().indexOf(namePart) !== -1) {
-				found.push(user);
+		const users = this.mumble.users();
+		const found = [];
+		for(const key in users) {
+			if(users.hasOwnProperty(key)) {
+				const user = users[key];
+				if(user.name.toLowerCase().indexOf(namePart) !== -1) {
+					found.push(user);
+				}
 			}
 		}
 		return found;
 	}
 }
 
-//TODO Util.inherits(Bot, EventEmitter);
-
-module.exports = Bot;
+export default Bot;
