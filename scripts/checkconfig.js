@@ -1,8 +1,15 @@
-var config = require("../config.json");
+import * as config from "../config.json"
 
-var okay = true;
+let okay = true;
 
-function check(key, config) {
+/**
+ * Checks whether the key is contained in the config
+ * sets this.okay to false if te key is not contained.
+ * @param {string} key The key.
+ * @param {object} config The config.
+ * @returns {undefined}
+ */
+const check = function(key, config) {
 	if(config[key] === undefined) {
 		okay = false;
 	}
