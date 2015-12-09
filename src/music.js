@@ -1,8 +1,9 @@
 /*
  * Imports
  */
-var FS = require('fs');
-var Winston = require('winston');
+import * as FS from "fs";
+import Winston from "winston";
+
 /*
  * Code
  */
@@ -11,76 +12,90 @@ var Winston = require('winston');
  * Handles playback of music from a fifo fed by a music player daemon.
  * This only echos the music streamed from the fifo into the mumble server and
  * does not control the playback, which is handled by mpdcontrol.js
- * @constructor
+
  * @param {Bot} bot - Bot this instance is attached to.
  */
-
-var Music = function(bot) {
-	this.path = bot.options.mpd.fifo;
-	this.fifo = FS.createReadStream(this.path, {
-		flags : 'r+'
-	});
-	this.inputStream = bot.mumble.inputStream();
-	this.muted = false;
-	this.volume = 0.5;
-	this.fifo.on('data', this._onData.bind(this));
-	Winston.info("Module started: Music");
-};
-
-Music.prototype._onData = function(chunk) {
-	if(!this.muted) {
-		this.inputStream.write(chunk);
+class Music {
+	/**
+	 * @param {Bot} bot The main Bot instance.
+	 * @constructor
+	 */
+	constructor(bot) {
+		this.path = bot.options.mpd.fifo;
+		this.fifo = FS.createReadStream(this.path, {
+			flags : "r+"
+		});
+		this.inputStream = bot.mumble.inputStream();
+		this.muted = false;
+		this.volume = 0.5;
+		this.fifo.on("data", this._onData.bind(this));
+		Winston.info("Module started: Music");
 	}
-};
 
-/**
- * Not working. This method should scale a pcm signal to lower or increase the
- * volume.
- * @param buffer - Buffer containing the pcm data to be scaled
- * @param {number} volume - Factor to scale the pcm data by.
- */
-function scaleVolume(buffer, volume) {
-	for(var i = 0; i < buffer.length; i++) {
-		buffer[i] *= volume;
+	/**
+	 * Data listener
+	 * @param {TODO} chunk The incomming data.
+	 * @returns {undefined}
+	 */
+	_onData(chunk) {
+		if(!this.muted) {
+			this.inputStream.write(chunk);
+		}
 	}
-};
 
-/**
- * Toggles muting of playback. If the playback is muted, it will be unmuted and
- * vice-verse.
- */
-Music.prototype.toggleMute = function() {
-	this.muted = !this.muted;
-};
+	/**
+	 * Not working. This method should scale a pcm signal to lower or increase the
+	 * volume.
+	 * @param {array} buffer - Buffer containing the pcm data to be scaled
+	 * @param {number} volume - Factor to scale the pcm data by.
+	 * @return {undefined}
+	 */
+	scaleVolume(buffer, volume) {
+		for(let i = 0; i < buffer.length; i++) {
+			buffer[i] *= volume;
+		}
+	}
 
-/**
- * Mutes the playback.
- */
-Music.prototype.mute = function() {
-	this.muted = true;
-};
+	/**
+	 * Toggles muting of playback. If the playback is muted, it will be unmuted and vice-versa.
+	 * @returns {undefined}
+	 */
+	toggleMute() {
+		this.muted = !this.muted;
+	}
 
-/**
- * Unmutes the playback.
- */
-Music.prototype.unmute = function() {
-	this.muted = false;
-};
+	/**
+	 * Mutes the playback.
+	 * @returns {undefined}
+	 */
+	mute() {
+		this.muted = true;
+	}
 
-/**
- * Shuts down this module.
- */
-Music.prototype.stop = function() {
-	Winston.info("Shutting down music ... ");
-	this.fifo.once('close', function() {
-		Winston.info("Music stopped.");
-	});
-	this.fifo.removeListener('data', this._onData);
-	var c = FS.createWriteStream(this.path);
-	c.write('\0');
-	c.close();
-	this.fifo.pause();
-	this.fifo.close();
-};
+	/**
+	 * Unmutes the playback.
+	 * @returns {undefined}
+	 */
+	unmute() {
+		this.muted = false;
+	}
+
+	/**
+	 * Shuts down this module.
+	 * @returns {undefined}
+	 */
+	stop() {
+		Winston.info("Shutting down music ... ");
+		this.fifo.once("close", () => {
+			Winston.info("Music stopped.");
+		});
+		this.fifo.removeListener("data", this._onData);
+		const c = FS.createWriteStream(this.path);
+		c.write("\0");
+		c.close();
+		this.fifo.pause();
+		this.fifo.close();
+	}
+}
 
 module.exports = Music;
