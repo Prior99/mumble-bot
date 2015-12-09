@@ -30,7 +30,7 @@ const fillZero = function(number, len) {
  * Returns the timestamp formatted as yyyy-mm-dd hh:mm:ss
  * @return {String} - the formatted timestamp.
  */
-const timestampFunction = () => {
+const timestampFunction = function() {
 	const d = new Date();
 	const javascriptYearZero = 1900;
 	const actualYear = d.getYear() + javascriptYearZero;
