@@ -1,5 +1,14 @@
 import $ from "jquery";
 
+/**
+ * Spawns a new notification.
+ * @param {string} type - Can be "error" or "success" Affects the color of the notification.
+ * @param {string} text - The text to display.
+ * @param {number} [timeout] - The timeout after which the notification selfdestructs in milliseconds.
+ *                             Default is 2 seconds.
+ * @param {boolean} [permanent] - Whether the notification should stay forever and never disappear. Default is false.
+ * @return {undefined}
+ */
 const spawnNotification = function(type, text, timeout, permanent) {
 	const twoSeconds = 2000;
 	if(!timeout) {

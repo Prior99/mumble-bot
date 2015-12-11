@@ -1,23 +1,20 @@
-var $ = require("jquery");
-var spawnNotification = require("./notification");
+import $ from "jquery";
+import * as spawnNotification from "./notification";
 
-$('#form').submit(function(e) {
+$("#form").submit((e) => {
 	$(".result-list").html("");
 	$(".result").hide();
 	e.preventDefault();
 	$.ajax("/api/google?string=" + encodeURIComponent($("#input").val()))
-	.done(function(res) {
+	.done((res) => {
 		if(res.okay) {
 			spawnNotification("success", "Abfrage erfolgreich durchgeführt.");
 		}
-		for(var i in res.results) {
-			var s = res.results[i];
+		for(const s of res.results) {
 			$(".result-list").append("<li class='list-group-item'>" + s + "</li>");
 		}
 		$("#amount").html(res.results.length);
 		$(".result").show();
 	})
-	.error(function() {
-		spawnNotification("error", "Konnte Abfrage nicht durchführen!");
-	});
+	.error(() => spawnNotification("error", "Konnte Abfrage nicht durchführen!"));
 });

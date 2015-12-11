@@ -1,10 +1,10 @@
-var $ = require("jquery");
+import $ from "jquery";
 
 $(".execute-command").click(function(e) {
 	e.preventDefault();
-	var cmd = $(this).attr("cmdId");
-	var arg = $(this).attr("argument");
-	var string = "/api/command?command=" + cmd;
+	const cmd = $(this).attr("cmdId");
+	const arg = $(this).attr("argument");
+	let string = "/api/command?command=" + cmd;
 	if(arg) {
 		string += "&argument=" + arg;
 	}

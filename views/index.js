@@ -1,20 +1,15 @@
-require("./sidebar");
-require("./tablesort");
-require("bootstrap");
+import "./sidebar";
+import "./tablesort";
+import "bootstrap";
+import $ from "jquery";
+import * as spawnNotification from "./notification";
 
-var $ = require("jquery");
-var spawnNotification = require("./notification");
-
-$('#nav-sign-out').click(function() {
-	$.ajax("/api/users/logout").done(function(res) {
-		window.location.reload();
-	});
+$("#nav-sign-out").click(() => {
+	$.ajax("/api/users/logout").done((res) => window.location.reload());
 })
-$('#quiet-nav-btn').click(function() {
-	$.ajax("/api/command?command=be%20quiet").done(function(res) {
-		spawnNotification('success', "Ausgabe von Sound sollte zeitnah aufhören.");
-	})
-	.error(function() {
-		spawnNotification('error', "Konnte Befehl nicht ausführen.");
-	});
+$("#quiet-nav-btn").click(() => {
+	$.ajax("/api/command?command=be%20quiet").done(
+		(res) => spawnNotification("success", "Ausgabe von Sound sollte zeitnah aufhören.")
+	)
+	.error(() => spawnNotification("error", "Konnte Befehl nicht ausführen."));
 })

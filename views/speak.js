@@ -23,6 +23,10 @@ const bloodhound = new Bloodhound({
 	}
 });
 
+/**
+ * Refresh the bestof list. This will look up the list at the REST api and display it on the table.
+ * @return {undefined}
+ */
 const refreshBestOf = function() {
 	$("#table").html("");
 	const createRow = (val, key) => $("<tr><td>" +
