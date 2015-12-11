@@ -1,32 +1,31 @@
-var $ = require("jquery");
-var spawnNotification = require("../notification");
+import $ from "jquery";
+import * as spawnNotification from "../notification";
 
-function refreshList() {
-	$.ajax("/api/bass/effects").done(function(res) {
+/**
+ * Refresh the list of effects by polling the RESTful api.
+ * @return {undefined}
+ */
+const refreshList = function() {
+	$.ajax("/api/bass/effects").done((res) => {
 		if(res.okay) {
 			$("#effect-list").html("");
-			var effects = res.effects;
-			for(var i in effects) {
-				var e = effects[i];
+			const effects = res.effects;
+			for(const e of effects) {
 				$("#effect-list").append("<li class='list-group-item'>" + e + "</li>");
 			}
 		}
 	})
-	.error(function() {
-		spawnNotification('error', "Konnte Liste von Effekten nicht abrufen.");
-	});
-}
+	.error(() => spawnNotification("error", "Konnte Liste von Effekten nicht abrufen."));
+};
 refreshList();
 
-$("#submit").click(function() {
-	var quote = $("#effect").val();
-	$.ajax("/api/bass/addEffect?effect=" + encodeURI(quote)).done(function(res) {
+$("#submit").click(() => {
+	const quote = $("#effect").val();
+	$.ajax("/api/bass/addEffect?effect=" + encodeURI(quote)).done((res) => {
 		if(res.okay) {
-			spawnNotification('success', "Effekt erfolgreich ergänzt.");
+			spawnNotification("success", "Effekt erfolgreich ergänzt.");
 			refreshList();
 		}
 	})
-	.error(function() {
-		spawnNotification('error', "Konnte Effekt nicht hinzufügen.");
-	});
+	.error(() => spawnNotification("error", "Konnte Effekt nicht hinzufügen."));
 });

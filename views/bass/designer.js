@@ -1,20 +1,19 @@
-var $ = require("jquery");
-var spawnNotification = require("../notification");
+import $ from "jquery";
+import * as spawnNotification from "../notification";
 
-var arr = [];
+let arr = [];
+
 $(".designer-button").click(function() {
-	var val = $(this).attr('effectValue');
+	const val = $(this).attr("effectValue");
 	arr.push(val);
 	$("#line").append("<li class='btn btn-default btn-sm list-group-item effect'>" + val + "</li>");
 });
 
-$("#play").click(function() {
-	$.ajax("/api/bass/play?bass=" + encodeURI(JSON.stringify(arr))).done(function(res) {
-		spawnNotification('success', "Erfolgreich abgespielt.");
+$("#play").click(() => {
+	$.ajax("/api/bass/play?bass=" + encodeURI(JSON.stringify(arr))).done((res) => {
+		spawnNotification("success", "Erfolgreich abgespielt.");
 		arr = [];
 		$("#line").html("");
 	})
-	.error(function() {
-		spawnNotification('error', "Konnte nicht abspielen.");
-	});
+	.error(() => spawnNotification("error", "Konnte nicht abspielen."));
 });
