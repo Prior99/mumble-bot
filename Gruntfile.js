@@ -105,6 +105,14 @@ module.exports = function(grunt) {
 					ext: ".js"
 				}]
 			}
+		},
+		jsdoc : {
+			dist : {
+				src : ["src/**/*.js", "views/**/*.js"],
+				options : {
+					destination : "doc"
+				}
+			}
 		}
 	});
 
@@ -113,6 +121,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks("grunt-browserify");
 	grunt.loadNpmTasks("grunt-contrib-watch");
 	grunt.loadNpmTasks("grunt-contrib-less");
+	grunt.loadNpmTasks("grunt-jsdoc");
 
-	grunt.registerTask("default", ["eslint", "babel", "browserify", "less"]);
+	grunt.registerTask("default", ["eslint", "jsdoc", "babel", "browserify", "less"]);
 };
