@@ -1,9 +1,15 @@
-var Winston = require('winston');
+import * as Winston from "winston";
+import * as HTTPCodes from "../httpcodes";
 
-var RSS = function(bot) {
+/**
+ * This handles the /rss endpoint and generates a list of all rss feeds.
+ * @param {object} bot - Pointer to the main bot instance.
+ * @return {ViewRenderer} - Feeded view renderer for this endpoint.
+ */
+const RSS = function(bot) {
 	return function(req, res) {
-		bot.permissions.hasPermission(req.session.user, 'rss', function(has) {
-			bot.database.listRSSFeeds(function(err, feeds) {
+		bot.permissions.hasPermission(req.session.user, "rss", (has) => {
+			bot.database.listRSSFeeds((err, feeds) => {
 				if(err) {
 					Winston.error("Could not retrieve list of feeds.", err);
 					res.locals.feeds = [];
@@ -18,4 +24,4 @@ var RSS = function(bot) {
 	};
 };
 
-module.exports = RSS;
+export default RSS;

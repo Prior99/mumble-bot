@@ -243,4 +243,4 @@ class Website {
 	}
 }
 
-module.exports = Website;
+export default Website;
