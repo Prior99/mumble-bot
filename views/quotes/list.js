@@ -1,5 +1,5 @@
-var $ = require("jquery");
+import $ from "jquery";
 
-$("a.quote-btn").click(function() {
-	$.ajax("/api/quotes/speak?id=" + $(this).attr("quoteId"));
+$("a.quote-btn").click((e) => {
+	$.ajax("/api/quotes/speak?id=" + $(e.currentTarget).attr("quoteId"));
 });

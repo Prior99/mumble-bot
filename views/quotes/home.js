@@ -1,5 +1,3 @@
-var $ = require("jquery");
+import $ from "jquery";
 
-$("#speak").click(function() {
-	$.ajax("/api/quotes/speak");
-});
+$("#speak").click(() => $.ajax("/api/quotes/speak"));

@@ -1,34 +1,41 @@
-var $ = require("jquery");
-var spawnNotification = require("../notification");
+import $ from "jquery";
+import * as spawnNotification from "../notification";
 
 $("#progress_wrapper").hide();
-$(":file").change(function() {
+$(":file").change(() => {
 	$("#progress_wrapper").show();
 	$("form").hide();
-	var formdata = new FormData($("form")[0]);
+	const formdata = new FormData($("form")[0]);
 
-	var files = [];
+	const files = [];
 	$("#progressbar_wrapper").html("");
-	for(var i = 0; i < this.files.length; i++) {
-		var file = this.files[i];
-		var name = file.name;
-		var row = $('<tr><td>' + name + '</td></tr>').append().appendTo("#filelist");
-		var symbol = $('<td><span class="glyphicon glyphicon-upload" aria-hidden="true"></span></td>');
+	for(let i = 0; i < this.files.length; i++) {
+		const file = this.files[i];
+		const name = file.name;
+		const row = $("<tr><td>" + name + "</td></tr>").append().appendTo("#filelist");
+		const symbol = $("<td><span class='glyphicon glyphicon-upload' aria-hidden='true'></span></td>");
 		symbol.appendTo(row);
 		files[name] = {
-			symbol: symbol,
-			row : row
+			symbol,
+			row
 		};
-
 	}
 
-	var progress = {};
-	progress.outer = $('<div class="progress"></div>').appendTo("#progressbar_wrapper");
-	progress.inner = $('<div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">').appendTo(progress.outer);
+	const progress = {};
+	progress.outer = $("<div class='progress'></div>").appendTo("#progressbar_wrapper");
+	progress.inner =
+		$("<div class='progress-bar' role='progressbar' aria-valuenow='60' aria-valuemin='0' aria-valuemax='100'>");
+	progress.inner.appendTo(progress.outer);
 
-	function updateProgress(e) {
+	/**
+	 * Update the progressbar when a new XHR event is received.
+	 * @param {event} e - The event from the XHR handler.
+	 * @return {undefined}
+	 */
+	const updateProgress = function(e) {
+		const percent = 100;
 		if(e.lengthComputable) {
-			var percent = parseInt((e.loaded/e.total)*100) +"%";
+			const percent = parseInt((e.loaded/e.total) * percent) + "%";
 			progress.inner.css({"width" : percent});
 		}
 	}
@@ -36,8 +43,8 @@ $(":file").change(function() {
 	$.ajax({
 		url : "/api/music/upload",
 		type : "POST",
-		xhr : function() {
-			var xhr = $.ajaxSettings.xhr();
+		xhr() {
+			const xhr = $.ajaxSettings.xhr();
 			if(xhr.upload) {
 				xhr.upload.addEventListener("progress", updateProgress, false);
 			}
@@ -47,23 +54,29 @@ $(":file").change(function() {
 		data: formdata,
 		processData: false,
 		contentType : false,
-		success : function(data) {
+		success(data) {
 			if(data.okay) {
-				for(var key in data) {
-					var file = data[key];
-					var elem = files[key];
-					elem.symbol.remove();
-					if(file.okay) {
-						elem.symbol = $('<td><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></td>').appendTo(elem.row);
-					}
-					else {
-						elem.symbol = $('<td><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></td>').appendTo(elem.row);
+				for(const key in data) {
+					if(data.hasOwnProperty(key)) {
+						const file = data[key];
+						const elem = files[key];
+						elem.symbol.remove();
+						if(file.okay) {
+							elem.symbol =
+								$("<td><span class='glyphicon glyphicon-ok' aria-hidden='true'></span></td>");
+							elem.symbol.appendTo(elem.row);
+						}
+						else {
+							elem.symbol =
+								$("<td><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></td>");
+							elem.symbol.appendTo(elem.row);
+						}
 					}
 				}
 				$("form").show();
 			}
 			else {
-				spawnNotification('error', "Sie verfügen nicht über die nötige Berechtigung, Musik hochzuladen.");
+				spawnNotification("error", "Sie verfügen nicht über die nötige Berechtigung, Musik hochzuladen.");
 			}
 		}
 	});
