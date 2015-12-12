@@ -1,36 +1,42 @@
-var Winston = require('winston');
+import * as Winston from "winston";
+import * as HTTPCodes from "../../httpcodes";
 
-module.exports = function(bot) {
+/**
+ * Add an RSS feed.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewAdd = function(bot) {
 	return function(req, res) {
-		bot.permissions.hasPermission(req.session.user, 'rss', function(has) {
+		bot.permissions.hasPermission(req.session.user, "rss", (has) => {
 			if(req.query.url && req.query.name) {
 				if(has) {
 					bot.rss.markAllArticlesAsKnown(req.query.url);
-					bot.database.addRSSFeed(req.query.url, req.query.name, function(err) {
+					bot.database.addRSSFeed(req.query.url, req.query.name, (err) => {
 						if(err) {
 							Winston.error("Could not add new RSS feed.", err);
-							res.status(500).send({
+							res.status(HTTPCodes.internalError).send({
 								okay : false,
 								reason : "internal_error"
 							});
 						}
 						else {
 							Winston.verbose(req.session.user.username + " added an rss-feed: " + req.query.url);
-							res.status(200).send({
+							res.status(HTTPCodes.okay).send({
 								okay : true
 							});
 						}
 					});
 				}
 				else {
-					res.status(401).send({
+					res.status(HTTPCodes.insufficientPermission).send({
 						okay : false,
 						reason : "permission_denied"
 					});
 				}
 			}
 			else {
-				res.status(499).send({
+				res.status(HTTPCodes.missingArguments).send({
 					okay : false,
 					reason : "missing_arguments"
 				});
@@ -38,3 +44,5 @@ module.exports = function(bot) {
 		});
 	};
 };
+
+export default ViewAdd;
