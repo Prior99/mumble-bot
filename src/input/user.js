@@ -2,20 +2,21 @@
  * Imports
  */
 
-var Samplerate = require("node-samplerate");
-var Winston = require('winston');
-var Util = require("util");
-var EventEmitter = require("events").EventEmitter;
-var FS = require("fs");
-var Lame = require("lame");
-var Stream = require('stream');
-var Util = require('util');
+import Samplerate from "node-samplerate";
+import Winston from "winston"
+import Util from "util";
+import EventEmitter from "events";
+import FS from "fs";
+import Lame from "lame";
+import Stream from "stream";
 
 /*
  * Defines
  */
 
-var TIMEOUT_THRESHOLD = 300;
+const TIMEOUT_THRESHOLD = 300;
+
+const msInS = 1000;
 
 /*
  * Polyfills
@@ -35,87 +36,138 @@ if(!String.prototype.startsWith) {
 /**
  * This class belongs to the VoiceInput and handles the speech recognition for a
  * single user.
- * @constructor
- * @param user - Mumble user to recognize the speech of.
- * @param databaseUser - ??
- * @param bot - ??
  */
-var VoiceInputUser = function(user, databaseUser, bot) {
-	this._user = user;
-	this.bot = bot;
-	this._databaseUser = databaseUser;
-	this.speaking = false;
-	Stream.Writable.call(this);
-	this._createNewRecordFile();
-	this._connectTime = new Date();
-	this._user.on('disconnect', this._onDisconnect.bind(this));
-};
-
-Util.inherits(VoiceInputUser, Stream.Writable);
-
-/**
- * Feed raw PCM audio data captured from mumble to this user.
- * @param chunk - Buffer of raw PCM audio data.
- */
-VoiceInputUser.prototype._write = function(chunk, encoding, done) {
-	if(!this.speaking) {
-		this._speechStarted();
-	}
-	this._speechContinued(chunk);
-	done();
-};
-
-VoiceInputUser.prototype._onDisconnect = function() {
-	this.bot.database.writeUserStatsOnline(this._databaseUser, this._connectTime, new Date());
-};
-
-VoiceInputUser.prototype._refreshTimeout = function() {
-	if(this._timeout) {
-		clearTimeout(this._timeout);
-	}
-	this._timeout = setTimeout(this._speechStopped.bind(this), TIMEOUT_THRESHOLD);
-};
-
-VoiceInputUser.prototype._speechStarted = function() {
-	this.speaking = true;
-	this._speakStartTime = new Date();
-};
-
-VoiceInputUser.prototype._createNewRecordFile = function() {
-	if(this._databaseUser.settings.record === true) {
-		try { FS.mkdirSync('tmp'); } catch(err) { }
-		try { FS.mkdirSync('tmp/useraudio'); } catch(err) { }
-		try { FS.mkdirSync('tmp/useraudio/' + this._user.id); } catch(err) { }
-		this._filename = 'tmp/useraudio/' + this._user.id + '/' + Date.now() + '.mp3';
-		this._encoder = new Lame.Encoder({
-			channels : 1,
-			bitDepth : 16,
-			sampleRate : 48000,
-			bitRate : 128,
-			outSampleRate : 44100,
-			mode : Lame.MONO
-		});
-		this._recordStream = FS.createWriteStream(this._filename);
-		this._encoder.pipe(this._recordStream);
-	}
-};
-
-VoiceInputUser.prototype._speechStopped = function() {
-	this.speaking = false;
-	this.started = false;
-	if(this._databaseUser.settings.record === true) {
-		this._encoder.end();
-		this.bot.addCachedAudio(this._filename, this._databaseUser, (Date.now() - this._speakStartTime.getTime())/1000);
+class VoiceInputUser extends EventEmitter {
+	/**
+	 * @constructor
+	 * @param {User} user - Mumble user to recognize the speech of.
+	 * @param {User} databaseUser - ??
+	 * @param {Bot} bot - ??
+	 */
+	constructor(user, databaseUser, bot) {
+		super();
+		this._user = user;
+		this.bot = bot;
+		this._databaseUser = databaseUser;
+		this.speaking = false;
+		Stream.Writable.call(this);
 		this._createNewRecordFile();
+		this._connectTime = new Date();
+		this._user.on("disconnect", this._onDisconnect.bind(this));
 	}
-	this.bot.database.writeUserStatsSpeak(this._databaseUser, this._speakStartTime, new Date());
-};
 
-VoiceInputUser.prototype._speechContinued = function(chunk) {
-	if(this._databaseUser.settings.record === true) {
-		this._encoder.write(chunk);
+	/**
+	 * Feed raw PCM audio data captured from mumble to this user.
+	 * @param {array} chunk - Buffer of raw PCM audio data.
+	 * @param {string} encoding - unused.
+	 * @param {function} done - callback.
+	 * @returns {undefined}
+	 */
+	_write(chunk, encoding, done) {
+		if(!this.speaking) {
+			this._speechStarted();
+		}
+		this._speechContinued(chunk);
+		done();
 	}
-	this._refreshTimeout();
-};
+
+	/**
+	 * Called when user disconnects.
+	 * Updates the stats.
+	 * @returns {undefined}
+	 */
+	_onDisconnect() {
+		this.bot.database.writeUserStatsOnline(this._databaseUser, this._connectTime, new Date());
+	}
+
+	/**
+	 * TODO
+	 * @returns {undefined}
+	 */
+	_refreshTimeout() {
+		if(this._timeout) {
+			clearTimeout(this._timeout);
+		}
+		this._timeout = setTimeout(this._speechStopped.bind(this), TIMEOUT_THRESHOLD);
+	}
+
+	/**
+	 * When user started speaking.
+	 * @returns {undefined}
+	 */
+	_speechStarted() {
+		this.speaking = true;
+		this._speakStartTime = new Date();
+	}
+
+	/**
+	 * Creates a new temporary record file.
+	 * @returns {undefined}
+	 */
+	_createNewRecordFile() {
+		if(this._databaseUser.settings.record === true) {
+			try {
+				FS.mkdirSync("tmp");
+			}
+			catch(err) {
+				Winston.error(err);
+			}
+			try {
+				FS.mkdirSync("tmp/useraudio");
+			}
+			catch(err) {
+				Winston.error(err);
+			}
+			try {
+				FS.mkdirSync("tmp/useraudio/" + this._user.id);
+			}
+			catch(err) {
+				Winston.error(err);
+			}
+			this._filename = "tmp/useraudio/" + this._user.id + "/" + Date.now() + ".mp3";
+			this._encoder = new Lame.Encoder({
+				channels : 1,
+				bitDepth : 16,
+				sampleRate : 48000,
+				bitRate : 128,
+				outSampleRate : 44100,
+				mode : Lame.MONO
+			});
+			this._recordStream = FS.createWriteStream(this._filename);
+			this._encoder.pipe(this._recordStream);
+		}
+	}
+
+	/**
+	 * When user stopped speaking.
+	 * @returns {undefined}
+	 */
+	_speechStopped() {
+		this.speaking = false;
+		this.started = false;
+		if(this._databaseUser.settings.record === true) {
+			this._encoder.end();
+			this.bot.addCachedAudio(
+				this._filename,
+				this._databaseUser,
+				(Date.now() - this._speakStartTime.getTime()) / msInS
+			);
+			this._createNewRecordFile();
+		}
+		this.bot.database.writeUserStatsSpeak(this._databaseUser, this._speakStartTime, new Date());
+	}
+
+	/**
+	 * When user continues skeaking TODO
+	 * @param {Buffer} chunk - The user's speech buffer.
+	 * @returns {undefined}
+	 */
+	_speechContinued(chunk) {
+		if(this._databaseUser.settings.record === true) {
+			this._encoder.write(chunk);
+		}
+		this._refreshTimeout();
+	}
+}
 
 module.exports = VoiceInputUser;

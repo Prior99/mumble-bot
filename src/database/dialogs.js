@@ -1,8 +1,8 @@
-const Winston = require("winston");
-const Promise = require("promise");
+import Winston from "winston";
+import Promise from "promise";
 
-module.exports = function(Database) {
-	Database.prototype.addDialog = function(dialog, callback) {
+class Database {
+	addDialog(dialog, callback) {
 		Promise.denodeify(this.pool.query.bind(this.pool))("INSERT INTO Dialogs(submitted) VALUES(?)", [new Date()])
 		.catch(callback)
 		.then(result => {
@@ -15,18 +15,18 @@ module.exports = function(Database) {
 		})
 		.catch(callback)
 		.then(() => { callback(null) });
-	};
+	}
 
-	Database.prototype.getDialogParts = function(dialogId, callback) {
+	getDialogParts(dialogId, callback) {
 		Promise.denodeify(this.pool.query.bind(this.pool))(
 			"SELECT recordId FROM DialogParts WHERE dialogId = ? ORDER BY position ASC", [dialogId])
 		.catch(callback)
 		.then(list => {
 			callback(null, list.map(p => p.recordId))
 		});
-	};
+	}
 
-	Database.prototype.getDialogRecords = function(dialogId, callback) {
+	getDialogRecords(dialogId, callback) {
 		Promise.denodeify(this.getDialogParts)(dialogId)
 		.catch(callback)
 		.then(ids => {
@@ -38,9 +38,9 @@ module.exports = function(Database) {
 		.then(records => {
 			callback(null, records);
 		});
-	};
+	}
 
-	Database.prototype.getDialog = function(id, callback) {
+	getDialog(id, callback) {
 		let dialog;
 		Promise.denodeify(this.pool.query.bind(this.pool))("SELECT id, submitted, used FROM Dialogs WHERE id = ?", [id])
 		.catch(callback)
@@ -58,9 +58,9 @@ module.exports = function(Database) {
 			dialog.records = parts;
 			callback(null, dialog);
 		});
-	};
+	}
 
-	Database.prototype.listDialogs = function(callback) {
+	listDialogs(callback) {
 		Promise.denodeify(this.pool.query.bind(this.pool))("SELECT id FROM Dialogs ORDER BY used DESC")
 		.catch(callback)
 		.then(dialogs => {
@@ -72,13 +72,15 @@ module.exports = function(Database) {
 		.then(dialogs => {
 			callback(null, dialogs);
 		});
-	};
+	}
 
-	Database.prototype.usedDialog = function(id, callback) {
+	usedDialog(id, callback) {
 		Promise.denodeify(this.pool.query.bind(this.pool))("UPDATE Dialogs SET used = used +1 WHERE id = ?", [id])
 		.catch(callback)
 		.then(() => {
 			callback(null);
 		});
-	};
-};
+	}
+}
+
+module.exports = Database; TODO
