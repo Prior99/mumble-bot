@@ -40,9 +40,9 @@ if(!String.prototype.startsWith) {
 class VoiceInputUser extends EventEmitter {
 	/**
 	 * @constructor
-	 * @param {User} user - Mumble user to recognize the speech of.
-	 * @param {User} databaseUser - ??
-	 * @param {Bot} bot - ??
+	 * @param {MumbleUser} user - Mumble user to recognize the speech of.
+	 * @param {DatabaseUser} databaseUser - The user from the database.
+	 * @param {Bot} bot - The bot instance this user belongs to.
 	 */
 	constructor(user, databaseUser, bot) {
 		super();
@@ -81,7 +81,7 @@ class VoiceInputUser extends EventEmitter {
 	}
 
 	/**
-	 * TODO
+	 * Refreshes the timeout of silence after which the audio will be sliced into different records.
 	 * @returns {undefined}
 	 */
 	_refreshTimeout() {
@@ -158,7 +158,8 @@ class VoiceInputUser extends EventEmitter {
 	}
 
 	/**
-	 * When user continues skeaking TODO
+	 * When user continues speaking this method will be called,
+	 * the audio will be encoded and the timeout will be refreshed.
 	 * @param {Buffer} chunk - The user's speech buffer.
 	 * @returns {undefined}
 	 */
