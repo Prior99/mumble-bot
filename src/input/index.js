@@ -16,9 +16,9 @@ import EventEmitter from "events";
  */
 class VoiceInput extends EventEmitter {
 	/**
-		* @constructor
-		* @param {Bot} bot - Instance of the bot this belongs to.
-		*/
+	 * @constructor
+	 * @param {Bot} bot - Instance of the bot this belongs to.
+	 */
 	constructor(bot) {
 		super();
 		this.bot = bot;
@@ -35,12 +35,15 @@ class VoiceInput extends EventEmitter {
 	 * @returns {undefined}
 	 */
 	_initConnectedUsers(users) {
-		for(const i of users) {
-			this._addUser(users[i]);
+		for(const i in users) {
+			if(users.hasOwnProperty(i)) {
+				this._addUser(users[i]);
+			}
 		}
 	}
 
 	/**
+	 * Creates a local user object handling the data received from the mumble user of a registered user.
 	 * @param {MumbleUser} user - The mumble user object.
 	 * @param {DatabaseUser} databaseUser - The user object from the database.
 	 * @returns {undefined}
@@ -79,7 +82,7 @@ class VoiceInput extends EventEmitter {
 
 	/**
 	 * Called when user disconnects. Unregisters the user.
-	 * @param {TODO} user - The user which disconnected.
+	 * @param {VoiceInputUser} user - The user which disconnected.
 	 * @returns {undefined}
 	 */
 	_removeUser(user) {
