@@ -2,24 +2,31 @@
  * Imports
  */
 
-var Express = require('express');
+import * as Express from "express";
 
 /*
  * Views
  */
 
-var viewAdd = require('./add');
-var viewPlay = require('./play');
+import * as viewAdd from "./add";
+import * as viewPlay from "./play";
 
 /*
  * Code
  */
 
-module.exports = function(bot) {
-	var router = Express.Router();
+/**
+ * Routes all requests related to the sound api commands in the /api/sounds/ endpoint.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {Router} - router for the current section.
+ */
+const RouteSounds = function(bot) {
+	const router = Express.Router();
 
-	router.use('/add', viewAdd(bot, router));
-	router.use('/play', viewPlay(bot));
+	router.use("/add", viewAdd(bot, router));
+	router.use("/play", viewPlay(bot));
 
 	return router;
 };
+
+export default RouteSounds;

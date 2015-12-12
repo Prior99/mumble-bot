@@ -1,16 +1,31 @@
-var Winston = require('winston');
-var Multer = require('multer');
-var FS = require('fs');
-module.exports = function(bot, router) {
+import * as Winston from "winston";
+import * as Multer from "multer";
+import * as FS from "fs";
+import * as HTTPCodes from "../../httpcodes";
 
+/**
+ * View for playback endpoint of sound section.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @param {object} router - Express router this view is connected to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewSoundAdd = function(bot, router) {
 	router.use(Multer({
 		dest: bot.options.website.tmp,
-		rename : function(fieldname, filename) {
+		rename(fieldname, filename) {
 			return filename + Date.now();
 		}
 	}));
 
-	function handleFile(file, res) {
+	/**
+	 * Handle a file upload.
+	 * @param {object} file - File from multer.
+	 * @param {object} file.path - Path of the temporary file.
+	 * @param {object} file.originalname - Original file name.
+	 * @param {object} res - Response from express to answer.
+	 * @return {undefined}
+	 */
+	const handleFile = function(file, res) {
 		try {
 			FS.mkdirSync("sounds/uploaded");
 		}
@@ -19,20 +34,20 @@ module.exports = function(bot, router) {
 				throw e;
 			}
 		}
-		bot.database.addSound(file.originalname, function(err, id) {
+		bot.database.addSound(file.originalname, (err, id) => {
 			if(err) {
 				Winston.error("Could not add sound to database", err);
-				res.status(500).send({
+				res.status(HTTPCodes.internalError).send({
 					okay : false,
 					reason : "internal_error"
 				});
 			}
 			else {
-				Winston.log('verbose', "added new sound #" + id);
+				Winston.log("verbose", "added new sound #" + id);
 				FS.renameSync(file.path, "sounds/uploaded/" + id);
-				res.status(200).send({
-					okay :true,
-					id : id
+				res.status(HTTPCodes.okay).send({
+					okay : true,
+					id
 				});
 			}
 		});
@@ -42,3 +57,5 @@ module.exports = function(bot, router) {
 		handleFile(req.files["upload"], res, req);
 	};
 };
+
+export default ViewSoundAdd;
