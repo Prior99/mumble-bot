@@ -98,4 +98,4 @@ class Music {
 	}
 }
 
-module.exports = Music;
+export default Music;

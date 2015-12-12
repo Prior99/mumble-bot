@@ -200,4 +200,4 @@ class MPDControl {
 	}
 }
 
-module.exports = MPDControl;
+export default MPDControl;
