@@ -1,21 +1,22 @@
-var Winston = require("winston");
+import * as Winston from "winston";
 
 /**
  * <b>/quotes/list/</b> Displays a list of quotes.
  * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
  */
-var ViewQuotesList= function(bot) {
+const ViewQuotesList= function(bot) {
 	return function(req, res) {
-		bot.quotes.list(function(err, list) {
+		bot.quotes.list((err, list) => {
 			if(err) {
 				Winston.error("Error fetching amount of quotes: " + err);
 				res.locals.quotes = [];
 			}
 			else {
-				var maxTextLength = 50;
-				for(var k in list) {
-					if(list[k].quote.length > maxTextLength) {
-						list[k].quote = list[k].quote.substring(0, maxTextLength - 3) + "...";
+				const maxTextLength = 50;
+				for(const k of list) {
+					if(k.quote.length > maxTextLength) {
+						k.quote = k.quote.substring(0, maxTextLength - 3) + "...";
 					}
 				}
 				res.locals.quotes = list;
@@ -25,4 +26,4 @@ var ViewQuotesList= function(bot) {
 	}
 };
 
-module.exports = ViewQuotesList;
+export default ViewQuotesList;

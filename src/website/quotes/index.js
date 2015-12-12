@@ -2,25 +2,25 @@
  * Imports
  */
 
-var Express = require('express');
+import * as Express from "express";
 
 /*
  * Views
  */
 
-var viewDefault = require('../default');
-var viewAddQuote = require("./add");
-var viewQuoteHome = require("./home");
-var viewListQuotes = require("./list");
+import * as viewDefault from "../default";
+import * as viewAddQuote from "./add";
+import * as viewQuoteHome from "./home";
+import * as viewListQuotes from "./list";
 
 /*
  * Code
  */
-var pages = [{
+const pages = [{
 	url : "/quotes/",
 	name : "Info",
 	icon : "info"
-},{
+}, {
 	url : "/quotes/add/",
 	name : "Zitat hinzufügen",
 	icon : "quote-right"
@@ -32,18 +32,19 @@ var pages = [{
 /**
  * Routes all requests related to quotes in the /quotes/ endpoint.
  * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
  */
-var RouteQuotes = function(bot) {
-	var router = Express.Router();
-	router.use(function(req, res, next) {
+const RouteQuotes = function(bot) {
+	const router = Express.Router();
+	router.use((req, res, next) => {
 		res.locals.subpages = pages;
 		next();
 	});
-	router.get('/add', viewAddQuote(bot));
-	router.get('/list', viewListQuotes(bot));
-	router.get('/', viewQuoteHome(bot));
+	router.get("/add", viewAddQuote(bot));
+	router.get("/list", viewListQuotes(bot));
+	router.get("/", viewQuoteHome(bot));
 
 	return router;
 };
 
-module.exports = RouteQuotes;
+export default RouteQuotes;
