@@ -2,28 +2,29 @@
  * Imports
  */
 
-var Express = require('express');
+import * as Express from "express";
+import * as HTTPCodes from "../httpcodes";
 
 /*
  * Views
  */
 
-var viewTree = require('./channeltree');
-var viewCommand = require('./command');
-var viewGoogleLookup = require('./googlelookup');
+import * as viewTree from "./channeltree";
+import * as viewCommand from "./command";
+import * as viewGoogleLookup from "./googlelookup";
 
 /*
  * Routes
  */
-var routeMusic = require('./music');
-var routeUsers = require('./users');
-var routeQuotes = require('./quotes');
-var routeBass = require('./bass');
-var routeSpeak = require('./speak');
-var routeSounds = require('./sounds');
-var routeRecord = require('./record');
-var routeRSS = require('./rss');
-var routeStats = require('./stats');
+import * as routeMusic from "./music";
+import * as routeUsers from "./users";
+import * as routeQuotes from "./quotes";
+import * as routeBass from "./bass";
+import * as routeSpeak from "./speak";
+import * as routeSounds from "./sounds";
+import * as routeRecord from "./record";
+import * as routeRSS from "./rss";
+import * as routeStats from "./stats";
 
 
 /*
@@ -33,36 +34,43 @@ var routeStats = require('./stats');
 /**
  * Routes all requests related to the qpi in the /qpi/ endpoint.
  * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {Router} - router for the current section.
  */
-var RouteAPI = function(bot) {
-
-	function loginByQueryString(req, res, next) {
-		bot.database.checkLoginData(req.query.username, req.query.password, function(err, okay) {
+const RouteAPI = function(bot) {
+	/**
+	 * Performs the login of a user for this session by query parameters.
+	 * @param {object} req - Express' request object.
+	 * @param {object} res - The response object from express to answer to in case of failure.
+	 * @param {VoidCallback} next - The next handler from express to call.
+	 * @return {undefined}
+	 */
+	const loginByQueryString = function(req, res, next) {
+		bot.database.checkLoginData(req.query.username, req.query.password, (err, okay) => {
 			if(err) {
 				Winston.error("Error checking whether user exists", err);
-				res.status(500).send({
+				res.status(HTTPCodes.internalError).send({
 					okay : false,
 					reason : "internal_error"
 				});
 			}
 			else {
 				if(okay) {
-					bot.database.getUserByUsername(req.query.username, function(err, user) {
+					bot.database.getUserByUsername(req.query.username, (err, user) => {
 						if(err) {
 							Winston.error("Error fetching user.", err);
-							res.status(500).send({
+							res.status(HTTPCodes.internalError).send({
 								okay : false,
 								reason : "internal_error"
 							});
 						}
 						else {
-							bot.permissions.hasPermission(user, "login", function(has) {
+							bot.permissions.hasPermission(user, "login", (has) =>{
 								if(has) {
 									req.session.user = user;
 									next();
 								}
 								else {
-									res.status(400).send({
+									res.status(HTTPCodes.invalidRequest).send({
 										okay : false,
 										reason : "no_login"
 									});
@@ -72,7 +80,7 @@ var RouteAPI = function(bot) {
 					});
 				}
 				else {
-					res.status(400).send({
+					res.status(HTTPCodes.invalidRequest).send({
 						okay : false,
 						reason : "no_login"
 					});
@@ -81,9 +89,9 @@ var RouteAPI = function(bot) {
 		});
 	}
 
-	var router = Express.Router();
-	router.use('/users', routeUsers(bot));
-	router.use(function(req, res, next) {
+	const router = Express.Router();
+	router.use("/users", routeUsers(bot));
+	router.use((req, res, next) => {
 		if(req.session.user) {
 			next();
 		}
@@ -91,19 +99,19 @@ var RouteAPI = function(bot) {
 			loginByQueryString(req, res, next);
 		}
 	});
-	router.use('/music', routeMusic(bot));
-	router.use('/tree', viewTree(bot));
-	router.use('/command', viewCommand(bot));
-	router.use('/quotes', routeQuotes(bot));
-	router.use('/bass', routeBass(bot));
-	router.use('/speak', routeSpeak(bot));
-	router.use('/sounds', routeSounds(bot));
-	router.use('/google', viewGoogleLookup(bot));
-	router.use('/record', routeRecord(bot));
-	router.use('/rss', routeRSS(bot));
-	router.use('/stats', routeStats(bot));
+	router.use("/music", routeMusic(bot));
+	router.use("/tree", viewTree(bot));
+	router.use("/command", viewCommand(bot));
+	router.use("/quotes", routeQuotes(bot));
+	router.use("/bass", routeBass(bot));
+	router.use("/speak", routeSpeak(bot));
+	router.use("/sounds", routeSounds(bot));
+	router.use("/google", viewGoogleLookup(bot));
+	router.use("/record", routeRecord(bot));
+	router.use("/rss", routeRSS(bot));
+	router.use("/stats", routeStats(bot));
 
 	return router;
 };
 
-module.exports = RouteAPI;
+export default RouteAPI;
