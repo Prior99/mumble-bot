@@ -4,5 +4,6 @@ export default {
 	notFound : 404,
 	invalidRequest : 400,
 	okay : 200,
-	insufficientPermission : 401
+	insufficientPermission : 401,
+	missingArguments : 499
 };
