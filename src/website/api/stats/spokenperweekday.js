@@ -1,22 +1,28 @@
-var Winston = require('winston');
-var Promise = require('promise');
+import * as Winston from "winston";
+import * as Promise from "promise";
+import * as HTTPCodes from "../../httpcodes";
 
-var weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+const weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 
-module.exports = function(bot) {
+/**
+ * API endpoint for statistics about speech per weekday.
+ * server this bot is connected to.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewSpokenPerWeekday = function(bot) {
 	return function(req, res) {
 		Promise.denodeify(bot.database.getSpokenPerWeekday.bind(bot.database))()
-		.catch(function(err) {
+		.catch((err) => {
 			Winston.error("Could not get speech amount per weekday.", err);
 			return [];
 		})
-		.then(function(spoken) {
-			res.status(200).send(spoken.map(function(elem) {
-                return {
-                    amount : elem.amount,
-                    day : weekdays[elem.day - 1]
-                }
-            }));
+		.then((spoken) => {
+			res.status(HTTPCodes.okay).send(
+				spoken.map((elem) => ({ "amount" : elem.amount, "day" : weekdays[elem.day - 1] }))
+			);
 		});
 	};
 };
+
+export default ViewSpokenPerWeekday;
