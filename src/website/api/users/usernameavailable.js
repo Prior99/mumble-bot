@@ -1,23 +1,29 @@
-var Winston = require('winston');
+import * as Winston from "winston";
+import * as HTTPCodes from "../../httpcodes";
 
-module.exports = function(bot) {
+/**
+ * Checks whether a username is available.
+ * @param {object} bot - Pointer to the main bot instance.
+ * @return {ViewRenderer} - Feeded view renderer for this endpoint.
+ */
+const ViewUsernameAvailable = function(bot) {
 	return function(req, res) {
-		bot.database.getUserByUsername(req.query.username, function(err, user) {
+		bot.database.getUserByUsername(req.query.username, (err, user) => {
 			if(err) {
 				Winston.error("Error checking whether username is available", err);
-				res.status(500).send(JSON.stringify({
+				res.status(HTTPCodes.internalError).send(JSON.stringify({
 					okay : false
 				}));
 			}
 			else {
 				if(user) {
-					res.status(400).send(JSON.stringify({
+					res.status(HTTPCodes.invalidRequest).send(JSON.stringify({
 						okay : true,
 						available : false
 					}));
 				}
 				else {
-					res.status(200).send(JSON.stringify({
+					res.status(HTTPCodes.okay).send(JSON.stringify({
 						okay : true,
 						available : true
 					}));
@@ -26,3 +32,5 @@ module.exports = function(bot) {
 		});
 	}
 };
+
+export default ViewUsernameAvailable;

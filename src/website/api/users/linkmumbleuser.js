@@ -1,30 +1,32 @@
-var Winston = require('winston');
+import * as Winston from "winston";
+import * as HTTPCodes from "../../httpcodes";
 
 /**
  * <b>/api/users/linkMumbleUser</b> Links a mumble user to a user.
  * server this bot is connected to.
  * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
  */
-var ViewAPIUsersLinkMumbleUser = function(bot) {
+const ViewAPIUsersLinkMumbleUser = function(bot) {
 	return function(req, res) {
-		if(req.session.user.username == req.query.username) {
-			bot.database.linkMumbleUser(req.query.id, req.query.username, function(err) {
+		if(req.session.user.username === req.query.username) {
+			bot.database.linkMumbleUser(req.query.id, req.query.username, (err) => {
 				if(err) {
-					res.status(500).send({
+					res.status(HTTPCodes.internalError).send({
 						okay : false,
 						reason : "internal_error"
 					});
 				}
 				else {
-					Winston.log('verbose', req.session.user.username + " linked mumble user with id " + req.query.id);
-					res.status(200).send({
+					Winston.log("verbose", req.session.user.username + " linked mumble user with id " + req.query.id);
+					res.status(HTTPCodes.okay).send({
 						okay : true
 					});
 				}
-			}.bind(this));
+			});
 		}
 		else {
-			res.status(400).send({
+			res.status(HTTPCodes.invalidRequest).send({
 				okay : false,
 				reason : "invalid_user"
 			});
@@ -32,4 +34,4 @@ var ViewAPIUsersLinkMumbleUser = function(bot) {
 	};
 };
 
-module.exports = ViewAPIUsersLinkMumbleUser;
+export default ViewAPIUsersLinkMumbleUser;

@@ -1,10 +1,18 @@
-var Steam64 = require("../../../steam64id");
-var Winston = require('winston');
+import * as Steam64 from "../../../steam64id";
+import * as Winston from "winston";
 
-module.exports = function(bot) {
-
-	function grantAll() {
-		bot.database.getUserById(1, function(err, user) {
+/**
+ * Register a new user on the server.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewRegister = function(bot) {
+	/**
+	 * Grants all permissions to the user with the id 1. (The first registered user is admin).
+	 * @return {undefined}
+	 */
+	const grantAll = function() {
+		bot.database.getUserById(1, (err, user) => {
 			if(err) {
 				Winston.error("Error when granting all permissions to user with id 0.", err);
 			}
@@ -15,9 +23,8 @@ module.exports = function(bot) {
 	}
 
 	return function(req, res) {
-		var data = req.query;
-		console.log(data);
-		Steam64(data.steamusername, function(err, steamid) {
+		const data = req.query;
+		Steam64(data.steamusername, (err, steamid) => {
 			if(err && data.steamusername) {
 				res.send({
 					okay : false,
@@ -36,12 +43,12 @@ module.exports = function(bot) {
 					username : data.username,
 					password : data.password,
 					identifier : data.identifier,
-					steamid : steamid,
+					steamid,
 					minecraft : data.minecraft
 
-				}, function(err, id) {
+				}, (err, id) => {
 					if(err) {
-						if(err.code == "ER_DUP_ENTRY") {
+						if(err.code === "ER_DUP_ENTRY") {
 							res.send({
 								okay : false,
 								reason : "username_taken"
@@ -56,10 +63,10 @@ module.exports = function(bot) {
 						}
 					}
 					else {
-						Winston.debug('verbose', "A new user registered: " + data.username);
+						Winston.debug("verbose", "A new user registered: " + data.username);
 						res.send({
 							okay : true,
-							id : id
+							id
 						});
 						if(id === 1) {
 							grantAll();
@@ -70,3 +77,4 @@ module.exports = function(bot) {
 		});
 	}
 };
+export default ViewRegister;

@@ -32,7 +32,7 @@ import * as routeStats from "./stats";
  */
 
 /**
- * Routes all requests related to the qpi in the /qpi/ endpoint.
+ * Routes all requests related to the api in the /api/ endpoint.
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {Router} - router for the current section.
  */

@@ -1,22 +1,28 @@
-var Steam64 = require("../../../steam64id.js");
+import * as Steam64 from "../../../steam64id.js";
+import * as HTTPCodes from "../../httpcodes";
 
-module.exports = function() {
+/**
+ * Looks up a steam 64 id on the steam api and proxies it to our api.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewSteam64Id = function() {
 	return function(req, res) {
-		Steam64(req.query.steamusername, function(err, steam64id) {
+		Steam64(req.query.steamusername, (err, steam64id) => {
 			if(err) {
-				res.status(500).send(JSON.stringify({
+				res.status(HTTPCodes.internalError).send(JSON.stringify({
 					okay : false
 				}));
 			}
 			else {
 				if(!steam64id) {
-					res.status(400).send(JSON.stringify({
+					res.status(HTTPCodes.invalidRequest).send(JSON.stringify({
 						okay : true,
 						exists : false
 					}));
 				}
 				else {
-					res.status(200).send(JSON.stringify({
+					res.status(HTTPCodes.okay).send(JSON.stringify({
 						okay : true,
 						exists : true,
 						id : steam64id
@@ -26,3 +32,5 @@ module.exports = function() {
 		});
 	}
 };
+
+export default ViewSteam64Id;
