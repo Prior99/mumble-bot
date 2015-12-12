@@ -1,5 +1,5 @@
-const RNG = require("rng-js");
-const Color = require("onecolor");
+import RNG from "rng-js";
+import Color from "onecolor";
 
 module.exports = function(string) {
 	const rng = new RNG(string);
