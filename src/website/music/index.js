@@ -2,18 +2,18 @@
  * Imports
  */
 
-var Express = require('express');
+import * as Express from "express";
 
 /*
  * Views
  */
 
-var viewDefault = require('../default');
+import * as viewDefault from "../default";
 
 /*
  * Code
  */
-var pages = [{
+const pages = [{
 	url : "/music/status/",
 	name : "Status",
 	icon : "headphones"
@@ -38,21 +38,22 @@ var pages = [{
 /**
  * Routes all requests related to music in the /music/ endpoint.
  * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {Router} - The router for this section.
  */
-var RouteMusic = function(bot) {
-	var router = Express.Router();
-	router.use(function(req, res, next) {
+const RouteMusic = function(bot) {
+	const router = Express.Router();
+	router.use((req, res, next) => {
 		res.locals.subpages = pages;
 		next();
 	});
-	router.use('/playlist', viewDefault("music/playlist"));
-	router.use('/status', viewDefault("music/status"));
-	router.use('/upload', viewDefault("music/upload"));
-	router.use('/songs', viewDefault("music/songs"));
-	router.use('/youtube', viewDefault("music/youtube"));
-	router.get('/', viewDefault("music/home"));
+	router.use("/playlist", viewDefault("music/playlist"));
+	router.use("/status", viewDefault("music/status"));
+	router.use("/upload", viewDefault("music/upload"));
+	router.use("/songs", viewDefault("music/songs"));
+	router.use("/youtube", viewDefault("music/youtube"));
+	router.get("/", viewDefault("music/home"));
 
 	return router;
 };
 
-module.exports = RouteMusic;
+export default RouteMusic;

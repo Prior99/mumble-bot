@@ -2,18 +2,18 @@
  * Imports
  */
 
-var Express = require('express');
+import * as Express from "express";
 
 /*
  * Views
  */
 
-var viewDefault = require('../default');
-var viewCreator = require('./creator');
+import * as viewDefault "../default";
+import * as viewCreator "./creator";
 /*
  * Code
  */
-var pages = [{
+const pages = [{
 	url : "/bass/effects/",
 	name : "Effekte",
 	icon : "puzzle-piece"
@@ -26,6 +26,7 @@ var pages = [{
 /**
  * Routes all requests related to bass in the /bass/ endpoint.
  * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {Router} - The router for this section.
  */
 var RouteBass = function(bot) {
 	var router = Express.Router();
@@ -33,11 +34,11 @@ var RouteBass = function(bot) {
 		res.locals.subpages = pages;
 		next();
 	});
-	router.use('/designer', viewCreator(bot));
-	router.use('/effects', viewDefault("bass/effects"));
-	router.get('/', viewCreator(bot));
+	router.use("/designer", viewCreator(bot));
+	router.use("/effects", viewDefault("bass/effects"));
+	router.get("/", viewCreator(bot));
 
 	return router;
 };
 
-module.exports = RouteBass;
+export default RouteBass;

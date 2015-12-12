@@ -32,7 +32,7 @@ const pages = [{
 /**
  * Routes all requests related to quotes in the /quotes/ endpoint.
  * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
+ * @return {Router} - The router for this section.
  */
 const RouteQuotes = function(bot) {
 	const router = Express.Router();
