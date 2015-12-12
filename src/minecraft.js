@@ -2,10 +2,9 @@
 /*
  * Includes
  */
-var Mineflayer = require('mineflayer');
-var Winston = require('winston');
-var EventEmitter = require("events").EventEmitter;
-var Util = require("util");
+import * as Mineflayer from "mineflayer";
+import * as Winston from "winston";
+import EventEmitter from "events";
 
 /*
  * Code
@@ -13,61 +12,73 @@ var Util = require("util");
 
 /**
  * This  class handles the connection of the bot to minecraft.
- * @constructor
- * @param options - Options for the connection read from config file
- * @param {Bot} bot - The bot this minecraft class is attached to
  */
-var Minecraft = function(options, bot) {
-	this.bot = bot;
-	Winston.info("Connecting to Minecraft server on " + options.host + ":" + options.port + " as " + bot.options.name + " ...");
-	this.mc = Mineflayer.createBot({
-		host : options.host,
-		port : options.port,
-		username : bot.options.name,
-		keepAlive : true
-	});
-	this._ready = false;
-	this.mc.once('spawn', function() {
-		Winston.info("Connected to minecraft and spawned at " + this.mc.entity.position);
-		this._ready = true;
-	}.bind(this));
-	this.mc.on('chat', this._onChat.bind(this));
-};
-
-Util.inherits(Minecraft, EventEmitter);
-
-Minecraft.prototype._onChat = function(username, message) {
-	if(username !== this.mc.username) {
-		this.bot.database.getUserByMinecraftUsername(username, function(err, user) {
-			if(err) {
-				Winston.error("Error fetching user by minecraft username.", err);
-			}
-			else {
-				this.bot.command.processPrefixed(message, 'minecraft', user);
-			}
+class Minecraft extends EventEmitter {
+	/**
+	 * @constructor
+	 * @param {object} options - Options for the connection read from config file.
+	 * @param {string} options.host - Host to connect to (ip or domain).
+	 * @param {number} options.port - Port to connect to.
+	 * @param {Bot} bot - The bot this minecraft class is attached to.
+	 */
+	constructor(options, bot) {
+		super();
+		this.bot = bot;
+		Winston.info("Connecting to Minecraft server on " +
+			options.host + ":" + options.port + " as " + bot.options.name + " ..."
+		);
+		this.mc = Mineflayer.createBot({
+			host : options.host,
+			port : options.port,
+			username : bot.options.name,
+			keepAlive : true
 		});
+		this._ready = false;
+		this.mc.once("spawn", () => {
+			Winston.info("Connected to minecraft and spawned at " + this.mc.entity.position);
+			this._ready = true;
+		});
+		this.mc.on("chat", this._onChat.bind(this));
 	}
-};
-
-/**
- * Say something in the minecraft servers chat.
- * @param {string} msg - The message to say in the servers chat
- */
-Minecraft.prototype.say = function(msg) {
-	if(this._ready) {
-		this.mc.chat(msg);
+	/**
+	 * Called when a message was received.
+	 * @param {string} username - Username of the user who sent the message.
+	 * @param {string} message - The message that was received.
+	 * @return {undefined}
+	 */
+	_onChat(username, message) {
+		if(username !== this.mc.username) {
+			this.bot.database.getUserByMinecraftUsername(username, function(err, user) {
+				if(err) {
+					Winston.error("Error fetching user by minecraft username.", err);
+				}
+				else {
+					this.bot.command.processPrefixed(message, "minecraft", user);
+				}
+			});
+		}
 	}
-};
 
-/**
- * Disconnect from minecraft gently and shutdown this instance.
- */
-Minecraft.prototype.stop = function() {
-	Winston.info("Closing connection to Minecraft ...");
-	this.mc.on('end', function() {
-		Winston.info("Disconnected from Minecraft.");
-	});
-	this.mc.quit();
-};
+	/**
+	 * Say something in the minecraft servers chat.
+	 * @param {string} msg - The message to say in the servers chat
+	 * @return {undefined}
+	 */
+	say(msg) {
+		if(this._ready) {
+			this.mc.chat(msg);
+		}
+	}
 
-module.exports = Minecraft;
+	/**
+	 * Disconnect from minecraft gently and shutdown this instance.
+	 * @return {undefined}
+	 */
+	stop() {
+		Winston.info("Closing connection to Minecraft ...");
+		this.mc.on("end", () => Winston.info("Disconnected from Minecraft."));
+		this.mc.quit();
+	}
+}
+
+export default Minecraft;
