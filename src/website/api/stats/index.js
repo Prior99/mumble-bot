@@ -21,10 +21,10 @@ import * as viewRecordPlaybacksPerUser from "./recordplaybacksperuser";
  */
 
 /**
-* Routes all requests related to the stats api commands in the /api/stats/ endpoint.
-* @param {Bot} bot - Bot the webpage belongs to.
-* @return {Router} - router for the current section.
-*/
+ * Routes all requests related to the stats api commands in the /api/stats/ endpoint.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {Router} - router for the current section.
+ */
 const RouteStats = function(bot) {
 	const router = Express.Router();
 

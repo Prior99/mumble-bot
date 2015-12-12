@@ -1,21 +1,30 @@
-var Winston = require('winston');
+import * as Winston from "winston";
+import * as HTTPCodes from "../../httpcodes";
 
-
-module.exports = function(bot) {
+/**
+ * Statistics view for playbacks per user.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewLookup = function(bot) {
 	return function(req, res) {
-		var text;
-		if(req.query.text) { text = req.query.text; }
-		else { text = ""; }
-		bot.database.lookupAutoComplete(text, function(err, arr) {
+		let text;
+		if(req.query.text) {
+			text = req.query.text;
+		}
+		else {
+			text = "";
+		}
+		bot.database.lookupAutoComplete(text, (err, arr) => {
 			if(err) {
 				Winston.error("Error looking up autocomplete", err);
-				res.status(500).send({
+				res.status(HTTPCodes.internalError).send({
 					okay : false,
 					reason : "internal_error"
 				});
 			}
 			else {
-				res.status(200).send({
+				res.status(HTTPCodes.okay).send({
 					okay : true,
 					suggestions : arr
 				});
@@ -23,3 +32,5 @@ module.exports = function(bot) {
 		});
 	};
 };
+
+export default ViewLookup;
