@@ -309,4 +309,4 @@ class Permissions {
 	}
 }
 
-module.exports = Permissions;
+export default Permissions;
