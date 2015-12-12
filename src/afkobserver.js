@@ -1,5 +1,5 @@
 
-const Winston = require("winston");
+import Winston from "winston";
 
 const msInS = 1000;
 
@@ -111,7 +111,7 @@ class AFKObserver {
 	 */
 	check() {
 		const now = Date.now();
-		for(const key in this.times) {
+		for(const key of this.times) {
 			const idleTime = Math.round((now - this.times[key])/msInS);
 			const mumbleUser = this.bot.mumble.userBySession(key);
 			if(mumbleUser) {
@@ -135,4 +135,3 @@ class AFKObserver {
 }
 
 module.exports = AFKObserver;
-
