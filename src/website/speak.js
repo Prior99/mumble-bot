@@ -9,4 +9,4 @@ const Speak = function(bot) {
 	};
 };
 
-module.exports = Speak;
+export default Speak;
