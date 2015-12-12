@@ -8,8 +8,8 @@ import * as Express from "express";
  * Views
  */
 
-import * as viewDefault "../default";
-import * as viewCreator "./creator";
+import * as viewDefault from "../default";
+import * as viewCreator from "./creator";
 /*
  * Code
  */
@@ -28,9 +28,9 @@ const pages = [{
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {Router} - The router for this section.
  */
-var RouteBass = function(bot) {
-	var router = Express.Router();
-	router.use(function(req, res, next) {
+const RouteBass = function(bot) {
+	const router = Express.Router();
+	router.use((req, res, next) => {
 		res.locals.subpages = pages;
 		next();
 	});
