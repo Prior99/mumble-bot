@@ -1,8 +1,9 @@
 /*
  * Includes
  */
-var parseXML = require('xml2js').parseString;
-var Request = require('request');
+import {parseString as parseXML} from "xml2js";
+import * as Request from "request";
+import * as HTTPCodes from "website/httpcodes";
 /*
  * Code
  */
@@ -11,19 +12,20 @@ var Request = require('request');
  * Retrieves the steam64 id by the username of a specified user on steam.
  * This is done by opening their profile as xml and parsing it.
  * @param {string} username - Username of the steam user to retrieve the id of.
- * @param callback - Called once the id was retrieved.
+ * @param {Callback} callback - Called once the id was retrieved.
+ * @return {undefined}
  */
-module.exports = function(username, callback) {
-	Request("http://steamcommunity.com/id/" + username + "?xml=1", function(err, response, body) {
+const Steam64Id = function(username, callback) {
+	Request("http://steamcommunity.com/id/" + username + "?xml=1", (err, response, body) => {
 		if(err) {
 			callback(err);
 		}
 		else {
-			if(response.statusCode !== 200) {
+			if(response.statusCode !== HTTPCodes.okay) {
 				callback(new Error("Non-okay status code when fetching steamcommunity.com"));
 			}
 			else {
-				parseXML(body, function (err, result) {
+				parseXML(body, (err, result) => {
 					if(result) {
 						if(result.profile && result.profile.steamID64 && result.profile.steamID64.length > 0) {
 							callback(null, result.profile.steamID64[0]);
@@ -37,3 +39,5 @@ module.exports = function(username, callback) {
 		}
 	});
 };
+
+export default Steam64Id;

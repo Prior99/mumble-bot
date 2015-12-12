@@ -19,6 +19,13 @@ import * as Readline from "readline";
  * @param {object} options - Options to connect with, read from configfile.
  */
 class SteamBot extends EventEmitter {
+	/**
+	 * @constructor
+	 * @param {Bot} bot - The bot this instance belongs to.
+	 * @param {object} options - The bots configuration for steam.
+	 * @param {string} options.user - The username to connect with.
+	 * @param {string} options.password - The password to use for authentication.
+	 */
 	constructor(bot, options) {
 		super();
 		this.bot = bot;
@@ -42,6 +49,10 @@ class SteamBot extends EventEmitter {
 		});
 	}
 
+	/**
+	 * Set up steamguard. The code will be read from the commandline.
+	 * @return {undefined}
+	 */
 	_startUpSteamGuard() {
 		const rl = Readline.createInterface({
 			input: process.stdin,
@@ -60,6 +71,12 @@ class SteamBot extends EventEmitter {
 		});
 	}
 
+	/**
+	 * Called when a chatmessage was received via steam.
+	 * @param {string} message - The message that was received.
+	 * @param {string} steamId - The SteamID of the user that sent us the message.
+	 * @return {undefined}
+	 */
 	_onMessage(message, steamId) {
 		this.bot.database.getUserBySteamId(steamId, (err, user) => {
 			if(err) {
@@ -71,6 +88,10 @@ class SteamBot extends EventEmitter {
 		});
 	}
 
+	/**
+	 * Called when the login was done. Registeres all neccessary listeners.
+	 * @return {undefined}
+	 */
 	_postLogin() {
 		this.client.on("message", (source, message, type, chatter) => {
 			if(type === Steam.EChatEntryType.ChatMsg) {
@@ -121,6 +142,10 @@ class SteamBot extends EventEmitter {
 		}
 	}
 
+	/**
+	 * Called when the conenction to steam was done. Performs the login.
+	 * @return {undefined}
+	 */
 	_startUp() {
 		Winston.info("Connecting to steam as " + this.options.accountName + " ... ");
 		this.client = new Steam.SteamClient();
@@ -147,4 +172,4 @@ class SteamBot extends EventEmitter {
 	}
 }
 
-module.exports = SteamBot;
+export default SteamBot;

@@ -1,20 +1,28 @@
-var Winston = require('winston');
+import * as Winston from "winston";
+import * as HTTPCodes from "../../httpcodes";
 
-module.exports = function(bot) {
+/**
+ * View for playing back a bass song.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewPlay = function(bot) {
 	return function(req, res) {
 		if(req.query.bass) {
-			var string = JSON.parse(req.query.bass).join(' ');
+			const string = JSON.parse(req.query.bass).join(" ");
 			bot.say(string);
-			Winston.log('verbose', req.session.user.username + " played a bassline");
-			res.status(200).send({
+			Winston.log("verbose", req.session.user.username + " played a bassline");
+			res.status(HTTPCodes.okay).send({
 				okay : true
 			});
 		}
 		else {
-			res.status(400).send({
+			res.status(HTTPCodes.missingArguments).send({
 				okay : false,
 				reason : "missing_arguments"
 			})
 		}
 	}
 };
+
+export default ViewPlay;

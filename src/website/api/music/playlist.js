@@ -1,10 +1,17 @@
-module.exports = function(bot) {
+/**
+ * View for showing the current playlist of the MPD.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewPlaylist = function(bot) {
 	return function(req, res) {
-		var arr = [];
-		var playlist = bot.mpd.mpd.playlist;
-		for(var i in bot.mpd.mpd.playlist) {
-			arr.push(playlist[i].flatCopy());
+		const arr = [];
+		const playlist = bot.mpd.mpd.playlist;
+		for(const song of bot.mpd.mpd.playlist) {
+			arr.push(song.flatCopy());
 		}
 		res.send(JSON.stringify(arr));
 	}
 };
+
+export default ViewPlaylist;
