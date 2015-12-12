@@ -2,22 +2,22 @@
  * Imports
  */
 
-var Express = require('express');
+import * as Express from "express";
 
 /*
  * Views
  */
-var viewDefault = require('../default');
-var viewSounds = require('./sounds');
+import * as viewDefault from "../default";
+import * as viewSounds from "./sounds";
 
 /*
  * Code
  */
-var pages = [{
+const pages = [{
 	url : "/sounds/",
 	name : "Sounds",
 	icon : "volume-down"
-},{
+}, {
 	url : "/sounds/upload/",
 	name : "Sound hochladen",
 	icon : "upload"
@@ -25,17 +25,18 @@ var pages = [{
 /**
  * Routes all requests related to quotes in the /quotes/ endpoint.
  * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {Router} - router for the current section.
  */
-var RouteSounds = function(bot) {
-	var router = Express.Router();
-	router.use(function(req, res, next) {
+const RouteSounds = function(bot) {
+	const router = Express.Router();
+	router.use((req, res, next) => {
 		res.locals.subpages = pages;
 		next();
 	});
-	router.get('/upload', viewDefault("sounds/upload"));
-	router.get('/', viewSounds(bot));
+	router.get("/upload", viewDefault("sounds/upload"));
+	router.get("/", viewSounds(bot));
 
 	return router;
 };
 
-module.exports = RouteSounds;
+export default RouteSounds;

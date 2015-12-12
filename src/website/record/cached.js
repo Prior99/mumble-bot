@@ -1,9 +1,14 @@
-var Winston = require("winston");
+import * as Winston from "winston";
 
-var ViewCached= function(bot) {
+/**
+ * <b>/record/cached/</b> Displays the page enpoint for the list of cached records.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewCached = function(bot) {
 	return function(req, res) {
-		var copy = bot.cachedAudios.slice();
-		res.locals.cached = copy.sort(function(a, b) {
+		const copy = bot.cachedAudios.slice();
+		res.locals.cached = copy.sort((a, b) => {
 			if(a.protected === b.protected) {
 				return a.date > b.date ? -1 : 1;
 			}
@@ -15,4 +20,4 @@ var ViewCached= function(bot) {
 	}
 };
 
-module.exports = ViewCached;
+export default ViewCached;

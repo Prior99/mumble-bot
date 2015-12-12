@@ -1,21 +1,23 @@
-var Winston = require("winston");
-var Promise = require("promise");
+import * as Winston from "winston";
+import * as Promise from "promise";
 
-var ViewOverview = function(bot) {
+/**
+ * <b>/record/</b> Homepage for the /record/ section displaying amount of records and a random-button.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewOverview = function(bot) {
 	return function(req, res) {
 		Promise.denodeify(bot.database.getRecordCount.bind(bot.database))()
-		.catch(function(err) {
+		.catch((err) => {
 			Winston.error("Error getting record amount", err);
 			return 0;
 		})
-		.then(function(c) {
-			return c;
-		})
-		.then(function(count) {
+		.then((count) => {
 			res.locals.recordAmount = count;
 			res.render("record/overview");
 		});
 	}
 };
 
-module.exports = ViewOverview;
+export default ViewOverview;

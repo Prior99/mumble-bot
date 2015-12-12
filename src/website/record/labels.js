@@ -1,8 +1,13 @@
-var Winston = require("winston");
+import * as Winston from "winston";
 
-var ViewLabels = function(bot) {
+/**
+ * <b>/record/labels/</b> Page for listing and creating labels.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewLabels = function(bot) {
 	return function(req, res) {
-		bot.database.listLabels(function(err, labels) {
+		bot.database.listLabels((err, labels) => {
 			if(err) {
 				Winston.error("Error listing labels", err);
 				res.locals.labels = [];
@@ -15,4 +20,4 @@ var ViewLabels = function(bot) {
 	}
 };
 
-module.exports = ViewLabels;
+export default ViewLabels;

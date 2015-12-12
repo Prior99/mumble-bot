@@ -1,9 +1,14 @@
-var Winston = require("winston");
+import * as Winston from "winston";
 
-var ViewCreateDialogs = function(bot) {
+/**
+ * <b>/record/create_dialog/</b> Page for creating new dialogs.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewCreateDialogs = function(bot) {
 	return function(req, res) {
 		res.render("record/create_dialog");
 	};
 };
 
-module.exports = ViewCreateDialogs;
+export default ViewCreateDialogs;

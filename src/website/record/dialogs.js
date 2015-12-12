@@ -1,19 +1,24 @@
-var Winston = require("winston");
-var Promise = require("promise");
+import * as Winston from "winston";
+import * as Promise from "promise";
 
-var ViewDialogs = function(bot) {
+/**
+ * <b>/record/dialogs/</b> Page for list of dialogs.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewDialogs = function(bot) {
 	return function(req, res) {
 		Promise.denodeify(bot.database.listDialogs.bind(bot.database))()
-		.catch(function(err) {
+		.catch((err) => {
 			Winston.error("Error listing dialogs", err);
 			res.locals.dialogs = [];
 			res.render("record/dialogs");
 		})
-		.then(function(dialogs) {
+		.then((dialogs) => {
 			res.locals.dialogs = dialogs;
 			res.render("record/dialogs");
 		});
 	}
 };
 
-module.exports = ViewDialogs;
+export default ViewDialogs;

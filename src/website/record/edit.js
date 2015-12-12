@@ -1,11 +1,17 @@
-var Winston = require("winston");
-var Promise = require("promise");
+import * as Winston from "winston";
+import * as Promise from "promise";
+import * as HTTPCodes from "../httpcodes";
 
-var ViewCached= function(bot) {
+/**
+ * <b>/record/edit/</b> Page for editing records.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewEdit = function(bot) {
 	return function(req, res) {
-		var labels, record;
+		let labels, record;
 		if(!req.query.id) {
-			res.status(400).send({
+			res.status(HTTPCodes.invalidRequest).send({
 				okay : false,
 				reason : "missing_argument"
 			});
@@ -15,13 +21,11 @@ var ViewCached= function(bot) {
 			Promise.denodeify(bot.database.listLabels.bind(bot.database))(),
 			Promise.denodeify(bot.database.getRecord.bind(bot.database))(req.query.id)
 		])
-		.then(function(results) {
+		.then((results) => {
 			labels = results[0];
 			record = results[1];
-			labels.forEach(function(label) {
-				if(record.labels.find(function(elem) {
-					return elem.id === label.id;
-				})) {
+			labels.forEach((label) => {
+				if(record.labels.find((elem) => elem.id === label.id)) {
 					label.has = true;
 				}
 			});
@@ -29,9 +33,9 @@ var ViewCached= function(bot) {
 			res.locals.record = record;
 			res.render("record/edit");
 		})
-		.catch(function(err) {
+		.catch((err) => {
 			Winston.error("An error occured while editing a record", err);
-			res.status(500).send({
+			res.status(HTTPCodes.internalError).send({
 				okay : false,
 				reason : "internal_error"
 			});
@@ -39,4 +43,4 @@ var ViewCached= function(bot) {
 	}
 };
 
-module.exports = ViewCached;
+export default ViewEdit;

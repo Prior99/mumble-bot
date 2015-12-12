@@ -1,40 +1,45 @@
-var Winston = require("winston");
-var Promise = require("promise");
+import * as Winston from "winston";
+import * as Promise from "promise";
 
-var WebsocketOverview = function(bot) {
+/**
+ * <b>/record/cached/</b> Handler for the WEBSOCKET handler for this endpoint.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - Websocket handler for this page.
+ */
+const WebsocketOverview = function(bot) {
 	return function(ws, req) {
-		var onAdd = function(audio) {
+		const onAdd = function(audio) {
 			ws.send(JSON.stringify({
-				type : 'add',
-				audio : audio
+				type : "add",
+				audio
 			}));
 		};
-		var onRemoveAudio = function(audio) {
+		const onRemoveAudio = function(audio) {
 			ws.send(JSON.stringify({
-				type : 'remove',
+				type : "remove",
 				id : audio.id
 			}));
 		};
-		var onProtect = function(audio) {
+		const onProtect = function(audio) {
 			ws.send(JSON.stringify({
-				type : 'protect',
+				type : "protect",
 				id : audio.id
 			}));
 		};
 		ws.send(JSON.stringify({
-			type : 'init',
+			type : "init",
 			cacheAmount : bot.audioCacheAmount,
 			list : bot.cachedAudios
 		}));
-		bot.on('cached-audio', onAdd);
-		bot.on('removed-cached-audio', onRemoveAudio);
-		bot.on('protect-cached-audio', onProtect);
-		ws.on('close', function() {
-			bot.removeListener('cached-audio', onAdd);
-			bot.removeListener('removed-cached-audio', onRemoveAudio);
-			bot.removeListener('protect-cached-audio', onProtect);
+		bot.on("cached-audio", onAdd);
+		bot.on("removed-cached-audio", onRemoveAudio);
+		bot.on("protect-cached-audio", onProtect);
+		ws.on("close", () => {
+			bot.removeListener("cached-audio", onAdd);
+			bot.removeListener("removed-cached-audio", onRemoveAudio);
+			bot.removeListener("protect-cached-audio", onProtect);
 		});
 	}
 };
 
-module.exports = WebsocketOverview;
+export default WebsocketOverview;

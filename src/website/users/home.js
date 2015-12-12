@@ -1,12 +1,13 @@
-var Winston = require('winston');
+import * as Winston from "winston";
 
 /**
  * <b>/users/</b> Displays the home page for the /users/ endpoint.
  * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - Feeded view renderer for this endpoint.
  */
-var ViewUsersHome = function(bot) {
+const ViewUsersHome = function(bot) {
 	return function(req, res) {
-		bot.database.countUsers(function(err, count) {
+		bot.database.countUsers((err, count) => {
 			if(err) {
 				Winston.error("Error fetching count of users", err);
 				res.locals.users = [];
@@ -19,4 +20,4 @@ var ViewUsersHome = function(bot) {
 	};
 };
 
-module.exports = ViewUsersHome;
+export default ViewUsersHome;
