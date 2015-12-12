@@ -1,34 +1,42 @@
-var Winston = require('winston');
-var Promise = require('promise');
+import * as Winston from "winston";
+import * as Promise from "promise";
+import * as HTTPCodes from "../../httpcodes";
 
-module.exports = function(bot) {
+/**
+ * View for playing back a random record.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewRandomPlayback = function(bot) {
 	return function(req, res) {
-		var record;
+		let record;
 		Promise.denodeify(bot.database.getRandomRecord.bind(bot.database))()
-		.catch(function(err) {
+		.catch((err) => {
 			Winston.error("Could not fetch random record", err);
-			res.status(500).send({
+			res.status(HTTPCodes.internalError).send({
 				okay: false,
 				reason : "internal_error"
 			});
 		})
-		.then(function(r) {
+		.then((r) => {
 			record = r;
 			return new Promise.denodeify(bot.database.usedRecord.bind(bot.database))(record.id);
 		})
-		.catch(function(err) {
+		.catch((err) => {
 			Winston.error("Could not increase usage of record", err);
-			res.status(500).send({
+			res.status(HTTPCodes.internalError).send({
 				okay: false,
 				reason : "internal_error"
 			});
 		})
-		.then(function() {
-			Winston.log('verbose', req.session.user.username + " played back random record  with id #" + record.id);
+		.then(() => {
+			Winston.log("verbose", req.session.user.username + " played back random record  with id #" + record.id);
 			bot.playSound("sounds/recorded/" + record.id);
-			res.status(200).send({
+			res.status(HTTPCodes.okay).send({
 				okay : true
 			});
 		});
 	};
 };
+
+export default ViewRandomPlayback;

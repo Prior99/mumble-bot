@@ -1,41 +1,61 @@
-var Winston = require('winston');
-var reply = require("../util.js").reply;
-var Promise = require("promise");
+import * as Winston from "winston";
+import reply from "../util.js";
+import * as Promise from "promise";
+import * as HTTPCodes from "../../httpcodes";
 
-module.exports = function(bot) {
+/**
+ * This view plays back saved dialogs.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewPlayDialog = function(bot) {
 	return function(req, res) {
-
-		function internalErr(msg)	{
+		/**
+		 * Handles an internal Error.
+		 * @param {string} msg - Message for the error.
+		 * @return {callback} - Call this function with the error as first
+		 *                      parameter in order to log and replay with an internal error.
+		 */
+		const internalErr = function(msg)	{
 			return function(err) {
 				Winston.error(msg, err);
-				reply(res, 500, false, { reason : "internal_error" });
+				reply(res, HTTPCodes.internalError, false, { reason : "internal_error" });
 			}
 		}
 
-		function playDialog(ids) {
-			var files = ids.map(function(id) {
-				return "sounds/recorded/" + id;
-			});
+		/**
+		 * Playback the dialog and respond with okay.
+		 * @param {number[]} ids - List of ids to play back in the given order.
+		 * @return {undefined}
+		 */
+		const playDialog = function(ids) {
+			const files = ids.map((id) => "sounds/recorded/" + id);
 			bot.output.playSounds(files);
-			reply(res, 200, true, {});
+			reply(res, HTTPCodes.okay, true, {});
 		}
 
-		function loadDialog() {
-			Winston.log('verbose', req.session.user.username + " played back dialog #" + req.query.id);
-			var cannotLoad = internalErr("Could not load dialog parts");
+		/**
+		 * Load the dialog from the given id and play it back.
+		 * @return {undefined}
+		 */
+		const loadDialog = function() {
+			Winston.log("verbose", req.session.user.username + " played back dialog #" + req.query.id);
+			const cannotLoad = internalErr("Could not load dialog parts");
 			Promise.denodeify(bot.database.getDialogParts.bind(bot.database))(req.query.id)
 			.catch(cannotLoad)
 			.then(playDialog);
 		}
 
 		if(req.query.id) {
-			var cannotUse = internalErr("Could not increment usage of dialog");
+			const cannotUse = internalErr("Could not increment usage of dialog");
 			Promise.denodeify(bot.database.usedDialog.bind(bot.database))(req.query.id)
 			.catch(cannotUse)
 			.then(loadDialog);
 		}
 		else {
-			reply(res, 499, false, { reason : "missing_arguments" });
+			reply(res, HTTPCodes.missingArguments, false, { reason : "missing_arguments" });
 		}
 	};
 };
+
+export default ViewPlayDialog;

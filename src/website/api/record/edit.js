@@ -1,34 +1,42 @@
-var Winston = require('winston');
-var FS = require('fs');
+import * as Winston from "winston";
+import * as FS from "fs";
+import * as HTTPCodes from "../../httpcodes";
 
-module.exports = function(bot) {
+/**
+ * This is the view for the api for editing records.
+ * @param {Bot} bot - Bot the webpage belongs to.
+ * @return {ViewRenderer} - View renderer for this endpoint.
+ */
+const ViewEdit = function(bot) {
 	return function(req, res) {
 		if(req.query.id && req.query.quote && req.query.labels) {
-			var labels = JSON.parse(req.query.labels);
-			var quote = req.query.quote;
-			var id = req.query.id;
+			const labels = JSON.parse(req.query.labels);
+			const quote = req.query.quote;
+			const id = req.query.id;
 
-			bot.database.updateRecord(id, quote, labels, function(err) {
+			bot.database.updateRecord(id, quote, labels, (err) => {
 				if(err) {
 					Winston.error("Could not edit record in database", err);
-					res.status(500).send({
+					res.status(HTTPCodes.internalError).send({
 						okay : false,
 						reason : "internal_error"
 					});
 				}
 				else {
-					Winston.log('verbose', req.session.user.username + " edited record #" + id);
-					res.status(200).send({
+					Winston.log("verbose", req.session.user.username + " edited record #" + id);
+					res.status(HTTPCodes.okay).send({
 						okay : true
 					});
 				}
 			});
 		}
 		else {
-			res.status(499).send({
+			res.status(HTTPCodes.missingArguments).send({
 				okay : false,
 				reason : "missing_arguments"
 			});
 		}
 	};
 };
+
+export default ViewEdit;
