@@ -1,4 +1,9 @@
-module.exports = function(Database) {
+/**
+ * Extends the database with methods for permission handling.
+ * @param {Database} Database - The Database class to extend.
+ * @return {undefined}
+ */
+const DatabasePermissions = function(Database) {
 	/**
 	 * Checks whether a user with the given id has a certain permission.
 	 * @param {number} userid - Id of the user to check.
@@ -73,3 +78,5 @@ module.exports = function(Database) {
 		}.bind(this));
 	};
 };
+
+export default DatabasePermissions;

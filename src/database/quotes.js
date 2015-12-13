@@ -1,4 +1,9 @@
-module.exports = function(Database) {
+/**
+ * Extends the database with methods for everything realted to quotes.
+ * @param {Database} Database - The Database class to extend.
+ * @return {undefined}
+ */
+const DatabaseQuotes = function(Database) {
 	/**
 	 * Add a quote to the database.
 	 * @param {string} quote - Text of the quote.
@@ -95,3 +100,5 @@ module.exports = function(Database) {
 		);
 	};
 };
+
+export default DatabaseQuotes;

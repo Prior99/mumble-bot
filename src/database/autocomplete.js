@@ -1,20 +1,28 @@
-module.exports = function(Database) {
+/**
+ * Extends the database with methods for autocompletition.
+ * @param {Database} Database - The Database class to extend.
+ * @return {undefined}
+ */
+const DatabaseAutocomplete = function(Database) {
 	Database.prototype.enterAutoComplete = function(sentence, callback) {
-		this.pool.query("INSERT INTO AutoComplete(sentence) VALUES (?) ON DUPLICATE KEY UPDATE used = used + 1", [sentence],
-			function(err, result) {
-				if(this._checkError(err, callback)) {
-					callback(null);
-				}
-			}.bind(this)
-		);
+		const q = "INSERT INTO AutoComplete(sentence) VALUES (?) ON DUPLICATE KEY UPDATE used = used + 1";
+		this.pool.query(q, [sentence], (err, result) => {
+			if(this._checkError(err, callback)) {
+				callback(null);
+			}
+		});
 	};
 	Database.prototype.lookupAutoComplete = function(part, callback) {
-		this.pool.query("SELECT id, sentence, used FROM AutoComplete WHERE sentence LIKE ? ORDER BY used DESC LIMIT 10", ["%" + part + "%"],
-			function(err, rows) {
-				if(this._checkError(err, callback)) {
-					callback(null, rows);
-				}
-			}.bind(this)
-		);
+		const q =
+			"SELECT id, sentence, used " +
+			"FROM AutoComplete " +
+			"WHERE sentence LIKE ? " +
+			"ORDER BY used DESC LIMIT 10";
+		this.pool.query(q, ["%" + part + "%"], (err, rows) => {
+			if(this._checkError(err, callback)) {
+				callback(null, rows);
+			}
+		});
 	};
 };
+export default DatabaseAutocomplete;

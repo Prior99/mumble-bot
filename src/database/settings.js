@@ -1,4 +1,9 @@
-module.exports = function(Database) {
+/**
+ * Extends the database with methods for user settings.
+ * @param {Database} Database - The Database class to extend.
+ * @return {undefined}
+ */
+const DatabaseSettings = function(Database) {
 	Database.prototype.getSetting = function(user, setting, callback) {
 		this.pool.query("SELECT value FROM UserSettings WHERE user = ? AND setting = ?", [user.id, setting], function(err, rows) {
 			if(this._checkError(err, callback)) {
@@ -30,3 +35,5 @@ module.exports = function(Database) {
 		}.bind(this));
 	};
 };
+
+export default DatabaseSettings;

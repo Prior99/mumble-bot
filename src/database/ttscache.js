@@ -1,4 +1,9 @@
-module.exports = function(Database) {
+/**
+ * Extends the database with methods for the TTS cache.
+ * @param {Database} Database - The Database class to extend.
+ * @return {undefined}
+ */
+const DatabaseTTSCache = function(Database) {
 	/**
 	 * Fetches a cached TTS MP3 file or null if the file for the given text was
 	 * not yet synthesized.
@@ -39,3 +44,5 @@ module.exports = function(Database) {
 		);
 	};
 };
+
+export default DatabaseTTSCache;

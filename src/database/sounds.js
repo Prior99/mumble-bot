@@ -1,4 +1,9 @@
-module.exports = function(Database) {
+/**
+ * Extends the database with methods for sounds.
+ * @param {Database} Database - The Database class to extend.
+ * @return {undefined}
+ */
+const DatabaseSounds = function(Database) {
 	Database.prototype.addSound = function(name, callback) {
 		this.pool.query("INSERT INTO Sounds(name) VALUES(?)",
 			[name], function(err, result) {
@@ -27,3 +32,5 @@ module.exports = function(Database) {
 		);
 	};
 };
+
+export default DatabaseSounds;

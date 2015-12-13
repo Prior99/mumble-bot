@@ -1,4 +1,9 @@
-module.exports = function(Database) {
+/**
+ * Extends the database with methods for the RSS feeds.
+ * @param {Database} Database - The Database class to extend.
+ * @return {undefined}
+ */
+const DatabaseRSS = function(Database) {
 	Database.prototype.addRSSFeed = function(url, name, callback) {
 		this.pool.query("INSERT INTO RSS(url, name) VALUES (?, ?)", [url, name],
 			function(err, result) {
@@ -45,3 +50,5 @@ module.exports = function(Database) {
 		);
 	};
 };
+
+export default DatabaseRSS;

@@ -1,6 +1,10 @@
 import Winston from "winston";
 import Promise from "promise";
-
+/**
+ * Extends the database with methods for dialogs.
+ * @param {Database} Database - The Database class to extend.
+ * @return {undefined}
+ */
 class Database {
 	addDialog(dialog, callback) {
 		Promise.denodeify(this.pool.query.bind(this.pool))("INSERT INTO Dialogs(submitted) VALUES(?)", [new Date()])

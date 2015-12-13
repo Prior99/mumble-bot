@@ -1,6 +1,11 @@
 var Promise = require('promise');
 
-module.exports = function(Database) {
+/**
+ * Extends the database with methods for records.
+ * @param {Database} Database - The Database class to extend.
+ * @return {undefined}
+ */
+const DatabaseRecords = function(Database) {
 	Database.prototype.addRecord = function(quote, user, date, labels, callback) {
 		this.pool.query("INSERT INTO Records(quote, user, submitted) VALUES(?, ?, ?)",
 			[quote, user.id, date], function(err, result) {
@@ -267,3 +272,5 @@ module.exports = function(Database) {
 		});
 	};
 };
+
+export default DatabaseRecords;

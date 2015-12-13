@@ -1,4 +1,9 @@
-module.exports = function(Database) {
+/**
+ * Extends the database with methods for managing users.
+ * @param {Database} Database - The Database class to extend.
+ * @return {undefined}
+ */
+const DatabaseUser = function(Database) {
 	/**
 	 * Register a new user in the database.
 	 * @param user - User which should be inserted into the database.
@@ -214,3 +219,5 @@ module.exports = function(Database) {
 		);
 	};
 };
+
+export default DatabaseUser;
