@@ -50,8 +50,8 @@ const DatabaseQuotes = function(Database) {
 	 * @param {number} id - Unique id of the quote to look up.
 	 * @return {Quote} - The quote identified by the given id.
 	 */
-	Database.prototype.getQuote = function(id) {
-		const rows = this.pool.query("SELECT quote, author, submitted, used FROM Quotes WHERE id = ?", [id]);
+	Database.prototype.getQuote = async function(id) {
+		const rows = await this.pool.query("SELECT quote, author, submitted, used FROM Quotes WHERE id = ?", [id]);
 		if(rows.length >= 1) {
 			this.increaseQuoteUsage(id);
 			return rows[0];
@@ -83,8 +83,8 @@ const DatabaseQuotes = function(Database) {
 	 * <b>Async</b> Retrieve a list with all quotes.
 	 * @return {Quote[]} - A list with all quotes.
 	 */
-	Database.prototype.getQuoteList = function() {
-		const rows = this.pool.query("SELECT id, author, quote, submitted, used FROM Quotes");
+	Database.prototype.getQuoteList = async function() {
+		const rows = await this.pool.query("SELECT id, author, quote, submitted, used FROM Quotes");
 		return rows;
 	};
 };
