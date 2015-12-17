@@ -116,6 +116,23 @@ const DatabaseRecords = function(Database) {
 			}.bind(this)
 		);
 	};
+	/**
+	 * A label with which the records can be tagged.
+	 * @typedef Label
+	 * @property {number} id - Unique id of this label.
+	 * @property {string} name - Name of this label.
+	 */
+	/**
+	 * A single record as represented in the database.
+	 * @typedef Record
+	 * @property {number} id - Unique id of this record which is used as the mapping to the audio file.
+	 * @property {string} quote - The quote for this record (textual description).
+	 * @property {number} used - How often this record was already used.
+	 * @property {DatabaseUser} user - The user who said this record.
+	 * @property {date} submitted - When the record was originally recorded.
+	 * @property {Label} labels - A list of all labels with which this record was tagged.
+	 */
+
 	Database.prototype.getRecord = function(id, callback) {
 		var record;
 		new Promise(function(okay, fail) {
