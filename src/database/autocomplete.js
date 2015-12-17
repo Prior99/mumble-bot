@@ -4,25 +4,35 @@
  * @return {undefined}
  */
 const DatabaseAutocomplete = function(Database) {
-	Database.prototype.enterAutoComplete = function(sentence, callback) {
+	/**
+	 * <b>Async</b> Inserts a new text into the database of autocompletition texts.
+	 * @param {string} sentence - The text to insert.
+	 * @return {undefined}
+	 */
+	Database.prototype.enterAutoComplete = async function(sentence) {
 		const q = "INSERT INTO AutoComplete(sentence) VALUES (?) ON DUPLICATE KEY UPDATE used = used + 1";
-		this.pool.query(q, [sentence], (err, result) => {
-			if(this._checkError(err, callback)) {
-				callback(null);
-			}
-		});
+		await this.pool.query(q, [sentence]);
 	};
-	Database.prototype.lookupAutoComplete = function(part, callback) {
+	/**
+	 * One autocompletition element.
+	 * @typedef AutocompleteElement
+	 * @property {number} id - Unique id.
+	 * @property {string} sentence - The autocompleted string.
+	 * @property {number} used- How often this sentence was already used.
+	 */
+	/**
+	 * <b>Async</b> Look up a part in the autocompletition database.
+	 * @param {string} part - The part to autocomplete.
+	 * @return {AutocompleteElement[]} - Suggestions.
+	 */
+	Database.prototype.lookupAutoComplete = async function(part) {
 		const q =
 			"SELECT id, sentence, used " +
 			"FROM AutoComplete " +
 			"WHERE sentence LIKE ? " +
 			"ORDER BY used DESC LIMIT 10";
-		this.pool.query(q, ["%" + part + "%"], (err, rows) => {
-			if(this._checkError(err, callback)) {
-				callback(null, rows);
-			}
-		});
+		const rows = await this.pool.query(q, ["%" + part + "%"]);
+		return rows;
 	};
 };
 export default DatabaseAutocomplete;

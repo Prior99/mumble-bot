@@ -5,38 +5,28 @@
  */
 const DatabaseBass = function(Database) {
 	/**
-	 * Insert a new bass "effect" word into the database.
+	 * <b>Async</b> Insert a new bass "effect" word into the database.
 	 * @param {string} effect - Word to insert
 	 * @param {callback} callback - Called when the query is done.
 	 * @return {undefined}
 	 */
-	Database.prototype.addBassEffect = function(effect, callback) {
-		this.pool.query("INSERT INTO BassEffects(effect) VALUES (?)", [effect],
-			function(err, result) {
-				if(this._checkError(err, callback)) {
-					callback(null, result.insertId);
-				}
-			}.bind(this)
-		);
+	Database.prototype.addBassEffect = async function(effect) {
+		const result = await this.pool.query("INSERT INTO BassEffects(effect) VALUES (?)", [effect]);
+		return result.insertId;
 	};
 
 	/**
-	 * Lists all bass effect words in the database.
+	 * <Async</b> Lists all bass effect words in the database.
 	 * @param {callback} callback - Called when the query is done.
 	 * @return {undefined}
 	 */
-	Database.prototype.listBassEffects = function(callback) {
-		this.pool.query("SELECT effect FROM BassEffects",
-			function(err, rows) {
-				if(this._checkError(err, callback)) {
-					var arr = [];
-					for(var i in rows) {
-						arr.push(rows[i].effect);
-					}
-					callback(null, arr);
-				}
-			}.bind(this)
-		);
+	Database.prototype.listBassEffects = async function() {
+		const rows = await this.pool.query("SELECT effect FROM BassEffects");
+		const arr = [];
+		for(const row of rows) {
+			arr.push(row.effect);
+		}
+		return arr;
 	};
 };
 

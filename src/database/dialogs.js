@@ -5,86 +5,90 @@ import Promise from "promise";
  * @param {Database} Database - The Database class to extend.
  * @return {undefined}
  */
-class Database {
-	addDialog(dialog, callback) {
-		Promise.denodeify(this.pool.query.bind(this.pool))("INSERT INTO Dialogs(submitted) VALUES(?)", [new Date()])
-		.catch(callback)
-		.then(result => {
-			const dialogId = result.insertId;
-			return Promise.all(dialog.map((id, index) => {
-				return Promise.denodeify(this.pool.query.bind(this.pool))(
-					"INSERT INTO DialogParts(dialogId, position, recordId) VALUES(?, ?, ?)",
-					[dialogId, index, id]);
-			}));
-		})
-		.catch(callback)
-		.then(() => { callback(null) });
-	}
+const DatabaseDialogs = function(Database) {
+	/**
+	 * <b>Async</b> Create a new dialog in the database.
+	 * @param {number[]} dialog - Array of ids of the records in the dialog.
+	 * @return {undefined}l
+	 */
+	Database.prototype.addDialog = async function(dialog) {
+		const result = await this.pool.query("INSERT INTO Dialogs(submitted) VALUES(?)", [new Date()]);
+		const dialogId = result.insertId;
+		await Promise.all(dialog.map((id, index) => this.pool.query(
+				"INSERT INTO DialogParts(dialogId, position, recordId) VALUES(?, ?, ?)",
+				[dialogId, index, id]
+			)
+		));
+	};
 
-	getDialogParts(dialogId, callback) {
-		Promise.denodeify(this.pool.query.bind(this.pool))(
-			"SELECT recordId FROM DialogParts WHERE dialogId = ? ORDER BY position ASC", [dialogId])
-		.catch(callback)
-		.then(list => {
-			callback(null, list.map(p => p.recordId))
-		});
-	}
+	/**
+	 * <b>Async</b> Get the parts of a dialog (The single records).
+	 * @param {number} dialogId - Id of the dialog to fetch the parts from.
+	 * @return {number[]} - List of all ids of the records in the dialog in the correct order.
+	 */
+	Database.prototype.getDialogParts = async function(dialogId) {
+		const list = await this.pool.query(
+			"SELECT recordId FROM DialogParts WHERE dialogId = ? ORDER BY position ASC",
+			[dialogId]
+		);
+		return list.map(p => p.recordId);
+	};
 
-	getDialogRecords(dialogId, callback) {
-		Promise.denodeify(this.getDialogParts)(dialogId)
-		.catch(callback)
-		.then(ids => {
-			return Promise.all(ids.map(id => {
-				return Promise.denodeify(this.getRecord.bind(this))(id);
-			}))
-		})
-		.catch(callback)
-		.then(records => {
-			callback(null, records);
-		});
+	/**
+	 * <b>Async</b> Get the single records from a dialog based on its id.
+	 * @param {number} dialogId - The id of the dialog to get the records from.
+	 * @return {Record[]} - List of all records belonging to this dialog.
+	 */
+	Database.prototype.getDialogRecords = async function(dialogId) {
+		const ids = await this.getDialogParts(dialogId);
+		const records = await Promise.all(ids.map(id => this.getRecord(id)));
+		return records;
 	}
-
-	getDialog(id, callback) {
+	/**
+	 * A dialog as represented in the database including all its records.
+	 * @typedef Dialog
+	 * @property {number} id - Unique id of this dialog.
+	 * @property {date} submitted - The date when this dialog was submitted.
+	 * @property {number} used - How often this dialog was used.
+	 * @property {Record[]} records - All records belonging to this dialog.
+	 */
+	/**
+	 * <b>Async</b> Grab a whole dialog by id, including all records belonging to this dialog.
+	 * @param {number} id - Id of the dialog to fetch.
+	 * @return {Dialog} - The dialog which was fetched.
+	 */
+	Database.prototype.getDialog = async function(id) {
 		let dialog;
-		Promise.denodeify(this.pool.query.bind(this.pool))("SELECT id, submitted, used FROM Dialogs WHERE id = ?", [id])
-		.catch(callback)
-		.then(results => {
-			if(!results.length) {
-				callback(null, null);
-			}
-			else {
-				dialog = results[0];
-				return Promise.denodeify(this.getDialogRecords.bind(this))(dialog.id);
-			}
-		})
-		.catch(callback)
-		.then(parts => {
+		const results = await this.pool.query("SELECT id, submitted, used FROM Dialogs WHERE id = ?", [id]);
+		if(!results.length) {
+			return null;
+		}
+		else {
+			dialog = results[0];
+			const parts = await this.getDialogRecords(dialog.id);
 			dialog.records = parts;
-			callback(null, dialog);
-		});
+			return dialog;
+		}
+	}
+	/**
+	 * List all dialogs existing in the database.
+	 * @return {Dialog[]} - List of all dialogs in the database.
+	 */
+	Database.prototype.listDialogs = async function() {
+		const dialogs = await this.pool.query("SELECT id FROM Dialogs ORDER BY used DESC");
+		const completedDialogs = await Promise.all(
+			dialogs.map(dialog => this.getDialog(dialog.id))
+		);
+		return completedDialogs;
 	}
 
-	listDialogs(callback) {
-		Promise.denodeify(this.pool.query.bind(this.pool))("SELECT id FROM Dialogs ORDER BY used DESC")
-		.catch(callback)
-		.then(dialogs => {
-			return Promise.all(dialogs.map(dialog => {
-				return Promise.denodeify(this.getDialog.bind(this))(dialog.id);
-			}));
-		})
-		.catch(callback)
-		.then(dialogs => {
-			callback(null, dialogs);
-		});
+	/**
+	 * Update a dialog to be used. (Increment the usages by one)
+	 * @param {number} id - Id of the dialog which was used.
+	 * @return {undefined}
+	 */
+	Database.prototype.usedDialog = async function(id) {
+		await this.pool.query("UPDATE Dialogs SET used = used +1 WHERE id = ?", [id]);
 	}
-
-	usedDialog(id, callback) {
-		Promise.denodeify(this.pool.query.bind(this.pool))("UPDATE Dialogs SET used = used +1 WHERE id = ?", [id])
-		.catch(callback)
-		.then(() => {
-			callback(null);
-		});
-	}
-}
-
-module.exports = Database; TODO
+};
+export default DatabaseDialogs;
