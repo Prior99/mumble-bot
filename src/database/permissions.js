@@ -5,77 +5,69 @@
  */
 const DatabasePermissions = function(Database) {
 	/**
-	 * Checks whether a user with the given id has a certain permission.
+	 * <b>Async</b> Checks whether a user with the given id has a certain permission.
 	 * @param {number} userid - Id of the user to check.
 	 * @param {string} permission - Permission to look for.
-	 * @param callback - Called once the query is done.
+	 * @return {boolean} - Whether the user has the requested permission.
 	 */
-	Database.prototype.hasPermission = function(userid, permission, callback) {
-		this.pool.query("SELECT id FROM UserPermissions WHERE user = ? AND permission = ?",
-			[userid, permission], function(err, rows) {
-				if(this._checkError(err, callback)) {
-					callback(null, rows && rows.length > 0);
-				}
-			}.bind(this)
-		);
+	Database.prototype.hasPermission = async function(userid, permission) {
+		const rows = await this.pool.query("SELECT id FROM UserPermissions WHERE user = ? AND permission = ?");
+		return rows && rows.length > 0;
 	};
 
 	/**
-	 * Grants a permission to a user without checking.
+	 * <b>Async</b> Grants a permission to a user without checking.
 	 * @param {number} userid - Id of the user to grant the permission to.
 	 * @param {string} permission - Permission to grant.
-	 * @param callback - Called once the query is done.
+	 * @return {undefined}
 	 */
-	Database.prototype.grantPermission = function(userid, permission, callback) {
-		this.pool.query("INSERT IGNORE INTO UserPermissions (user, permission) VALUES (?, ?)",
-			[userid, permission], function(err, rows) {
-				if(this._checkError(err, callback)) {
-					callback(null);
-				}
-			}.bind(this)
+	Database.prototype.grantPermission = async function(userid, permission) {
+		await this.pool.query("INSERT IGNORE INTO UserPermissions (user, permission) VALUES (?, ?)",
+			[userid, permission]
 		);
 	};
 
 	/**
-	 * Revokes a permission from a user without performing any checks.
+	 * <b>Async</b> Revokes a permission from a user without performing any checks.
 	 * @param {number} userid - Id of the user to revoke the permission from.
 	 * @param {string} permission - Permission to revoke.
-	 * @param callback - Called once the query is done.
+	 * @return {undefined}
 	 */
-	Database.prototype.revokePermission = function(userid, permission, callback) {
-		this.pool.query("DELETE FROM UserPermissions WHERE user = ? AND permission = ?",
-			[userid, permission], function(err, rows) {
-				if(this._checkError(err, callback)) {
-					callback(null);
-				}
-			}.bind(this)
+	Database.prototype.revokePermission = async function(userid, permission) {
+		await this.pool.query("DELETE FROM UserPermissions WHERE user = ? AND permission = ?",
+			[userid, permission]
 		);
 	};
-
 	/**
-	 * Get details about a certain permission.
+	 * A single permission as stored in the database.
+	 * @typedef Permission
+	 * @property {string} id - Unique id of the permission as unique string.
+	 * @property {string} name - Human readable name of the permission.
+	 * @property {string} description - Human readable description of the permission.
+	 * @property {string} icon - Font Awesome icon class of this permission.
+	 */
+	/**
+	 * <b>Async</b> Get details about a certain permission.
 	 * @param {string} permission - Permission to look up.
-	 * @param callback - Called once the query is done.
+	 * @return {Permission} - The permission to get the details of.
 	 */
-	Database.prototype.getPermission = function(permission, callback) {
-		this.pool.query("SELECT id, name, description, icon FROM Permissions",
-			[permission], function(err, rows) {
-				if(this._checkError(err, callback)) {
-					callback(null, rows[0]);
-				}
-			}.bind(this)
-		);
+	Database.prototype.getPermission = async function(permission) {
+		const rows = await this.pool.query("SELECT id, name, description, icon FROM Permissions WHERE id = ?",
+			[permission]);
+		if(rows.length > 0) {
+			return rows[0];
+		}
+		else {
+			return null;
+		}
 	};
 	/**
-	 * Get a list of all permissions.
-	 * @param callback - Called once the query is done.
+	 * <b>Async</b> Get a list of all permissions.
+	 * @return {Permission[]} - The permission to get the details of.
 	 */
-	Database.prototype.listPermissions = function(callback) {
-		this.pool.query("SELECT id, name, description, icon FROM Permissions", function(err, rows) {
-			if(this._checkError(err, callback)) {
-				callback(null, rows);
-			}
-		}.bind(this));
+	Database.prototype.listPermissions = async function() {
+		const rows = await this.pool.query("SELECT id, name, description, icon FROM Permissions");
+		return rows;
 	};
 };
 
