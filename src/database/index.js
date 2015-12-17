@@ -1,8 +1,8 @@
 /*
  * Imports
  */
-const Winston = require('winston');
-const MySQL = require('mysql');
+const Winston = require("winston");
+const MySQL = require("promise-mysql");
 const FS = require("fs");
 
 /*
