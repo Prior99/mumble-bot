@@ -82,6 +82,10 @@ class Output extends Stream.Writable {
 	}
 
 	/**
+	 * Write something into this stream.
+	 * @param {buffer} chunk - Chunk to be written to the queue.
+	 * @param {string} encoding - Encoding of the cunk if any.
+	 * @param {VoidCallback} done - Called when the data is shifted into the queue.
 	 * @returns {undefined}
 	 */
 	_write(chunk, encoding, done) {
