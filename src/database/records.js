@@ -1,120 +1,113 @@
-var Promise = require('promise');
-
 /**
  * Extends the database with methods for records.
  * @param {Database} Database - The Database class to extend.
  * @return {undefined}
  */
 const DatabaseRecords = function(Database) {
-	Database.prototype.addRecord = function(quote, user, date, labels, callback) {
-		this.pool.query("INSERT INTO Records(quote, user, submitted) VALUES(?, ?, ?)",
-			[quote, user.id, date], function(err, result) {
-				if(this._checkError(err, callback)) {
-					labels.forEach(function(label) {
-						this.addRecordToLabel(result.insertId, label);
-					}.bind(this));
-					if(callback) { callback(null, result.insertId); }
-				}
-			}.bind(this)
+	/**
+	 * <b>Async</b> Add a new record to the database.
+	 * @param {string} quote - The quote of the record to be added.
+	 * @param {DatabaseUser} user - The user from whom the record was recorded.
+	 * @param {date} date - The date and time the record was recorded.
+	 * @param {string[]} labels - A list of labels with which this record was tagged.
+	 * @return {number} - The unique id of the new record.
+	 */
+	Database.prototype.addRecord = async function(quote, user, date, labels) {
+		const result = await this.pool.query("INSERT INTO Records(quote, user, submitted) VALUES(?, ?, ?)",
+			[quote, user.id, date]
 		);
+		labels.forEach((label) => this.addRecordToLabel(result.insertId, label));
+		return result.insertId;
 	};
-	Database.prototype._completeRecords = function(records, callback) {
-		var promises = records.map(function(record) {
-			return Promise.denodeify(this.getRecord.bind(this))(record.id);
-		}.bind(this));
-		Promise.all(promises)
-		.catch(callback)
-		.then(function(records) {
-			callback(null, records);
-		});
+
+	/**
+	 * <b>Async</b> Complete a list of records by adding all possible information to it by resolving ids of
+	 * user and labels etc.
+	 * @param {Record[]} records - Uncompleted list of records which need to be recorded.
+	 * @return {Record[]} - List of completed records.
+	 */
+	Database.prototype._completeRecords = async function(records) {
+		const rs = await Promise.all(records.map((r) => this.getRecord(r.id)));
+		return rs;
 	};
-	Database.prototype.getRecordCountByUsers = function(callback) {
-		Promise.denodeify(this.pool.query.bind(this.pool))("SELECT COUNT(r.id) AS amount, u.username AS user FROM Users u LEFT JOIN Records r ON r.user = u.id GROUP BY u.id HAVING COUNT(r.id) > 0 ORDER BY amount DESC")
-		.catch(callback)
-		.then(function(rows) {
-			callback(null, rows);
-		})
+
+		/**
+		 * @typedef RecordCountByUserStat
+		 * @property {number} amount - Amount of records this user has.
+		 * @property {string} user - Name of the user the records belong to.
+		 */
+	/**
+	 * <b>Async</b> Get the amount of records by one single user.
+	 * @return {RecordCountByUserStat[]} - List of users and the amount of records they have.
+	 */
+	Database.prototype.getRecordCountByUsers = async function() {
+		const rows = await this.pool.query(
+			"SELECT COUNT(r.id) AS amount, u.username AS user " +
+			"FROM Users u " +
+			"LEFT JOIN Records r ON r.user = u.id " +
+			"GROUP BY u.id HAVING COUNT(r.id) > 0 ORDER BY amount DESC");
+		return rows;
 	};
-	Database.prototype.getRecordCountByDays = function(callback) {
-		Promise.denodeify(this.pool.query.bind(this.pool))("SELECT DATE(submitted) AS submitted, COUNT(id) AS amount FROM Records GROUP BY DATE(submitted) ORDER BY submitted DESC")
-		.catch(callback)
-		.then(function(rows) {
-			callback(null, rows);
-		})
-	};
-	Database.prototype.updateRecord = function(id, quote, labels, callback) {
-		Promise.denodeify(this.pool.query.bind(this.pool))("UPDATE Records SET quote = ? WHERE id = ?", [quote, id])
-		.catch(callback)
-		.then(function() {
-			return new Promise(function(okay, fail) {
-				this.pool.query("DELETE FROM RecordLabelRelation WHERE record = ?", [id], function(err) {
-					if(err) {
-						fail(err);
-					}
-					else {
-						okay();
-					}
-				});
-			}.bind(this));
-		}.bind(this))
-		.catch(callback)
-		.then(function() {
-			labels.forEach(function(label) {
-				this.addRecordToLabel(id, label);
-			}.bind(this));
-			callback();
-		}.bind(this));
-	};
-	Database.prototype.listRecords = function(callback) {
-		new Promise(function(okay, fail) {
-			this.pool.query("SELECT id FROM Records ORDER BY used DESC", function(err, rows) {
-					if(err) {
-						fail(err);
-					}
-					else {
-						okay(rows);
-					}
-				}
-			);
-		}.bind(this))
-		.catch(callback)
-		.then(function(records) {
-			return Promise.denodeify(this._completeRecords.bind(this))(records);
-		}.bind(this))
-		.catch(callback)
-		.then(function(records) {
-			callback(null, records);
-		});
-	};
-	Database.prototype.listRecordsForUser = function(user, callback) {
-		new Promise(function(okay, fail) {
-			this.pool.query("SELECT id FROM Records WHERE user = ? ORDER BY used DESC", [user.id], function(err, rows) {
-					if(err) {
-						fail(err);
-					}
-					else {
-						okay(rows);
-					}
-				}
-			);
-		}.bind(this))
-		.catch(callback)
-		.then(function(records) {
-			return Promise.denodeify(this._completeRecords.bind(this))(records);
-		}.bind(this))
-		.catch(callback)
-		.then(function(records) {
-			callback(null, records);
-		});
-	};
-	Database.prototype.usedRecord = function(id, callback) {
-		this.pool.query("UPDATE Records SET used = used +1 WHERE id = ?",
-			[id], function(err) {
-				if(this._checkError(err, callback)) {
-					if(callback) { callback(null); }
-				}
-			}.bind(this)
+
+	/**
+	 * @typedef RecordCountByDateStat
+	 * @property {number} amount - Amount of records this user has.
+	 * @property {date} date - Date of the day this entry belongs to.
+	 */
+	/**
+	 * <b>Async</b> Get the amount of records mapped to days of the week.
+	 * @return {RecordCountByDateStat[]} - List of days and the amount of records recorded on that day.
+	 */
+	Database.prototype.getRecordCountByDays = async function() {
+		const rows = await this.pool.query(
+			"SELECT DATE(submitted) AS submitted, COUNT(id) AS amount " +
+			"FROM Records " +
+			"GROUP BY DATE(submitted) ORDER BY submitted DESC"
 		);
+		return rows;
+	};
+	/**
+	 * <b>Async</b> Update a record with a new quote and a new list of labels.
+	 * @param {number} id - The unique id of the record which is to be updated.
+	 * @param {string} quote - The new quote to set.
+	 * @param {string[]} labels - List of the names of labels which should REPLACE the old labels. (All old labels
+	 *                            will be purged so you will have to list all labels that should be kept again here).
+	 * @return {undefined}
+	 */
+	Database.prototype.updateRecord = async function(id, quote, labels) {
+		await this.pool.query("UPDATE Records SET quote = ? WHERE id = ?", [quote, id]);
+		await this.pool.query("DELETE FROM RecordLabelRelation WHERE record = ?", [id]);
+		labels.forEach((label) => this.addRecordToLabel(id, label));
+	};
+
+	/**
+	 * <b>Async</b> List all records existing in the database.
+	 * @return {Record[]} - List of all records in the database.
+	 */
+	Database.prototype.listRecords = async function() {
+		const rows = await this.pool.query("SELECT id FROM Records ORDER BY used DESC");
+		const records = await this._completeRecords(rows)
+		return records;
+	};
+
+	/**
+	 * <b>Async</b> List all records in the database belonging to one specified user.
+	 * @param {DatabaseUser} user - User for which the records whould be listed.
+	 * @return {Record[]} - List of all records in the database belonging to the specified user.
+	 */
+	Database.prototype.listRecordsForUser = async function(user) {
+		const rows = await this.pool.query("SELECT id FROM Records WHERE user = ? ORDER BY used DESC", [user.id]);
+		const records = await this._completeRecords(records);
+		return records;
+	};
+
+	/**
+	 * <b>Async</b> Indicate that a record was played back (Increase usages by one).
+	 * @param {number} id - Unique id of the record to update.
+	 * @return {undefined}
+	 */
+	Database.prototype.usedRecord = async function(id) {
+		await this.pool.query("UPDATE Records SET used = used +1 WHERE id = ?", [id]);
 	};
 	/**
 	 * A label with which the records can be tagged.
@@ -130,163 +123,154 @@ const DatabaseRecords = function(Database) {
 	 * @property {number} used - How often this record was already used.
 	 * @property {DatabaseUser} user - The user who said this record.
 	 * @property {date} submitted - When the record was originally recorded.
-	 * @property {Label} labels - A list of all labels with which this record was tagged.
+	 * @property {Label[]} labels - A list of all labels with which this record was tagged.
 	 */
 
-	Database.prototype.getRecord = function(id, callback) {
-		var record;
-		new Promise(function(okay, fail) {
-			var query = "SELECT id, quote, used, user, submitted FROM Records WHERE id = ?";
-			this.pool.query(query, [id], function(err, rows) {
-				if(err) {
-					fail(err);
-				}
-				else {
-					okay(rows[0]);
-				}
-			});
-		}.bind(this))
-		.catch(callback)
-		.then(function(_record) {
-			record = _record;
-			var getUser = Promise.denodeify(this.getUserById.bind(this));
-			var getLabels = Promise.denodeify(this.getLabelsOfRecord.bind(this));
-			return Promise.all([getUser(record.user), getLabels(record.id)]);
-		}.bind(this))
-		.catch(callback)
-		.then(function(result) {
-			record.user = result[0];
-			record.labels = result[1];
-			callback(null, record);
-		});
-	};
-	Database.prototype.getRandomRecord = function(callback) {
-		new Promise(function(okay, fail) {
-			this.pool.query("SELECT id FROM Records ORDER BY RAND() LIMIT 1,1", function(err, rows) {
-				if(err) {
-					fail(err);
-				}
-				else {
-					okay(rows[0]);
-				}
-			});
-		}.bind(this))
-		.catch(callback)
-		.then(function(record) {
-			if(!record) {
-				callback(null, null);
-			}
-			else return Promise.denodeify(this.getRecord.bind(this))(record.id);
-		}.bind(this))
-		.catch(callback)
-		.then(function(record) {
-			callback(null, record);
-		});
-	};
-	Database.prototype.getLabelsOfRecord = function(recordId, callback) {
-		this.pool.query("SELECT r.id AS id, r.name AS name FROM RecordLabels r LEFT JOIN RecordLabelRelation l ON l.label = r.id WHERE l.record = ?", [recordId], function(err, rows) {
-			if(this._checkError(err, callback)) {
-				if(callback) { callback(null, rows); }
-			}
-		}.bind(this));
-	};
-	Database.prototype.getRecordCount = function(callback) {
-		this.pool.query("SELECT COUNT(id) AS amount FROM Records",
-			function(err, rows) {
-				if(this._checkError(err, callback)) {
-					if(callback) { callback(null, rows[0].amount); }
-				}
-			}.bind(this)
-		);
-	};
-	Database.prototype.addRecordLabel = function(name, callback) {
-		this.pool.query("INSERT INTO RecordLabels(name) VALUES(?)", [name], function(err, result) {
-			if(this._checkError(err, callback)) {
-				if(callback) { callback(null, result.insertId); }
-			}
-		}.bind(this));
-	};
-	Database.prototype.listLabels = function(callback) {
-		this.pool.query("SELECT name, id, COUNT(record) AS records FROM RecordLabels LEFT JOIN RecordLabelRelation ON id = label GROUP BY id", function(err, rows) {
-			if(this._checkError(err, callback)) {
-				callback(null, rows);
-			}
-		}.bind(this));
-	};
-	Database.prototype.addRecordToLabel = function(record, label, callback) {
-		this.pool.query("INSERT INTO RecordLabelRelation(record, label) VALUES(?, ?)", [record, label], function(err, result) {
-			if(this._checkError(err, callback)) {
-				if(callback) { callback(null); }
-			}
-		}.bind(this));
-	};
-	Database.prototype.listRecordsByLabel = function(label, callback) {
-		new Promise(function(okay, fail) {
-			this.pool.query("SELECT id FROM Records LEFT JOIN RecordLabelRelation ON id = record WHERE label = ? ORDER BY used DESC", [label], function(err, rows) {
-					if(err) {
-						fail(err);
-					}
-					else {
-						okay(rows);
-					}
-				}
-			);
-		}.bind(this))
-		.catch(callback)
-		.then(function(records) {
-			return Promise.denodeify(this._completeRecords.bind(this))(records);
-		}.bind(this))
-		.catch(callback)
-		.then(function(records) {
-			callback(null, records);
-		});
-	};
-
-
-	Database.prototype.lookupRecord = function(part, callback) {
-		var q = "SELECT id, quote, user, used, submitted FROM Records WHERE quote LIKE ? ORDER BY used DESC LIMIT 20";
-		this.queryAndCheck(q, ["%" + part + "%"],	callback, function(err, records) {
-			var pos = 0;
-			var next = function() {
-				if(pos >= records.length) {
-					callback(null, records);
-				} else {
-					this._getUserAndLabels(records[pos], callback, function(err, res) {
-						pos++;
-						next();
-					}.bind(this));
-				}
-			}.bind(this);
-
-			next();
-
-		}.bind(this));
+	/**
+	 * <b>Async</b> Get complet information about one record by its id. This includes resolved user and labels.
+	 * @param {number} id - The unique id of the record that is to be fetched.
+	 * @return {Record} - The record belonging to the specified unique id.
+	 */
+	Database.prototype.getRecord = async function(id) {
+		const rows = await this.pool.query("SELECT id, quote, used, user, submitted FROM Records WHERE id = ?");
+		if(rows && rows.length > 0) {
+			const record = rows[0];
+			const user = await this.getUserById(record.user);
+			const labels = await this.getLabelsOfRecord(record.id);
+			record.user = user;
+			record.labels = labels;
+			return record;
+		}
+		else {
+			return null;
+		}
 	};
 
 	/**
-	 * Adds userinfo and labels to the given record.
+	 * <b>Async</b> Get a random record from the database.
+	 * @return {Record} - A random record from the database.
 	 */
-	Database.prototype._getUserAndLabels = function(record, cb1, cb2) {
-		this.getUserById(record.user, function(err, userInfo) {
-			if(this._checkError(err, cb1)) {
-				this.getLabelsOfRecord(record.id, function(err2, labels) {
-					if(this._checkError(err2, cb1)) {
-						record.user = userInfo;
-						record.labels = labels;
-						cb2(null, record);
-					}
-				}.bind(this))
-			}
-		}.bind(this));
+	Database.prototype.getRandomRecord = async function() {
+		const rows = await this.pool.query("SELECT id FROM Records ORDER BY RAND() LIMIT 1,1");
+		if(rows && rows.length > 0) {
+			let record = rows[0];
+			record = this.getRecord(record.id);
+			return record;
+		}
+		else {
+			return null;
+		}
 	};
 
+	/**
+	 * <b>Async</b> Get all labels belonging to one record.
+	 * @param {number} recordId - The unique id of the record that is to be fetched.
+	 * @return {Label[]} - List of all labels with which the specified record is tagged.
+	 */
+	Database.prototype.getLabelsOfRecord = async function(recordId) {
+		const rows = await this.pool.query(
+			"SELECT r.id AS id, r.name AS name " +
+			"FROM RecordLabels r " +
+			"LEFT JOIN RecordLabelRelation l ON l.label = r.id WHERE l.record = ?", [recordId]
+		);
+		return rows;
+	};
 
-	Database.prototype.getRecordPlaybackCountPerUser = function(callback) {
-		Promise.denodeify(this.pool.query.bind(this.pool))("SELECT username AS user, SUM(used) AS playbacks, SUM(used)/COUNT(r.id) AS playbacksRelative FROM Records r LEFT JOIN Users u ON u.id = user GROUP BY user")
-		.catch(callback)
-		.then(function(rows) {
-			callback(null, rows);
-		});
+	/**
+	 * <b>Async</b> Get the amount of records in the database.
+	 * @return {number} - Amount of all records in the database.
+	 */
+	Database.prototype.getRecordCount = async function() {
+		const rows = await this.pool.query("SELECT COUNT(id) AS amount FROM Records");
+		return rows[0].amount;
+	};
+
+	/**
+	 * <b>Async</b> Add a new label to the database.
+	 * @param {string} name - Name of the new label to add.
+	 * @return {number} - Generated unique id of the new label that was added.
+	 */
+	Database.prototype.addRecordLabel = async function(name) {
+		const result = await this.pool.query("INSERT INTO RecordLabels(name) VALUES(?)", [name]);
+		return result.insertId;
+	};
+
+	/**
+	 * <b>Async</b> List all labels exiting in the database.
+	 * @return {Label[]} - A list of all labels in the database with an added numerical property "records"
+	 *                     that represents the number of records tagged with the label.
+	 */
+	Database.prototype.listLabels = async function() {
+		const rows = await this.pool.query(
+			"SELECT name, id, COUNT(record) AS records " +
+			"FROM RecordLabels " +
+			"LEFT JOIN RecordLabelRelation ON id = label " +
+			"GROUP BY id"
+		);
+		return rows;
+	};
+
+	/**
+	 * <b>Async</b> Add a label to a record.
+	 * @param {number} record - Unique id of the record to tag with the label.
+	 * @param {number} label - Unique id of the label with which the record should be tagged.
+	 * @return {undefined}
+	 */
+	Database.prototype.addRecordToLabel = async function(record, label) {
+		await this.pool.query("INSERT INTO RecordLabelRelation(record, label) VALUES(?, ?)", [record, label]);
+	};
+
+	/**
+	 * <b>Async</b> List all records belonging to one label.
+	 * @param {number} label - Unique id of the label of which to list the records.
+	 * @return {Record[]} - List of all records which were tagged with the specified label.
+	 */
+	Database.prototype.listRecordsByLabel = async function(label) {
+		const rows = await this.pool.query(
+			"SELECT id " +
+			"FROM Records " +
+			"LEFT JOIN RecordLabelRelation ON id = record " +
+			"WHERE label = ? " +
+			"ORDER BY used DESC", [label]
+		);
+		const records = await this._completeRecords(rows)
+		return records;
+	};
+
+	/**
+	 * <b>Async</b> Look up 20 records with their quotes matching a given query string.
+	 * @param {string} part - Query string which should be looked up in the database.
+	 * @return {Record[]} - A list of max. 20 records that match the given query string.
+	 */
+	Database.prototype.lookupRecord = async function(part) {
+		const rows = await this.pool.query(
+			"SELECT id, quote, user, used, submitted " +
+			"FROM Records " +
+			"WHERE quote LIKE ? " +
+			"ORDER BY used DESC " +
+			"LIMIT 20", ["%" + part + "%"]
+		);
+		const records = await Promise.all(rows.map((r) => this.getRecord(r.id)));
+		return records;
+	};
+	/**
+	 * @typedef PlaybackCountByUserStat
+	 * @property {number} playbacks - How often all records of the user have been played back in total.
+	 * @property {string} user - Name of the user to which the playbacks belong.
+	 * @property {number} playbacksRelative - playbacks relative to total amount of records in the database.
+	 */
+	/**
+	 * <b>Async</b> Return the amount of playbacks each record of each user has received grouped by the users.
+	 * @return {PlaybackCountByUserStat[]} - List of all users and how often their records have been played back.
+	 */
+	Database.prototype.getRecordPlaybackCountPerUser = async function() {
+		const rows = await this.pool.query(
+			"SELECT username AS user, SUM(used) AS playbacks, SUM(used)/COUNT(r.id) AS playbacksRelative " +
+			"FROM Records r " +
+			"LEFT JOIN Users u ON u.id = user " +
+			"GROUP BY user"
+		);
+		return rows;
 	};
 };
 
