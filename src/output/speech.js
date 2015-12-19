@@ -1,28 +1,13 @@
-/*
- * Imports
- */
-
 import * as ESpeak from "node-espeak";
-import * as Request from "request";
-import * as Lame from "lame";
 import * as Samplerate from "node-samplerate";
 import EventEmitter from "events";
 import * as Winston from "winston";
-import * as GoogleTTS from "./googletranslatetts";
-import * as BingTTS from "./bingtranslatetts";
-import * as ResponsiveTTS from "./responsivetts";
-import * as Sox from "sox-audio";
+import GoogleTTS from "./googletranslatetts";
+import BingTTS from "./bingtranslatetts";
+import ResponsiveTTS from "./responsivetts";
+import Sox from "sox-audio";
 import {PassThrough as PassThroughStream} from "stream";
 import * as FS from "fs";
-
-/*
- * Code
- */
-
-/**
- * Handles the TTS for the bot. This class is intended to be used by Output and
- * not to be used seperatly.
- */
 
 const msPerSecond = 1000;
 const sampleRate = 48000;
@@ -31,6 +16,8 @@ const timeoutDuration = 100;
 
 /**
  * Handles the speech dispatching queue for the bot.
+ * This class is intended to be used by Output and
+ * not to be used seperatly.
  */
 class Speech extends EventEmitter {
 	/**

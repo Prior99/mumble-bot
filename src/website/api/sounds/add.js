@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import * as Multer from "multer";
+import Multer from "multer";
 import * as FS from "fs";
 import * as HTTPCodes from "../../httpcodes";
 

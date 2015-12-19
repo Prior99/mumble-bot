@@ -1,8 +1,8 @@
 /*
  * Imports
  */
-import * as Multer from "multer";
-import * as MusicMetadata from "musicmetadata";
+import Multer from "multer";
+import MusicMetadata from "musicmetadata";
 import * as FS from "fs";
 import * as Winston from "winston";
 

@@ -1,14 +1,6 @@
-/*
- * Imports
- */
-
-import * as CachedWebTTS from "./cachedwebtts";
+import CachedWebTTS from "./cachedwebtts";
 import * as Request from "request";
 import * as Winston from "winston";
-
-/*
- * Code
- */
 
 /**
  * Refresh the access token for Bing TTS.

@@ -1,12 +1,4 @@
-/*
- * Imports
- */
-
-import * as CachedWebTTS from "./cachedwebtts";
-
-/*
- * Code
- */
+import CachedWebTTS from "./cachedwebtts";
 
 /**
  * The Google Translate TTS text to speech api as cached web tts.
