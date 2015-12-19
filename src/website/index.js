@@ -1,43 +1,44 @@
 /*
  * Imports
  */
-const Express = require("express");
-const ExpHbs = require("express-handlebars");
-const Winston = require("winston");
-const Less = require("less-middleware");
-const Session = require("express-session");
-const FileStore = require("session-file-store")(Session);
-const Moment = require("moment");
-const ExpressWS = require("express-ws");
-const colorify = require("../colorbystring");
+import Express from "express";
+import ExpHbs from "express-handlebars";
+import * as Winston from "winston";
+import Less from "less-middleware";
+import Session from "express-session";
+import SessionFileStore from "session-file-store";
+import Moment from "moment";
+import ExpressWS from "express-ws";
+import colorify from "../colorbystring";
 
 /*
  * Views
  */
-const viewDefault = require("./default");
-const viewSpeak = require("./speak");
-const viewRegisterLogin = require("./users/registerLogin");
-const viewLog = require("./log");
-const viewQueue = require("./queue");
-const viewRSS = require("./rss");
+import ViewDefault from "./default";
+import ViewSpeak from "./speak";
+import ViewRegisterLogin from "./users/registerLogin";
+import ViewLog from "./log";
+import ViewQueue from "./queue";
+import ViewRSS from "./rss";
 
-const websocketCached = require("./record/websocketcached");
+import websocketCached from "./record/websocketcached";
 
 /*
  * Routes
  */
-const routeMusic = require("./music");
-const routeApi = require("./api");
-const routeQuotes = require("./quotes");
-const routeUsers = require("./users");
-const routeBass = require("./bass");
-const routeRecord = require("./record");
-const routeSounds = require("./sounds");
-const routeStats = require("./stats");
+import RouteMusic from "./music";
+import RouteApi from "./api";
+import RouteQuotes from "./quotes";
+import RouteUsers from "./users";
+import RouteBass from "./bass";
+import RouteRecord from "./record";
+import RouteSounds from "./sounds";
+import RouteStats from "./stats";
 
 /*
  * Code
  */
+const FileStore = SessionFileStore(Session);
 
 const pages = [
 	{
@@ -199,31 +200,31 @@ class Website {
 		this.app.use("/tablesorter", Express.static("node_modules/tablesorter/dist/"));
 		this.app.use("/favicon.ico", Express.static("favicon.ico"));
 		this.app.use("/dist/", Express.static("dist/"));
-		this.app.use("/api", routeApi(bot));
+		this.app.use("/api", RouteApi(bot));
 		this.app.use((req, res, next) => {
 			if(req.session.user) {
 				next();
 			}
 			else {
-				return viewRegisterLogin(bot)(req, res);
+				return ViewRegisterLogin(bot)(req, res);
 			}
 		});
-		this.app.use("/music", routeMusic(bot));
-		this.app.use("/users", routeUsers(bot));
-		this.app.use("/bass", routeBass(bot));
-		this.app.use("/record", routeRecord(bot));
+		this.app.use("/music", RouteMusic(bot));
+		this.app.use("/users", RouteUsers(bot));
+		this.app.use("/bass", RouteBass(bot));
+		this.app.use("/record", RouteRecord(bot));
 		this.app.ws("/record/cached", websocketCached(bot));
-		this.app.use("/quotes", routeQuotes(bot));
-		this.app.use("/sounds", routeSounds(bot));
-		this.app.use("/stats", routeStats(bot));
-		this.app.use("/commands", viewDefault("commands"));
-		this.app.get("/tree", viewDefault("channeltree"));
-		this.app.get("/", viewDefault("home"));
-		this.app.get("/speak", viewSpeak(bot));
-		this.app.get("/google", viewDefault("googlelookup"));
-		this.app.get("/log", viewLog(bot));
-		this.app.get("/queue", viewQueue(bot));
-		this.app.get("/rss", viewRSS(bot));
+		this.app.use("/quotes", RouteQuotes(bot));
+		this.app.use("/sounds", RouteSounds(bot));
+		this.app.use("/stats", RouteStats(bot));
+		this.app.use("/commands", ViewDefault("commands"));
+		this.app.get("/tree", ViewDefault("channeltree"));
+		this.app.get("/", ViewDefault("home"));
+		this.app.get("/speak", ViewSpeak(bot));
+		this.app.get("/google", ViewDefault("googlelookup"));
+		this.app.get("/log", ViewLog(bot));
+		this.app.get("/queue", ViewQueue(bot));
+		this.app.get("/rss", ViewRSS(bot));
 		const port = this.bot.options.website.port;
 		this.server = this.app.listen(port);
 		const timeoutValue = 5000;
