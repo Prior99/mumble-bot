@@ -38,4 +38,4 @@ const ViewAddEffect = function(bot) {
 	}
 };
 
-export default ViewAddEffects;
+export default ViewAddEffect;
