@@ -123,5 +123,5 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks("grunt-contrib-less");
 	grunt.loadNpmTasks("grunt-jsdoc");
 
-	grunt.registerTask("default", ["eslint", "jsdoc", "babel", "browserify", "less"]);
+	grunt.registerTask("default", ["eslint", /*"jsdoc",*/ "babel", "browserify", "less"]);
 };
