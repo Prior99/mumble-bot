@@ -9,39 +9,31 @@ const DatabaseTTSCache = function(Database) {
 	 * not yet synthesized.
 	 * @param {string} api - Identifier of the api to use.
 	 * @param {string} text - Text for which a MP3 file should be retrieved.
-	 * @param callback - Called when the query has been done.
+	 * @return {number} - The filename of the cached file (Files are named after numerical generated ids).
 	 */
-	Database.prototype.getCachedTTS = function(api, text, callback) {
-		this.pool.query("SELECT id AS filename FROM TTSCache WHERE text LIKE ? AND api = ?", [text.toLowerCase(), api],
-			function(err, rows) {
-				if(this._checkError(err, callback)) {
-					if(callback) {
-						if(rows.length >= 1) {
-							callback(null, rows[0].filename);
-						}
-						else {
-							callback(null, null);
-						}
-					}
-				}
-			}.bind(this)
+	Database.prototype.getCachedTTS = async function(api, text) {
+		const rows = await this.pool.query(
+			"SELECT id AS filename " +
+			"FROM TTSCache " +
+			"WHERE text LIKE ? AND api = ?", [text.toLowerCase(), api]
 		);
+		if(rows && rows.length > 0) {
+			return rows[0].filename;
+		}
+		else {
+			return null;
+		}
 	};
 
 	/**
 	 * Adds a new TTS MP3 file to the cache.
+	 * @param {string} api - Name of the api this cached audio belongs to.
 	 * @param {string} text - Text for which a MP3 was newly generated.
-	 * @param callback - Called when the text was synthesized with the id of the
-	 *					 entry after which the file should be named.
+	 * @return {number} - Unique generated id of the new entry.
 	 */
-	Database.prototype.addCachedTTS = function(api, text, callback) {
-		this.pool.query("INSERT INTO TTSCache(text, api) VALUES(?, ?)", [text.toLowerCase(), api],
-			function(err, result) {
-				if(this._checkError(err, callback)) {
-					if(callback) { callback(null, result.insertId); }
-				}
-			}.bind(this)
-		);
+	Database.prototype.addCachedTTS = async function(api, text) {
+		const result = await this.pool.query("INSERT INTO TTSCache(text, api) VALUES(?, ?)", [text.toLowerCase(), api]);
+		return result.insertId;
 	};
 };
 

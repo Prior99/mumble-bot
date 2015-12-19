@@ -4,32 +4,38 @@
  * @return {undefined}
  */
 const DatabaseSounds = function(Database) {
-	Database.prototype.addSound = function(name, callback) {
-		this.pool.query("INSERT INTO Sounds(name) VALUES(?)",
-			[name], function(err, result) {
-				if(this._checkError(err, callback)) {
-					if(callback) { callback(null, result.insertId); }
-				}
-			}.bind(this)
-		);
+	/**
+	 * @typedef DatabaseSound
+	 * @property {string} name - The name of the sound (filename).
+	 * @property {number} id - Unique id of this sound.
+	 * @property {number} used - How often the sound was already palyed back.
+	 */
+	/**
+	 * <b>Async</b> Add a new sound to the database.
+	 * @param {string} name - The name of the sound to add (filename).
+	 * @return {number} - The unique id of the newly created sound.
+	 */
+	Database.prototype.addSound = async function(name) {
+		const result = await this.pool.query("INSERT INTO Sounds(name) VALUES(?)", [name]);
+		return result.insertId;
 	};
-	Database.prototype.listSounds = function(callback) {
-		this.pool.query("SELECT id, name, used FROM Sounds ORDER BY name, used DESC",
-			function(err, rows) {
-				if(this._checkError(err, callback)) {
-					if(callback) { callback(null, rows); }
-				}
-			}.bind(this)
-		);
+
+	/**
+	 * <b>Async</b> List all sounds in the database.
+	 * @return {Sound[]} - List of all sounds in the database.
+	 */
+	Database.prototype.listSounds = async function() {
+		const rows = await this.pool.query("SELECT id, name, used FROM Sounds ORDER BY name, used DESC");
+		return rows;
 	};
-	Database.prototype.usedSound = function(id, callback) {
-		this.pool.query("UPDATE Sounds SET used = used +1 WHERE id = ?",
-			[id], function(err) {
-				if(this._checkError(err, callback)) {
-					if(callback) { callback(null); }
-				}
-			}.bind(this)
-		);
+
+	/**
+	 * <b>Async</b> Update a sound to be played back one more times (Increase usages by one).
+	 * @param {number} id - Unique id of the sound to update.
+	 * @return {undefined}
+	 */
+	Database.prototype.usedSound = async function(id) {
+		await this.pool.query("UPDATE Sounds SET used = used +1 WHERE id = ?", [id]);
 	};
 };
 
