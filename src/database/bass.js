@@ -3,7 +3,7 @@
  * @param {Database} Database - The Database class to extend.
  * @return {undefined}
  */
-const DatabaseBass = function(Database) {
+const BassExtension = function(Database) {
 	/**
 	 * <b>Async</b> Insert a new bass "effect" word into the database.
 	 * @param {string} effect - Word to insert
@@ -11,7 +11,7 @@ const DatabaseBass = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.addBassEffect = async function(effect) {
-		const result = await this.pool.query("INSERT INTO BassEffects(effect) VALUES (?)", [effect]);
+		const result = await this.connection.query("INSERT INTO BassEffects(effect) VALUES (?)", [effect]);
 		return result.insertId;
 	};
 
@@ -21,7 +21,7 @@ const DatabaseBass = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.listBassEffects = async function() {
-		const rows = await this.pool.query("SELECT effect FROM BassEffects");
+		const rows = await this.connection.query("SELECT effect FROM BassEffects");
 		const arr = [];
 		for(const row of rows) {
 			arr.push(row.effect);
@@ -30,4 +30,4 @@ const DatabaseBass = function(Database) {
 	};
 };
 
-export default DatabaseBass;
+export default BassExtension;

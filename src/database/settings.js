@@ -3,7 +3,7 @@
  * @param {Database} Database - The Database class to extend.
  * @return {undefined}
  */
-const DatabaseSettings = function(Database) {
+const SettingsExtension = function(Database) {
 	/**
 	 * <b>Async</b> Get get the specified setting from to the given user.
 	 * @param {DatabaseUser} user - User to fetch the setting from.
@@ -11,7 +11,7 @@ const DatabaseSettings = function(Database) {
 	 * @return {string} - The value in its unchanged string representation as taken from the database.
 	 */
 	Database.prototype.getSetting = async function(user, setting) {
-		const rows = await this.pool.query("SELECT value FROM UserSettings WHERE user = ? AND setting = ?",
+		const rows = await this.connection.query("SELECT value FROM UserSettings WHERE user = ? AND setting = ?",
 			[user.id, setting]
 		);
 		if(rows && rows.length > 0) {
@@ -29,7 +29,7 @@ const DatabaseSettings = function(Database) {
 	 *                    (parsed from json) as value.
 	 */
 	Database.prototype.getSettings = async function(user) {
-		const rows = await this.pool.query("SELECT setting, value FROM UserSettings WHERE user = ?", [user.id]);
+		const rows = await this.connection.query("SELECT setting, value FROM UserSettings WHERE user = ?", [user.id]);
 		const settings = {};
 		rows.forEach((row) => settings[row.setting] = JSON.parse(row.value));
 		return settings;
@@ -43,7 +43,7 @@ const DatabaseSettings = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.setSetting = async function(user, setting, value) {
-		await this.pool.query(
+		await this.connection.query(
 			"INSERT INTO UserSettings(user, setting, value) " +
 			"VALUES(?, ?, ?) " +
 			"ON DUPLICATE KEY UPDATE value = VALUES(value)", [user.id, setting, value]
@@ -51,4 +51,4 @@ const DatabaseSettings = function(Database) {
 	};
 };
 
-export default DatabaseSettings;
+export default SettingsExtension;

@@ -3,7 +3,7 @@
  * @param {Database} Database - The Database class to extend.
  * @return {undefined}
  */
-const DatabaseRecords = function(Database) {
+const RecordsExtension = function(Database) {
 	/**
 	 * <b>Async</b> Add a new record to the database.
 	 * @param {string} quote - The quote of the record to be added.
@@ -13,7 +13,7 @@ const DatabaseRecords = function(Database) {
 	 * @return {number} - The unique id of the new record.
 	 */
 	Database.prototype.addRecord = async function(quote, user, date, labels) {
-		const result = await this.pool.query("INSERT INTO Records(quote, user, submitted) VALUES(?, ?, ?)",
+		const result = await this.connection.query("INSERT INTO Records(quote, user, submitted) VALUES(?, ?, ?)",
 			[quote, user.id, date]
 		);
 		labels.forEach((label) => this.addRecordToLabel(result.insertId, label));
@@ -41,7 +41,7 @@ const DatabaseRecords = function(Database) {
 	 * @return {RecordCountByUserStat[]} - List of users and the amount of records they have.
 	 */
 	Database.prototype.getRecordCountByUsers = async function() {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT COUNT(r.id) AS amount, u.username AS user " +
 			"FROM Users u " +
 			"LEFT JOIN Records r ON r.user = u.id " +
@@ -59,7 +59,7 @@ const DatabaseRecords = function(Database) {
 	 * @return {RecordCountByDateStat[]} - List of days and the amount of records recorded on that day.
 	 */
 	Database.prototype.getRecordCountByDays = async function() {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT DATE(submitted) AS submitted, COUNT(id) AS amount " +
 			"FROM Records " +
 			"GROUP BY DATE(submitted) ORDER BY submitted DESC"
@@ -75,8 +75,8 @@ const DatabaseRecords = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.updateRecord = async function(id, quote, labels) {
-		await this.pool.query("UPDATE Records SET quote = ? WHERE id = ?", [quote, id]);
-		await this.pool.query("DELETE FROM RecordLabelRelation WHERE record = ?", [id]);
+		await this.connection.query("UPDATE Records SET quote = ? WHERE id = ?", [quote, id]);
+		await this.connection.query("DELETE FROM RecordLabelRelation WHERE record = ?", [id]);
 		labels.forEach((label) => this.addRecordToLabel(id, label));
 	};
 
@@ -85,7 +85,7 @@ const DatabaseRecords = function(Database) {
 	 * @return {Record[]} - List of all records in the database.
 	 */
 	Database.prototype.listRecords = async function() {
-		const rows = await this.pool.query("SELECT id FROM Records ORDER BY used DESC");
+		const rows = await this.connection.query("SELECT id FROM Records ORDER BY used DESC");
 		const records = await this._completeRecords(rows)
 		return records;
 	};
@@ -96,7 +96,7 @@ const DatabaseRecords = function(Database) {
 	 * @return {Record[]} - List of all records in the database belonging to the specified user.
 	 */
 	Database.prototype.listRecordsForUser = async function(user) {
-		const rows = await this.pool.query("SELECT id FROM Records WHERE user = ? ORDER BY used DESC", [user.id]);
+		const rows = await this.connection.query("SELECT id FROM Records WHERE user = ? ORDER BY used DESC", [user.id]);
 		const records = await this._completeRecords(records);
 		return records;
 	};
@@ -107,7 +107,7 @@ const DatabaseRecords = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.usedRecord = async function(id) {
-		await this.pool.query("UPDATE Records SET used = used +1 WHERE id = ?", [id]);
+		await this.connection.query("UPDATE Records SET used = used +1 WHERE id = ?", [id]);
 	};
 	/**
 	 * A label with which the records can be tagged.
@@ -132,7 +132,7 @@ const DatabaseRecords = function(Database) {
 	 * @return {Record} - The record belonging to the specified unique id.
 	 */
 	Database.prototype.getRecord = async function(id) {
-		const rows = await this.pool.query("SELECT id, quote, used, user, submitted FROM Records WHERE id = ?");
+		const rows = await this.connection.query("SELECT id, quote, used, user, submitted FROM Records WHERE id = ?");
 		if(rows && rows.length > 0) {
 			const record = rows[0];
 			const user = await this.getUserById(record.user);
@@ -151,7 +151,7 @@ const DatabaseRecords = function(Database) {
 	 * @return {Record} - A random record from the database.
 	 */
 	Database.prototype.getRandomRecord = async function() {
-		const rows = await this.pool.query("SELECT id FROM Records ORDER BY RAND() LIMIT 1,1");
+		const rows = await this.connection.query("SELECT id FROM Records ORDER BY RAND() LIMIT 1,1");
 		if(rows && rows.length > 0) {
 			let record = rows[0];
 			record = this.getRecord(record.id);
@@ -168,7 +168,7 @@ const DatabaseRecords = function(Database) {
 	 * @return {Label[]} - List of all labels with which the specified record is tagged.
 	 */
 	Database.prototype.getLabelsOfRecord = async function(recordId) {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT r.id AS id, r.name AS name " +
 			"FROM RecordLabels r " +
 			"LEFT JOIN RecordLabelRelation l ON l.label = r.id WHERE l.record = ?", [recordId]
@@ -181,7 +181,7 @@ const DatabaseRecords = function(Database) {
 	 * @return {number} - Amount of all records in the database.
 	 */
 	Database.prototype.getRecordCount = async function() {
-		const rows = await this.pool.query("SELECT COUNT(id) AS amount FROM Records");
+		const rows = await this.connection.query("SELECT COUNT(id) AS amount FROM Records");
 		return rows[0].amount;
 	};
 
@@ -191,7 +191,7 @@ const DatabaseRecords = function(Database) {
 	 * @return {number} - Generated unique id of the new label that was added.
 	 */
 	Database.prototype.addRecordLabel = async function(name) {
-		const result = await this.pool.query("INSERT INTO RecordLabels(name) VALUES(?)", [name]);
+		const result = await this.connection.query("INSERT INTO RecordLabels(name) VALUES(?)", [name]);
 		return result.insertId;
 	};
 
@@ -201,7 +201,7 @@ const DatabaseRecords = function(Database) {
 	 *                     that represents the number of records tagged with the label.
 	 */
 	Database.prototype.listLabels = async function() {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT name, id, COUNT(record) AS records " +
 			"FROM RecordLabels " +
 			"LEFT JOIN RecordLabelRelation ON id = label " +
@@ -217,7 +217,7 @@ const DatabaseRecords = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.addRecordToLabel = async function(record, label) {
-		await this.pool.query("INSERT INTO RecordLabelRelation(record, label) VALUES(?, ?)", [record, label]);
+		await this.connection.query("INSERT INTO RecordLabelRelation(record, label) VALUES(?, ?)", [record, label]);
 	};
 
 	/**
@@ -226,7 +226,7 @@ const DatabaseRecords = function(Database) {
 	 * @return {Record[]} - List of all records which were tagged with the specified label.
 	 */
 	Database.prototype.listRecordsByLabel = async function(label) {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT id " +
 			"FROM Records " +
 			"LEFT JOIN RecordLabelRelation ON id = record " +
@@ -243,7 +243,7 @@ const DatabaseRecords = function(Database) {
 	 * @return {Record[]} - A list of max. 20 records that match the given query string.
 	 */
 	Database.prototype.lookupRecord = async function(part) {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT id, quote, user, used, submitted " +
 			"FROM Records " +
 			"WHERE quote LIKE ? " +
@@ -264,7 +264,7 @@ const DatabaseRecords = function(Database) {
 	 * @return {PlaybackCountByUserStat[]} - List of all users and how often their records have been played back.
 	 */
 	Database.prototype.getRecordPlaybackCountPerUser = async function() {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT username AS user, SUM(used) AS playbacks, SUM(used)/COUNT(r.id) AS playbacksRelative " +
 			"FROM Records r " +
 			"LEFT JOIN Users u ON u.id = user " +
@@ -274,4 +274,4 @@ const DatabaseRecords = function(Database) {
 	};
 };
 
-export default DatabaseRecords;
+export default RecordsExtension;

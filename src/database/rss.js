@@ -3,7 +3,7 @@
  * @param {Database} Database - The Database class to extend.
  * @return {undefined}
  */
-const DatabaseRSS = function(Database) {
+const RSSExtension = function(Database) {
 	/**
 	 * @typedef RSSFeed
 	 * @property {string} url - URL to the RSS feed.
@@ -17,7 +17,7 @@ const DatabaseRSS = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.addRSSFeed = async function(url, name) {
-		await this.pool.query("INSERT INTO RSS(url, name) VALUES (?, ?)", [url, name]);
+		await this.connection.query("INSERT INTO RSS(url, name) VALUES (?, ?)", [url, name]);
 	};
 
 	/**
@@ -26,7 +26,7 @@ const DatabaseRSS = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.removeRSSFeed = async function(id) {
-		await this.pool.query("DELETE FROM RSS WHERE id = ?", [id]);
+		await this.connection.query("DELETE FROM RSS WHERE id = ?", [id]);
 	};
 
 	/**
@@ -34,7 +34,7 @@ const DatabaseRSS = function(Database) {
 	 * @return {RSSFeed[]} - List of all subscribed RSS feeds.
 	 */
 	Database.prototype.listRSSFeeds = async function() {
-		const rows = await this.pool.query("SELECT id, url, name FROM RSS");
+		const rows = await this.connection.query("SELECT id, url, name FROM RSS");
 		return rows;
 	};
 
@@ -44,7 +44,7 @@ const DatabaseRSS = function(Database) {
 	 * @return {boolean} - Whether the article is already known.
 	 */
 	Database.prototype.isRSSFeedEntryKnown = async function(hash) {
-		const rows = await this.pool.query("SELECT hash FROM KnownRSSEntries WHERE hash = ?", [hash]);
+		const rows = await this.connection.query("SELECT hash FROM KnownRSSEntries WHERE hash = ?", [hash]);
 		return rows && rows.length > 0;
 	};
 
@@ -55,8 +55,8 @@ const DatabaseRSS = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.addKnownRSSFeedEntry = async function(hash, url) {
-		await this.pool.query("INSERT INTO KnownRSSEntries(hash, url, seen) VALUES(?, ?, ?)", [hash, url, new Date()]);
+		await this.connection.query("INSERT INTO KnownRSSEntries(hash, url, seen) VALUES(?, ?, ?)", [hash, url, new Date()]);
 	};
 };
 
-export default DatabaseRSS;
+export default RSSExtension;

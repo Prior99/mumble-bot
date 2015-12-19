@@ -5,16 +5,16 @@ import Promise from "promise";
  * @param {Database} Database - The Database class to extend.
  * @return {undefined}
  */
-const DatabaseDialogs = function(Database) {
+const DialogsExtension = function(Database) {
 	/**
 	 * <b>Async</b> Create a new dialog in the database.
 	 * @param {number[]} dialog - Array of ids of the records in the dialog.
 	 * @return {undefined}l
 	 */
 	Database.prototype.addDialog = async function(dialog) {
-		const result = await this.pool.query("INSERT INTO Dialogs(submitted) VALUES(?)", [new Date()]);
+		const result = await this.connection.query("INSERT INTO Dialogs(submitted) VALUES(?)", [new Date()]);
 		const dialogId = result.insertId;
-		await Promise.all(dialog.map((id, index) => this.pool.query(
+		await Promise.all(dialog.map((id, index) => this.connection.query(
 				"INSERT INTO DialogParts(dialogId, position, recordId) VALUES(?, ?, ?)",
 				[dialogId, index, id]
 			)
@@ -27,7 +27,7 @@ const DatabaseDialogs = function(Database) {
 	 * @return {number[]} - List of all ids of the records in the dialog in the correct order.
 	 */
 	Database.prototype.getDialogParts = async function(dialogId) {
-		const list = await this.pool.query(
+		const list = await this.connection.query(
 			"SELECT recordId FROM DialogParts WHERE dialogId = ? ORDER BY position ASC",
 			[dialogId]
 		);
@@ -59,7 +59,7 @@ const DatabaseDialogs = function(Database) {
 	 */
 	Database.prototype.getDialog = async function(id) {
 		let dialog;
-		const results = await this.pool.query("SELECT id, submitted, used FROM Dialogs WHERE id = ?", [id]);
+		const results = await this.connection.query("SELECT id, submitted, used FROM Dialogs WHERE id = ?", [id]);
 		if(!results.length) {
 			return null;
 		}
@@ -75,7 +75,7 @@ const DatabaseDialogs = function(Database) {
 	 * @return {Dialog[]} - List of all dialogs in the database.
 	 */
 	Database.prototype.listDialogs = async function() {
-		const dialogs = await this.pool.query("SELECT id FROM Dialogs ORDER BY used DESC");
+		const dialogs = await this.connection.query("SELECT id FROM Dialogs ORDER BY used DESC");
 		const completedDialogs = await Promise.all(
 			dialogs.map(dialog => this.getDialog(dialog.id))
 		);
@@ -88,7 +88,7 @@ const DatabaseDialogs = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.usedDialog = async function(id) {
-		await this.pool.query("UPDATE Dialogs SET used = used +1 WHERE id = ?", [id]);
+		await this.connection.query("UPDATE Dialogs SET used = used +1 WHERE id = ?", [id]);
 	}
 };
-export default DatabaseDialogs;
+export default DialogsExtension;

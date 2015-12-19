@@ -4,7 +4,7 @@ import * as Winston from "winston";
  * @param {Database} Database - The Database class to extend.
  * @return {undefined}
  */
-const DatabaseUserStats = function(Database) {
+const UserStatsExtension = function(Database) {
 	const millisecondsPerSecond = 1000;
 	/**
 	 * <b>Async</b> Write a new set of statistics into the database when a user has spoken.
@@ -14,7 +14,7 @@ const DatabaseUserStats = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.writeUserStatsSpeak = async function(user, started, ended) {
-		await this.pool.query(
+		await this.connection.query(
 			"INSERT INTO UserStatsSpeaking(user, started, ended) VALUES(?, ?, ?)", [user.id, started, ended]
 		);
 	};
@@ -27,7 +27,7 @@ const DatabaseUserStats = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.writeUserStatsOnline = async function(user, started, ended) {
-		await this.pool.query(
+		await this.connection.query(
 			"INSERT INTO UserStatsOnline(user, started, ended) VALUES(?, ?, ?)", [user.id, started, ended]
 		);
 	};
@@ -42,7 +42,7 @@ const DatabaseUserStats = function(Database) {
 	 * @return {StatObjectSpeechPerHour[]} - List of objects representing the statistics requested.
 	 */
 	Database.prototype.getSpokenPerHour = async function() {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT HOUR(started) AS hour, SUM(TIME_TO_SEC(ended-started)) AS amount " +
 			"FROM UserStatsSpeaking GROUP BY HOUR(started)"
 		);
@@ -62,7 +62,7 @@ const DatabaseUserStats = function(Database) {
 	 * @return {StatObjectSpeechPerUser[]} - List of objects representing the statistics requested.
 	 */
 	Database.prototype.getSpokenPerUser = async function() {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT username AS user, SUM(TIME_TO_SEC(ended-started)) AS amount " +
 			"FROM UserStatsSpeaking " +
 			"LEFT JOIN Users u ON user = u.id " +
@@ -83,7 +83,7 @@ const DatabaseUserStats = function(Database) {
 	 * @return {StatObjectSpeechPerWeekday[]} - List of objects representing the statistics requested.
 	 */
 	Database.prototype.getSpokenPerWeekday = async function() {
-		const rows = await Promise.denodeify(this.pool.query.bind(this.pool))(
+		const rows = await this.connection.query(
 			"SELECT DAYOFWEEK(started) AS day, SUM(TIME_TO_SEC(ended-started)) AS amount " +
 			"FROM UserStatsSpeaking " +
 			"GROUP BY DAYOFWEEK(started)"
@@ -103,7 +103,7 @@ const DatabaseUserStats = function(Database) {
 	 * @return {StatObjectOnlinePerUser[]} - List of objects representing the statistics requested.
 	 */
 	Database.prototype.getOnlinePerUser = async function() {
-		const rows = await Promise.denodeify(this.pool.query.bind(this.pool))(
+		const rows = await this.connection.query(
 			"SELECT username AS user, SUM(TIME_TO_SEC(ended-started)) AS amount " +
 			"FROM UserStatsOnline " +
 			"LEFT JOIN Users u ON user = u.id " +
@@ -116,4 +116,4 @@ const DatabaseUserStats = function(Database) {
 	};
 };
 
-export default DatabaseUserStats;
+export default UserStatsExtension;

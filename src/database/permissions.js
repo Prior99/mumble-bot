@@ -3,7 +3,7 @@
  * @param {Database} Database - The Database class to extend.
  * @return {undefined}
  */
-const DatabasePermissions = function(Database) {
+const PermissionsExtension = function(Database) {
 	/**
 	 * <b>Async</b> Checks whether a user with the given id has a certain permission.
 	 * @param {number} userid - Id of the user to check.
@@ -11,7 +11,7 @@ const DatabasePermissions = function(Database) {
 	 * @return {boolean} - Whether the user has the requested permission.
 	 */
 	Database.prototype.hasPermission = async function(userid, permission) {
-		const rows = await this.pool.query("SELECT id FROM UserPermissions WHERE user = ? AND permission = ?");
+		const rows = await this.connection.query("SELECT id FROM UserPermissions WHERE user = ? AND permission = ?");
 		return rows && rows.length > 0;
 	};
 
@@ -22,7 +22,7 @@ const DatabasePermissions = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.grantPermission = async function(userid, permission) {
-		await this.pool.query("INSERT IGNORE INTO UserPermissions (user, permission) VALUES (?, ?)",
+		await this.connection.query("INSERT IGNORE INTO UserPermissions (user, permission) VALUES (?, ?)",
 			[userid, permission]
 		);
 	};
@@ -34,7 +34,7 @@ const DatabasePermissions = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.revokePermission = async function(userid, permission) {
-		await this.pool.query("DELETE FROM UserPermissions WHERE user = ? AND permission = ?",
+		await this.connection.query("DELETE FROM UserPermissions WHERE user = ? AND permission = ?",
 			[userid, permission]
 		);
 	};
@@ -52,7 +52,7 @@ const DatabasePermissions = function(Database) {
 	 * @return {Permission} - The permission to get the details of.
 	 */
 	Database.prototype.getPermission = async function(permission) {
-		const rows = await this.pool.query("SELECT id, name, description, icon FROM Permissions WHERE id = ?",
+		const rows = await this.connection.query("SELECT id, name, description, icon FROM Permissions WHERE id = ?",
 			[permission]);
 		if(rows.length > 0) {
 			return rows[0];
@@ -66,9 +66,9 @@ const DatabasePermissions = function(Database) {
 	 * @return {Permission[]} - The permission to get the details of.
 	 */
 	Database.prototype.listPermissions = async function() {
-		const rows = await this.pool.query("SELECT id, name, description, icon FROM Permissions");
+		const rows = await this.connection.query("SELECT id, name, description, icon FROM Permissions");
 		return rows;
 	};
 };
 
-export default DatabasePermissions;
+export default PermissionsExtension;

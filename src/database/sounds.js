@@ -3,7 +3,7 @@
  * @param {Database} Database - The Database class to extend.
  * @return {undefined}
  */
-const DatabaseSounds = function(Database) {
+const SoundsExtension = function(Database) {
 	/**
 	 * @typedef DatabaseSound
 	 * @property {string} name - The name of the sound (filename).
@@ -16,7 +16,7 @@ const DatabaseSounds = function(Database) {
 	 * @return {number} - The unique id of the newly created sound.
 	 */
 	Database.prototype.addSound = async function(name) {
-		const result = await this.pool.query("INSERT INTO Sounds(name) VALUES(?)", [name]);
+		const result = await this.connection.query("INSERT INTO Sounds(name) VALUES(?)", [name]);
 		return result.insertId;
 	};
 
@@ -25,7 +25,7 @@ const DatabaseSounds = function(Database) {
 	 * @return {Sound[]} - List of all sounds in the database.
 	 */
 	Database.prototype.listSounds = async function() {
-		const rows = await this.pool.query("SELECT id, name, used FROM Sounds ORDER BY name, used DESC");
+		const rows = await this.connection.query("SELECT id, name, used FROM Sounds ORDER BY name, used DESC");
 		return rows;
 	};
 
@@ -35,8 +35,8 @@ const DatabaseSounds = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.usedSound = async function(id) {
-		await this.pool.query("UPDATE Sounds SET used = used +1 WHERE id = ?", [id]);
+		await this.connection.query("UPDATE Sounds SET used = used +1 WHERE id = ?", [id]);
 	};
 };
 
-export default DatabaseSounds;
+export default SoundsExtension;

@@ -3,7 +3,7 @@
  * @param {Database} Database - The Database class to extend.
  * @return {undefined}
  */
-const DatabaseAutocomplete = function(Database) {
+const AutocompleteExtension = function(Database) {
 	/**
 	 * <b>Async</b> Inserts a new text into the database of autocompletition texts.
 	 * @param {string} sentence - The text to insert.
@@ -11,7 +11,7 @@ const DatabaseAutocomplete = function(Database) {
 	 */
 	Database.prototype.enterAutoComplete = async function(sentence) {
 		const q = "INSERT INTO AutoComplete(sentence) VALUES (?) ON DUPLICATE KEY UPDATE used = used + 1";
-		await this.pool.query(q, [sentence]);
+		await this.connection.query(q, [sentence]);
 	};
 	/**
 	 * One autocompletition element.
@@ -31,8 +31,8 @@ const DatabaseAutocomplete = function(Database) {
 			"FROM AutoComplete " +
 			"WHERE sentence LIKE ? " +
 			"ORDER BY used DESC LIMIT 10";
-		const rows = await this.pool.query(q, ["%" + part + "%"]);
+		const rows = await this.connection.query(q, ["%" + part + "%"]);
 		return rows;
 	};
 };
-export default DatabaseAutocomplete;
+export default AutocompleteExtension;

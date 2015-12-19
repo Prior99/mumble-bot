@@ -3,7 +3,7 @@
  * @param {Database} Database - The Database class to extend.
  * @return {undefined}
  */
-const DatabaseQuotes = function(Database) {
+const QuotesExtension = function(Database) {
 	/**
 	 * <b>Async</b> Add a quote to the database.
 	 * @param {string} quote - Text of the quote.
@@ -12,7 +12,7 @@ const DatabaseQuotes = function(Database) {
 	 */
 	Database.prototype.addQuote = async function(quote, author) {
 		if(quote && author) {
-			const result = await this.pool.query("INSERT INTO Quotes(quote, author, submitted) VALUES(?, ?, ?)",
+			const result = await this.connection.query("INSERT INTO Quotes(quote, author, submitted) VALUES(?, ?, ?)",
 				[quote, author, new Date()]
 			);
 			return result.insertId;
@@ -36,7 +36,7 @@ const DatabaseQuotes = function(Database) {
 	 * @return {Quote} - The randomly selected quote.
 	 */
 	Database.prototype.getRandomQuote = async function() {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT quote, author, submitted, used, id FROM Quotes " +
 			"(SELECT RAND() * (SELECT MAX(id) FROM Quotes) AS tid) AS Tmp " +
 			"WHERE Quotes.id >= Tmp.tid ORDER BY id ASC LIMIT 1"
@@ -51,7 +51,7 @@ const DatabaseQuotes = function(Database) {
 	 * @return {Quote} - The quote identified by the given id.
 	 */
 	Database.prototype.getQuote = async function(id) {
-		const rows = await this.pool.query("SELECT quote, author, submitted, used FROM Quotes WHERE id = ?", [id]);
+		const rows = await this.connection.query("SELECT quote, author, submitted, used FROM Quotes WHERE id = ?", [id]);
 		if(rows.length >= 1) {
 			this.increaseQuoteUsage(id);
 			return rows[0];
@@ -67,7 +67,7 @@ const DatabaseQuotes = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.increaseQuoteUsage = async function(id) {
-		await this.pool.query("UPDATE Quotes SET used = used + 1 WHERE id = ?", [id]);
+		await this.connection.query("UPDATE Quotes SET used = used + 1 WHERE id = ?", [id]);
 	};
 
 	/**
@@ -75,7 +75,7 @@ const DatabaseQuotes = function(Database) {
 	 * @return {number} - How many quotes are stored in the database.
 	 */
 	Database.prototype.getQuoteCount = async function() {
-		const rows = await this.pool.query("SELECT COUNT(id) AS amount FROM Quotes");
+		const rows = await this.connection.query("SELECT COUNT(id) AS amount FROM Quotes");
 		return rows[0].amount;
 	};
 
@@ -84,9 +84,9 @@ const DatabaseQuotes = function(Database) {
 	 * @return {Quote[]} - A list with all quotes.
 	 */
 	Database.prototype.getQuoteList = async function() {
-		const rows = await this.pool.query("SELECT id, author, quote, submitted, used FROM Quotes");
+		const rows = await this.connection.query("SELECT id, author, quote, submitted, used FROM Quotes");
 		return rows;
 	};
 };
 
-export default DatabaseQuotes;
+export default QuotesExtension;

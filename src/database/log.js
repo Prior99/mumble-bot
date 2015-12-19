@@ -3,7 +3,7 @@
  * @param {Database} Database - The Database class to extend.
  * @return {undefined}
  */
-const DatabaseLog = function(Database) {
+const LogExtension = function(Database) {
 	/**
 	 * One entry in the bots log.
 	 * @typedef LogEntry
@@ -16,11 +16,11 @@ const DatabaseLog = function(Database) {
 	 * @return {LogEntry[]} - Last 500 log entries.
 	 */
 	Database.prototype.listLog = async function() {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT level, message, `timestamp` FROM Log ORDER BY `timestamp` DESC LIMIT 500"
 		);
 		return rows;
 	}
 }
 
-export default DatabaseLog;
+export default LogExtension;

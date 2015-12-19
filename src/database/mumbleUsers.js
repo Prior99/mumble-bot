@@ -3,7 +3,7 @@
  * @param {Database} Database - The Database class to extend.
  * @return {undefined}
  */
-const DatabaseMumbleUsers = function(Database) {
+const MumbleUsersExtension = function(Database) {
 	/**
 	 * A Mumble user representation in the database used for storing linkage from mumble user to database users.
 	 * @typedef MumbleDatabaseUser
@@ -16,7 +16,7 @@ const DatabaseMumbleUsers = function(Database) {
 	 * @return {MumbleDatabaseUser[]} - The mumble users in the database.
 	 */
 	Database.prototype.getLinkedMumbleUsers = async function() {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT m.mumbleId AS id, u.username AS username " +
 			"FROM MumbleUsers m" +
 			"LEFT JOIN Users u ON u.id = m.user"
@@ -30,7 +30,7 @@ const DatabaseMumbleUsers = function(Database) {
 	 * @return {MumbleDatabaseUser[]} - The linked users of the requested database user.
 	 */
 	Database.prototype.getLinkedMumbleUsersOfUser = async function(username) {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT m.mumbleId AS id, u.username AS username " +
 			"FROM MumbleUsers m " +
 			"LEFT JOIN Users u ON u.id = m.user WHERE u.username = ?",
@@ -46,7 +46,7 @@ const DatabaseMumbleUsers = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.linkMumbleUser = async function(id, username) {
-		await this.pool.query(
+		await this.connection.query(
 			"INSERT INTO MumbleUsers(mumbleId, user) VALUES(?, (SELECT id FROM Users WHERE username = ?))",
 			[id, username]
 		);
@@ -58,7 +58,7 @@ const DatabaseMumbleUsers = function(Database) {
 	 * @return {DatabaseUser} - User in the database which is linked with the given mumble users id.
 	 */
 	Database.prototype.getLinkedUser = async function(id) {
-		const rows = await this.pool.query("SELECT user FROM MumbleUsers WHERE mumbleId = ?", [id]);
+		const rows = await this.connection.query("SELECT user FROM MumbleUsers WHERE mumbleId = ?", [id]);
 		if(rows.length > 0) {
 			const user = await this.getUserById(rows[0].user);
 			return user;
@@ -69,4 +69,4 @@ const DatabaseMumbleUsers = function(Database) {
 	}
 }
 
-module.exports = Database;
+export default MumbleUsersExtension;

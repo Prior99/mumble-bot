@@ -3,7 +3,7 @@
  * @param {Database} Database - The Database class to extend.
  * @return {undefined}
  */
-const DatabaseUser = function(Database) {
+const UsersExtension = function(Database) {
 	/**
 	 * <b>Async</b> Register a new user in the database.
 	 * @param {object} user - User which should be inserted into the database.
@@ -16,7 +16,7 @@ const DatabaseUser = function(Database) {
 	 * @return {number} - Unique id of the newly generated user.
 	 */
 	Database.prototype.registerUser = async function(user) {
-		const result = await this.pool.query(
+		const result = await this.connection.query(
 			"INSERT INTO Users(email, username, password, identifier, steamid, minecraft) VALUES(?, ?, ?, ?, ?, ?)",
 			[user.email, user.username, user.password, user.identifier, user.steamid, user.minecraft]
 		);
@@ -29,7 +29,7 @@ const DatabaseUser = function(Database) {
 	 * @return {DatabaseUser} - The user related to this identifier.
 	 */
 	Database.prototype.getUserByIdentifier = async function(identifier) {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT u.id AS id FROM Users u " +
 			"Left JOIN Identifiers i ON u.identifier = i.id WHERE i.identifier = ?",
 			[identifier]
@@ -48,7 +48,7 @@ const DatabaseUser = function(Database) {
 	 * @return {DatabaseUser} - The user related to this username.
 	 */
 	Database.prototype.getUserByUsername = async function(username) {
-		const rows = await this.pool.query("SELECT id FROM Users WHERE username = ?", [username]);
+		const rows = await this.connection.query("SELECT id FROM Users WHERE username = ?", [username]);
 		if(rows && rows.length > 0) {
 			return this.getUserById(rows[0].id);
 		}
@@ -73,7 +73,7 @@ const DatabaseUser = function(Database) {
 	 * @return {DatabaseUser} - The user related to this identifier.
 	 */
 	Database.prototype.getUserById = async function(id) {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT " +
 				"u.minecraft AS minecraft, " +
 				"u.id AS id, " +
@@ -101,7 +101,7 @@ const DatabaseUser = function(Database) {
 	 * @return {DatabaseUser} - The user related to this steam id.
 	 */
 	Database.prototype.getUserBySteamId = async function(steamId) {
-		const rows = await this.pool.query("SELECT id FROM Users WHERE steamid = ?", [steamId]);
+		const rows = await this.connection.query("SELECT id FROM Users WHERE steamid = ?", [steamId]);
 		if(rows && rows.length > 0) {
 			return this.getUserById(rows[0].id);
 		}
@@ -115,7 +115,7 @@ const DatabaseUser = function(Database) {
 	 * @return {DatabaseUser} - A random user from the database.
 	 */
 	Database.prototype.getRandomUser = async function() {
-		const rows = await this.pool.query("SELECT id FROM Users ORDER BY RAND() LIMIT 1");
+		const rows = await this.connection.query("SELECT id FROM Users ORDER BY RAND() LIMIT 1");
 		if(rows && rows.length > 0) {
 			return this.getUserById(rows[0].id);
 		}
@@ -130,7 +130,7 @@ const DatabaseUser = function(Database) {
 	 * @return {DatabaseUser} - The user related to this minecraft username.
 	 */
 	Database.prototype.getUserByMinecraftUsername = async function(minecraft) {
-		const rows = await this.pool.query("SELECT id FROM Users WHERE minecraft = ?", [minecraft]);
+		const rows = await this.connection.query("SELECT id FROM Users WHERE minecraft = ?", [minecraft]);
 		if(rows && rows.length > 0) {
 			return this.getUserById(rows[0].id);
 		}
@@ -146,7 +146,7 @@ const DatabaseUser = function(Database) {
 	 * @return {boolean} - Whether the username and the password matched.
 	 */
 	Database.prototype.checkLoginData = async function(username, passwordHash) {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT id FROM Users " +
 			"WHERE username = ? AND password = ?", [username, passwordHash]);
 		return rows && rows.length > 0;
@@ -162,7 +162,7 @@ const DatabaseUser = function(Database) {
 	 * @return {DatabaseIdentifier[]} - A list of all free identifiers.
 	 */
 	Database.prototype.getFreeIdentifiers = async function() {
-		const rows = await this.pool.query(
+		const rows = await this.connection.query(
 			"SELECT id, identifier FROM Identifiers " +
 			"WHERE id NOT IN (SELECT identifier FROM Users) " +
 			"ORDER BY Identifiers.id"
@@ -175,7 +175,7 @@ const DatabaseUser = function(Database) {
 	 * @return {DatabaseIdentifier[]} - A list of all identifiers in the database.
 	 */
 	Database.prototype.getAllIdentifiers = async function() {
-		const rows = await this.pool.query("SELECT id, identifier FROM Identifiers");
+		const rows = await this.connection.query("SELECT id, identifier FROM Identifiers");
 		return rows;
 	};
 
@@ -184,7 +184,7 @@ const DatabaseUser = function(Database) {
 	 * @return {DatabaseUser[]} - All users in the whole database.
 	 */
 	Database.prototype.listUsers = async function() {
-		const rows = await this.pool.query("SELECT id FROM Users");
+		const rows = await this.connection.query("SELECT id FROM Users");
 		const users = await Promise.all(rows.map((u) => this.getUserById(u.id)));
 		return users;
 	};
@@ -194,9 +194,9 @@ const DatabaseUser = function(Database) {
 	 * @return {number} - Amount of users in the database.
 	 */
 	Database.prototype.countUsers = async function() {
-		const rows = await this.pool.query("SELECT COUNT(id) AS count FROM Users");
+		const rows = await this.connection.query("SELECT COUNT(id) AS count FROM Users");
 		return rows[0].count;
 	};
 };
 
-export default DatabaseUser;
+export default UsersExtension;
