@@ -25,7 +25,8 @@ const DatabaseSettings = function(Database) {
 	/**
 	 * <b>Async</b> Get all settings of a specified user as an object.
 	 * @param {DatabaseUser} user - The user to get the settings from.
-	 * @return {object} - An object with each settings key as key and the corresponding value (parsed from json) as value.
+	 * @return {object} - An object with each settings key as key and the corresponding value
+	 *                    (parsed from json) as value.
 	 */
 	Database.prototype.getSettings = async function(user) {
 		const rows = await this.pool.query("SELECT setting, value FROM UserSettings WHERE user = ?", [user.id]);
