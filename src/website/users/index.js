@@ -1,18 +1,10 @@
-/*
- * Imports
- */
-
 import * as Express from "express";
 
-/*
- * Views
- */
-
-import * as viewList from "./list";
-import * as viewHome from "./home";
-import * as viewProfile from "./profile";
-import * as viewPermissions from "./permissions";
-import * as viewSettings from "./settings";
+import ViewList from "./list";
+import ViewHome from "./home";
+import ViewProfile from "./profile";
+import ViewPermissions from "./permissions";
+import ViewSettings from "./settings";
 /*
  * Code
  */
@@ -33,11 +25,11 @@ const RouteUsers = function(bot) {
 		res.locals.subpages = pages;
 		next();
 	});
-	router.get("/list", viewList(bot));
-	router.get("/settings", viewSettings(bot));
-	router.get("/profile/:username", viewProfile(bot));
-	router.get("/permissions/:username", viewPermissions(bot));
-	router.get("/", viewHome(bot));
+	router.get("/list", ViewList(bot));
+	router.get("/settings", ViewSettings(bot));
+	router.get("/profile/:username", ViewProfile(bot));
+	router.get("/permissions/:username", ViewPermissions(bot));
+	router.get("/", ViewHome(bot));
 
 	return router;
 };

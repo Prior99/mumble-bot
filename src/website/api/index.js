@@ -1,35 +1,19 @@
-/*
- * Imports
- */
-
-import * as Express from "express";
+import Express from "express";
 import * as HTTPCodes from "../httpcodes";
 
-/*
- * Views
- */
+import ViewTree from "./channeltree";
+import ViewCommand from "./command";
+import ViewGoogleLookup from "./googlelookup";
 
-import * as viewTree from "./channeltree";
-import * as viewCommand from "./command";
-import * as viewGoogleLookup from "./googlelookup";
-
-/*
- * Routes
- */
-import * as routeMusic from "./music";
-import * as routeUsers from "./users";
-import * as routeQuotes from "./quotes";
-import * as routeBass from "./bass";
-import * as routeSpeak from "./speak";
-import * as routeSounds from "./sounds";
-import * as routeRecord from "./record";
-import * as routeRSS from "./rss";
-import * as routeStats from "./stats";
-
-
-/*
- * Code
- */
+import RouteMusic from "./music";
+import RouteUsers from "./users";
+import RouteQuotes from "./quotes";
+import RouteBass from "./bass";
+import RouteSpeak from "./speak";
+import RouteSounds from "./sounds";
+import RouteRecord from "./record";
+import RouteRSS from "./rss";
+import RouteStats from "./stats";
 
 /**
  * Routes all requests related to the api in the /api/ endpoint.
@@ -90,7 +74,7 @@ const RouteAPI = function(bot) {
 	}
 
 	const router = Express.Router();
-	router.use("/users", routeUsers(bot));
+	router.use("/users", RouteUsers(bot));
 	router.use((req, res, next) => {
 		if(req.session.user) {
 			next();
@@ -99,17 +83,17 @@ const RouteAPI = function(bot) {
 			loginByQueryString(req, res, next);
 		}
 	});
-	router.use("/music", routeMusic(bot));
-	router.use("/tree", viewTree(bot));
-	router.use("/command", viewCommand(bot));
-	router.use("/quotes", routeQuotes(bot));
-	router.use("/bass", routeBass(bot));
-	router.use("/speak", routeSpeak(bot));
-	router.use("/sounds", routeSounds(bot));
-	router.use("/google", viewGoogleLookup(bot));
-	router.use("/record", routeRecord(bot));
-	router.use("/rss", routeRSS(bot));
-	router.use("/stats", routeStats(bot));
+	router.use("/music", RouteMusic(bot));
+	router.use("/tree", ViewTree(bot));
+	router.use("/command", ViewCommand(bot));
+	router.use("/quotes", RouteQuotes(bot));
+	router.use("/bass", RouteBass(bot));
+	router.use("/speak", RouteSpeak(bot));
+	router.use("/sounds", RouteSounds(bot));
+	router.use("/google", ViewGoogleLookup(bot));
+	router.use("/record", RouteRecord(bot));
+	router.use("/rss", RouteRSS(bot));
+	router.use("/stats", RouteStats(bot));
 
 	return router;
 };

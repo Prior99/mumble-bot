@@ -1,19 +1,7 @@
-/*
- * Imports
- */
+import Express from "express";
 
-import * as Express from "express";
-
-/*
- * Views
- */
-
-import * as viewAdd from "./add";
-import * as viewPlay from "./play";
-
-/*
- * Code
- */
+import ViewAdd from "./add";
+import ViewPlay from "./play";
 
 /**
  * Routes all requests related to the sound api commands in the /api/sounds/ endpoint.
@@ -23,8 +11,8 @@ import * as viewPlay from "./play";
 const RouteSounds = function(bot) {
 	const router = Express.Router();
 
-	router.use("/add", viewAdd(bot, router));
-	router.use("/play", viewPlay(bot));
+	router.use("/add", ViewAdd(bot, router));
+	router.use("/play", ViewPlay(bot));
 
 	return router;
 };

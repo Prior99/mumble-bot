@@ -1,15 +1,7 @@
-/*
- * Imports
- */
+import Express from "express";
 
-import * as Express from "express";
-
-/*
- * Views
- */
-
-import * as viewAdd from "./add";
-import * as viewSpeak from "./speak";
+import ViewAdd from "./add";
+import ViewSpeak from "./speak";
 
 /*
  * Code
@@ -22,8 +14,8 @@ import * as viewSpeak from "./speak";
  */
 const RouteQuotes = function(bot) {
 	const router = Express.Router();
-	router.use("/add", viewAdd(bot));
-	router.use("/speak", viewSpeak(bot));
+	router.use("/add", ViewAdd(bot));
+	router.use("/speak", ViewSpeak(bot));
 	return router;
 };
 

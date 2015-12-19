@@ -1,26 +1,14 @@
-/*
- * Imports
- */
+import Express from "express";
 
-import * as Express from "express";
-
-/*
- * Views
- */
-
-import * as viewAdd from "./add";
-import * as viewStatus from "./status";
-import * as viewPlaylist from "./playlist";
-import * as viewSongs from "./songs";
-import * as viewNext from "./next";
-import * as viewPlay from "./play";
-import * as viewPause from "./pause";
-import * as viewUpload from "./upload";
-import * as viewYoutube from "./youtube";
-
-/*
- * Code
- */
+import ViewAdd from "./add";
+import ViewStatus from "./status";
+import ViewPlaylist from "./playlist";
+import ViewSongs from "./songs";
+import ViewNext from "./next";
+import ViewPlay from "./play";
+import ViewPause from "./pause";
+import ViewUpload from "./upload";
+import ViewYoutube from "./youtube";
 
 /**
  * Router for all API callbacks related to the music section.
@@ -30,15 +18,15 @@ import * as viewYoutube from "./youtube";
 const RouteMusic = function(bot) {
 	const router = Express.Router();
 
-	router.use("/add", viewAdd(bot));
-	router.use("/status", viewStatus(bot));
-	router.use("/playlist", viewPlaylist(bot));
-	router.use("/songs", viewSongs(bot));
-	router.use("/next", viewNext(bot));
-	router.use("/play", viewPlay(bot));
-	router.use("/pause", viewPause(bot));
-	router.use("/upload", viewUpload(bot, router));
-	router.use("/youtube", viewYoutube(bot, router));
+	router.use("/add", ViewAdd(bot));
+	router.use("/status", ViewStatus(bot));
+	router.use("/playlist", ViewPlaylist(bot));
+	router.use("/songs", ViewSongs(bot));
+	router.use("/next", ViewNext(bot));
+	router.use("/play", ViewPlay(bot));
+	router.use("/pause", ViewPause(bot));
+	router.use("/upload", ViewUpload(bot, router));
+	router.use("/youtube", ViewYoutube(bot, router));
 
 	return router;
 };

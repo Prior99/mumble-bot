@@ -1,18 +1,8 @@
-/*
- * Imports
- */
+import Express from "express";
 
-import * as Express from "express";
+import ViewDefault from "../default";
+import ViewCreator from "./creator";
 
-/*
- * Views
- */
-
-import * as viewDefault from "../default";
-import * as viewCreator from "./creator";
-/*
- * Code
- */
 const pages = [{
 	url : "/bass/effects/",
 	name : "Effekte",
@@ -34,9 +24,9 @@ const RouteBass = function(bot) {
 		res.locals.subpages = pages;
 		next();
 	});
-	router.use("/designer", viewCreator(bot));
-	router.use("/effects", viewDefault("bass/effects"));
-	router.get("/", viewCreator(bot));
+	router.use("/designer", ViewCreator(bot));
+	router.use("/effects", ViewDefault("bass/effects"));
+	router.get("/", ViewCreator(bot));
 
 	return router;
 };

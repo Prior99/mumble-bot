@@ -1,17 +1,7 @@
-/*
- * Imports
- */
-
 import * as Express from "express";
 
-/*
- * Views
- */
-import * as viewDefault from "../default";
+import ViewDefault from "../default";
 
-/*
- * Code
- */
 const pages = [{
 	url : "/stats/",
 	name : "Statistiken",
@@ -57,14 +47,14 @@ const RouteStats = function(bot) {
 		res.locals.subpages = pages;
 		next();
 	});
-	router.get("/recordsperuser", viewDefault("stats/recordsperuser"));
-	router.get("/recordspertime", viewDefault("stats/recordspertime"));
-	router.get("/recordplaybacksperuser", viewDefault("stats/recordplaybacksperuser"));
-	router.get("/onlineperuser", viewDefault("stats/onlineperuser"));
-	router.get("/spokenperuser", viewDefault("stats/spokenperuser"));
-	router.get("/spokenperhour", viewDefault("stats/spokenperhour"));
-	router.get("/spokenperweekday", viewDefault("stats/spokenperweekday"));
-	router.get("/", viewDefault("stats/"));
+	router.get("/recordsperuser", ViewDefault("stats/recordsperuser"));
+	router.get("/recordspertime", ViewDefault("stats/recordspertime"));
+	router.get("/recordplaybacksperuser", ViewDefault("stats/recordplaybacksperuser"));
+	router.get("/onlineperuser", ViewDefault("stats/onlineperuser"));
+	router.get("/spokenperuser", ViewDefault("stats/spokenperuser"));
+	router.get("/spokenperhour", ViewDefault("stats/spokenperhour"));
+	router.get("/spokenperweekday", ViewDefault("stats/spokenperweekday"));
+	router.get("/", ViewDefault("stats/"));
 
 	return router;
 };

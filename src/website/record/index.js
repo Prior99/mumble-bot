@@ -1,25 +1,14 @@
-/*
- * Imports
- */
+import Express from "express";
 
-import * as Express from "express";
+import ViewCurrentCached from "./cached";
+import ViewSave from "./save";
+import ViewStored from "./stored";
+import ViewLabels from "./labels";
+import ViewEdit from "./edit";
+import ViewOverview from "./overview";
+import ViewDialogs from "./dialogs.js";
+import ViewCreateDialog from "./createDialog.js";
 
-/*
- * Views
- */
-
-import * as viewCurrentCached from "./cached";
-import * as viewSave from "./save";
-import * as viewStored from "./stored";
-import * as viewLabels from "./labels";
-import * as viewEdit from "./edit";
-import * as viewOverview from "./overview";
-import * as viewDialogs from "./dialogs.js";
-import * as viewCreateDialog from "./createDialog.js";
-
-/*
- * Code
- */
 const pages = [{
 	url : "/record/",
 	name : "Übersicht",
@@ -51,14 +40,14 @@ const RouteRecord = function(bot) {
 		res.locals.subpages = pages;
 		next();
 	});
-	router.get("/cached", viewCurrentCached(bot));
-	router.get("/save", viewSave(bot));
-	router.get("/labels", viewLabels(bot));
-	router.get("/edit", viewEdit(bot));
-	router.get("/stored", viewStored(bot));
-	router.get("/dialogs", viewDialogs(bot));
-	router.get("/create_dialog", viewCreateDialog(bot));
-	router.get("/", viewOverview(bot));
+	router.get("/cached", ViewCurrentCached(bot));
+	router.get("/save", ViewSave(bot));
+	router.get("/labels", ViewLabels(bot));
+	router.get("/edit", ViewEdit(bot));
+	router.get("/stored", ViewStored(bot));
+	router.get("/dialogs", ViewDialogs(bot));
+	router.get("/create_dialog", ViewCreateDialog(bot));
+	router.get("/", ViewOverview(bot));
 
 	return router;
 };

@@ -1,19 +1,7 @@
-/*
- * Imports
- */
+import Express from "express";
 
-import * as Express from "express";
-
-/*
- * Views
- */
-
-import * as viewAdd from "./add";
-import * as viewRemove from "./remove";
-
-/*
- * Code
- */
+import ViewAdd from "./add";
+import ViewRemove from "./remove";
 
 /**
  * Router for all API callbacks related to /api/rss/
@@ -23,8 +11,8 @@ import * as viewRemove from "./remove";
 const RouterRSS = function(bot) {
 	const router = Express.Router();
 
-	router.use("/add", viewAdd(bot));
-	router.use("/remove", viewRemove(bot));
+	router.use("/add", ViewAdd(bot));
+	router.use("/remove", ViewRemove(bot));
 
 	return router;
 };

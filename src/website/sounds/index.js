@@ -1,18 +1,8 @@
-/*
- * Imports
- */
+import Express from "express";
 
-import * as Express from "express";
+import ViewDefault from "../default";
+import ViewSounds from "./sounds";
 
-/*
- * Views
- */
-import * as viewDefault from "../default";
-import * as viewSounds from "./sounds";
-
-/*
- * Code
- */
 const pages = [{
 	url : "/sounds/",
 	name : "Sounds",
@@ -33,8 +23,8 @@ const RouteSounds = function(bot) {
 		res.locals.subpages = pages;
 		next();
 	});
-	router.get("/upload", viewDefault("sounds/upload"));
-	router.get("/", viewSounds(bot));
+	router.get("/upload", ViewDefault("sounds/upload"));
+	router.get("/", ViewSounds(bot));
 
 	return router;
 };

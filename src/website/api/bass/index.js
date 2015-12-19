@@ -1,20 +1,8 @@
-/*
- * Imports
- */
+import Express from "express";
 
-import * as Express from "express";
-
-/*
- * Views
- */
-
-import * as viewAddEffects from "./addeffect";
-import * as viewEffects from "./effects";
-import * as viewPlay from "./play";
-
-/*
- * Code
- */
+import ViewAddEffects from "./addeffect";
+import ViewEffects from "./effects";
+import ViewPlay from "./play";
 
 /**
  * Bass API related endpoints are routed by this class.
@@ -24,9 +12,9 @@ import * as viewPlay from "./play";
 const RouteBass = function(bot) {
 	const router = Express.Router();
 
-	router.use("/addEffect", viewAddEffects(bot));
-	router.use("/effects", viewEffects(bot));
-	router.use("/play", viewPlay(bot));
+	router.use("/addEffect", ViewAddEffects(bot));
+	router.use("/effects", ViewEffects(bot));
+	router.use("/play", ViewPlay(bot));
 
 	return router;
 };

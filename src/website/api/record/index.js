@@ -1,31 +1,19 @@
-/*
- * Imports
- */
+import Express from "express";
 
-import * as Express from "express";
-
-/*
- * Views
- */
-
-import * as viewPlayCached from "./playcached";
-import * as viewSave from "./save";
-import * as viewPlay from "./play";
-import * as viewDownload from "./download";
-import * as viewDeleteCached from "./deletecached";
-import * as viewProtect from "./protect";
-import * as viewAddLabel from "./addlabel";
-import * as viewEdit from "./edit";
-import * as viewRandom from "./random";
-import * as viewList from "./list";
-import * as viewSaveDialog from "./save_dialog";
-import * as viewPlayDialog from "./play_dialog";
-import * as viewLookup from "./lookup";
-import * as viewGet from "./get";
-
-/*
- * Code
- */
+import ViewPlayCached from "./playcached";
+import ViewSave from "./save";
+import ViewPlay from "./play";
+import ViewDownload from "./download";
+import ViewDeleteCached from "./deletecached";
+import ViewProtect from "./protect";
+import ViewAddLabel from "./addlabel";
+import ViewEdit from "./edit";
+import ViewRandom from "./random";
+import ViewList from "./list";
+import ViewSaveDialog from "./save_dialog";
+import ViewPlayDialog from "./play_dialog";
+import ViewLookup from "./lookup";
+import ViewGet from "./get";
 
 /**
  * Router for all API callbacks related to /api/record/.
@@ -35,20 +23,20 @@ import * as viewGet from "./get";
 const RouteRecords = function(bot) {
 	const router = Express.Router();
 
-	router.use("/save", viewSave(bot));
-	router.use("/play", viewPlay(bot));
-	router.use("/playcached", viewPlayCached(bot));
-	router.use("/download", viewDownload(bot));
-	router.use("/protect", viewProtect(bot));
-	router.use("/deletecached", viewDeleteCached(bot));
-	router.use("/addlabel", viewAddLabel(bot));
-	router.use("/edit", viewEdit(bot));
-	router.use("/random", viewRandom(bot));
-	router.use("/list", viewList(bot));
-	router.use("/lookup", viewLookup(bot));
-	router.use("/save_dialog", viewSaveDialog(bot));
-	router.use("/get", viewGet(bot));
-	router.use("/play_dialog", viewPlayDialog(bot));
+	router.use("/save", ViewSave(bot));
+	router.use("/play", ViewPlay(bot));
+	router.use("/playcached", ViewPlayCached(bot));
+	router.use("/download", ViewDownload(bot));
+	router.use("/protect", ViewProtect(bot));
+	router.use("/deletecached", ViewDeleteCached(bot));
+	router.use("/addlabel", ViewAddLabel(bot));
+	router.use("/edit", ViewEdit(bot));
+	router.use("/random", ViewRandom(bot));
+	router.use("/list", ViewList(bot));
+	router.use("/lookup", ViewLookup(bot));
+	router.use("/save_dialog", ViewSaveDialog(bot));
+	router.use("/get", ViewGet(bot));
+	router.use("/play_dialog", ViewPlayDialog(bot));
 
 	return router;
 };

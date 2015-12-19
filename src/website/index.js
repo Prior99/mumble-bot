@@ -1,6 +1,3 @@
-/*
- * Imports
- */
 import Express from "express";
 import ExpHbs from "express-handlebars";
 import * as Winston from "winston";
@@ -10,10 +7,8 @@ import SessionFileStore from "session-file-store";
 import Moment from "moment";
 import ExpressWS from "express-ws";
 import colorify from "../colorbystring";
+import websocketCached from "./record/websocketcached";
 
-/*
- * Views
- */
 import ViewDefault from "./default";
 import ViewSpeak from "./speak";
 import ViewRegisterLogin from "./users/registerLogin";
@@ -21,11 +16,7 @@ import ViewLog from "./log";
 import ViewQueue from "./queue";
 import ViewRSS from "./rss";
 
-import websocketCached from "./record/websocketcached";
 
-/*
- * Routes
- */
 import RouteMusic from "./music";
 import RouteApi from "./api";
 import RouteQuotes from "./quotes";
@@ -35,9 +26,6 @@ import RouteRecord from "./record";
 import RouteSounds from "./sounds";
 import RouteStats from "./stats";
 
-/*
- * Code
- */
 const FileStore = SessionFileStore(Session);
 
 const pages = [

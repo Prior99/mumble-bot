@@ -1,23 +1,15 @@
-/*
- * Imports
- */
+import Express from "express";
 
-import * as Express from "express";
-
-/*
- * Views
- */
-
-import * as viewAvailable from "./usernameavailable";
-import * as viewSteam64Id from "./steam64id";
-import * as viewRegister from "./register";
-import * as viewLogin from "./login";
-import * as viewLogout from "./logout";
-import * as viewPermissions from "./permissions";
-import * as viewGrant from "./grantpermission";
-import * as viewRevoke from "./revokepermission";
-import * as viewLinkMumbleUser from "./linkmumbleuser";
-import * as viewSettings from "./settings";
+import ViewAvailable from "./usernameavailable";
+import ViewSteam64Id from "./steam64id";
+import ViewRegister from "./register";
+import ViewLogin from "./login";
+import ViewLogout from "./logout";
+import ViewPermissions from "./permissions";
+import ViewGrant from "./grantpermission";
+import ViewRevoke from "./revokepermission";
+import ViewLinkMumbleUser from "./linkmumbleuser";
+import ViewSettings from "./settings";
 /*
  * Code
  */
@@ -29,16 +21,16 @@ import * as viewSettings from "./settings";
  */
 const RouterUsers = function(bot) {
 	const router = Express.Router();
-	router.use("/usernameAvailable", viewAvailable(bot));
-	router.use("/steam64id", viewSteam64Id());
-	router.use("/register", viewRegister(bot));
-	router.use("/login", viewLogin(bot));
-	router.use("/logout", viewLogout());
-	router.use("/permissions", viewPermissions(bot));
-	router.get("/grantPermission", viewGrant(bot));
-	router.get("/revokePermission", viewRevoke(bot));
-	router.get("/linkMumbleUser", viewLinkMumbleUser(bot));
-	router.get("/settings", viewSettings(bot));
+	router.use("/usernameAvailable", ViewAvailable(bot));
+	router.use("/steam64id", ViewSteam64Id());
+	router.use("/register", ViewRegister(bot));
+	router.use("/login", ViewLogin(bot));
+	router.use("/logout", ViewLogout());
+	router.use("/permissions", ViewPermissions(bot));
+	router.get("/grantPermission", ViewGrant(bot));
+	router.get("/revokePermission", ViewRevoke(bot));
+	router.get("/linkMumbleUser", ViewLinkMumbleUser(bot));
+	router.get("/settings", ViewSettings(bot));
 	return router;
 };
 

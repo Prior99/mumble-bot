@@ -1,18 +1,7 @@
-/*
- * Imports
- */
+import Express from "express";
 
-import * as Express from "express";
+import ViewDefault from "../default";
 
-/*
- * Views
- */
-
-import * as viewDefault from "../default";
-
-/*
- * Code
- */
 const pages = [{
 	url : "/music/status/",
 	name : "Status",
@@ -46,12 +35,12 @@ const RouteMusic = function(bot) {
 		res.locals.subpages = pages;
 		next();
 	});
-	router.use("/playlist", viewDefault("music/playlist"));
-	router.use("/status", viewDefault("music/status"));
-	router.use("/upload", viewDefault("music/upload"));
-	router.use("/songs", viewDefault("music/songs"));
-	router.use("/youtube", viewDefault("music/youtube"));
-	router.get("/", viewDefault("music/home"));
+	router.use("/playlist", ViewDefault("music/playlist"));
+	router.use("/status", ViewDefault("music/status"));
+	router.use("/upload", ViewDefault("music/upload"));
+	router.use("/songs", ViewDefault("music/songs"));
+	router.use("/youtube", ViewDefault("music/youtube"));
+	router.get("/", ViewDefault("music/home"));
 
 	return router;
 };

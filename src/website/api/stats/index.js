@@ -1,24 +1,12 @@
-/*
- * Imports
- */
+import Express from "express";
 
-import * as Express from "express";
-
-/*
- * Views
- */
-
-import * as viewRecordsPerUser from "./recordsperuser";
-import * as viewRecordsPerTime from "./recordspertime";
-import * as viewSpokenPerHour from "./spokenperhour";
-import * as viewSpokenPerUser from "./spokenperuser";
-import * as viewSpokenPerWeekday from "./spokenperweekday";
-import * as viewOnlinePerUser from "./onlineperuser";
-import * as viewRecordPlaybacksPerUser from "./recordplaybacksperuser";
-
-/*
- * Code
- */
+import ViewRecordsPerUser from "./recordsperuser";
+import ViewRecordsPerTime from "./recordspertime";
+import ViewSpokenPerHour from "./spokenperhour";
+import ViewSpokenPerUser from "./spokenperuser";
+import ViewSpokenPerWeekday from "./spokenperweekday";
+import ViewOnlinePerUser from "./onlineperuser";
+import ViewRecordPlaybacksPerUser from "./recordplaybacksperuser";
 
 /**
  * Routes all requests related to the stats api commands in the /api/stats/ endpoint.
@@ -28,13 +16,13 @@ import * as viewRecordPlaybacksPerUser from "./recordplaybacksperuser";
 const RouteStats = function(bot) {
 	const router = Express.Router();
 
-	router.use("/recordsperuser", viewRecordsPerUser(bot));
-	router.use("/recordspertime", viewRecordsPerTime(bot));
-	router.use("/spokenperhour", viewSpokenPerHour(bot));
-	router.use("/spokenperuser", viewSpokenPerUser(bot));
-	router.use("/spokenperweekday", viewSpokenPerWeekday(bot));
-	router.use("/onlineperuser", viewOnlinePerUser(bot));
-	router.use("/recordplaybacksperuser", viewRecordPlaybacksPerUser(bot));
+	router.use("/recordsperuser", ViewRecordsPerUser(bot));
+	router.use("/recordspertime", ViewRecordsPerTime(bot));
+	router.use("/spokenperhour", ViewSpokenPerHour(bot));
+	router.use("/spokenperuser", ViewSpokenPerUser(bot));
+	router.use("/spokenperweekday", ViewSpokenPerWeekday(bot));
+	router.use("/onlineperuser", ViewOnlinePerUser(bot));
+	router.use("/recordplaybacksperuser", ViewRecordPlaybacksPerUser(bot));
 
 	return router;
 };

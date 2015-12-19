@@ -1,18 +1,7 @@
-/*
- * Imports
- */
+import Express from "express";
 
-import * as Express from "express";
-
-/*
- * Views
- */
-
-import * as viewLookup from "./lookup";
-import * as viewSpeak from "./speak";
-/*
- * Code
- */
+import ViewLookup from "./lookup";
+import ViewSpeak from "./speak";
 
 /**
  * Routes all requests related to the speak api commands in the /api/speak/ endpoint.
@@ -21,8 +10,8 @@ import * as viewSpeak from "./speak";
  */
 const RouteSpeak = function(bot) {
 	const router = Express.Router();
-	router.use("/lookup", viewLookup(bot));
-	router.use("/speak", viewSpeak(bot));
+	router.use("/lookup", ViewLookup(bot));
+	router.use("/speak", ViewSpeak(bot));
 	return router;
 };
 
