@@ -1,6 +1,7 @@
 /*
  * Imports
  */
+import "babel-polyfill";
 import "array.prototype.find";
 import Mumble from "mumble";
 import Bot from "./src";
@@ -100,58 +101,59 @@ const stopMumble = function(connection, callback) {
 
 /**
  * Called once the database was started.
- * @param {Error} err - If an error occurred during database initialization this contains the error.
  * @param {object} connection - Connection to the mumble server.
  * @param {object} database - Initialized instance of database.
  * @return {undefined}
  */
-const databaseStarted = function(err, connection, database) {
-	if(err) {
-		throw err;
+const databaseStarted = function(connection, database) {
+	Winston.transports.Mysql.prototype.level = "verbose";
+	Winston.add(Winston.transports.Mysql, {
+		host : options.database.host,
+		user : options.database.user,
+		password : options.database.password,
+		database : options.database.database,
+		table : "Log"
+	});
+	let bot;
+	try {
+		bot = new Bot(connection, options, database);
 	}
-	else {
-		Winston.transports.Mysql.prototype.level = "verbose";
-		Winston.add(Winston.transports.Mysql, {
-			host : options.database.host,
-			user : options.database.user,
-			password : options.database.password,
-			database : options.database.database,
-			table : "Log"
-		});
-		const bot = new Bot(connection, options, database);
-		Winston.info("Joining channel: " + options.channel);
-		bot.join(options.channel);
-		bot.say("Ich grüße euch!");
-		bot.on("shutdown", () => {
-			stopDatabase(database, () => {
-				stopMumble(connection, () => {
-					process.exit();
-				});
+	catch(err) {
+		Winston.error("Error starting the bot:", err);
+		return;
+	}
+	Winston.info("Joining channel: " + options.channel);
+	bot.join(options.channel);
+	bot.say("Ich grüße euch!");
+	bot.on("shutdown", () => {
+		stopDatabase(database, () => {
+			stopMumble(connection, () => {
+				process.exit();
 			});
 		});
+	});
 
-		let killed = false;
+	let killed = false;
 
-		/**
-		 * Called when SIGINT is received either through CTRL+C or through the bot.
-		 * @return {undefined}
-		 */
-		const sigint = function() {
-			if(killed) {
-				Winston.error("CTRL^C detected. Terminating!");
-				process.exit(1);
-			}
-			else {
-				killed = true;
-				Winston.warn("CTRL^C detected. Secure shutdown initiated.");
-				Winston.warn("Press CTRL^C again to terminate at your own risk.");
-				bot.shutdown();
-			}
+	/**
+	 * Called when SIGINT is received either through CTRL+C or through the bot.
+	 * @return {undefined}
+	 */
+	const sigint = function() {
+		if(killed) {
+			Winston.error("CTRL^C detected. Terminating!");
+			process.exit(1);
 		}
-
-		process.on("SIGINT", sigint);
-		bot.on("SIGINT", sigint);
+		else {
+			killed = true;
+			Winston.warn("CTRL^C detected. Secure shutdown initiated.");
+			Winston.warn("Press CTRL^C again to terminate at your own risk.");
+			bot.shutdown();
+		}
 	}
+
+	process.on("SIGINT", sigint);
+	bot.on("SIGINT", sigint);
 }
 
 /**
@@ -159,10 +161,17 @@ const databaseStarted = function(err, connection, database) {
  * @param {object} connection - Already initialized mumble connection.
  * @return {undefined}
  */
-const startup = function(connection) {
-	const database = new Database(options.database, (err) => {
-		databaseStarted(err, connection, database);
-	});
+const startup = async function(connection) {
+	const database = new Database(options.database);
+	try {
+		await database.connect();
+	}
+	catch(err) {
+		Winston.error("Unable to connect to database. Quitting.");
+		database.stop();
+		return;
+	}
+	databaseStarted(connection, database);
 }
 
 Mumble.connect("mumble://" + options.url, mumbleOptions, (err, connection) => {

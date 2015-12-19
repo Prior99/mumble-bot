@@ -1,7 +1,6 @@
 /*
  * Imports
  */
-import "babel-polyfill";
 import Util from "util";
 import Input from "./input";
 import Command from "./command";

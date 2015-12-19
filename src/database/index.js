@@ -1,7 +1,7 @@
 /*
  * Imports
  */
-import * as Winston from "winston";
+import Winston from "winston";
 import * as MySQL from "promise-mysql";
 import * as FS from "fs-promise";
 
@@ -33,30 +33,39 @@ class Database {
 	/**
 	 * @constructor
 	 * @param {object} options - Options for connecting to the database.
-	 * @param {callback} callback - Called once the connection is up and running.
 	 */
-	constructor(options, callback) {
-		MySQL.createConnection({
-			host : options.host,
-			user : options.user,
-			password : options.password,
-			database : options.database,
-			multipleStatements : true,
-			connectTimeout : options.connectTimeout ? options.connectTimeout : timeout
-		}).then((conn) => {
+	constructor(options) {
+		this.options = options;
+	}
+
+	/**
+	 * Connect to the database.
+	 * @return {undefined}
+	 */
+	async connect() {
+		try {
+			Winston.info(
+				"Connecting to database " +
+				"mysql://" + this.options.user + "@" + this.options.host + "/" + this.options.database + " ... "
+			);
+			const conn = await MySQL.createConnection({
+				host : this.options.host,
+				user : this.options.user,
+				password : this.options.password,
+				database : this.options.database,
+				multipleStatements : true,
+				connectTimeout : this.options.connectTimeout ? this.options.connectTimeout : timeout
+			});
 			Winston.info("Successfully connected to database!");
 			this.connection = conn;
-			this._setupDatabase(callback);
-		})
-		.catch((err) => {
-			Winston.error("Connecting to database failed!");
-			if(callback) { callback(err); }
-			else { throw err; }
-		});
-		Winston.info(
-			"Connecting to database mysql://" + options.user + "@" + options.host + "/" + options.database + " ... "
-		);
+			await this._setupDatabase();
+		}
+		catch(err) {
+			Winston.error("Connecting to database failed!", err);
+			throw err;
+		}
 	}
+
 	/**
 	 * Sets up the database based on the schema file "schema.sql".
 	 * @return {undefined}
@@ -65,6 +74,7 @@ class Database {
 		const data = await FS.readFile("schema.sql", {encoding : "utf8"});
 		try {
 			await this.connection.query(data);
+			return;
 		}
 		catch(err) {
 			Winston.error("An error occured while configuring database:", err);
@@ -78,6 +88,7 @@ class Database {
 	 */
 	async stop() {
 		await this.connection.release();
+		return;
 	}
 }
 

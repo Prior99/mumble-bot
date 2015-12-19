@@ -19,6 +19,7 @@ class Quotes {
 		bot.newCommand("speak", () => this.speakRandom(),
 			"Gibt einen zufälligen intelligenten Kommentar aus der Datenbank aus.", "quote-left"
 		);
+		Winston.info("Module started: Quotes");
 	}
 
 	/**

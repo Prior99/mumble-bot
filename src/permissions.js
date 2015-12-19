@@ -19,6 +19,7 @@ class Permissions {
 	 */
 	constructor(database) {
 		this.database = database;
+		Winston.info("Module started: Permissions");
 	}
 
 	/**

@@ -39,11 +39,12 @@ const routeStats = require("./stats");
  * Code
  */
 
-const pages = [{
-	url : "/quotes/",
-	name : "Zitate",
-	icon : "commenting"
-},
+const pages = [
+	{
+		url : "/quotes/",
+		name : "Zitate",
+		icon : "commenting"
+	},
 	{
 		url : "/users/",
 		name : "Benutzer",
@@ -76,11 +77,12 @@ const pages = [{
 	}
 ];
 
-const subpages = [{
-	url : "/tree/",
-	name : "Channel-Struktur",
-	icon : "sitemap"
-},
+const subpages = [
+	{
+		url : "/tree/",
+		name : "Channel-Struktur",
+		icon : "sitemap"
+	},
 	{
 		url : "/commands/",
 		name : "Befehle",
