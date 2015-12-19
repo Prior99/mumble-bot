@@ -5,7 +5,7 @@
  */
 const DatabaseTTSCache = function(Database) {
 	/**
-	 * Fetches a cached TTS MP3 file or null if the file for the given text was
+	 * <b>Async</b> Fetches a cached TTS MP3 file or null if the file for the given text was
 	 * not yet synthesized.
 	 * @param {string} api - Identifier of the api to use.
 	 * @param {string} text - Text for which a MP3 file should be retrieved.
@@ -26,7 +26,7 @@ const DatabaseTTSCache = function(Database) {
 	};
 
 	/**
-	 * Adds a new TTS MP3 file to the cache.
+	 * <b>Async</b> Adds a new TTS MP3 file to the cache.
 	 * @param {string} api - Name of the api this cached audio belongs to.
 	 * @param {string} text - Text for which a MP3 was newly generated.
 	 * @return {number} - Unique generated id of the new entry.
