@@ -1,22 +1,25 @@
 /*
  * Imports
  */
-const Winston = require("winston");
-const MySQL = require("promise-mysql");
-const FS = require("fs");
+import * as Winston from "winston";
+import * as MySQL from "promise-mysql";
+import * as FS from "fs-promise";
 
 /*
  * Code
  */
 
+const timeout = 4000;
+
 /**
  * Handles the connection to a MySQL-Database.
- * @constructor
- * @param options - Options for connecting to the database.
- * @param callback - Called once the connection is up and running.
  */
 class Database {
-
+	/**
+	 * @constructor
+	 * @param {object} options - Options for connecting to the database.
+	 * @param {callback} callback - Called once the connection is up and running.
+	 */
 	constructor(options, callback) {
 		this.pool = MySQL.createPool({
 			host : options.host,
@@ -24,10 +27,12 @@ class Database {
 			password : options.password,
 			database : options.database,
 			multipleStatements : true,
-			connectTimeout : options.connectTimeout ? options.connectTimeout : 4000
+			connectTimeout : options.connectTimeout ? options.connectTimeout : timeout
 		});
-		Winston.info("Connecting to database mysql://" + options.user + "@" + options.host + "/" + options.database + " ... ");
-		this.pool.getConnection(function(err, conn) {
+		Winston.info(
+			"Connecting to database mysql://" + options.user + "@" + options.host + "/" + options.database + " ... "
+		);
+		this.pool.getConnection((err, conn) => {
 			if(err) {
 				Winston.error("Connecting to database failed!");
 				if(callback) { callback(err); }
@@ -38,62 +43,29 @@ class Database {
 				Winston.info("Successfully connected to database!");
 				this._setupDatabase(callback);
 			}
-		}.bind(this));
+		});
 	}
-
 	/**
-	 * Executes the query and checks for errors.
-	 * If an error occured, then throw it, of use callback (if supplied).
-	 * If no error occured, then continue with callback, or, if a dedicated
-	 * success handler has been passed, use that one.
+	 * Sets up the database based on the schema file "schema.sql".
+	 * @return {undefined}
 	 */
-	queryAndCheck(query, params, callErr, callSucc) {
-		this.pool.query(query, params, function(err, result) {
-			if(err) {
-				if(callErr) { callErr(err); }
-				else { throw err; }
-			}
-			else if(callSucc) {	callSucc(null, result);	}
-			else if(callErr) { callErr(null, result); }
-
-		}.bind(this));
-	}
-
-	_checkError(err, callback) {
-		if(err) {
-			if(callback) { callback(err); }
-			else { throw err; }
-			return false;
+	async _setupDatabase() {
+		const data = await FS.readFile("schema.sql", {encoding : "utf8"});
+		try {
+			await this.pool.query(data);
 		}
-		else {
-			return true;
+		catch(err) {
+			Winston.error("An error occured while configuring database:", err);
+			throw err;
 		}
-	}
-
-	_setupDatabase(callback) {
-		FS.readFile("schema.sql", {encoding : "utf8"}, function(err, data) {
-			if(err) {
-				throw err;
-			}
-			else {
-				this.pool.query(data, function(err) {
-					if(err) {
-						Winston.error("An error occured while configuring database:", err);
-						if(callback) { callback(err); }
-						else { throw err; }
-					}
-					else  if(callback) { callback(); }
-				});
-			}
-		}.bind(this));
 	}
 
 	/**
 	 * Stops the database by disconnecting gently.
-	 * @param callback - Called once disconnected.
+	 * @return {undefined}
 	 */
-	stop(callback) {
-		this.pool.end(callback);
+	async stop() {
+		await this.pool.end();
 	}
 }
 
