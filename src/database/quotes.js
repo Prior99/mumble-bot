@@ -51,7 +51,9 @@ const QuotesExtension = function(Database) {
 	 * @return {Quote} - The quote identified by the given id.
 	 */
 	Database.prototype.getQuote = async function(id) {
-		const rows = await this.connection.query("SELECT quote, author, submitted, used FROM Quotes WHERE id = ?", [id]);
+		const rows = await this.connection.query(
+			"SELECT quote, author, submitted, used FROM Quotes WHERE id = ?", [id]
+		);
 		if(rows.length >= 1) {
 			this.increaseQuoteUsage(id);
 			return rows[0];

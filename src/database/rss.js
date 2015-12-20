@@ -55,7 +55,9 @@ const RSSExtension = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.addKnownRSSFeedEntry = async function(hash, url) {
-		await this.connection.query("INSERT INTO KnownRSSEntries(hash, url, seen) VALUES(?, ?, ?)", [hash, url, new Date()]);
+		await this.connection.query(
+			"INSERT INTO KnownRSSEntries(hash, url, seen) VALUES(?, ?, ?)", [hash, url, new Date()]
+		);
 	};
 };
 

@@ -11,7 +11,7 @@ import Winston from "winston";
 import Website from "./website";
 import Readline from "readline";
 import Quotes from "./quotes";
-import FS from "fs";
+import FS from "fs-promise";
 import Steam from "./steam";
 import EventEmitter from "events";
 import Permissions from "./permissions";
@@ -88,13 +88,18 @@ class Bot extends EventEmitter {
 		}
 
 		this.afkObserver = new AFKObserver(this);
+		this._init();
+	}
+	/**
+	 * Register commands and listeners and load all addons.
+	 * @return {undefined}
+	 */
+	async _init() {
+		await this._loadAddons("addons/");
 
-		this._loadAddons("addons/", () => {
-			//Must be run after all commands were registered
-			this.input = new Input(this);
-			this.input.on("input", (text, user) => {
-				this._onVoiceInput(text, user);
-			});
+		this.input = new Input(this);
+		this.input.on("input", (text, user) => {
+			this._onVoiceInput(text, user);
 		});
 
 		this.mumble.on("user-connect", this.handleUserConnect);
@@ -139,41 +144,40 @@ class Bot extends EventEmitter {
 	}
 
 	/**
-	 * Handles the connection for a user in the mumble server.
+	 * <b>Async</b> Handles the connection for a user in the mumble server.
 	 * Looks up the user in the database and registers the respective handlers.
 	 * @param {MumbleUser} user - The user connected to the server.
 	 * @return {undefined}
 	 */
-	handleUserConnect(user) {
-		this.database.getLinkedUser(user.id, (err, dbUser) => {
-			if(err) {
-				Winston.error("Unable to fetch mumble user linkage.", err);
+	async handleUserConnect(user) {
+		try {
+			const dbUser = await this.database.getLinkedUser(user.id);
+			if(dbUser) {
+				const announce = this.options.announce;
+				if(!announce || (announce.connect !== false && announce.connect !== "false")) {
+					this.sayImportant(dbUser.username + " hat als " + user.name
+						+ " Mumble betreten.");
+				}
 			}
 			else {
-				if(dbUser) {
-					const announce = this.options.announce;
-					if(!announce || (announce.connect !== false && announce.connect !== "false")) {
-						this.sayImportant(dbUser.username + " hat als " + user.name
-							+ " Mumble betreten.");
-					}
+				if(!announce || (announce.connect !== false && announce.connect !== "false")) {
+					this.sayImportant("Unbekannter Nutzer " + user.name
+						+ " hat Mumble betreten.");
+					this.notifyOnlineUsersWithPermission("grant", "Ein unbekannter Nutzer "
+						+ "mit Namen \"" + user.name + "\" hat soeben Mumble betreten.");
+					user.sendMessage("Herzlich Willkommen. Ich bin " + this.options.name + ". "
+						+ "Es sollte ein Administrator kommen und dich begrüßen. "
+						+ "In der Zwischenzeit kannst du dir unter "
+						+ this.options.webpageurl + " einen Account anlegen.");
 				}
-				else {
-					if(!announce || (announce.connect !== false && announce.connect !== "false")) {
-						this.sayImportant("Unbekannter Nutzer " + user.name
-							+ " hat Mumble betreten.");
-						this.notifyOnlineUsersWithPermission("grant", "Ein unbekannter Nutzer "
-							+ "mit Namen \"" + user.name + "\" hat soeben Mumble betreten.");
-						user.sendMessage("Herzlich Willkommen. Ich bin " + this.options.name + ". "
-							+ "Es sollte ein Administrator kommen und dich begrüßen. "
-							+ "In der Zwischenzeit kannst du dir unter "
-							+ this.options.webpageurl + " einen Account anlegen.");
-					}
-					if(this.options.kickChannel) {
-						user.moveToChannel(this.options.publicChannel);
-					}
+				if(this.options.kickChannel) {
+					user.moveToChannel(this.options.publicChannel);
 				}
 			}
-		});
+		}
+		catch(err) {
+			Winston.error("Unable to fetch mumble user linkage.", err);
+		}
 		this._addEventListenersToMumbleUser(user);
 	}
 
@@ -198,56 +202,52 @@ class Bot extends EventEmitter {
 	}
 
 	/**
-	 * Sends a notification to users in the mumble that have the required permission.
+	 * <b>Async</b> Sends a notification to users in the mumble that have the required permission.
 	 * @param {string} permission - The permission required to receive the message.
 	 * @param {string} message - The message to send.
 	 * @return {undefined}
 	 */
-	notifyOnlineUsersWithPermission(permission, message) {
-		this.database.listUsers((err, users) => {
-			if(err) {
-				Winston.error("Unable to list users.", err);
-			}
-			else {
-				users.forEach(potential => {
-					this.permissions.hasPermission(potential, permission, has => {
-						if(has) {
-							this.database.getLinkedMumbleUsersOfUser(potential.username, (err, ids) => {
-								if(err) {
-									Winston.error("Unable to get linked mumble users of user "
-										+ potential.username, err);
-								}
-								else {
-									ids.forEach(id => {
-										const mumbleUser = this.mumble.userById(id.id);
-										if(mumbleUser) {
-											mumbleUser.sendMessage(message);
-										}
-									});
-								}
-							});
+	async notifyOnlineUsersWithPermission(permission, message) {
+		try {
+			const users = await this.database.listUsers();
+			for(const potential of users) {
+				const has = await this.permissions.hasPermission(potential, permission);
+				if(has) {
+					try {
+						const ids = await this.database.getLinkedMumbleUsersOfUser(potential.username);
+						for(id of ids) {
+							const mumbleUser = this.mumble.userById(id.id);
+							if(mumbleUser) {
+								mumbleUser.sendMessage(message);
+							}
 						}
-					});
-				});
+					}
+					catch(err) {
+						Winston.error("Unable to get linked mumble users of user "
+							+ potential.username, err);
+					}
+				}
 			}
-		});
+		}
+		catch(err) {
+			Winston.error("Unable to list users.", err);
+		}
 	}
 
 	/**
-	 * Callback method called when voice (speech recognition) is emitted from a user in the mumble.
+	 * <b>Async</b> Callback method called when voice (speech recognition) is emitted from a user in the mumble.
 	 * @param {string} text - The text from the speech recognition parsed from what the user said.
 	 * @param {MumbleUser} mumbleUser - The user the speech came from.
 	 * @return {undefined}
 	 */
-	_onVoiceInput(text, mumbleUser) {
-		this.database.getLinkedUser(mumbleUser.id, (err, user) => {
-			if(err) {
-				Winston.error("Error fetching user by mumble user id.", err);
-			}
-			else {
-				this.command.processPrefixed(text, "mumble", user);
-			}
-		});
+	async _onVoiceInput(text, mumbleUser) {
+		try {
+			const user = await this.database.getLinkedUser(mumbleUser.id);
+			this.command.processPrefixed(text, "mumble", user);
+		}
+		catch(err) {
+			Winston.error("Error fetching user by mumble user id.", err);
+		}
 	}
 
 	/**
@@ -259,28 +259,26 @@ class Bot extends EventEmitter {
 	}
 
 	/**
-	 * Gently shutdown the whole bot.
+	 * <b>Async</b> Gently shutdown the whole bot.
 	 * @return {undefined}
 	 */
-	shutdown() {
-		this.say("Herunterfahren initiiert.", () => {
-			this._deleteAllCachedAudio(0);
-			this.website.shutdown(() => {
-				if(this.steam) {
-					this.steam.stop();
-				}
-				if(this.minecraft) {
-					this.minecraft.stop();
-				}
-				if(this.mpd) {
-					this.mpd.stop();
-				}
-				if(this.music) {
-					this.music.stop();
-				}
-				this.emit("shutdown");
-			});
-		});
+	async shutdown() {
+		await this.say("Herunterfahren initiiert.");
+		this._deleteAllCachedAudio(0);
+		await this.website.shutdown();
+		if(this.steam) {
+			this.steam.stop();
+		}
+		if(this.minecraft) {
+			this.minecraft.stop();
+		}
+		if(this.mpd) {
+			this.mpd.stop();
+		}
+		if(this.music) {
+			this.music.stop();
+		}
+		this.emit("shutdown");
 	}
 
 	/**
@@ -305,60 +303,51 @@ class Bot extends EventEmitter {
 	 * @return {undefined}
 	 */
 	_initChatInput() {
-		this.mumble.on("message", (message, mumbleUser, scope) => {
-			this.database.getLinkedUser(mumbleUser.id, (err, user) => {
-				if(err) {
-					Winston.error("Error fetching user by mumble user id.", err);
-				}
-				else {
-					this.command.process(message, "mumble", user);
-				}
-			});
+		this.mumble.on("message", async (message, mumbleUser, scope) => {
+			try {
+				const user = await this.database.getLinkedUser(mumbleUser.id);
+				this.command.process(message, "mumble", user);
+			}
+			catch(err) {
+				Winston.error("Error fetching user by mumble user id.", err);
+			}
 		});
 	}
 
 	/**
-	 * Loads the addons from a specified directory.
+	 * <b>Async</b> Loads the addons from a specified directory.
 	 * @param {string} dir - Directory to load the addons from.
 	 * @param {VoidCallback} callback - Called when all addons were loaded.
 	 * @return {undefined}
 	 */
-	_loadAddons(dir, callback) {
-		FS.stat(dir, (err, stats) => {
-			if(err || !stats.isDirectory()) {
-				Winston.warn("Cannot access directory " + dir);
+	async _loadAddons(dir, callback) {
+		try {
+			const stats = await FS.stat(dir);
+			if(!stats.isDirectory()) {
+				Winston.warn(dir + " is not a directory");
 			}
 			else {
-				FS.readdir(dir, (err, files) => {
-					if(err) {
-						Winston.error("Error loading addons!");
-						throw err;
+				try {
+					const files = await FS.readdir(dir);
+					for(const file of files) {
+						const filename = dir + file;
+						if(FS.lstatSync(filename).isDirectory() && file.substr(0, 1) !== ".") {
+							Winston.info("Loading addon " + filename + " ...");
+							const addon = require("../" + filename);
+							await addon(this);
+						}
 					}
-					else {
-						const next = () => {
-							if(files.length > 0) {
-								const file = files.shift()
-								const filename = dir + file;
-								if(FS.lstatSync(filename).isDirectory() && file.substr(0, 1) !== ".") {
-									Winston.info("Loading addon " + filename + " ...");
-									const isAsync = require("../" + filename)(this, next);
-									if(!isAsync) {
-										next();
-									}
-								}
-								else {
-									next();
-								}
-							}
-							else {
-								callback();
-							}
-						};
-						next();
-					}
-				});
+					return;
+				}
+				catch(err) {
+					Winston.error("Error loading addons!");
+					throw err;
+				}
 			}
-		});
+		}
+		catch(err) {
+			Winston.warn("Cannot access directory " + dir);
+		}
 	}
 
 	/**
@@ -372,11 +361,10 @@ class Bot extends EventEmitter {
 	/**
 	 * Plays a sound in the mumble server.
 	 * @param {string} filename - Filename of the soundfile to play. Must be a mono-channel 48,000Hz WAV-File
-	 * @param {VoidCallback} cb - Callback will be called when sound has finished playing
 	 * @return {undefined}
 	 */
-	playSound(filename, cb) {
-		this.output.playSound(filename, cb);
+	async playSound(filename) {
+		await this.output.playSound(filename);
 	}
 
 	/**
@@ -593,48 +581,51 @@ class Bot extends EventEmitter {
 	}
 
 	/**
-	 * Will say something. The text will be played in mumble using TTS, written to
+	 * <b>Async</b> Will say something. The text will be played in mumble using TTS, written to
 	 * the bots current channel (theoretically) and written in minecraft.
 	 * @param {string} text - Text to say.
 	 * @param {VoidCallback} cb - Callback, will be called *after playback of TTS has finished.
 	 * @return {undefined}
 	 */
-	sayOnlyVoice(text, cb) {
-		return this.output.sayOnlyVoice(text, cb);
+	async sayOnlyVoice(text, cb) {
+		await this.output.sayOnlyVoice(text, cb);
 	}
 
 	/**
-	 * Will say something. The text will be played in mumble using TTS, written to
+	 * <b>Async</b> Will say something. The text will be played in mumble using TTS, written to
 	 * the bots current channel (theoretically) and written in minecraft.
 	 * @param {string} text - Text to say.
 	 * @param {VoidCallback} cb - Callback, will be called *after playback of TTS has finished.
 	 * @return {undefined}
 	 */
-	say(text, cb) {
-		return this.output.say(text, cb);
+	async say(text, cb) {
+		const s = await this.output.say(text, cb);
+		return s;
 	}
 
 	/**
-	 * Say something important. Other than the normal say method this will also say
+	 * <b>Async</b> Say something important. Other than the normal say method this will also say
 	 * the shit in steam.
 	 * @param {string} text - Text to say.
 	 * @param {VoidCallback} cb - Callback, will be called *after playback of TTS has finished.
 	 * @return {undefined}
 	 */
-	sayImportant(text, cb) {
+	async sayImportant(text, cb) {
 		if(this.steam) {
 			this.steam.broadcast(text);
 		}
-		return this.say(text, cb);
+		const s = await this.say(text, cb);
+		return s;
 	}
 
 	/**
-	 * Report an error by saying it.
+	 * <b>Async</b> Report an error by saying it.
 	 * @param {string} text - Message of the error to report.
 	 * @return {undefined}
 	 */
-	sayError(text) {
-		return this.output.say("Error:    " + text);
+	async sayError(text) {
+		const s = await this.output.say("Error:    " + text);
+		return s;
 	}
 
 	/**

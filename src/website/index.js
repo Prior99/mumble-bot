@@ -165,16 +165,15 @@ class Website {
 			resave: false,
 			saveUninitialized: true
 		}));
-		this.app.use((req, res, next) => {
+		this.app.use(async (req, res, next) => {
 			res.locals.bot = bot;
 			res.locals.pages = pages;
 			res.locals.session = req.session;
 			res.locals.subpages = subpages;
 			if(req.session.user) {
-				bot.permissions.listPermissionsAssocForUser(req.session.user, permissions => {
-					res.locals.userPermissions = permissions;
-					next();
-				});
+				const permissions = await bot.permissions.listPermissionsAssocForUser(req.session.user);
+				res.locals.userPermissions = permissions;
+				next();
 			}
 			else {
 				next();
@@ -222,14 +221,15 @@ class Website {
 
 	/**
 	 * Stop the webpage immediatly.
-	 * @param {VoidCallback} callback - Will be called once the webpage came to a full stop.
-	 * @return {undefined}
+	 * @return {Promise} - Promise which will be resolved when the website has been shut down.
 	 */
-	shutdown(callback) {
-		Winston.info("Stopping module: Website ...");
-		this.server.close(() => {
-			Winston.info("Module stopped: Website.");
-			callback();
+	shutdown() {
+		return new Promise((resolve, reject) => {
+			Winston.info("Stopping module: Website ...");
+			this.server.close(() => {
+				Winston.info("Module stopped: Website.");
+				resolve();
+			});
 		});
 	}
 }

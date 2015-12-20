@@ -172,13 +172,17 @@ class Output extends Stream.Writable {
 	 * audio data (*.wav is fine), 44,100Hz and mono-channel.
 	 * @param {string} file - Name of the soundfile to play.
 	 * @param {function} callback - Called after the soundfile was played. TODO type
-	 * @returns {undefined}
+	 * @returns {Promise} - Resolved once the sound has finished playing.
 	 */
 	playSound(file, callback) {
-		this._enqueue({
-			type : "sound",
-			file,
-			callback
+		return new Promise((resolve, reject) => {
+			this._enqueue({
+				type : "sound",
+				file,
+				callback() {
+					resolve();
+				}
+			});
 		});
 	}
 
@@ -197,32 +201,38 @@ class Output extends Stream.Writable {
 	}
 
 	/**
-	 * Say something using TTS.
+	 * lSay something using TTS.
 	 * @param {string} text -  Text to say viw TTS.
-	 * @param {function} callback - Called after the text was spoken. TODO type
-	 * @returns {undefined}
+	 * @returns {Promise} - Will be resolved once the speech was dispatched.
 	 */
-	say(text, callback) {
-		this._enqueue({
-			type : "speech",
-			print : true,
-			text,
-			callback
+	say(text) {
+		return new Promise((resolve, reject) => {
+			this._enqueue({
+				type : "speech",
+				print : true,
+				text,
+				callback() {
+					resolve();
+				}
+			});
 		});
 	}
 
 	/**
 	 * Say something using TTS, don't print it to the chat.
 	 * @param {string} text -  Text to say viw TTS.
-	 * @param {function} callback - Called after the text was spoken. TODO type
-	 * @returns {undefined}
+	 * @returns {Promise} - Will be resolved once the speech was dispatched.
 	 */
-	sayOnlyVoice(text, callback) {
-		this._enqueue({
-			type : "speech",
-			print : false,
-			text,
-			callback
+	sayOnlyVoice(text) {
+		return new Promise((resolve, reject) => {
+			this._enqueue({
+				type : "speech",
+				print : false,
+				text,
+				callback() {
+					resolve();
+				}
+			});
 		});
 	}
 

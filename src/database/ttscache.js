@@ -32,7 +32,9 @@ const TTSCacheExtension = function(Database) {
 	 * @return {number} - Unique generated id of the new entry.
 	 */
 	Database.prototype.addCachedTTS = async function(api, text) {
-		const result = await this.connection.query("INSERT INTO TTSCache(text, api) VALUES(?, ?)", [text.toLowerCase(), api]);
+		const result = await this.connection.query(
+			"INSERT INTO TTSCache(text, api) VALUES(?, ?)", [text.toLowerCase(), api]
+		);
 		return result.insertId;
 	};
 };

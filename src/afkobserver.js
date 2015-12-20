@@ -111,24 +111,30 @@ class AFKObserver {
 	 */
 	check() {
 		const now = Date.now();
-		for(const key of this.times) {
-			const idleTime = Math.round((now - this.times[key])/msInS);
-			const mumbleUser = this.bot.mumble.userBySession(key);
-			if(mumbleUser) {
-				if(idleTime >= this.bot.options.afkTimeout) {
-					mumbleUser.sendMessage("Da du über " + this.bot.options.afkTimeout
-						+ " Sekunden inaktiv warst, wirst du in den AFK-Channel verschoben.");
-					mumbleUser.moveToChannel(this.bot.options.afkChannel);
-					this.unregisterUser(mumbleUser);
-					this.bot.sayImportant(mumbleUser.name + " ist jetzt AFK.");
+		const toDelete = [];
+		for(const key in this.times) {
+			if(this.times.hasOwnProperty(key)) {
+				const idleTime = Math.round((now - this.times[key])/msInS);
+				const mumbleUser = this.bot.mumble.userBySession(key);
+				if(mumbleUser) {
+					if(idleTime >= this.bot.options.afkTimeout) {
+						mumbleUser.sendMessage("Da du über " + this.bot.options.afkTimeout
+							+ " Sekunden inaktiv warst, wirst du in den AFK-Channel verschoben.");
+						mumbleUser.moveToChannel(this.bot.options.afkChannel);
+						this.unregisterUser(mumbleUser);
+						this.bot.sayImportant(mumbleUser.name + " ist jetzt AFK.");
+					}
+					else if(idleTime === this.bot.options.afkWarnTimeout) {
+						this.bot.sayOnlyVoice(mumbleUser.name + ", bist du AFK?");
+					}
 				}
-				else if(idleTime === this.bot.options.afkWarnTimeout) {
-					this.bot.sayOnlyVoice(mumbleUser.name + ", bist du AFK?");
+				else {
+					toDelete.push(t);
 				}
 			}
-			else {
-				delete this.times[key];
-			}
+		}
+		for(const t of toDelete) {
+			delete this.times[t];
 		}
 	}
 
