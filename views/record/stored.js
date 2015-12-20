@@ -1,7 +1,7 @@
 import Handlebars from "handlebars";
 import Moment from "moment";
 import $ from "jquery";
-import * as spawnNotification from "../notification";
+import spawnNotification from "../notification";
 import colorify from "../../src/colorbystring";
 
 Handlebars.registerHelper("paginate", require("handlebars-paginate"));

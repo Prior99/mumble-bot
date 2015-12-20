@@ -1,5 +1,5 @@
 import $ from "jquery";
-import * as spawnNotification from "../notification";
+import spawnNotification from "../notification";
 
 /**
  * Update the progressbar with an event emitted from the upload.

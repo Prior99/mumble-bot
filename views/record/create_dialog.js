@@ -1,5 +1,5 @@
 import $ from "jquery";
-import * as spawnNotification from "../notification";
+import spawnNotification from "../notification";
 import Handlebars from "handlebars";
 
 const DialogTemplate = Handlebars.compile($("#template-dialog").html());

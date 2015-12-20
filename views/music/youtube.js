@@ -1,5 +1,5 @@
 import $ from "jquery";
-import * as spawnNotification from "../notification";
+import spawnNotification from "../notification";
 
 /**
  * Called when the download from youtube is finished.

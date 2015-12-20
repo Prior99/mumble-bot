@@ -35,7 +35,7 @@ const UsersExtension = function(Database) {
 			[identifier]
 		);
 		if(rows && rows.length > 0) {
-			return this.getUserById(rows[0].id);
+			return await this.getUserById(rows[0].id);
 		}
 		else {
 			return null;
@@ -50,7 +50,7 @@ const UsersExtension = function(Database) {
 	Database.prototype.getUserByUsername = async function(username) {
 		const rows = await this.connection.query("SELECT id FROM Users WHERE username = ?", [username]);
 		if(rows && rows.length > 0) {
-			return this.getUserById(rows[0].id);
+			return await this.getUserById(rows[0].id);
 		}
 		else {
 			return null;
@@ -87,8 +87,9 @@ const UsersExtension = function(Database) {
 		);
 		if(rows && rows.length > 0) {
 			const user = rows[0];
-			const settings = this.getSettings(user);
+			const settings = await this.getSettings(user);
 			user.settings = settings;
+			return user;
 		}
 		else {
 			return null;
@@ -103,7 +104,7 @@ const UsersExtension = function(Database) {
 	Database.prototype.getUserBySteamId = async function(steamId) {
 		const rows = await this.connection.query("SELECT id FROM Users WHERE steamid = ?", [steamId]);
 		if(rows && rows.length > 0) {
-			return this.getUserById(rows[0].id);
+			return await this.getUserById(rows[0].id);
 		}
 		else {
 			return null;
@@ -117,7 +118,7 @@ const UsersExtension = function(Database) {
 	Database.prototype.getRandomUser = async function() {
 		const rows = await this.connection.query("SELECT id FROM Users ORDER BY RAND() LIMIT 1");
 		if(rows && rows.length > 0) {
-			return this.getUserById(rows[0].id);
+			return await this.getUserById(rows[0].id);
 		}
 		else {
 			return null;
@@ -132,7 +133,7 @@ const UsersExtension = function(Database) {
 	Database.prototype.getUserByMinecraftUsername = async function(minecraft) {
 		const rows = await this.connection.query("SELECT id FROM Users WHERE minecraft = ?", [minecraft]);
 		if(rows && rows.length > 0) {
-			return this.getUserById(rows[0].id);
+			return await this.getUserById(rows[0].id);
 		}
 		else {
 			return null;

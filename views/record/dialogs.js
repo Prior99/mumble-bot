@@ -1,5 +1,5 @@
 import $ from "jquery";
-import * as spawnNotification from "../notification";
+import spawnNotification from "../notification";
 
 $("a.playdialog").click((e) => {
 	const id = $(e.currentTarget).attr("dialogId");

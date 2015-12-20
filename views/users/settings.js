@@ -1,5 +1,5 @@
 import $ from "jquery";
-import * as spawnNotification from "../notification";
+import spawnNotification from "../notification";
 
 $("#submit").click(() => {
 	const record = encodeURI($("#record").val());

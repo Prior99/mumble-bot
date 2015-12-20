@@ -1,5 +1,5 @@
 import $ from "jquery";
-import * as spawnNotification from "../notification";
+import spawnNotification from "../notification";
 import * as WebSocket from "ws"; //returns global.WebSocket
 import * as Handlebars from "handlebars";
 import * as Moment from "moment";

@@ -2,7 +2,7 @@ import "./sidebar";
 import "./tablesort";
 import "bootstrap";
 import $ from "jquery";
-import * as spawnNotification from "./notification";
+import spawnNotification from "./notification";
 
 $("#nav-sign-out").click(() => {
 	$.ajax("/api/users/logout").done((res) => window.location.reload());

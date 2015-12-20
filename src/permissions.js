@@ -30,8 +30,7 @@ class Permissions {
 	 */
 	async hasPermission(user, permission) {
 		if(!user) {
-			callback(false);
-			return;
+			return false;
 		}
 		try {
 			const has = await this.database.hasPermission(user.id, permission);

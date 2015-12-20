@@ -1,5 +1,5 @@
 import $ from "jquery";
-import * as spawnNotification from "../notification";
+import spawnNotification from "../notification";
 
 $("a.playrecord").click(() => {
 	const id = $(this).attr("recordId");

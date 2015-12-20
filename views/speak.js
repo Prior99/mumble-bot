@@ -1,5 +1,5 @@
 import $ from "jquery";
-import * as spawnNotification from "./notification";
+import spawnNotification from "./notification";
 
 global.jQuery = $;
 const typeahead = require("typeahead.js-browserify").loadjQueryPlugin();

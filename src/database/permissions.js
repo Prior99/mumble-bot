@@ -11,7 +11,9 @@ const PermissionsExtension = function(Database) {
 	 * @return {boolean} - Whether the user has the requested permission.
 	 */
 	Database.prototype.hasPermission = async function(userid, permission) {
-		const rows = await this.connection.query("SELECT id FROM UserPermissions WHERE user = ? AND permission = ?");
+		const rows = await this.connection.query("SELECT id FROM UserPermissions WHERE user = ? AND permission = ?",
+			[userid, permission]
+		);
 		return rows && rows.length > 0;
 	};
 
