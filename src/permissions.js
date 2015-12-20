@@ -23,29 +23,24 @@ class Permissions {
 	}
 
 	/**
-	 * Callback from hasPermission(). The first parameter indicates whether the permission is granted
-	 * or whether not.
-	 * @callback PermissionCallback
-	 * @param {boolean} has - Whether the permission was granted or whether not.
-	 */
-	/**
-	 * Checks whether a user has the given permission.
+	 * <b>Async</b> Checks whether a user has the given permission.
 	 * @param {User} user - User to check the permission of.
 	 * @param {string} permission - Permission to check.
-	 * @param {PermissionCallback} callback - This callback is called when the data was fetched.
-	 * @returns {undefined}
+	 * @returns {boolean} - Whether the permission was granted or whether not.
 	 */
-	hasPermission(user, permission, callback) {
+	async hasPermission(user, permission) {
 		if(!user) {
 			callback(false);
 			return;
 		}
-		this.database.hasPermission(user.id, permission, (err, has) => {
-			if(err) {
-				Winston.error("Could not check whether user has permission", err);
-			}
-			callback(!err && has);
-		});
+		try {
+			const has = await this.database.hasPermission(user.id, permission);
+			return has;
+		}
+		catch(err) {
+			Winston.error("Could not check whether user has permission", err);
+			return false;
+		}
 	}
 
 	/**
@@ -75,80 +70,61 @@ class Permissions {
 	}
 
 	/**
-	 * Called when a permission was granted or revoked.
-	 * @callback GrantPermissionCallback
-	 * @param {boolean} - True when the permission was granted and false otherwise.
-	 */
-	/**
-	 * Grants the permission to a user. If the issuer is null or undefined, no
+	 * <b>Async</b> Grants the permission to a user. If the issuer is null or undefined, no
 	 * checks will be performed. If the issuer is defined, a check will be performed
 	 * whether the issuer can grant the requested permission at all.
 	 * @param {User} issuer - User that issues this command.
 	 * @param {User} user - User to grant the permission to.
 	 * @param {string} permission - Permission to grant to the user.
-	 * @param {GrantPermissionCallback} callback - Will be called after the permission was granted.
-	 * @returns {undefined}
+	 * @returns {boolean} - True when the permission was granted and false otherwise.
 	 */
-	grantPermission(issuer, user, permission, callback) {
-		if(!callback) {
-			callback = function() {};
+	async grantPermission(issuer, user, permission) {
+		const grant = await this.hasPermission(issuer, "grant");
+		const perm = await this.hasPermission(issuer, permission);
+		if(!issuer || (grant && perm)) {
+			try {
+				await this.database.grantPermission(user.id, permission);
+				Winston.info("Permission \"" + permission + "\" was granted to user " + user.username);
+				return true;
+			}
+			catch(err) {
+				Winston.error("Error when granting permission \"" + permission + "\" to user "
+					+ user.username + ".", err);
+				return false;
+			}
 		}
-		this.hasPermission(issuer, "grant", grant => {
-			this.hasPermission(issuer, permission, perm => {
-				if(!issuer || (grant && perm)) {
-					this.database.grantPermission(user.id, permission, err => {
-						if(err) {
-							Winston.error("Error when granting permission \"" + permission + "\" to user "
-								+ user.username + ".", err);
-							callback(false);
-						}
-						else {
-							Winston.info("Permission \"" + permission + "\" was granted to user " + user.username);
-							callback(true);
-						}
-					});
-				}
-				else {
-					callback(false);
-				}
-			});
-		});
+		else {
+			return false;
+		}
 	}
 
 	/**
-	 * Revokes a certain permission from a user. If the issuer is null or undefined, no
+	 * <b>Async</b> Revokes a certain permission from a user. If the issuer is null or undefined, no
 	 * checks will be performed. If the issuer is defined, a check will be performed
 	 * whether the issuer can revoke the requested permission at all.
 	 * @param {User} issuer - User that issues this command.
 	 * @param {User} user - User to revoke the permission from.
 	 * @param {string} permission - Permission to grant to the user.
-	 * @param {GrantPermissionCallback} callback - Will be called after the permission was revoked.
-	 * @returns {undefined}
+	 * @returns {boolean} - True when the permission was revoked and false otherwise.
 	 */
-	revokePermission(issuer, user, permission, callback) {
-		if(!callback) {
-			callback = function() {};
+	async revokePermission(issuer, user, permission) {
+		const grant = await this.hasPermission(issuer, "grant");
+		const perm = await this.hasPermission(issuer, permission);
+		if(!issuer || (grant && perm)) {
+			try {
+				await this.database.revokePermission(user.id, permission);
+				Winston.info("Permission \"" + permission + "\" was revoked from user " + user.username);
+				return true;
+			}
+			catch(err) {
+				Winston.error("Error when revoking permission \"" + permission + "\" from user "
+					+ user.username + " by user " + issuer.username + ".", error);
+				return false;
+			}
 		}
-		this.hasPermission(issuer, "grant", grant => {
-			this.hasPermission(issuer, permission, perm => {
-				if(!issuer || (grant && perm)) {
-					this.database.revokePermission(user.id, permission, err => {
-						if(err) {
-							Winston.error("Error when revoking permission \"" + permission + "\" from user "
-								+ user.username + " by user " + issuer.username + ".", error);
-							callback(false);
-						}
-						else {
-							Winston.info("Permission \"" + permission + "\" was revoked from user " + user.username);
-							callback(true);
-						}
-					});
-				}
-				else {
-					callback(false);
-				}
-			});
-		});
+		else {
+			return false;
+		}
 	}
 	/**
 	 * This object holds all information about a specific permission.
@@ -159,154 +135,98 @@ class Permissions {
 	 * @property {string} icon - Fontawesome icon class for this permission.
 	 */
 	/**
-	 * Called from getPermission() when a permission was read from the database.
-	 * @callback GetPermissionCallback
-	 * @param {Permission} permission - An object holding information about the permission that was requested.
-	 */
-	/**
-	 * Retrieve information about a given permission.
+	 * <b>Async</b> Retrieve information about a given permission.
 	 * @param {string} permission - Permission to gather information about.
-	 * @param {GetPermissionCallback} callback - Called once the inforamtion was retrieved.
-	 * @returns {undefined}
+	 * @returns {Permission} - An object holding information about the permission that was requested.
 	 */
-	getPermission(permission, callback) {
-		this.database.getPermission(permission, (err, permission) => {
-			if(err) {
-				Winston.error("Error when getting permission \"" + permission + "\".", err);
-				callback();
-			}
-			else {
-				callback(permission);
-			}
-		});
+	async getPermission(permission) {
+		try {
+			const permission = await this.database.getPermission(permission);
+			return permission;
+		}
+		catch(err) {
+			Winston.error("Error when getting permission \"" + permission + "\".", err);
+			return null;
+		}
 	}
 
 	/**
-	 * Called from listPermissions() when a permission was read from the database.
-	 * @callback GetPermissionCallback
-	 * @param {Permission[]} permission - An array holding objects holding information about the permissions.
+	 * <b>Async</b> Retrieve an array containing all permissions known to this bot.
+	 * @returns {Permission[]} - An array holding objects holding information about the permissions.
 	 */
-	/**
-	 * Retrieve an array containing all permissions known to this bot.
-	 * @param {ListPermissionsCallback} callback - Called once the list was retrieved.
-	 * @returns {undefined}
-	 */
-	listPermissions(callback) {
-		this.database.listPermissions((err, permissions) => {
-			if(err) {
-				Winston.error("Error when listing permissions.", err);
-				callback([]);
-			}
-			else {
-				callback(permissions);
-			}
-		});
+	async listPermissions() {
+		try {
+			const permissions = await this.database.listPermissions();
+			return permissions;
+		}
+		catch(err) {
+			Winston.error("Error when listing permissions.", err);
+			return [];
+		}
 	}
 
 	/**
-	 * Grants all known permissions to one user. If the issuer is null or undefined
+	 * <b>Async</b> Grants all known permissions to one user. If the issuer is null or undefined
 	 * no checking will be performed. Else it will be checked if the issuer can
 	 * grant the requested permissions at all and only those he can grant will be
 	 * granted.
 	 * @param {User} issuer - User that issued this command.
 	 * @param {User} user - User to grant the permissions to.
 	 * @param {GrantPermissionCallback} callback - Called once all permissions were processed.
-	 * @returns {undefined}
+	 * @returns {boolean} - If everything has gone right.
 	 */
-	grantAllPermissions(issuer, user, callback) {
-		if(!callback) {
-			callback = function() {};
+	async grantAllPermissions(issuer, user, callback) {
+		const permissions = await this.listPermissions();
+		let okay = true;
+		while(permissions.length) {
+			const permission = permissions.shift();
+			const ok = await this.grantPermission(issuer, user, permission.id);
+			if(!ok) {
+				okay = false;
+			}
 		}
-		this.listPermissions(permissions => {
-			let okay = true;
-			const next = function() {
-				permission = permissions.shift();
-				this.grantPermission(issuer, user, permission.id, ok => {
-					if(!ok) {
-						okay = false;
-					}
-					if(permissions.length > 0) {
-						next();
-					}
-					else {
-						callback(okay);
-					}
-				});
-			}.bind(this);
-			next();
-		});
+		return okay;
 	}
 
 	/**
-	 * Lists all permissions from the view of a single user. Information about
+	 * <b>Async</b> Lists all permissions from the view of a single user. Information about
 	 * whether the user has the permission and whether the issuer can grant it will be added.
 	 * @param {User} issuer - User that issued the command and of which it should be
 	 *  			   checked whether he can grant the permissions.
 	 * @param {User} user - User of which it should be checked whether he has the permissions.
-	 * @param {ListPermissionsCallback} callback - Called once the list was retrieved.
-	 * @returns {undefined}
+	 * @returns {Permission[]} - List of all permissions for a user. Each permission object has two additional
+	 *                           properties: "has" which indicates whether the user has the permission and "canGrant"
+	 *                           to determine whether the issuer can grant the permission.
 	 */
-	listPermissionsForUser(issuer, user, callback) {
+	async listPermissionsForUser(issuer, user) {
 		const array = [];
-
-		const iteratePermissions = function(permissions, issuerCanGrant) {
-			if(permissions.length > 0) {
-				const permission = permissions.shift();
-				this.hasPermission(user, permission.id, has => {
-					permission.granted = has;
-					this.hasPermission(issuer, permission.id, has => {
-						permission.canGrant = has && issuerCanGrant;
-						array.push(permission);
-						iteratePermissions(permissions, issuerCanGrant);
-					});
-				});
-			}
-			else {
-				callback(array);
-			}
-		}.bind(this)
-
-		this.hasPermission(issuer, "grant", issuerCanGrant => {
-			this.listPermissions(permissions => {
-				iteratePermissions(permissions, issuerCanGrant);
-			});
-		});
+		const issuerCanGrant = await this.hasPermission(issuer, "grant");
+		const permissions = await this.listPermissions();
+		while(permissions.length) {
+			const permission = permissions.shift();
+			let has = await this.hasPermission(user, permission.id);
+			permission.granted = has;
+			has = this.hasPermission(issuer, permission.id);
+			permission.canGrant = has && issuerCanGrant;
+			array.push(permission);
+		}
+		return array;
 	}
-
 	/**
-	 * Called from listPermissionsAssocForUser().
-	 * Is given an object containing the permission association for one user.
-	 * @callback PermissionAssocCallback
-	 * @param {object} obj - The permission association for the user.
-	 * @see Permissions~listPermissionsAssocForUser
-	 */
-
-	/**
-	 * Returns an object with the permissions as keys and a boolean designating whether
+	 * <b>Async</b> Returns an object with the permissions as keys and a boolean designating whether
 	 * the user has or does not have the permission.
 	 * (for example: { "permissionA" : true, "permissionB" : false, ... })
 	 * @param {User} user - The user to fetch the object for.
-	 * @param {PermissionAssocCallback} callback - Will be called when the object is successfully created.
-	 * @returns {undefined}
+	 * @returns {object} - The object as described.
 	 */
-	listPermissionsAssocForUser(user, callback) {
+	async listPermissionsAssocForUser(user) {
 		const obj = {};
-		const iteratePermissions = function(permissions) {
-			if(permissions.length > 0) {
-				const permission = permissions.shift();
-				this.hasPermission(user, permission.id, has => {
-					obj[permission.id] = has;
-					iteratePermissions(permissions);
-				});
-			}
-			else {
-				callback(obj);
-			}
-		}.bind(this)
-
-		this.listPermissions(permissions => {
-			iteratePermissions(permissions);
-		});
+		const permissions = await this.listPermissions(permissions);
+		while(permissions.length) {
+			const permission = permissions.shift();
+			const has = await this.hasPermission(user, permission.id);
+			obj[permission.id] = has;
+		}
 	}
 }
 
