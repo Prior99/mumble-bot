@@ -8,13 +8,15 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewRecordsPerTime = function(bot) {
-	return function(req, res) {
-		Promise.denodeify(bot.database.getRecordCountByDays.bind(bot.database))()
-		.catch((err) => {
+	return async function(req, res) {
+		try {
+			const spoken = await bot.database.getRecordCountByDays();
+			res.status(HTTPCodes.okay).send(spoken);
+		}
+		catch(err) {
 			Winston.error("Could not get record count by days.", err);
-			return [];
-		})
-		.then((spoken) => res.status(HTTPCodes.okay).send(spoken));
+			res.status(HTTPCodes.okay).send([]);
+		}
 	};
 };
 

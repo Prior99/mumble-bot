@@ -7,29 +7,28 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - Feeded view renderer for this endpoint.
  */
 const ViewUsernameAvailable = function(bot) {
-	return function(req, res) {
-		bot.database.getUserByUsername(req.query.username, (err, user) => {
-			if(err) {
-				Winston.error("Error checking whether username is available", err);
-				res.status(HTTPCodes.internalError).send(JSON.stringify({
-					okay : false
+	return async function(req, res) {
+		try {
+			const user = await bot.database.getUserByUsername(req.query.username);
+			if(user) {
+				res.status(HTTPCodes.invalidRequest).send(JSON.stringify({
+					okay : true,
+					available : false
 				}));
 			}
 			else {
-				if(user) {
-					res.status(HTTPCodes.invalidRequest).send(JSON.stringify({
-						okay : true,
-						available : false
-					}));
-				}
-				else {
-					res.status(HTTPCodes.okay).send(JSON.stringify({
-						okay : true,
-						available : true
-					}));
-				}
+				res.status(HTTPCodes.okay).send(JSON.stringify({
+					okay : true,
+					available : true
+				}));
 			}
-		});
+		}
+		catch(err) {
+			Winston.error("Error checking whether username is available", err);
+			res.status(HTTPCodes.internalError).send(JSON.stringify({
+				okay : false
+			}));
+		}
 	}
 };
 

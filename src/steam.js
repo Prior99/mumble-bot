@@ -72,20 +72,19 @@ class SteamBot extends EventEmitter {
 	}
 
 	/**
-	 * Called when a chatmessage was received via steam.
+	 * <b>Async</b> Called when a chatmessage was received via steam.
 	 * @param {string} message - The message that was received.
 	 * @param {string} steamId - The SteamID of the user that sent us the message.
 	 * @return {undefined}
 	 */
-	_onMessage(message, steamId) {
-		this.bot.database.getUserBySteamId(steamId, (err, user) => {
-			if(err) {
-				Winston("Error fetching user by steamid", err);
-			}
-			else {
-				this.bot.command.process(message, "steam", user);
-			}
-		});
+	async _onMessage(message, steamId) {
+		try {
+			const user = await this.bot.database.getUserBySteamId(steamId);
+			this.bot.command.process(message, "steam", user);
+		}
+		catch(err) {
+			Winston("Error fetching user by steamid", err);
+		}
 	}
 
 	/**

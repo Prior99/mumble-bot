@@ -8,7 +8,7 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewLookup = function(bot) {
-	return function(req, res) {
+	return async function(req, res) {
 		let text;
 		if(req.query.text) {
 			text = req.query.text;
@@ -16,15 +16,14 @@ const ViewLookup = function(bot) {
 		else {
 			text = "";
 		}
-		bot.database.lookupRecord(text, (err, arr) => {
-			if(err) {
-				Winston.error("Error looking up autocomplete", err);
-				reply(res, HTTPCodes.internalError, false, { reason : "internal_error" });
-			}
-			else {
-				reply(res, HTTPCodes.okay, true, { suggestions : arr });
-			}
-		});
+		try {
+			const arr = await bot.database.lookupRecord(text);
+			reply(res, HTTPCodes.okay, true, { suggestions : arr });
+		}
+		catch(err) {
+			Winston.error("Error looking up autocomplete", err);
+			reply(res, HTTPCodes.internalError, false, { reason : "internal_error" });
+		}
 	};
 };
 

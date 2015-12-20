@@ -9,7 +9,7 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewPlayDialog = function(bot) {
-	return function(req, res) {
+	return async function(req, res) {
 		/**
 		 * Handles an internal Error.
 		 * @param {string} msg - Message for the error.
@@ -35,22 +35,30 @@ const ViewPlayDialog = function(bot) {
 		}
 
 		/**
-		 * Load the dialog from the given id and play it back.
+		 * <b>Async</b> Load the dialog from the given id and play it back.
 		 * @return {undefined}
 		 */
-		const loadDialog = function() {
+		const loadDialog = async function() {
 			Winston.log("verbose", req.session.user.username + " played back dialog #" + req.query.id);
 			const cannotLoad = internalErr("Could not load dialog parts");
-			Promise.denodeify(bot.database.getDialogParts.bind(bot.database))(req.query.id)
-			.catch(cannotLoad)
-			.then(playDialog);
+			try {
+				const parts = await bot.database.getDialogParts(req.query.id);
+				playDialog(parts);
+			}
+			catch(err) {
+				cannotLoad(err);
+			}
 		}
 
 		if(req.query.id) {
 			const cannotUse = internalErr("Could not increment usage of dialog");
-			Promise.denodeify(bot.database.usedDialog.bind(bot.database))(req.query.id)
-			.catch(cannotUse)
-			.then(loadDialog);
+			try {
+				await bot.database.usedDialog(req.query.id);
+				loadDialog();
+			}
+			catch(err) {
+				cannotUse(err);
+			}
 		}
 		else {
 			reply(res, HTTPCodes.missingArguments, false, { reason : "missing_arguments" });

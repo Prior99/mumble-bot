@@ -25,25 +25,24 @@ const ViewDownload = function(bot) {
 						reason : "internal_error"
 					});
 				}
-			}).on("readable", () => {
-				bot.database.getRecord(req.query.id, (err, record) => {
-					if(err) {
-						res.status(HTTPCodes.internalError).send({
-							okay : false,
-							reason : "internal_error"
-						});
-						Winston.error(
-							"Error occured when trying to fetch data about record to download from database",
-							req.query.id
-						);
-					}
-					else {
-						res.status(HTTPCodes.okay).setHeader(
-							"Content-disposition", "attachment; filename=" + record.quote + ".mp3"
-						);
-						stream.pipe(res);
-					}
-				});
+			}).on("readable", async () => {
+				try {
+					const record = await bot.database.getRecord(req.query.id);
+					res.status(HTTPCodes.okay).setHeader(
+						"Content-disposition", "attachment; filename=" + record.quote + ".mp3"
+					);
+					stream.pipe(res);
+				}
+				catch(err) {
+					res.status(HTTPCodes.internalError).send({
+						okay : false,
+						reason : "internal_error"
+					});
+					Winston.error(
+						"Error occured when trying to fetch data about record to download from database",
+						req.query.id
+					);
+				}
 			});
 		}
 		else {

@@ -8,23 +8,22 @@ import * as Winston from "winston";
  */
 const ViewRegister = function(bot) {
 	/**
-	 * Grants all permissions to the user with the id 1. (The first registered user is admin).
+	 * <b>Async</b> Grants all permissions to the user with the id 1. (The first registered user is admin).
 	 * @return {undefined}
 	 */
-	const grantAll = function() {
-		bot.database.getUserById(1, (err, user) => {
-			if(err) {
-				Winston.error("Error when granting all permissions to user with id 0.", err);
-			}
-			else {
-				bot.permissions.grantAllPermissions(null, user);
-			}
-		});
+	const grantAll = async function() {
+		try {
+			const user = await bot.database.getUserById(1);
+			bot.permissions.grantAllPermissions(null, user);
+		}
+		catch(err) {
+			Winston.error("Error when granting all permissions to user with id 0.", err);
+		}
 	}
 
 	return function(req, res) {
 		const data = req.query;
-		Steam64(data.steamusername, (err, steamid) => {
+		Steam64(data.steamusername, async (err, steamid) => {
 			if(err && data.steamusername) {
 				res.send({
 					okay : false,
@@ -38,41 +37,39 @@ const ViewRegister = function(bot) {
 				});
 			}
 			else {
-				bot.database.registerUser({
-					email : data.email,
-					username : data.username,
-					password : data.password,
-					identifier : data.identifier,
-					steamid,
-					minecraft : data.minecraft
-
-				}, (err, id) => {
-					if(err) {
-						if(err.code === "ER_DUP_ENTRY") {
-							res.send({
-								okay : false,
-								reason : "username_taken"
-							});
-						}
-						else {
-							Winston.error("Error registering new user: ", err);
-							res.send({
-								okay : false,
-								reason : "internal_error"
-							});
-						}
+				try {
+					const id = await bot.database.registerUser({
+						email : data.email,
+						username : data.username,
+						password : data.password,
+						identifier : data.identifier,
+						steamid,
+						minecraft : data.minecraft
+					});
+					Winston.debug("verbose", "A new user registered: " + data.username);
+					res.send({
+						okay : true,
+						id
+					});
+					if(id === 1) {
+						grantAll();
+					}
+				}
+				catch(err) {
+					if(err.code === "ER_DUP_ENTRY") {
+						res.send({
+							okay : false,
+							reason : "username_taken"
+						});
 					}
 					else {
-						Winston.debug("verbose", "A new user registered: " + data.username);
+						Winston.error("Error registering new user: ", err);
 						res.send({
-							okay : true,
-							id
+							okay : false,
+							reason : "internal_error"
 						});
-						if(id === 1) {
-							grantAll();
-						}
 					}
-				});
+				}
 			}
 		});
 	}

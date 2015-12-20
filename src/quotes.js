@@ -23,82 +23,80 @@ class Quotes {
 	}
 
 	/**
-	 * Speak a quote. If the id is defined, a specific quote will be spoken. If it
+	 * <b>Async</b> Speak a quote. If the id is defined, a specific quote will be spoken. If it
 	 * is undefined, a random quote will be chosen from the database.
 	 * @param {number} id - Id of the quote to speak. If this is undefined a random
 	 * 						quote will be chosen.
 	 * @param {callback} callback - Will be called once the quote was spoken.
 	 * @return {undefined}
 	 */
-	speak(id, callback) {
+	async speak(id, callback) {
 		if(id === undefined) {
 			this.speakRandom(callback);
 		}
 		else {
-			this.bot.database.getQuote(id, (err, quote) => {
-				if(err) {
-					Winston.error("Error fetching random quote: " + err);
-				}
-				else {
-					this._dispatch(quote, callback);
-				}
-			});
+			try {
+				const quote = await this.bot.database.getQuote(id);
+				this._dispatch(quote, callback);
+			}
+			catch(err) {
+				Winston.error("Error fetching random quote: " + err);
+			}
 		}
 	}
 
 	/**
-	 * Add a quote to the database.
+	 * <b>Async</b> Add a quote to the database.
 	 * @param {string} quote - Text of the quote.
 	 * @param {string} author - Author of the quote.
-	 * @param {callback} callback - `Called once the quote was submitted.
-	 * @return {undefined}
+	 * @return {number} - Unique id of the new quote.
 	 */
-	add(quote, author, callback) {
-		this.bot.database.addQuote(quote, author, callback);
+	async add(quote, author) {
+		const id = await this.bot.database.addQuote(quote, author);
+		return id;
 	}
 
 	/**
-	 * Retrieve an array of all known quotes.
+	 * <b>Async</b> Retrieve an array of all known quotes.
 	 * @param {callback} callback - Called once the array was retrieved.
-	 * @return {undefined}
+	 * @return {Quote[]} - All quotes in the database.
 	 */
-	list(callback) {
-		this.bot.database.getQuoteList(callback);
+	async list(callback) {
+		const list = await this.bot.database.getQuoteList();
+		return list;
 	}
 
 	/**
-	 * Counts all quotes in the database.
+	 * <b>Async</b> Counts all quotes in the database.
 	 * @param {callback} callback - Called once the quotes were counted.
-	 * @return {undefined}
+	 * @return {number} - Amount of quotes in the database.
 	 */
-	count(callback) {
-		this.bot.database.getQuoteCount(callback);
+	async count() {
+		const amount = await this.bot.database.getQuoteCount();
+		return amount;
 	}
 
 	/**
-	 * Dispatch the actual quote (say it using TTS) to the bot.
+	 * <b>Async</b> Dispatch the actual quote (say it using TTS) to the bot.
 	 * @param {string} quote - Quote to synthesize and speak.
-	 * @param {callback} callback - Will be called after the text was spoken.
 	 * @return {undefined}
 	 */
-	_dispatch(quote, callback) {
-		this.bot.say(quote.quote, callback);
+	async _dispatch(quote) {
+		await this.bot.say(quote.quote);
 	}
 
 	/**
-	 * Speaks a randomly chosen quote from the database.
-	 * @param {callback} callback - Called once the quote was spoken.
+	 * <b>Async</b> Speaks a randomly chosen quote from the database.
 	 * @return {undefined}
 	 */
-	speakRandom(callback) {
-		this.bot.database.getRandomQuote((err, quote) => {
-			if(err) {
-				Winston.error("Error fetching random quote: " + err);
-			}
-			else {
-				this._dispatch(quote, callback);
-			}
-		});
+	async speakRandom() {
+		try {
+			const quote = await this.bot.database.getRandomQuote();
+			await this._dispatch(quote);
+		}
+		catch(err) {
+			Winston.error("Error fetching random quote: " + err);
+		}
 	}
 }
 

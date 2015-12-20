@@ -8,8 +8,7 @@ import * as HTTPCodes from "../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewEdit = function(bot) {
-	return function(req, res) {
-		let labels, record;
+	return async function(req, res) {
 		if(!req.query.id) {
 			res.status(HTTPCodes.invalidRequest).send({
 				okay : false,
@@ -17,13 +16,9 @@ const ViewEdit = function(bot) {
 			});
 			return;
 		}
-		Promise.all([
-			Promise.denodeify(bot.database.listLabels.bind(bot.database))(),
-			Promise.denodeify(bot.database.getRecord.bind(bot.database))(req.query.id)
-		])
-		.then((results) => {
-			labels = results[0];
-			record = results[1];
+		try {
+			const labels = await bot.database.listLabels();
+			const record = await bot.database.getRecord(req.query.id);
 			labels.forEach((label) => {
 				if(record.labels.find((elem) => elem.id === label.id)) {
 					label.has = true;
@@ -32,14 +27,14 @@ const ViewEdit = function(bot) {
 			res.locals.labels = labels;
 			res.locals.record = record;
 			res.render("record/edit");
-		})
-		.catch((err) => {
+		}
+		catch(err) {
 			Winston.error("An error occured while editing a record", err);
 			res.status(HTTPCodes.internalError).send({
 				okay : false,
 				reason : "internal_error"
 			});
-		});
+		}
 	}
 };
 

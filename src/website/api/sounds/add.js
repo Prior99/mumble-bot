@@ -25,7 +25,7 @@ const ViewSoundAdd = function(bot, router) {
 	 * @param {object} res - Response from express to answer.
 	 * @return {undefined}
 	 */
-	const handleFile = function(file, res) {
+	const handleFile = async function(file, res) {
 		try {
 			FS.mkdirSync("sounds/uploaded");
 		}
@@ -34,23 +34,22 @@ const ViewSoundAdd = function(bot, router) {
 				throw e;
 			}
 		}
-		bot.database.addSound(file.originalname, (err, id) => {
-			if(err) {
-				Winston.error("Could not add sound to database", err);
-				res.status(HTTPCodes.internalError).send({
-					okay : false,
-					reason : "internal_error"
-				});
-			}
-			else {
-				Winston.log("verbose", "added new sound #" + id);
-				FS.renameSync(file.path, "sounds/uploaded/" + id);
-				res.status(HTTPCodes.okay).send({
-					okay : true,
-					id
-				});
-			}
-		});
+		try {
+			const id = await bot.database.addSound(file.originalname);
+			Winston.log("verbose", "added new sound #" + id);
+			FS.renameSync(file.path, "sounds/uploaded/" + id);
+			res.status(HTTPCodes.okay).send({
+				okay : true,
+				id
+			});
+		}
+		catch(err) {
+			Winston.error("Could not add sound to database", err);
+			res.status(HTTPCodes.internalError).send({
+				okay : false,
+				reason : "internal_error"
+			});
+		}
 	}
 
 	return function(req, res) {

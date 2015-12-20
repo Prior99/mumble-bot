@@ -1,5 +1,4 @@
 import * as Winston from "winston";
-import * as Promise from "promise";
 import * as HTTPCodes from "../../httpcodes";
 
 /**
@@ -8,21 +7,21 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewList = function(bot) {
-	return function(req, res) {
-		Promise.denodeify(bot.database.listRecords.bind(bot.database))()
-		.then((records) => {
+	return async function(req, res) {
+		try {
+			records = await bot.database.listRecords();
 			res.status(HTTPCodes.okay).send({
 				okay : true,
 				records
 			});
-		})
-		.catch((err) => {
+		}
+		catch(err) {
 			Winston.error("Error listing records", err);
 			res.status(HTTPCodes.internalError).send({
 				okay : false,
 				reason : "internal_error"
 			});
-		});
+		}
 	};
 };
 

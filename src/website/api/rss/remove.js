@@ -7,40 +7,38 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewRemove = function(bot) {
-	return function(req, res) {
-		bot.permissions.hasPermission(req.session.user, "rss", (has) => {
-			if(req.query.id) {
-				if(has) {
-					bot.database.removeRSSFeed(req.query.id, (err) => {
-						if(err) {
-							Winston.error("Could not remove new RSS feed.", err);
-							res.status(HTTPCodes.internalError).send({
-								okay : false,
-								reason : "internal_error"
-							});
-						}
-						else {
-							Winston.verbose(req.session.user.username + " removed rss-feed with id " + req.query.id);
-							res.status(HTTPCodes.okay).send({
-								okay : true
-							});
-						}
+	return async function(req, res) {
+		const has = await bot.permissions.hasPermission(req.session.user, "rss");
+		if(req.query.id) {
+			if(has) {
+				try {
+					await bot.database.removeRSSFeed(req.query.id);
+					Winston.verbose(req.session.user.username + " removed rss-feed with id " + req.query.id);
+					res.status(HTTPCodes.okay).send({
+						okay : true
 					});
 				}
-				else {
-					res.status(HTTPCodes.insufficientPermission).send({
+				catch(err) {
+					Winston.error("Could not remove new RSS feed.", err);
+					res.status(HTTPCodes.internalError).send({
 						okay : false,
-						reason : "permission_denied"
+						reason : "internal_error"
 					});
 				}
 			}
 			else {
-				res.status(HTTPCodes.missingArguments).send({
+				res.status(HTTPCodes.insufficientPermission).send({
 					okay : false,
-					reason : "missing_arguments"
+					reason : "permission_denied"
 				});
 			}
-		});
+		}
+		else {
+			res.status(HTTPCodes.missingArguments).send({
+				okay : false,
+				reason : "missing_arguments"
+			});
+		}
 	};
 };
 

@@ -7,17 +7,17 @@ import * as Promise from "promise";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewDialogs = function(bot) {
-	return function(req, res) {
-		Promise.denodeify(bot.database.listDialogs.bind(bot.database))()
-		.catch((err) => {
+	return async function(req, res) {
+		try {
+			const dialogs = await bot.database.listDialogs();
+			res.locals.dialogs = dialogs;
+			res.render("record/dialogs");
+		}
+		catch(err) {
 			Winston.error("Error listing dialogs", err);
 			res.locals.dialogs = [];
 			res.render("record/dialogs");
-		})
-		.then((dialogs) => {
-			res.locals.dialogs = dialogs;
-			res.render("record/dialogs");
-		});
+		}
 	}
 };
 

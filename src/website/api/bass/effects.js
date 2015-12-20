@@ -7,22 +7,21 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewEffects = function(bot) {
-	return function(req, res) {
-		bot.database.listBassEffects((err, effects) => {
-			if(err) {
-				Winston.error("Unabled to get list of effects", err);
-				res.status(HTTPCodes.internalError).send({
-					okay : false,
-					reason : "internal_error"
-				});
-			}
-			else {
-				res.send({
-					okay : true,
-					effects
-				});
-			}
-		});
+	return async function(req, res) {
+		try {
+			const effects = await bot.database.listBassEffects();
+			res.send({
+				okay : true,
+				effects
+			});
+		}
+		catch(err) {
+			Winston.error("Unabled to get list of effects", err);
+			res.status(HTTPCodes.internalError).send({
+				okay : false,
+				reason : "internal_error"
+			});
+		}
 	}
 };
 

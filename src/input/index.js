@@ -57,15 +57,13 @@ class VoiceInput extends EventEmitter {
 	}
 
 	/**
-	 * Called when a user joined the server, or was there before the bot joined.
+	 * <b>Async</b> Called when a user joined the server, or was there before the bot joined.
 	 * @param {MumbleUser} user - The user who should be registered.
 	 * @returns {undefined}
 	 */
-	_addUser(user) {
-		this.bot.database.getLinkedUser(user.id, (err, databaseUser) => {
-			if(err) {
-				Winston.error("Error occured when trying to fetch user by mumble id", err);
-			}
+	async _addUser(user) {
+		try {
+			const databaseUser = await this.bot.database.getLinkedUser(user.id);
 			if(!databaseUser) {
 				Winston.info("Did not register input for user " + user.name
 					+ " as this user is not linked to any database user.");
@@ -77,7 +75,10 @@ class VoiceInput extends EventEmitter {
 				return;
 			}
 			this._addRegisteredUser(user, databaseUser);
-		});
+		}
+		catch(err) {
+			Winston.error("Error occured when trying to fetch user by mumble id", err);
+		}
 	}
 
 	/**

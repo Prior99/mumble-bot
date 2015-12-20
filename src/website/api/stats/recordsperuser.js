@@ -9,13 +9,15 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewRecordsPerUser = function(bot) {
-	return function(req, res) {
-		Promise.denodeify(bot.database.getRecordCountByUsers.bind(bot.database))()
-		.catch((err) => {
+	return async function(req, res) {
+		try {
+			const arr = await bot.database.getRecordCountByUsers();
+			res.status(HTTPCodes.okay).send(arr);
+		}
+		catch(err) {
 			Winston.error("Could not get record count by users.", err);
-			return [];
-		})
-		.then((arr) => res.status(HTTPCodes.okay).send(arr));
+			res.status(HTTPCodes.internalError).send(arr);
+		}
 	};
 };
 

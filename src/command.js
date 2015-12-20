@@ -114,7 +114,7 @@ class Command {
 	 */
 	newCommand(name, command, args, permission) {
 		if(permission) {
-			this.commands[name] = function(user, via, arg) {
+			this.commands[name] = async (user, via, arg) => {
 				if(via === "terminal") {
 					command.apply(this, args);
 				}
@@ -123,17 +123,16 @@ class Command {
 						+ "\" which needs permission \"" + permission + "\".");
 				}
 				else {
-					this.bot.permissions.hasPermission(user, permission, hasPermission => {
-						if(hasPermission) {
-							command.apply(this, arguments);
-						}
-						else {
-							Winston.warn("User \"" + user.username + "\" tried to execute command \"" + name
-								+ "\" which needs permission \"" + permission + "\".");
-						}
-					});
+					const hasPermission = await this.bot.permissions.hasPermission(user, permission);
+					if(hasPermission) {
+						command.apply(this, arguments);
+					}
+					else {
+						Winston.warn("User \"" + user.username + "\" tried to execute command \"" + name
+							+ "\" which needs permission \"" + permission + "\".");
+					}
 				}
-			}.bind(this);
+			};
 		}
 		else {
 			this.commands[name] = command;

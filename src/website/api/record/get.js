@@ -8,18 +8,17 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewGet = function(bot) {
-	return function(req, res) {
+	return async function(req, res) {
 		const id = req.query.id;
 		if(id) {
-			bot.database.getRecord(id, (err, rec) => {
-				if(err) {
-					Winston.error("Error while getting record", err);
-					reply(res, HTTPCodes.internalError, false, { reason : "internal_error" });
-				}
-				else {
-					reply(res, HTTPCodes.okay, true, { record : rec });
-				}
-			});
+			try {
+				const rec = await bot.database.getRecord(id);
+				reply(res, HTTPCodes.okay, true, { record : rec });
+			}
+			catch(err) {
+				Winston.error("Error while getting record", err);
+				reply(res, HTTPCodes.internalError, false, { reason : "internal_error" });
+			}
 		}
 		else {
 			reply(res, HTTPCodes.invalidRequest, false, { reason : "missing_argument" });

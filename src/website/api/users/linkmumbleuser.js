@@ -8,22 +8,21 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewAPIUsersLinkMumbleUser = function(bot) {
-	return function(req, res) {
+	return async function(req, res) {
 		if(req.session.user.username === req.query.username) {
-			bot.database.linkMumbleUser(req.query.id, req.query.username, (err) => {
-				if(err) {
-					res.status(HTTPCodes.internalError).send({
-						okay : false,
-						reason : "internal_error"
-					});
-				}
-				else {
-					Winston.log("verbose", req.session.user.username + " linked mumble user with id " + req.query.id);
-					res.status(HTTPCodes.okay).send({
-						okay : true
-					});
-				}
-			});
+			try {
+				await bot.database.linkMumbleUser(req.query.id, req.query.username);
+				Winston.log("verbose", req.session.user.username + " linked mumble user with id " + req.query.id);
+				res.status(HTTPCodes.okay).send({
+					okay : true
+				});
+			}
+			catch(err) {
+				res.status(HTTPCodes.internalError).send({
+					okay : false,
+					reason : "internal_error"
+				});
+			}
 		}
 		else {
 			res.status(HTTPCodes.invalidRequest).send({

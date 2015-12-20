@@ -7,24 +7,23 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewSoundPlay = function(bot) {
-	return function(req, res) {
+	return async function(req, res) {
 		if(req.query.id) {
-			bot.database.usedSound(req.query.id, (err) => {
-				if(err) {
-					Winston.error("Could not increase usages of sound", err);
-					res.status(HTTPCodes.internalError).send({
-						okay: false,
-						reason : "internal_error"
-					});
-				}
-				else {
-					Winston.log("verbose", req.session.user.username + " played sound #" + req.query.id);
-					bot.playSound("sounds/uploaded/" + req.query.id);
-					res.status(HTTPCodes.okay).send({
-						okay : true
-					});
-				}
-			});
+			try {
+				await bot.database.usedSound(req.query.id);
+				Winston.log("verbose", req.session.user.username + " played sound #" + req.query.id);
+				bot.playSound("sounds/uploaded/" + req.query.id);
+				res.status(HTTPCodes.okay).send({
+					okay : true
+				});
+			}
+			catch(err) {
+				Winston.error("Could not increase usages of sound", err);
+				res.status(HTTPCodes.internalError).send({
+					okay: false,
+					reason : "internal_error"
+				});
+			}
 		}
 		else {
 			res.status(HTTPCodes.missingArguments).send({

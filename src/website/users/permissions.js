@@ -7,7 +7,7 @@ import * as Winston from "winston";
  */
 const ViewUsersPermissions = function(bot) {
 	return function(req, res) {
-		bot.database.getUserByUsername(req.params.username, (err, user) => {
+		bot.database.getUserByUsername(req.params.username, async (err, user) => {
 			if(err) {
 				res.locals.permissions = [];
 				Winston.error("Could not fetch user: " + req.params.username, err);
@@ -15,10 +15,9 @@ const ViewUsersPermissions = function(bot) {
 			else {
 				if(user) {
 					res.locals.user = user;
-					bot.permissions.listPermissionsForUser(req.session.user, user, (permissions) => {
-						res.locals.permissions = permissions;
-						res.render("users/permissions");
-					});
+					const permissions = await bot.permissions.listPermissionsForUser(req.session.user, user);
+					res.locals.permissions = permissions;
+					res.render("users/permissions");
 				}
 				else {
 					res.locals.permissions = [];

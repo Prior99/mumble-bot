@@ -118,45 +118,44 @@ const downloadFinished = function(err, output, tmpAudioName, res) {
  */
 const ViewYoutube = function(b) {
 	bot = b;
-	return function(req, res) {
-		bot.permissions.hasPermission(req.session.user, "upload-music", (has) => {
-			if(has) {
-				if(req.query.url) {
-					const url = req.query.url;
-					let format;
-					if(req.format) {
-						format = req.format;
-					}
-					else {
-						format = "%(artist)s - %(title)s"
-					}
-					const tmpName = bot.options.website.tmp + "/youtube" + Date.now();
-					const tmpVideoName = tmpName + ".mp4";
-					const tmpAudioName = tmpName + ".mp3";
-					YoutubeDl.exec(url,
-						[
-							"--add-metadata",
-							"--metadata-from-title", format,
-							"-x",
-							"--audio-format", "mp3",
-							"-o", tmpVideoName
-						], {}, (err, output) => downloadFinished(err, output, tmpAudioName, res)
-					);
+	return async function(req, res) {
+		const has = await bot.permissions.hasPermission(req.session.user, "upload-music");
+		if(has) {
+			if(req.query.url) {
+				const url = req.query.url;
+				let format;
+				if(req.format) {
+					format = req.format;
 				}
 				else {
-					res.send(JSON.stringify({
-						okay : false,
-						reason: "no_url"
-					}));
+					format = "%(artist)s - %(title)s"
 				}
+				const tmpName = bot.options.website.tmp + "/youtube" + Date.now();
+				const tmpVideoName = tmpName + ".mp4";
+				const tmpAudioName = tmpName + ".mp3";
+				YoutubeDl.exec(url,
+					[
+						"--add-metadata",
+						"--metadata-from-title", format,
+						"-x",
+						"--audio-format", "mp3",
+						"-o", tmpVideoName
+					], {}, (err, output) => downloadFinished(err, output, tmpAudioName, res)
+				);
 			}
 			else {
 				res.send(JSON.stringify({
 					okay : false,
-					reason: "insufficient_permission"
+					reason: "no_url"
 				}));
 			}
-		});
+		}
+		else {
+			res.send(JSON.stringify({
+				okay : false,
+				reason: "insufficient_permission"
+			}));
+		}
 	}
 };
 

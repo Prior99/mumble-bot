@@ -7,20 +7,18 @@ import * as HTTPCodes from "./httpcodes";
  * @return {ViewRenderer} - Feeded view renderer for this endpoint.
  */
 const RSS = function(bot) {
-	return function(req, res) {
-		bot.permissions.hasPermission(req.session.user, "rss", (has) => {
-			bot.database.listRSSFeeds((err, feeds) => {
-				if(err) {
-					Winston.error("Could not retrieve list of feeds.", err);
-					res.locals.feeds = [];
-				}
-				else {
-					res.locals.feeds = feeds;
-				}
-				res.locals.canrss = has;
-				res.render("rss");
-			});
-		});
+	return async function(req, res) {
+		const has = await bot.permissions.hasPermission(req.session.user, "rss");
+		try {
+			const feeds = await bot.database.listRSSFeeds();
+			res.locals.feeds = feeds;
+		}
+		catch(err) {
+			Winston.error("Could not retrieve list of feeds.", err);
+			res.locals.feeds = [];
+		}
+		res.locals.canrss = has;
+		res.render("rss");
 	};
 };
 

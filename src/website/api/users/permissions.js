@@ -7,31 +7,29 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewPermissions = function(bot) {
-	return function(req, res) {
-		const user = bot.database.getUserByUsername(req.query.username, (err, user) => {
-			if(err) {
-				res.status(HTTPCodes.internalError).send({
-					okay : false,
-					reason : "internal_error"
+	return async function(req, res) {
+		try {
+			const user = await bot.database.getUserByUsername(req.query.username);
+			if(user) {
+				const permissions = await bot.permissions.listPermissionsForUser(req.session.user, user);
+				res.status(HTTPCodes.okay).send({
+					okay : true,
+					permissions
 				});
 			}
 			else {
-				if(user) {
-					bot.permissions.listPermissionsForUser(req.session.user, user, (permissions) => {
-						res.status(HTTPCodes.okay).send({
-							okay : true,
-							permissions
-						});
-					});
-				}
-				else {
-					res.status(HTTPCodes.invalidRequest).send({
-						okay : false,
-						reason : "missing_argument"
-					});
-				}
+				res.status(HTTPCodes.invalidRequest).send({
+					okay : false,
+					reason : "missing_argument"
+				});
 			}
-		});
+		}
+		catch(err) {
+			res.status(HTTPCodes.internalError).send({
+				okay : false,
+				reason : "internal_error"
+			});
+		}
 	};
 };
 

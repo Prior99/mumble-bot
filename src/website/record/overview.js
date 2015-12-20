@@ -7,16 +7,16 @@ import * as Promise from "promise";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewOverview = function(bot) {
-	return function(req, res) {
-		Promise.denodeify(bot.database.getRecordCount.bind(bot.database))()
-		.catch((err) => {
-			Winston.error("Error getting record amount", err);
-			return 0;
-		})
-		.then((count) => {
+	return async function(req, res) {
+		try {
+			const count = await bot.database.getRecordCount();
 			res.locals.recordAmount = count;
-			res.render("record/overview");
-		});
+		}
+		catch(err) {
+			Winston.error("Error getting record amount", err);
+			res.locals.recordAmount = 0;
+		}
+		res.render("record/overview");
 	}
 };
 

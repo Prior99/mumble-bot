@@ -8,83 +8,56 @@ import * as HTTPCodes from "../../httpcodes";
  */
 const ViewSettings = function(bot) {
 	/**
-	 * Apply settings to the database.
+	 * <b>Async</b> Apply settings to the database.
 	 * @param {object} settings - The settings object containing the modified settings for the user.
 	 *                            The keys represent the setting-keys as well as the values the changed values.
 	 * @param {number} user - The numerical user id of the user to change.
-	 * @param {VoidCallback} callback - Called once all settings were changed in the database.
 	 * @return {undefined}
 	 */
-	const applySettings = function(settings, user, callback) {
-		const next = function() {
-			const setting = settings.pop();
-			bot.database.setSetting(user, setting.key, setting.val, (err) => {
-				if(err) {
-					callback(err);
-				}
-				else {
-					if(settings.length > 0) {
-						next();
-					}
-					else {
-						callback();
-					}
-				}
-			});
-		}
-		if(settings.length > 0) {
-			next();
-		}
-		else {
-			callback();
+	const applySettings = async function(settings, user) {
+		for(const setting of settings) {
+			await bot.database.setSetting(user, setting.key, setting.val);
 		}
 	};
 
 	/**
-	 * Reload the user in the session from the database.
+	 * <b>Async</b> Reload the user in the session from the database.
 	 * @param {object} req - The request from express.
-	 * @param {callback} callback - Callback which will be called (With the error as first parameter)
-	 *                              after the user is refreshed.
 	 * @return {undefined}
 	 */
-	const reloadUser = function(req, callback) {
-		bot.database.getUserById(req.session.user.id, (err, user) => {
-			if(!err) {
-				req.session.user = user;
-			}
-			callback(err);
-		});
+	const reloadUser = async function(req) {
+		const user = await bot.database.getUserById(req.session.user.id);
+		req.session.user = user;
 	};
 
 	return function(req, res) {
 		const settings = [];
-		if(req.query.record) { settings.push({ key : "record", val : req.query.record }); }
-		/* ... */
-		applySettings(settings, req.session.user, (err) => {
-			if(err) {
-				Winston.error("An error occured while saving settings for user " + req.session.user.username, err);
+		if(req.query.record) {
+			settings.push({ key : "record", val : req.query.record });
+		}
+		try {
+			applySettings(settings, req.session.user);
+			try {
+				reloadUser(req);
+				res.status(HTTPCodes.okay).send({
+					okay : true
+				});
+			}
+			catch(err) {
+				Winston.error("Error reloading user into session.", err);
 				res.status(HTTPCodes.internalError).send({
 					okay : false,
 					reason : "internal_error"
 				});
 			}
-			else {
-				reloadUser(req, (err) => {
-					if(err) {
-						Winston.error("Error reloading user into session.", err);
-						res.status(HTTPCodes.internalError).send({
-							okay : false,
-							reason : "internal_error"
-						});
-					}
-					else {
-						res.status(HTTPCodes.okay).send({
-							okay : true
-						});
-					}
-				});
-			}
-		});
+		}
+		catch(err) {
+			Winston.error("An error occured while saving settings for user " + req.session.user.username, err);
+			res.status(HTTPCodes.internalError).send({
+				okay : false,
+				reason : "internal_error"
+			});
+		}
 	};
 };
 

@@ -6,22 +6,23 @@ import * as HTTPCodes from "./httpcodes";
  * @return {ViewRenderer} - Feeded view renderer for this endpoint.
  */
 const Log = function(bot) {
-	return function(req, res) {
-		bot.database.listLog((err, entries) => {
-			if(err) {
-				Winston.error("Unabled to fetch logentries from database.", err);
-				entries = [];
-			}
-			bot.permissions.hasPermission(req.session.user, "log", (has) => {
-				if(has) {
-					res.locals.log = entries;
-					res.render("log");
-				}
-				else {
-					res.status(HTTPCodes.forbidden).send("Forbidden.");
-				}
-			});
-		});
+	return async function(req, res) {
+		let entries;
+		try {
+			entries = await bot.database.listLog();
+		}
+		catch(err) {
+			Winston.error("Unabled to fetch logentries from database.", err);
+			entries = [];
+		}
+		const has = await bot.permissions.hasPermission(req.session.user, "log");
+		if(has) {
+			res.locals.log = entries;
+			res.render("log");
+		}
+		else {
+			res.status(HTTPCodes.forbidden).send("Forbidden.");
+		}
 	};
 };
 

@@ -8,7 +8,7 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewAddLabel = function(bot) {
-	return function(req, res) {
+	return async function(req, res) {
 		if(req.query.name && req.query.name.trim().length > 0) {
 			if(req.query.name.indexOf(" ") !== -1) {
 				res.status(HTTPCodes.invalidArgument).send({
@@ -17,25 +17,24 @@ const ViewAddLabel = function(bot) {
 				});
 				return;
 			}
-			bot.database.addRecordLabel(req.query.name, (err, id) => {
-				if(err) {
-					Winston.error("Unabled to add new label", err);
-					res.status(HTTPCodes.internalError).send({
-						okay : false,
-						reason : "internal_error"
-					});
-				}
-				else {
-					Winston.log("verbose",
-						req.session.user.username + " added new label for records: \"" + req.query.name + "\""
-					);
-					res.status(HTTPCodes.okay).send({
-						okay : true,
-						color : colorify(req.query.name),
-						id
-					});
-				}
-			});
+			try {
+				const id = await bot.database.addRecordLabel(req.query.name);
+				Winston.log("verbose",
+					req.session.user.username + " added new label for records: \"" + req.query.name + "\""
+				);
+				res.status(HTTPCodes.okay).send({
+					okay : true,
+					color : colorify(req.query.name),
+					id
+				});
+			}
+			catch(err) {
+				Winston.error("Unabled to add new label", err);
+				res.status(HTTPCodes.internalError).send({
+					okay : false,
+					reason : "internal_error"
+				});
+			}
 		}
 		else {
 			res.status(HTTPCodes.invalidRequest).send({

@@ -140,18 +140,17 @@ const ViewUpload = function(bot, router) {
 			return filename + Date.now();
 		}
 	}));
-	return function(req, res) {
-		bot.permissions.hasPermission(req.session.user, "upload-music", (has) => {
-			if(has) {
-				new Upload(bot, router, req, res);
-			}
-			else {
-				res.send({
-					okay : false,
-					reason: "insufficient_permission"
-				});
-			}
-		});
+	return async function(req, res) {
+		const has = await bot.permissions.hasPermission(req.session.user, "upload-music");
+		if(has) {
+			new Upload(bot, router, req, res);
+		}
+		else {
+			res.send({
+				okay : false,
+				reason: "insufficient_permission"
+			});
+		}
 	}
 };
 

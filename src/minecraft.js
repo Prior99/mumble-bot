@@ -41,21 +41,20 @@ class Minecraft extends EventEmitter {
 		this.mc.on("chat", this._onChat.bind(this));
 	}
 	/**
-	 * Called when a message was received.
+	 * <b>Async</b> Called when a message was received.
 	 * @param {string} username - Username of the user who sent the message.
 	 * @param {string} message - The message that was received.
 	 * @return {undefined}
 	 */
-	_onChat(username, message) {
+	async _onChat(username, message) {
 		if(username !== this.mc.username) {
-			this.bot.database.getUserByMinecraftUsername(username, function(err, user) {
-				if(err) {
-					Winston.error("Error fetching user by minecraft username.", err);
-				}
-				else {
-					this.bot.command.processPrefixed(message, "minecraft", user);
-				}
-			});
+			try {
+				const user = await this.bot.database.getUserByMinecraftUsername(username);
+				this.bot.command.processPrefixed(message, "minecraft", user);
+			}
+			catch(err) {
+				Winston.error("Error fetching user by minecraft username.", err);
+			}
 		}
 	}
 

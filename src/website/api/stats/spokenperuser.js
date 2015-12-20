@@ -9,13 +9,15 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewSpokenPerUser = function(bot) {
-	return function(req, res) {
-		Promise.denodeify(bot.database.getSpokenPerUser.bind(bot.database))()
-		.catch((err) =>{
+	return async function(req, res) {
+		try {
+			const spoken = await bot.database.getSpokenPerUser();
+			res.status(HTTPCodes.okay).send(spoken);
+		}
+		catch(err) {
 			Winston.error("Could not get amount of speech by user.", err);
-			return [];
-		})
-		.then((spoken) => res.status(HTTPCodes.okay).send(spoken));
+			res.status(HTTPCodes.internalError).send([]);
+		}
 	};
 };
 

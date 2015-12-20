@@ -6,15 +6,17 @@ import * as Winston from "winston";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const Creator = function(bot) {
-	return function(req, res) {
-		bot.database.listBassEffects((err, effects) => {
-			if(err) {
-				Winston.error("Unable to fetch list of effects", err);
-				effects = [];
-			}
-			res.locals.effects = effects;
-			res.render("bass/designer");
-		})
+	return async function(req, res) {
+		let effects;
+		try {
+			effects = await bot.database.listBassEffects();
+		}
+		catch(err) {
+			Winston.error("Unable to fetch list of effects", err);
+			effects = [];
+		}
+		res.locals.effects = effects;
+		res.render("bass/designer");
 	}
 };
 

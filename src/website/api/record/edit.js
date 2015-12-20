@@ -8,27 +8,25 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewEdit = function(bot) {
-	return function(req, res) {
+	return async function(req, res) {
 		if(req.query.id && req.query.quote && req.query.labels) {
 			const labels = JSON.parse(req.query.labels);
 			const quote = req.query.quote;
 			const id = req.query.id;
-
-			bot.database.updateRecord(id, quote, labels, (err) => {
-				if(err) {
-					Winston.error("Could not edit record in database", err);
-					res.status(HTTPCodes.internalError).send({
-						okay : false,
-						reason : "internal_error"
-					});
-				}
-				else {
-					Winston.log("verbose", req.session.user.username + " edited record #" + id);
-					res.status(HTTPCodes.okay).send({
-						okay : true
-					});
-				}
-			});
+			try {
+				await bot.database.updateRecord(id, quote, labels);
+				Winston.log("verbose", req.session.user.username + " edited record #" + id);
+				res.status(HTTPCodes.okay).send({
+					okay : true
+				});
+			}
+			catch(err) {
+				Winston.error("Could not edit record in database", err);
+				res.status(HTTPCodes.internalError).send({
+					okay : false,
+					reason : "internal_error"
+				});
+			}
 		}
 		else {
 			res.status(HTTPCodes.missingArguments).send({

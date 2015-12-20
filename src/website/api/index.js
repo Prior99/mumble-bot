@@ -22,56 +22,53 @@ import RouteStats from "./stats";
  */
 const RouteAPI = function(bot) {
 	/**
-	 * Performs the login of a user for this session by query parameters.
+	 * <b>Async</b> Performs the login of a user for this session by query parameters.
 	 * @param {object} req - Express' request object.
 	 * @param {object} res - The response object from express to answer to in case of failure.
 	 * @param {VoidCallback} next - The next handler from express to call.
 	 * @return {undefined}
 	 */
-	const loginByQueryString = function(req, res, next) {
-		bot.database.checkLoginData(req.query.username, req.query.password, (err, okay) => {
-			if(err) {
-				Winston.error("Error checking whether user exists", err);
-				res.status(HTTPCodes.internalError).send({
-					okay : false,
-					reason : "internal_error"
-				});
+	const loginByQueryString = async function(req, res, next) {
+		try {
+			const okay = await bot.database.checkLoginData(req.query.username, req.query.password);
+			if(okay) {
+				try {
+					const user = await bot.database.getUserByUsername(req.query.username);
+					const has = await bot.permissions.hasPermission(user, "login");
+					if(has) {
+						req.session.user = user;
+						next();
+					}
+					else {
+						res.status(HTTPCodes.invalidRequest).send({
+							okay : false,
+							reason : "no_login"
+						});
+					}
+				}
+				catch(err) {
+					Winston.error("Error fetching user.", err);
+					res.status(HTTPCodes.internalError).send({
+						okay : false,
+						reason : "internal_error"
+					});
+				}
 			}
 			else {
-				if(okay) {
-					bot.database.getUserByUsername(req.query.username, (err, user) => {
-						if(err) {
-							Winston.error("Error fetching user.", err);
-							res.status(HTTPCodes.internalError).send({
-								okay : false,
-								reason : "internal_error"
-							});
-						}
-						else {
-							bot.permissions.hasPermission(user, "login", (has) =>{
-								if(has) {
-									req.session.user = user;
-									next();
-								}
-								else {
-									res.status(HTTPCodes.invalidRequest).send({
-										okay : false,
-										reason : "no_login"
-									});
-								}
-							});
-						}
-					});
-				}
-				else {
-					res.status(HTTPCodes.invalidRequest).send({
-						okay : false,
-						reason : "no_login"
-					});
-				}
+				res.status(HTTPCodes.invalidRequest).send({
+					okay : false,
+					reason : "no_login"
+				});
 			}
-		});
-	}
+		}
+		catch(err) {
+			Winston.error("Error checking whether user exists", err);
+			res.status(HTTPCodes.internalError).send({
+				okay : false,
+				reason : "internal_error"
+			});
+		}
+	};
 
 	const router = Express.Router();
 	router.use("/users", RouteUsers(bot));

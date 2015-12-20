@@ -11,17 +11,20 @@ const weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Fr
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewSpokenPerWeekday = function(bot) {
-	return function(req, res) {
-		Promise.denodeify(bot.database.getSpokenPerWeekday.bind(bot.database))()
-		.catch((err) => {
-			Winston.error("Could not get speech amount per weekday.", err);
-			return [];
-		})
-		.then((spoken) => {
+	return async function(req, res) {
+		try {
+			const spoken = await bot.database.getSpokenPerWeekday();
 			res.status(HTTPCodes.okay).send(
-				spoken.map((elem) => ({ "amount" : elem.amount, "day" : weekdays[elem.day - 1] }))
+				spoken.map((elem) => ({
+					"amount" : elem.amount,
+					"day" : weekdays[elem.day - 1]
+				}))
 			);
-		});
+		}
+		catch(err) {
+			Winston.error("Could not get speech amount per weekday.", err);
+			res.status(HTTPCodes.internalError).send([]);
+		}
 	};
 };
 

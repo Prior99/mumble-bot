@@ -7,18 +7,19 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {Router} - router for the current section.
  */
 const ViewSpeak = function(bot) {
-	return function(req, res) {
+	return async function(req, res) {
 		if(req.query.text) {
-			bot.database.enterAutoComplete(req.query.text, (err) => {
-				if(err) {
-					Winston.error("Error entering autocomplete", err);
-				}
-			});
-			Winston.log("verbose", req.session.user.username + " speak: \"" + req.query.text + "\"");
-			bot.say(req.query.text);
-			res.status(HTTPCodes.okay).send({
-				okay : true
-			});
+			try {
+				await bot.database.enterAutoComplete(req.query.text);
+				Winston.log("verbose", req.session.user.username + " speak: \"" + req.query.text + "\"");
+				bot.say(req.query.text);
+				res.status(HTTPCodes.okay).send({
+					okay : true
+				});
+			}
+			catch(err) {
+				Winston.error("Error entering autocomplete", err);
+			}
 		}
 		else {
 			res.status(HTTPCodes.invalidRequest).send({

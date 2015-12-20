@@ -7,27 +7,26 @@ import * as HTTPCodes from "../../httpcodes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewAddEffect = function(bot) {
-	return function(req, res) {
+	return async function(req, res) {
 		if(req.query.effect && req.query.effect.trim().length > 0) {
-			bot.database.addBassEffect(req.query.effect, (err) => {
-				if(err) {
-					if(err.code !== "ER_DUP_ENTRY") {
-						Winston.error("Unabled to add ne effects", err);
-					}
-					res.status(HTTPCodes.invaldRequest).send({
-						okay : false,
-						reason : "internal_error"
-					});
+			try {
+				await bot.database.addBassEffect(req.query.effect);
+				Winston.log("verbose",
+					req.session.user.username + " added new bass-effect: \"" + req.query.effect + "\""
+				);
+				res.status(HTTPCodes.okay).send({
+					okay : true
+				});
+			}
+			catch(err) {
+				if(err.code !== "ER_DUP_ENTRY") {
+					Winston.error("Unabled to add ne effects", err);
 				}
-				else {
-					Winston.log("verbose",
-						req.session.user.username + " added new bass-effect: \"" + req.query.effect + "\""
-					);
-					res.status(HTTPCodes.okay).send({
-						okay : true
-					});
-				}
-			});
+				res.status(HTTPCodes.invaldRequest).send({
+					okay : false,
+					reason : "internal_error"
+				});
+			}
 		}
 		else {
 			res.status(HTTPCodes.missingArguments).send({

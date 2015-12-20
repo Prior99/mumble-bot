@@ -40,7 +40,7 @@ class RSS {
 	}
 
 	/**
-	 * If the article is not yet know, announce it in the mumble and store it as known.
+	 * <b>Async</b> If the article is not yet know, announce it in the mumble and store it as known.
 	 * @param {object} article - A single article from the feed.
  	 * @param {string} article.title - The title of the article.
  	 * @param {string} article.content - The content of the article.
@@ -49,46 +49,44 @@ class RSS {
  	 * @param {string} feed.name - The name of the RSS feed.
 	 * @return {undefined}
 	 */
-	_handleArticle(article, feed) {
-		this.isArticleKnown(article, known => {
-			if(!known) {
-				const newArticle = {
-					title : StripTags(article.title).trim(),
-					content : StripTags(article.content).trim(),
-					url : article.link
-				};
-				if(newArticle.title && newArticle.content) {
-					this.bot.say(
-						"Neuer Artikel auf " + feed.name + ": " + newArticle.title + " - " + newArticle.content
-					);
-				}
-				else if(!newArticle.title && newArticle.content) {
-					this.bot.say("Neuer Artikel auf " + feed.name + ": " + newArticle.content);
-				}
-				else if(newArticle.title && !newArticle.content) {
-					this.bot.say("Neuer Artikel auf " + feed.name + ": " + newArticle.title);
-				}
-				this.markArticleAsRead(article);
+	async _handleArticle(article, feed) {
+		const known = await this.isArticleKnown(article);
+		if(!known) {
+			const newArticle = {
+				title : StripTags(article.title).trim(),
+				content : StripTags(article.content).trim(),
+				url : article.link
+			};
+			if(newArticle.title && newArticle.content) {
+				this.bot.say(
+					"Neuer Artikel auf " + feed.name + ": " + newArticle.title + " - " + newArticle.content
+				);
 			}
-		});
+			else if(!newArticle.title && newArticle.content) {
+				this.bot.say("Neuer Artikel auf " + feed.name + ": " + newArticle.content);
+			}
+			else if(newArticle.title && !newArticle.content) {
+				this.bot.say("Neuer Artikel auf " + feed.name + ": " + newArticle.title);
+			}
+			this.markArticleAsRead(article);
+		}
 	}
 
 	/**
-	 * Fetch all known RSS feeds.
+	 * <b>Async</b> Fetch all known RSS feeds.
 	 * @return {undefined}
 	 */
-	fetch() {
+	async fetch() {
 		Winston.info("Refreshing RSS Feeds...");
-		this.bot.database.listRSSFeeds((err, feeds) => {
-			if(err) {
-				Winston.error("Could not fetch list of subscribed rss feeds.", err);
-			}
-			else {
-				feeds.forEach(feed => {
-					this.fetchFeed(feed);
-				});
-			}
-		});
+		try {
+			const feeds = await this.bot.database.listRSSFeeds();
+			feeds.forEach(feed => {
+				this.fetchFeed(feed);
+			});
+		}
+		catch(err) {
+			Winston.error("Could not fetch list of subscribed rss feeds.", err);
+		}
 	}
 
 	/**
@@ -110,21 +108,19 @@ class RSS {
 	}
 
 	/**
-	 * Checks whether an article is already known or whether not.
+	 * <b>Async</b> Checks whether an article is already known or whether not.
 	 * @param {object} article - A single article from the feed.
-	 * @param {BooleanCallback} callback - Called when the check is done.
-	 * @return {undefined}
+	 * @return {boolean} - True when the feed is known.
 	 */
-	isArticleKnown(article, callback) {
-		this.bot.database.isRSSFeedEntryKnown(this.hashArticle(article), (err, known) => {
-			if(err) {
-				Winston.error("Could not determine whether article was already known.", err);
-				callback(false);
-			}
-			else {
-				callback(known);
-			}
-		});
+	async isArticleKnown(article) {
+		try {
+			const known = await this.bot.database.isRSSFeedEntryKnown(this.hashArticle(article));
+			return known;
+		}
+		catch(err) {
+			Winston.error("Could not determine whether article was already known.", err);
+			return false;
+		}
 	}
 
 	/**
