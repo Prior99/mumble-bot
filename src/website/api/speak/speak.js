@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import * as HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../httpcodes";
 
 /**
  * Routes all requests related to the stats api commands in the /api/stats/ endpoint.

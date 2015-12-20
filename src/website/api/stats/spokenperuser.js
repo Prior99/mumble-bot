@@ -1,6 +1,6 @@
 import * as Winston from "winston";
 import * as Promise from "promise";
-import * as HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../httpcodes";
 
 /**
  * API endpoint for statistics about speech per user.

@@ -132,7 +132,9 @@ const RecordsExtension = function(Database) {
 	 * @return {Record} - The record belonging to the specified unique id.
 	 */
 	Database.prototype.getRecord = async function(id) {
-		const rows = await this.connection.query("SELECT id, quote, used, user, submitted FROM Records WHERE id = ?");
+		const rows = await this.connection.query("SELECT id, quote, used, user, submitted FROM Records WHERE id = ?",
+			[id]
+		);
 		if(rows && rows.length > 0) {
 			const record = rows[0];
 			const user = await this.getUserById(record.user);

@@ -3,7 +3,7 @@
  */
 import {parseString as parseXML} from "xml2js";
 import * as Request from "request";
-import * as HTTPCodes from "./website/httpcodes";
+import HTTPCodes from "./website/httpcodes";
 /*
  * Code
  */

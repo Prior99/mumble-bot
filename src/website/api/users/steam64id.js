@@ -1,5 +1,5 @@
 import * as Steam64 from "../../../steam64id.js";
-import * as HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../httpcodes";
 
 /**
  * Looks up a steam 64 id on the steam api and proxies it to our api.

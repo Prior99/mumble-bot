@@ -1,6 +1,6 @@
 import * as Winston from "winston";
 import reply from "../util.js";
-import * as HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../httpcodes";
 
 /**
  * This view returns the details to one specific record.

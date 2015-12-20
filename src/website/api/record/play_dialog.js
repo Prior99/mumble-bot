@@ -1,7 +1,7 @@
 import * as Winston from "winston";
 import reply from "../util.js";
 import * as Promise from "promise";
-import * as HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../httpcodes";
 
 /**
  * This view plays back saved dialogs.

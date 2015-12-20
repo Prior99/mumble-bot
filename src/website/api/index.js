@@ -1,5 +1,5 @@
 import Express from "express";
-import * as HTTPCodes from "../httpcodes";
+import HTTPCodes from "../httpcodes";
 
 import ViewTree from "./channeltree";
 import ViewCommand from "./command";

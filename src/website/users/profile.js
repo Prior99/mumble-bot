@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import * as HTTPCodes from "../httpcodes";
+import HTTPCodes from "../httpcodes";
 
 /**
  * <b>/users/profile/:username</b> Display the profile of a specific user.

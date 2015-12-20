@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import * as HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../httpcodes";
 
 /**
  * View for playback endpoint of sound section.

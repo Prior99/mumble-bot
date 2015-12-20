@@ -1,6 +1,6 @@
 import * as Winston from "winston";
 import * as FS from "fs-promise";
-import * as HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../httpcodes";
 
 /**
  * View for saving a record.

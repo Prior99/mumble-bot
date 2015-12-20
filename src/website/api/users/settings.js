@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import * as HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../httpcodes";
 
 /**
  * Apply the settings from the api callback to the database and reload the session.

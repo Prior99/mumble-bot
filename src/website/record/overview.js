@@ -1,5 +1,4 @@
 import * as Winston from "winston";
-import * as Promise from "promise";
 
 /**
  * <b>/record/</b> Homepage for the /record/ section displaying amount of records and a random-button.

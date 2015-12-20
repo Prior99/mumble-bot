@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import * as HTTPCodes from "./httpcodes";
+import HTTPCodes from "./httpcodes";
 /**
  * This handles the /log endpoint with the list of the latest log entries when the needed permission is given.
  * @param {object} bot - Pointer to the main bot instance.

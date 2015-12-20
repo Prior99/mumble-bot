@@ -1,6 +1,6 @@
 import * as Winston from "winston";
 import * as Request from "request";
-import * as HTTPCodes from "../httpcodes";
+import HTTPCodes from "../httpcodes";
 /**
  * <b>/api/google/</b> Looks up something on the google autocomplete api.
  * @param {Bot} bot - Bot the webpage belongs to.

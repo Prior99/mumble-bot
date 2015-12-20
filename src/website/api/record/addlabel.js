@@ -1,6 +1,6 @@
 import * as Winston from "winston";
 import * as colorify from "../../../colorbystring";
-import * as HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../httpcodes";
 
 /**
  * View for adding labels.

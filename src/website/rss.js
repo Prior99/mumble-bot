@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import * as HTTPCodes from "./httpcodes";
+import HTTPCodes from "./httpcodes";
 
 /**
  * This handles the /rss endpoint and generates a list of all rss feeds.

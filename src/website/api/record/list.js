@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import * as HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../httpcodes";
 
 /**
  * List all records.
@@ -9,7 +9,7 @@ import * as HTTPCodes from "../../httpcodes";
 const ViewList = function(bot) {
 	return async function(req, res) {
 		try {
-			records = await bot.database.listRecords();
+			const records = await bot.database.listRecords();
 			res.status(HTTPCodes.okay).send({
 				okay : true,
 				records

@@ -109,21 +109,15 @@ class VoiceInputUser extends EventEmitter {
 			try {
 				FS.mkdirSync("tmp");
 			}
-			catch(err) {
-				Winston.error(err);
-			}
+			catch(err) { /* Ignored */ }
 			try {
 				FS.mkdirSync("tmp/useraudio");
 			}
-			catch(err) {
-				Winston.error(err);
-			}
+			catch(err) { /* Ignored */ }
 			try {
 				FS.mkdirSync("tmp/useraudio/" + this._user.id);
 			}
-			catch(err) {
-				Winston.error(err);
-			}
+			catch(err) { /* Ignored */ }
 			this._filename = "tmp/useraudio/" + this._user.id + "/" + Date.now() + ".mp3";
 			this._encoder = new Lame.Encoder({
 				channels : 1,

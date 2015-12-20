@@ -1,4 +1,4 @@
-import * as HTTPCodes from "../httpcodes";
+import HTTPCodes from "../httpcodes";
 
 /**
  * <b>/api/command/</b> Runs a specified command on the bot.

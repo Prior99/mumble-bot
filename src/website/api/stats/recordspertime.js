@@ -1,6 +1,6 @@
 import * as Winston from "winston";
 import * as Promise from "promise";
-import * as HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../httpcodes";
 
 /**
  * This view displays the statistics for the records per time endpoint.
