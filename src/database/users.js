@@ -182,9 +182,10 @@ const UsersExtension = function(Database) {
 
 	/**
 	 * <b>Async</b> Retrieves a list of users from the database.
+	 * @param {any} asdf - This parameter only exists in order to avoid babel error T6744.
 	 * @return {DatabaseUser[]} - All users in the whole database.
 	 */
-	Database.prototype.listUsers = async function() {
+	Database.prototype.listUsers = async function(asdf) {
 		const rows = await this.connection.query("SELECT id FROM Users");
 		const users = await Promise.all(rows.map((u) => this.getUserById(u.id)));
 		return users;

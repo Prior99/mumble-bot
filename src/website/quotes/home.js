@@ -6,17 +6,16 @@ import * as Winston from "winston";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const ViewQuotesHome = function(bot) {
-	return function(req, res) {
-		bot.quotes.count((err, count) => {
-			if(err) {
-				Winston.error("Error fetching amount of quotes: " + err);
-				res.locals.quoteAmount = 0;
-			}
-			else {
-				res.locals.quoteAmount = count;
-			}
-			res.render("quotes/home");
-		});
+	return async function(req, res) {
+		try {
+			const count = await bot.quotes.count();
+			res.locals.quoteAmount = count;
+		}
+		catch(err) {
+			Winston.error("Error fetching amount of quotes: " + err);
+			res.locals.quoteAmount = 0;
+		}
+		res.render("quotes/home");
 	}
 };
 export default ViewQuotesHome;

@@ -1,6 +1,5 @@
 import * as Winston from "winston";
 import reply from "../util.js";
-import * as Promise from "promise";
 import HTTPCodes from "../../httpcodes";
 
 /**

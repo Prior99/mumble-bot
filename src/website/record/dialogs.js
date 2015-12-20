@@ -1,5 +1,4 @@
 import * as Winston from "winston";
-import * as Promise from "promise";
 
 /**
  * <b>/record/dialogs/</b> Page for list of dialogs.

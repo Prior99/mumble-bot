@@ -15,58 +15,56 @@ const ViewSettings = function(bot) {
 	 *                        to which linking is still possible.
 	 * @return {undefined}
 	 */
-	const getMumbleUsersLinkingPossible = function(mumbleUsers, cb) {
-		const arr = [];
-		bot.database.getLinkedMumbleUsers((err, mumbleIds) => {
-			if(err) {
-				Winston.error("Error fetching registered mumble users", err);
-				cb([]);
-			}
-			else {
-				for(const u of mumbleUsers) {
-					let linked = false;
-					for(const j of mumbleIds) {
-						if(j.id === u.id) {
-							linked = true;
-							break;
-						}
-					}
-					if(!linked && u.id !== bot.mumble.user.id) {
-						arr.push(u);
+	const getMumbleUsersLinkingPossible = async function(mumbleUsers, cb) {
+		try {
+			const arr = [];
+			const mumbleIds = await bot.database.getLinkedMumbleUsers();
+			for(const u of mumbleUsers) {
+				let linked = false;
+				for(const j of mumbleIds) {
+					if(j.id === u.id) {
+						linked = true;
+						break;
 					}
 				}
-				cb(arr);
+				if(!linked && u.id !== bot.mumble.user.id) {
+					arr.push(u);
+				}
 			}
-		});
+			return arr;
+		}
+		catch(err) {
+			Winston.error("Error fetching registered mumble users", err);
+			return [];
+		}
 	}
 
-	return function(req, res) {
-		const user = req.session.user;
-		bot.database.getUserByUsername(user.username, (err, user) => { //Reload user from database
-			if(err) {
-				Winston.error("Error displaying profile of user " + username + ".", err);
-				res.status(HTTPCodes.internalError).send("Internal error.");
+	return async function(req, res) {
+		let user = req.session.user;
+		try {
+			user = await bot.database.getUserByUsername(user.username); //Reload user from database
+			if(user) {
+				const mumbleUsers = await getMumbleUsersLinkingPossible(bot.getRegisteredMumbleUsers());
+				try {
+					const linkedUsers = await bot.database.getLinkedMumbleUsersOfUser(user.username);
+					res.locals.user = user;
+					res.locals.linkedUsers = linkedUsers.map((user) => bot.mumble.userById(user.id));
+					res.locals.freeMumbleUsers = mumbleUsers;
+					res.render("users/settings");
+				}
+				catch(err) {
+					Winston.error("Unabled to fetch linked mumble users of user " + user.username, err);
+					linkedUsers = [];
+				}
 			}
 			else {
-				if(user) {
-					getMumbleUsersLinkingPossible(bot.getRegisteredMumbleUsers(), (mumbleUsers) => {
-						bot.database.getLinkedMumbleUsersOfUser(user.username, (err, linkedUsers) => {
-							if(err) {
-								Winston.error("Unabled to fetch linked mumble users of user " + user.username, err);
-								linkedUsers = [];
-							}
-							res.locals.user = user;
-							res.locals.linkedUsers = linkedUsers.map((user) => bot.mumble.userById(user.id));
-							res.locals.freeMumbleUsers = mumbleUsers;
-							res.render("users/settings");
-						});
-					});
-				}
-				else {
-					res.status(HTTPCodes.notFound).send("Unknown user.");
-				}
+				res.status(HTTPCodes.notFound).send("Unknown user.");
 			}
-		});
+		}
+		catch(err) {
+			Winston.error("Error displaying profile of user " + username + ".", err);
+			res.status(HTTPCodes.internalError).send("Internal error.");
+		}
 	};
 };
 

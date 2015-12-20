@@ -19,7 +19,6 @@ const ViewUsersProfile = function(bot) {
 	 */
 	const renderPage = function(linkedUsers, records, user, username, req, res) {
 		res.locals.user = user;
-
 		res.locals.linkedUsers = linkedUsers.map((user) => bot.mumble.userById(user.id));
 		res.locals.own = req.session.user.id === user.id;
 		res.locals.records = records;
@@ -35,14 +34,16 @@ const ViewUsersProfile = function(bot) {
 	 * @param {object} res - The original response object.
 	 * @return {undefined}
 	 */
-	const fetchLinkedMumbleUsers = function(records, user, username, req, res) {
-		bot.database.getLinkedMumbleUsersOfUser(username, (err, linkedUsers) => {
-			if(err) {
-				Winston.error("Unabled to fetch linked mumble users of user " + username, err);
-				linkedUsers = [];
-			}
-			renderPage(linkedUsers, records, user, username, req, res);
-		});
+	const fetchLinkedMumbleUsers = async function(records, user, username, req, res) {
+		let linkedUsers;
+		try {
+			linkedUsers = await bot.database.getLinkedMumbleUsersOfUser(username);
+		}
+		catch(err) {
+			Winston.error("Unabled to fetch linked mumble users of user " + username, err);
+			linkedUsers = [];
+		}
+		renderPage(linkedUsers, records, user, username, req, res);
 	}
 
 	/**
@@ -53,14 +54,14 @@ const ViewUsersProfile = function(bot) {
 	 * @param {object} res - The original response object.
 	 * @return {undefined}
 	 */
-	const fetchRecords = function(user, username, req, res) {
-		bot.database.listRecordsForUser(user, (err, records) => {
-			if(err) {
-				Winston.error("Error fetching records of user " + username + ".", err);
-				records = [];
-			}
-			fetchLinkedMumbleUsers(records, user, username, req, res);
-		});
+	const fetchRecords = async function(user, username, req, res) {
+		try {
+			const records = await bot.database.listRecordsForUser(user);
+		}
+		catch(err) {
+			Winston.error("Error fetching records of user " + username + ".", err);
+			records = [];
+		}
 	}
 
 	/**
@@ -70,26 +71,25 @@ const ViewUsersProfile = function(bot) {
 	 * @param {object} res - The original response object.
 	 * @return {undefined}
 	 */
-	const fetchUser = function(username, req, res) {
-		bot.database.getUserByUsername(username, (err, user) => {
-			if(err) {
-				Winston.error("Error displaying profile of user " + username + ".", err);
-				res.status(HTTPCodes.internalError).send("Internal error.");
+	const fetchUser = async function(username, req, res) {
+		try {
+			const user = await bot.database.getUserByUsername(username);
+			if(user) {
+				await fetchRecords(user, username, req, res);
 			}
 			else {
-				if(user) {
-					fetchRecords(user, username, req, res);
-				}
-				else {
-					res.status(HTTPCodes.notFound).send("Unknown user.");
-				}
+				res.status(HTTPCodes.notFound).send("Unknown user.");
 			}
-		});
+		}
+		catch(err) {
+			Winston.error("Error displaying profile of user " + username + ".", err);
+			res.status(HTTPCodes.internalError).send("Internal error.");
+		}
 	}
 
-	return function(req, res) {
+	return async function(req, res) {
 		const username = req.params.username;
-		fetchUser(username, req, res);
+		await fetchUser(username, req, res);
 	};
 };
 

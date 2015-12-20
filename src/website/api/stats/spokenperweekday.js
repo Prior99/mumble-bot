@@ -1,5 +1,4 @@
 import * as Winston from "winston";
-import * as Promise from "promise";
 import HTTPCodes from "../../httpcodes";
 
 const weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];

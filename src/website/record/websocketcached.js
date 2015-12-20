@@ -1,5 +1,4 @@
 import * as Winston from "winston";
-import * as Promise from "promise";
 
 /**
  * <b>/record/cached/</b> Handler for the WEBSOCKET handler for this endpoint.
