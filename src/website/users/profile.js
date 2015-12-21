@@ -55,13 +55,15 @@ const ViewUsersProfile = function(bot) {
 	 * @return {undefined}
 	 */
 	const fetchRecords = async function(user, username, req, res) {
+		let records;
 		try {
-			const records = await bot.database.listRecordsForUser(user);
+			records = await bot.database.listRecordsForUser(user);
 		}
 		catch(err) {
 			Winston.error("Error fetching records of user " + username + ".", err);
 			records = [];
 		}
+		fetchLinkedMumbleUsers(records, user, username, req, res);
 	}
 
 	/**

@@ -86,7 +86,7 @@ const RecordsExtension = function(Database) {
 	 */
 	Database.prototype.listRecords = async function() {
 		const rows = await this.connection.query("SELECT id FROM Records ORDER BY used DESC");
-		const records = await this._completeRecords(rows)
+		const records = await this._completeRecords(rows);
 		return records;
 	};
 
@@ -97,7 +97,7 @@ const RecordsExtension = function(Database) {
 	 */
 	Database.prototype.listRecordsForUser = async function(user) {
 		const rows = await this.connection.query("SELECT id FROM Records WHERE user = ? ORDER BY used DESC", [user.id]);
-		const records = await this._completeRecords(records);
+		const records = await this._completeRecords(rows);
 		return records;
 	};
 

@@ -16,14 +16,10 @@ class AFKObserver {
 	constructor(bot) {
 		this.times = [];
 		this.bot = bot;
-		this.bot.mumble.on("user-move", this.someUserMoved);
+		this.bot.mumble.on("user-move", (user, oldc, newc) => this.someUserMoved(user, oldc, newc));
 		//TODO this event is not documented with these parameters (user oldc newc)!
-		this.bot.mumble.on("user-connect", user => {
-			this.someUserMoved(user, undefined, user.channel);
-		});
-		this.bot.mumble.on("user-disconnect", user => {
-			this.someUserMoved(user, undefined, undefined);
-		});
+		this.bot.mumble.on("user-connect", (user) => this.someUserMoved(user, undefined, user.channel));
+		this.bot.mumble.on("user-disconnect", (user) => this.someUserMoved(user, undefined, undefined));
 		setInterval(this.check, msInS);
 		Winston.info("Module started: AFKObserver");
 		Winston.info("Warn time: " + this.bot.options.afkWarnTimeout);
@@ -81,7 +77,7 @@ class AFKObserver {
 		if(user.session !== this.bot.mumble.session) {
 			Winston.info("Registering AFKhandler for user " + user.name);
 			this.times[user.session] = Date.now();
-			user.outputStream(true).on("data", function() {
+			user.outputStream(true).on("data", () => {
 				const now = Date.now();
 				const idleTime = (now - this.times[user.session])/msInS;
 				this.times[user.session] = Date.now();
