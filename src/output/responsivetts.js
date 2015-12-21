@@ -15,11 +15,13 @@ const ResponsiveVoiceTTS = function(database) {
 			"Referer" : "http://responsivevoice.org/",
 			"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:41.0) Gecko/20100101 Firefox/41.0"
 		},
-		storeCallback(text, callback) {
-			database.addCachedTTS("responsive", text, callback);
+		async storeCallback(text, callback) {
+			const filename = await database.addCachedTTS("responsive", text);
+			callback(filename);
 		},
-		retrieveCallback(text, callback) {
-			database.getCachedTTS("responsive", text, callback);
+		async retrieveCallback(text, callback) {
+			const filename = await database.getCachedTTS("responsive", text);
+			callback(filename);
 		}
 	});
 };

@@ -87,7 +87,7 @@ class Database {
 	 * @return {undefined}
 	 */
 	async stop() {
-		await this.connection.release();
+		this.connection.end();
 		return;
 	}
 }

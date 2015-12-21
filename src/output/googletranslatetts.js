@@ -18,11 +18,13 @@ const GoogleTranslateTTS = function(database) {
 				"AppleWebKit/537.36 (KHTML, like Gecko) " +
 				"Chrome/42.0.2311.82 Safari/537.36"
 		},
-		storeCallback(text, callback) {
-			database.addCachedTTS("google", text, callback);
+		async storeCallback(text, callback) {
+			const filename = await database.addCachedTTS("google", text);
+			callback(filename);
 		},
-		retrieveCallback(text, callback) {
-			database.getCachedTTS("google", text, callback);
+		async retrieveCallback(text, callback) {
+			const filename = await database.getCachedTTS("google", text);
+			callback(filename);
 		}
 	});
 };

@@ -1,19 +1,12 @@
-/*
- * Imports
- */
 import * as FS from "fs";
 import * as Request from "request";
 import * as Lame from "lame";
 import EventEmitter from "events";
 import * as Winston from "winston";
 import {Readable as ReadableStream} from "stream"
-/*
- * Constants
- */
+
 const RETRIES = 3;
-/*
- * Code
- */
+
 /**
  * Split the text on the nearest whitespace. This way the text can be split into
  * chunks of a specified maximum length but will not be split in the middle of a
@@ -50,7 +43,7 @@ const splitTextOnNearestSpace = function(text, len) {
 /**
  * Provides TTS (Text-To-Speech) by querying (abusing) any TTS apis.
  */
-class CachedWebTTS extends EventEmitter {
+class CachedWebTTS extends ReadableStream {
 	/**
 	 * @constructor
 	 * @param {object} options - Options with which the cached webb tts will be configured.
@@ -176,24 +169,19 @@ class CachedWebTTS extends EventEmitter {
 	 * @return {undefined}
 	 */
 	_getMP3Part(text, callback) {
-		this.retrieveCallback(text, (err, file) => {
-			if(err) {
-				callback(err);
+		this.retrieveCallback(text, (file) => {
+			if(!file) {
+				this._cacheMP3Part(text, (err) => {
+					if(err) {
+						callback(err);
+					}
+					else {
+						this._getMP3Part(text, callback);
+					}
+				});
 			}
 			else {
-				if(!file) {
-					this._cacheMP3Part(text, (err) => {
-						if(err) {
-							callback(err);
-						}
-						else {
-							this._getMP3Part(text, callback);
-						}
-					});
-				}
-				else {
-					this._readMP3PartFromCache(file, callback);
-				}
+				this._readMP3PartFromCache(file, callback);
 			}
 		});
 	}

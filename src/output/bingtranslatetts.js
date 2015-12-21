@@ -36,12 +36,14 @@ const BingTTS = function(clientID, clientSecret, database) {
 		cacheDir : "bing-tts-cache",
 		//splitAfter : 90,
 		header : { },
-		storeCallback : function(text, callback) {
-			database.addCachedTTS("bing_" + tts.gender, text, callback);
-		}.bind(tts),
-		retrieveCallback : function(text, callback) {
-			database.getCachedTTS("bing_" + tts.gender, text, callback);
-		}.bind(tts)
+		async storeCallback(text, callback) {
+			const filename = await database.addCachedTTS("bing_" + tts.gender, text);
+			callback(filename);
+		},
+		async retrieveCallback(text, callback) {
+			const filename = await database.getCachedTTS("bing_" + tts.gender, text);
+			callback(filename);
+		}
 	});
 
 	tts.baseUrl = "http://api.microsofttranslator.com/v2/Http.svc/Speak?language=de&format=audio/mp3";

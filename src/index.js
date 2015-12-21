@@ -98,9 +98,7 @@ class Bot extends EventEmitter {
 		await this._loadAddons("addons/");
 
 		this.input = new Input(this);
-		this.input.on("input", (text, user) => {
-			this._onVoiceInput(text, user);
-		});
+		this.input.on("input", (text, user) => this._onVoiceInput(text, user));
 
 		this.mumble.on("user-connect", this.handleUserConnect);
 		this.newCommand("help", () => {

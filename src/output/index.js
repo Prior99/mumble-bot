@@ -1,7 +1,3 @@
-/*
- * Imports
- */
-
 import Util from "util";
 import EventEmitter from "events";
 import Winston from "winston";
@@ -9,10 +5,9 @@ import Sound from "./sound";
 import Speech from "./speech";
 import Stream from "stream";
 
-/*
- * Code
- */
-
+const PREBUFFER = 0.5;
+const audioFreq = 48000;
+const msInS = 1000;
 
 /**
  * Audio output for the bot. This class handles the whole audio output,
@@ -38,8 +33,6 @@ class Output extends Stream.Writable {
 		this._playbackAhead = 0;
 		this.bot.newCommand("change voice", this.changeGender.bind(this),
 			"Deprecated. Changes the gender of the voice.", "venus-mars");
-
-		this.PREBUFFER = 0.5;
 	}
 	//var PREBUFFER = 0.5; TODO see above
 

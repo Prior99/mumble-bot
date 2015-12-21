@@ -76,12 +76,11 @@ else {
  * @param {VoidCallback} callback - Called once the connection to the database is closed.
  * @return {undefined}
  */
-const stopDatabase = function(database, callback) {
+const stopDatabase = async function(database, callback) {
 	Winston.info("Stopping database ... ");
-	database.stop(() => {
-		Winston.info("Database stopped.");
-		callback();
-	});
+	await database.stop();
+	Winston.info("Database stopped.");
+	callback();
 }
 
 /**
