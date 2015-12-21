@@ -31,8 +31,8 @@ const ViewGrantPermission = function(bot) {
 
 		const permission = req.query.permission;
 		try {
+			const user = await bot.database.getUserByUsername(req.query.user);
 			if(user) {
-				const user = await bot.database.getUserByUsername(req.query.user);
 				tryGrant(user, permission);
 			}
 			else {

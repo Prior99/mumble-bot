@@ -37,7 +37,7 @@ if(!String.prototype.startsWith) {
  * This class belongs to the VoiceInput and handles the speech recognition for a
  * single user.
  */
-class VoiceInputUser extends EventEmitter {
+class VoiceInputUser extends Stream.Writable {
 	/**
 	 * @constructor
 	 * @param {MumbleUser} user - Mumble user to recognize the speech of.
@@ -50,7 +50,6 @@ class VoiceInputUser extends EventEmitter {
 		this.bot = bot;
 		this._databaseUser = databaseUser;
 		this.speaking = false;
-		Stream.Writable.call(this);
 		this._createNewRecordFile();
 		this._connectTime = new Date();
 		this._user.on("disconnect", this._onDisconnect.bind(this));

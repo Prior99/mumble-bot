@@ -149,9 +149,9 @@ class Bot extends EventEmitter {
 	 */
 	async handleUserConnect(user) {
 		try {
+			const announce = this.options.announce;
 			const dbUser = await this.database.getLinkedUser(user.id);
 			if(dbUser) {
-				const announce = this.options.announce;
 				if(!announce || (announce.connect !== false && announce.connect !== "false")) {
 					this.sayImportant(dbUser.username + " hat als " + user.name
 						+ " Mumble betreten.");
@@ -185,8 +185,8 @@ class Bot extends EventEmitter {
 	 * @return {undefined}
 	 */
 	_addEventListenersToMumbleUser(user) {
+		const announce = this.options.announce;
 		user.on("disconnect", () => {
-			const announce = this.options.announce;
 			if(!announce || (announce.disconnect !== false && announce.disconnect !== "false")) {
 				this.sayImportant(user.name + " hat Mumble verlassen");
 			}
@@ -479,6 +479,7 @@ class Bot extends EventEmitter {
 	 * @return {CachedAudio} - The cached audio or null when the id was invalid.
 	 */
 	getCachedAudioById(id) {
+		id = +id;
 		for(const key in this.cachedAudios) {
 			if(this.cachedAudios.hasOwnProperty(key)) {
 				const audio = this.cachedAudios[key];

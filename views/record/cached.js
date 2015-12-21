@@ -1,8 +1,8 @@
 import $ from "jquery";
 import spawnNotification from "../notification";
-import * as WebSocket from "ws"; //returns global.WebSocket
+import WebSocket from "ws"; //returns global.WebSocket
 import * as Handlebars from "handlebars";
-import * as Moment from "moment";
+import Moment from "moment";
 
 Handlebars.registerHelper("formatDate", (date) => Moment(date).format("DD.MM.YY"));
 Handlebars.registerHelper("formatTime", (date) => Moment(date).format("HH:mm:ss"));

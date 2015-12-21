@@ -57,22 +57,24 @@ class Command {
 	 */
 	process(text, via, user) {
 		let found = false;
-		for(const key of this.commands) {
-			if(key === text.substring(0, key.length)) {
-				text = text.substring(key.length + 1, text.length);
-				const method = this.commands[key];
-				let args = [];
-				if(text.length >= 0) {
-					args = text.split(" ");
+		for(const key in this.commands) {
+			if(this.commands.hasOwnProperty(key)) {
+				if(key === text.substring(0, key.length)) {
+					text = text.substring(key.length + 1, text.length);
+					const method = this.commands[key];
+					let args = [];
+					if(text.length >= 0) {
+						args = text.split(" ");
+					}
+					if(typeof method === "function") {
+						this._logCommand(key, args, via, user);
+						args.unshift(via);
+						args.unshift(user);
+						method.apply(this, args);
+					}
+					found = true;
+					break;
 				}
-				if(typeof method === "function") {
-					this._logCommand(key, args, via, user);
-					args.unshift(via);
-					args.unshift(user);
-					method.apply(this, args);
-				}
-				found = true;
-				break;
 			}
 		}
 		if(!found) {

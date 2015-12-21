@@ -96,11 +96,6 @@ const subpages = [
 		url : "/queue/",
 		name : "Queue",
 		icon : "road"
-	},
-	{
-		url : "/rss/",
-		name : "RSS Feeds",
-		icon : "rss"
 	}
 ];
 
@@ -121,6 +116,13 @@ class Website {
 				url : "/music/",
 				name : "Musik",
 				icon : "music"
+			});
+		}
+		if(bot.options.rss) {
+			subpages.unshift({
+				url : "/rss/",
+				name : "RSS Feeds",
+				icon : "rss"
 			});
 		}
 		this.app = Express();

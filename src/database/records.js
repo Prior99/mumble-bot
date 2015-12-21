@@ -77,7 +77,7 @@ const RecordsExtension = function(Database) {
 	Database.prototype.updateRecord = async function(id, quote, labels) {
 		await this.connection.query("UPDATE Records SET quote = ? WHERE id = ?", [quote, id]);
 		await this.connection.query("DELETE FROM RecordLabelRelation WHERE record = ?", [id]);
-		labels.forEach((label) => this.addRecordToLabel(id, label));
+		await Promise.all(labels.map((label) => this.addRecordToLabel(id, label)));
 	};
 
 	/**

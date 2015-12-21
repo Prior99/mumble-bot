@@ -4,9 +4,9 @@ import spawnNotification from "../notification";
 $("#submit").click((e) => {
 	const quote = encodeURI($("#description").val());
 	const labels = [];
-	$(".tag-checkbox").each(() => {
-		if($(e.currentTarget).prop("checked")) {
-			labels.push($(e.currentTarget).attr("tagId"));
+	$(".tag-checkbox").each((i, v) => {
+		if($(v).prop("checked")) {
+			labels.push($(v).attr("tagId"));
 		}
 	});
 	const jsonLabels = encodeURI(JSON.stringify(labels));

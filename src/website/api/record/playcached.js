@@ -9,7 +9,7 @@ import HTTPCodes from "../../httpcodes";
 const ViewPlayCached = function(bot) {
 	return function(req, res) {
 		if(req.query.id) {
-			const sound = bot.getCachedAudioById(req.query.id);
+			const sound = bot.getCachedAudioById(+req.query.id);
 			if(sound) {
 				bot.playSound(sound.file);
 				Winston.log("verbose", req.session.user.username + " played back cached record #" + req.query.id);
@@ -18,7 +18,7 @@ const ViewPlayCached = function(bot) {
 				});
 			}
 			else {
-				res.status(HTTPCodes.invalidArgument).send({
+				res.status(HTTPCodes.invalidRequest).send({
 					okay : false,
 					reason : "invalid_argument"
 				});

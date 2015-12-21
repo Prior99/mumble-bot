@@ -28,6 +28,7 @@ const startQuote = function(quote, author) {
 	const elem = addElem(quote, author);
 	$.ajax("/api/quotes/add?quote=" + encodeURI(quote) + "&author=" + encodeURI(author))
 	.done((response) => {
+		response = JSON.parse(response);
 		if(response.okay) {
 			elem.html("<td>" + quote + "</td><td>" + author + "</td><td><i class=\"fa fa-check\"></i></td>");
 		}

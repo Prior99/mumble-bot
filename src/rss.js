@@ -100,9 +100,7 @@ class RSS {
 				Winston.error("Error marking everything as read in RSS feed from " + url, err);
 			}
 			else {
-				articles.forEach(article => {
-					this.markArticleAsRead(article);
-				});
+				articles.forEach(article => this.markArticleAsRead(article));
 			}
 		});
 	}

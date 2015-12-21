@@ -12,7 +12,7 @@ const ViewSave = function(bot) {
 			const labels = await bot.database.listLabels();
 			res.locals.labels = labels;
 			if(req.query.id) {
-				const record = bot.getCachedAudioById(req.query.id);
+				const record = bot.getCachedAudioById(+req.query.id);
 				if(record) {
 					res.locals.record = record;
 					res.render("record/save");

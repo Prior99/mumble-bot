@@ -209,13 +209,8 @@ class CachedWebTTS extends ReadableStream {
 				callback(err);
 			}
 			else {
-				this.storeCallback(text, (err, filename) => {
-					if(err) {
-						callback(err);
-					}
-					else {
-						this._saveRetrievedMP3Part(text, mp3Stream, callback, filename);
-					}
+				this.storeCallback(text, (filename) => {
+					this._saveRetrievedMP3Part(text, mp3Stream, callback, filename);
 				});
 			}
 		});

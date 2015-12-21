@@ -72,9 +72,10 @@ const DialogsExtension = function(Database) {
 	}
 	/**
 	 * List all dialogs existing in the database.
+	 * @param {any} ignored - This parameter only exists in order to avoid babel error T6744.
 	 * @return {Dialog[]} - List of all dialogs in the database.
 	 */
-	Database.prototype.listDialogs = async function() {
+	Database.prototype.listDialogs = async function(ignored) {
 		const dialogs = await this.connection.query("SELECT id FROM Dialogs ORDER BY used DESC");
 		const completedDialogs = await Promise.all(
 			dialogs.map(dialog => this.getDialog(dialog.id))

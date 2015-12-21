@@ -37,7 +37,7 @@ const QuotesExtension = function(Database) {
 	 */
 	Database.prototype.getRandomQuote = async function() {
 		const rows = await this.connection.query(
-			"SELECT quote, author, submitted, used, id FROM Quotes " +
+			"SELECT quote, author, submitted, used, id FROM Quotes, " +
 			"(SELECT RAND() * (SELECT MAX(id) FROM Quotes) AS tid) AS Tmp " +
 			"WHERE Quotes.id >= Tmp.tid ORDER BY id ASC LIMIT 1"
 		);

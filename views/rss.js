@@ -16,9 +16,9 @@ $("#go").click(() => {
 	});
 });
 
-$("a.delete-feed").click(() => {
-	const id = $(this).attr("rssId");
-	const parent = $(this).parent();
+$("a.delete-feed").click((evt) => {
+	const id = $(evt.currentTarget).attr("rssId");
+	const parent = $(evt.currentTarget).parent();
 	$.ajax("/api/rss/remove?id=" + id)
 	.done((res) => {
 		if(res.okay) {
