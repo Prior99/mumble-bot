@@ -134,8 +134,12 @@ class Website {
 				"colorify" : string => colorify(string),
 				"formatDate" : date => Moment(date).format("DD.MM.YY"),
 				"formatTime" : date => Moment(date).format("HH:mm"),
-				"isSpeech" : (a, block) => a.type === "speech" ? block.fn(this) : undefined,
-				"isSound" : (a, block) => a.type === "sound" ? block.fn(this) : undefined,
+				"isSpeech" : function(a, block) { //eslint-disable-line object-shorthand
+					return a.type === "speech" ? block.fn(this) : undefined;
+				},
+				"isSound" : function(a, block) { //eslint-disable-line object-shorthand
+					return a.type === "sound" ? block.fn(this) : undefined;
+				},
 				"bootstrapClassByLogLevel" : level => {
 					if(level === "info") {
 						return "success";
