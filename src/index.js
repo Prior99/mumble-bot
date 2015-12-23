@@ -100,7 +100,7 @@ class Bot extends EventEmitter {
 		this.input = new Input(this);
 		this.input.on("input", (text, user) => this._onVoiceInput(text, user));
 
-		this.mumble.on("user-connect", this.handleUserConnect);
+		this.mumble.on("user-connect", (user) => this.handleUserConnect(user));
 		this.newCommand("help", () => {
 			const help = "Hilfe. Du musst mich mit meinem hot Word ansprechen. Mein hot Word ist: \""
 				+ this.hotword + "\". Um eine Liste aller Kommandos zu erhalten, sag: \""
