@@ -8,6 +8,7 @@ Handlebars.registerHelper("paginate", require("handlebars-paginate"));
 Handlebars.registerHelper("formatDate", (date) => Moment(date).format("DD.MM.YY"));
 Handlebars.registerHelper("formatTime", (date) => Moment(date).format("HH:mm"));
 Handlebars.registerHelper("colorify", (string) => colorify(string));
+Handlebars.registerHelper("fixed2", (number) => number.toFixed(2));
 
 const ListTemplate = Handlebars.compile($("#template-list").html());
 const PageinationTemplate = Handlebars.compile($("#template-pageination").html());

@@ -12,9 +12,9 @@ const RecordsExtension = function(Database) {
 	 * @param {string[]} labels - A list of labels with which this record was tagged.
 	 * @return {number} - The unique id of the new record.
 	 */
-	Database.prototype.addRecord = async function(quote, user, date, labels) {
-		const result = await this.connection.query("INSERT INTO Records(quote, user, submitted) VALUES(?, ?, ?)",
-			[quote, user.id, date]
+	Database.prototype.addRecord = async function(quote, user, date, labels, duration) {
+		const result = await this.connection.query("INSERT INTO Records(quote, user, submitted, changed, duration) VALUES(?, ?, ?, ?, ?)",
+			[quote, user.id, date, new Date(), duration]
 		);
 		labels.forEach((label) => this.addRecordToLabel(result.insertId, label));
 		return result.insertId;
@@ -75,7 +75,7 @@ const RecordsExtension = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.updateRecord = async function(id, quote, labels) {
-		await this.connection.query("UPDATE Records SET quote = ? WHERE id = ?", [quote, id]);
+		await this.connection.query("UPDATE Records SET quote = ?, changed = ? WHERE id = ?", [quote, new Date(), id]);
 		await this.connection.query("DELETE FROM RecordLabelRelation WHERE record = ?", [id]);
 		await Promise.all(labels.map((label) => this.addRecordToLabel(id, label)));
 	};
@@ -132,8 +132,10 @@ const RecordsExtension = function(Database) {
 	 * @return {Record} - The record belonging to the specified unique id.
 	 */
 	Database.prototype.getRecord = async function(id) {
-		const rows = await this.connection.query("SELECT id, quote, used, user, submitted FROM Records WHERE id = ?",
-			[id]
+		const rows = await this.connection.query(
+			"SELECT id, quote, used, user, submitted, duration, changed " +
+			"FROM Records " +
+			"WHERE id = ?", [id]
 		);
 		if(rows && rows.length > 0) {
 			const record = rows[0];

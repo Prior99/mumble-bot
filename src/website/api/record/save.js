@@ -22,7 +22,7 @@ const ViewSave = function(bot) {
 				}
 			}
 			try {
-				const id = await bot.database.addRecord(quote, sound.user, sound.date, labels);
+				const id = await bot.database.addRecord(quote, sound.user, sound.date, labels, sound.duration);
 				try {
 					await FS.rename(sound.file, "sounds/recorded/" + id);
 					if(bot.removeCachedAudio(sound)) {
