@@ -1,6 +1,6 @@
-import * as config from "../config.json"
+var config = require("../config.json");
 
-let okay = true;
+var okay = true;
 
 /**
  * Checks whether the key is contained in the config
@@ -9,11 +9,11 @@ let okay = true;
  * @param {object} config The config.
  * @returns {undefined}
  */
-const check = function(key, config) {
+var check = function(key, config) {
 	if(config[key] === undefined) {
 		okay = false;
 	}
-}
+};
 
 check("url", config);
 check("name", config);
