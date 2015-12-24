@@ -101,13 +101,13 @@ module.exports = function(grunt) {
 				files: [{
 					expand: true,
 					src: ["*.js"],
-					dest: "upgrade",
+					dest: "compiled/scripts/upgrade",
 					ext: ".js",
 					cwd : "scripts/upgrades"
 				}, {
 					expand: true,
 					src: ["src/**/*.js", "index.js"],
-					dest: "server",
+					dest: "compiled/server",
 					ext: ".js"
 				}]
 			}

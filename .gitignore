@@ -15,6 +15,5 @@ sounds/uploaded/
 sounds/recorded/
 addons/
 dist/
-server/
 doc/
-upgrade/
+compiled/

@@ -5,7 +5,7 @@ import * as FS from "fs-promise";
 import Winston from "winston";
 import FFMpeg from "fluent-ffmpeg";
 
-const options = require("../config.json");
+const options = require("../../../config.json");
 const msInS = 1000;
 const audioFreq = 48000;
 const timeout = 1000;

@@ -58,7 +58,7 @@ Winston.add(Winston.transports.File, {
 /*
  * Code
  */
-const options = require("../config.json");
+const options = require("../../config.json");
 
 const mumbleOptions = {};
 
