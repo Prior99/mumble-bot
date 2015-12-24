@@ -91,6 +91,8 @@ CREATE TABLE IF NOT EXISTS Records (
 	submitted		DATETIME,
 	user			INT NOT NULL,
 	used			INT NOT NULL DEFAULT 0,
+	changed			DATETIME NOT NULL,
+	duration		FLOAT NOT NULL,
 	FOREIGN KEY(user) REFERENCES Users(id)
 );
 
