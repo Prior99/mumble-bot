@@ -14,6 +14,7 @@ import ViewSaveDialog from "./save_dialog";
 import ViewPlayDialog from "./play_dialog";
 import ViewLookup from "./lookup";
 import ViewGet from "./get";
+import ViewVisualized from "./visualized";
 
 /**
  * Router for all API callbacks related to /api/record/.
@@ -37,6 +38,7 @@ const RouteRecords = function(bot) {
 	router.use("/save_dialog", ViewSaveDialog(bot));
 	router.use("/get", ViewGet(bot));
 	router.use("/play_dialog", ViewPlayDialog(bot));
+	router.use("/visualized", ViewVisualized(bot));
 
 	return router;
 };

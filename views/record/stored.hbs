@@ -4,17 +4,16 @@
 		<td width="20" style="border-right: 1px solid #EEE;">
 			<p class="text-center"><a class="username" userName="\{{user.username}}">\{{user.username}}</a></p>
 			<p class="text-nowrap text-center"><small>\{{formatDate submitted}} \{{formatTime submitted}}</small></p>
+			<p class="text-nowrap text-center">\{{fixed2 duration}}s</p>
 		</td>
 		<td>
-			<p>\{{quote}}</p>
 			<p>
-			\{{#each labels}}
-				<a class="label" style="background: \{{colorify this.name}};" tagName="\{{this.name}}">\{{this.name}}</a>
-			\{{/each}}
+				\{{quote}}
+				\{{#each labels}}
+					<a class="label" style="background: \{{colorify this.name}};" tagName="\{{this.name}}">\{{this.name}}</a>
+				\{{/each}}
 			</p>
-		</td>
-		<td width="5">
-			<p>\{{fixed2 duration}}s</p>
+			<p class="visualization"><img src="/api/record/visualized?id=\{{id}}" /></p>
 		</td>
 		<td width="5">
 			<div class="btn-group-vertical buttons" role="group">
@@ -85,7 +84,6 @@
 		<thead>
 			<th>Benutzer</th>
 			<th>Text</th>
-			<th><i class="fa fa-clock-o"></i></th>
 			<th><i class="fa fa-hand-spock-o"></i></th>
 			<th><i class="fa fa-repeat"></i></th>
 		</thead>
@@ -93,5 +91,11 @@
 
 		</tbody>
 	</table>
+	<div class=row>
+		<div class="col-md-12">
+			<ul style="margin : 0;" class="pagination" id="pagination">
+			</ul>
+		</div>
+	</div>
 </div>
 <script src="/dist/record/stored.js"></script>
