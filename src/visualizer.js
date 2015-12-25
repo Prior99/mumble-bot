@@ -5,6 +5,13 @@ import * as FS from "fs";
 const maxUnsignedByte = 240;
 const audioFreq = 16000;
 
+/**
+ * <b>Async</b> Visualize an audiofile and return the buffer holding a generated png image.
+ * @param {string} filename - Name of the audio file to visualize.
+ * @param {number} height - Height of the image to generate.
+ * @param {number} samplesPerPixel - Number of samples per pixel (determines the width of the image).
+ * @return {Buffer} - Buffer holding the generated png image.
+ */
 const VisualizeAudioFile = function(filename, height, samplesPerPixel) {
 	let samplesTotal = 0;
 	let turn = 0;

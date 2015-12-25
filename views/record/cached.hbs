@@ -3,6 +3,7 @@
 	<tr class="\{{bootstrapClassIfProtected this}}">
 		<td><a href="/users/profile/\{{this.user.username}}">\{{this.user.username}}</a></td>
 		<td>\{{formatDate this.date}} \{{formatTime this.date}}</td>
+		<td><div class="visualization" style="background-image: url('/api/record/visualizedcached?id=\{{this.id}}')"></div></td>
 		<td>\{{this.duration}}s</td>
 		<td class="protectindicate">
 		\{{#if this.protected}}
@@ -46,11 +47,12 @@
 
 	<table class="table table-striped table-responsive">
 		<thead>
-			<th>Benutzer</th>
-			<th>Zeitpunkt</th>
-			<th>Länge</th>
-			<th><i class="fa fa-lock" aria-hidden="true"></i></th>
-			<th class="no-sort"></th>
+			<th class="col-md-2">Benutzer</th>
+			<th class="col-md-2">Zeitpunkt</th>
+			<th class="col-md-4">Visualisierung</th>
+			<th class="col-md-1">Länge</th>
+			<th class="col-md-1"><i class="fa fa-lock" aria-hidden="true"></i></th>
+			<th class="col-md-2 no-sort"></th>
 		</thead>
 		<tbody id="cachedtable">
 		</tbody>

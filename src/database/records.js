@@ -10,10 +10,12 @@ const RecordsExtension = function(Database) {
 	 * @param {DatabaseUser} user - The user from whom the record was recorded.
 	 * @param {date} date - The date and time the record was recorded.
 	 * @param {string[]} labels - A list of labels with which this record was tagged.
+	 * @param {number} duration - The duration of the sample in seconds.
 	 * @return {number} - The unique id of the new record.
 	 */
 	Database.prototype.addRecord = async function(quote, user, date, labels, duration) {
-		const result = await this.connection.query("INSERT INTO Records(quote, user, submitted, changed, duration) VALUES(?, ?, ?, ?, ?)",
+		const result = await this.connection.query(
+			"INSERT INTO Records(quote, user, submitted, changed, duration) VALUES(?, ?, ?, ?, ?)",
 			[quote, user.id, date, new Date(), duration]
 		);
 		labels.forEach((label) => this.addRecordToLabel(result.insertId, label));

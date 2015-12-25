@@ -25,6 +25,7 @@ const ViewSave = function(bot) {
 				const id = await bot.database.addRecord(quote, sound.user, sound.date, labels, sound.duration);
 				try {
 					await FS.rename(sound.file, "sounds/recorded/" + id);
+					await FS.rename(sound.file + ".png", "sounds/visualized/" + id + ".png");
 					if(bot.removeCachedAudio(sound)) {
 						Winston.log("verbose", req.session.user.username + " added new record #" + id);
 						res.status(HTTPCodes.okay).send({

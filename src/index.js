@@ -17,6 +17,7 @@ import EventEmitter from "events";
 import Permissions from "./permissions";
 import AFKObserver from "./afkobserver";
 import RSS from "./rss";
+import VisualizeAudioFile from "./visualizer";
 
 const AUDIO_CACHE_AMOUNT = 4;
 
@@ -447,7 +448,7 @@ class Bot extends EventEmitter {
 	 * @param {number} duration - Duration of the audio.
 	 * @return {undefined}
 	 */
-	addCachedAudio(filename, user, duration) {
+	async addCachedAudio(filename, user, duration) {
 		const obj = {
 			file : filename,
 			date : new Date(),
@@ -456,6 +457,10 @@ class Bot extends EventEmitter {
 			duration,
 			protected : false
 		};
+		const height = 32;
+		const samplesPerPixel = 400;
+		const buffer = await VisualizeAudioFile(filename, height, samplesPerPixel);
+		await FS.writeFile(filename + ".png", buffer);
 		this.cachedAudios.push(obj);
 		this.emit("cached-audio", obj);
 		this._clearUpCachedAudio();

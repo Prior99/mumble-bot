@@ -9,11 +9,13 @@
 		<td>
 			<p>
 				\{{quote}}
-				\{{#each labels}}
-					<a class="label" style="background: \{{colorify this.name}};" tagName="\{{this.name}}">\{{this.name}}</a>
-				\{{/each}}
 			</p>
-			<p class="visualization"><img src="/api/record/visualized?id=\{{id}}" /></p>
+			<p>
+			\{{#each labels}}
+				<a class="label" style="background: \{{colorify this.name}};" tagName="\{{this.name}}">\{{this.name}}</a>
+			\{{/each}}
+			</p>
+			<div class="visualization" style="background-image: url('/api/record/visualized?id=\{{id}}')"></div>
 		</td>
 		<td width="5">
 			<div class="btn-group-vertical buttons" role="group">
