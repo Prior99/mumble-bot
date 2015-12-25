@@ -121,19 +121,43 @@ const search = function() {
 	refreshPageination();
 }
 
+const loadData = function() {
+	const updateData = function(since, prefetched) {
+		let query = "/api/record/list";
+		if(since && prefetched) {
+			query += "?since=" + since;
+		}
+		else {
+			prefetched = [];
+		}
+		$.ajax(query).done((res) => {
+			records = prefetched.concat(res.records);
+			$("#loading").remove();
+			$("#records").show();
+			localStorage.setItem("record_storage_last_update", Date.now());
+			localStorage.setItem("record_storage", JSON.stringify(records));
+			search();
+		})
+		.error((err) => {
+			spawnNotification("error", "Konnte Liste von Aufnahmen nicht laden.");
+		});
+	};
+	const updateKeyName = "record_storage_last_update";
+	const dataKeyName = "record_storage";
+	if(localStorage.getItem("record_storage_last_update") && localStorage.getItem("record_storage")) {
+		const since = localStorage.getItem("record_storage_last_update");
+		updateData(since, JSON.parse(localStorage.getItem("record_storage")));
+	}
+	else {
+		updateData();
+	}
+};
+
 refreshHash();
 $("#search").val(query);
 
-$.ajax("/api/record/list").done((res) => {
-	$("#loading").remove();
-	$("#records").show();
+loadData();
 
-	records = res.records;
-	search();
-})
-.error((err) => {
-	spawnNotification("error", "Konnte Liste von Aufnahmen nicht laden.");
-});
 
 $("#search").keyup((e) => {
 	const string = $(e.currentTarget).val().toLowerCase();

@@ -9,7 +9,11 @@ import HTTPCodes from "../../httpcodes";
 const ViewList = function(bot) {
 	return async function(req, res) {
 		try {
-			const records = await bot.database.listRecords();
+			let since;
+			if(req.query.since) {
+				since = new Date(+req.query.since);
+			}
+			const records = await bot.database.listRecords(since);
 			res.status(HTTPCodes.okay).send({
 				okay : true,
 				records

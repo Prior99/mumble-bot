@@ -82,10 +82,17 @@ const RecordsExtension = function(Database) {
 
 	/**
 	 * <b>Async</b> List all records existing in the database.
+	 * @param {date} [since] - Optional argument to only list records which have been updated after this date.
 	 * @return {Record[]} - List of all records in the database.
 	 */
-	Database.prototype.listRecords = async function() {
-		const rows = await this.connection.query("SELECT id FROM Records ORDER BY used DESC");
+	Database.prototype.listRecords = async function(since) {
+		let rows;
+		if(since) {
+			rows = await this.connection.query("SELECT id FROM Records WHERE changed >= ? ORDER BY used DESC", since);
+		}
+		else {
+			rows = await this.connection.query("SELECT id FROM Records ORDER BY used DESC");
+		}
 		const records = await this._completeRecords(rows);
 		return records;
 	};
