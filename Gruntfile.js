@@ -41,7 +41,7 @@ module.exports = function(grunt) {
 					"dist/users/permissions.js" : "views/users/permissions.js",
 					"dist/users/profile.js" : "views/users/profile.js",
 					"dist/users/settings.js" : "views/users/settings.js",
-
+					"dist/spotify/play.js" : "views/spotify/play.js",
 					"dist/bundle.js": ["views/index.js",
 						"node_modules/tablesorter/dist/js/jquery.tablesorter.min.js",
 						"node_modules/tablesorter/dist/js/jquery.tablesorter.widgets.min.js"]

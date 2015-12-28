@@ -25,6 +25,7 @@ import RouteBass from "./bass";
 import RouteRecord from "./record";
 import RouteSounds from "./sounds";
 import RouteStats from "./stats";
+import RouteSpotify from "./spotify";
 
 const FileStore = SessionFileStore(Session);
 
@@ -218,6 +219,7 @@ class Website {
 		this.app.get("/log", ViewLog(bot));
 		this.app.get("/queue", ViewQueue(bot));
 		this.app.get("/rss", ViewRSS(bot));
+		this.app.use("/spotify", RouteSpotify(bot));
 		const port = this.bot.options.website.port;
 		this.server = this.app.listen(port);
 		const timeoutValue = 5000;

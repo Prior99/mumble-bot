@@ -14,6 +14,7 @@ import RouteSounds from "./sounds";
 import RouteRecord from "./record";
 import RouteRSS from "./rss";
 import RouteStats from "./stats";
+import RouteSpotify from "./spotify";
 
 /**
  * Routes all requests related to the api in the /api/ endpoint.
@@ -80,6 +81,7 @@ const RouteAPI = function(bot) {
 			loginByQueryString(req, res, next);
 		}
 	});
+	router.use("/spotify", RouteSpotify(bot));
 	router.use("/music", RouteMusic(bot));
 	router.use("/tree", ViewTree(bot));
 	router.use("/command", ViewCommand(bot));

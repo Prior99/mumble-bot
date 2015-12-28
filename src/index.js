@@ -18,6 +18,7 @@ import Permissions from "./permissions";
 import AFKObserver from "./afkobserver";
 import RSS from "./rss";
 import VisualizeAudioFile from "./visualizer";
+import SpotifyWrapper from "./spotify";
 
 const AUDIO_CACHE_AMOUNT = 4;
 
@@ -69,6 +70,10 @@ class Bot extends EventEmitter {
 		}
 		else {
 			this.audioCacheAmount = AUDIO_CACHE_AMOUNT;
+		}
+
+		if(options.spotify) {
+			this.spotify = new SpotifyWrapper(this.options.spotify);
 		}
 
 		if(options.mpd) {

@@ -11,6 +11,7 @@ public/style/*.css
 *-tts-cache/
 steam-sentry-hash
 session-store
+sounds/spotify/
 sounds/uploaded/
 sounds/recorded/
 sounds/visualized/
