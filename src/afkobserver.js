@@ -20,7 +20,7 @@ class AFKObserver {
 		//TODO this event is not documented with these parameters (user oldc newc)!
 		this.bot.mumble.on("user-connect", (user) => this.someUserMoved(user, undefined, user.channel));
 		this.bot.mumble.on("user-disconnect", (user) => this.someUserMoved(user, undefined, undefined));
-		setInterval(this.check, msInS);
+		this._interval = setInterval(this.check, msInS);
 		Winston.info("Module started: AFKObserver");
 		Winston.info("Warn time: " + this.bot.options.afkWarnTimeout);
 		Winston.info("AFK time: " + this.bot.options.afkTimeout);
@@ -133,7 +133,13 @@ class AFKObserver {
 			delete this.times[t];
 		}
 	}
-
+	/**
+	 * Stop the AFK Observer.
+	 * @return {undefined}
+	 */
+	stop() {
+		clearInterval(this._interval);
+	}
 }
 
 module.exports = AFKObserver;

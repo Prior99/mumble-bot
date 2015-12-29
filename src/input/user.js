@@ -1,7 +1,3 @@
-/*
- * Imports
- */
-
 import Samplerate from "node-samplerate";
 import Winston from "winston"
 import Util from "util";
@@ -10,17 +6,8 @@ import FS from "fs";
 import Lame from "lame";
 import Stream from "stream";
 
-/*
- * Defines
- */
-
 const TIMEOUT_THRESHOLD = 300;
-
 const msInS = 1000;
-
-/*
- * Polyfills
- */
 
 if(!String.prototype.startsWith) {
 	String.prototype.startsWith = function(searchString, position) {
@@ -28,10 +15,6 @@ if(!String.prototype.startsWith) {
 		return this.lastIndexOf(searchString, position) === position;
 	};
 }
-
-/*
- * Code
- */
 
 /**
  * This class belongs to the VoiceInput and handles the speech recognition for a
@@ -161,6 +144,18 @@ class VoiceInputUser extends Stream.Writable {
 			this._encoder.write(chunk);
 		}
 		this._refreshTimeout();
+	}
+
+	/**
+	 * Stop all timeouts and shutdown everything.
+	 * @return {undefined}
+	 */
+	stop() {
+		this.end();
+		if(this._timeout) {
+			clearTimeout(this._timeout);
+		}
+		Winston.info("Input stopped for user " + this._user.name);
 	}
 }
 

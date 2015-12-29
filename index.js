@@ -131,7 +131,6 @@ const databaseStarted = function(connection, database) {
 			});
 		});
 	});
-
 	let killed = false;
 
 	/**
@@ -141,7 +140,7 @@ const databaseStarted = function(connection, database) {
 	const sigint = function() {
 		if(killed) {
 			Winston.error("CTRL^C detected. Terminating!");
-			process.exit(1);
+			process.exit(1);debugger;
 		}
 		else {
 			killed = true;
@@ -150,9 +149,8 @@ const databaseStarted = function(connection, database) {
 			bot.shutdown();
 		}
 	}
-
-	process.on("SIGINT", sigint);
-	bot.on("SIGINT", sigint);
+	bot.on("SIGINT", () => sigint());
+	process.on("SIGINT", () => sigint());
 }
 
 /**

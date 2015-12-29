@@ -264,6 +264,14 @@ class Speech extends EventEmitter {
 			this._next();
 		}
 	}
+
+	/**
+	 * Stop everything.
+	 * @return {undefined}
+	 */
+	stop() {
+		this.stream.end();
+	}
 }
 
 export default Speech;

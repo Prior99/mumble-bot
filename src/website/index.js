@@ -3,7 +3,6 @@ import ExpHbs from "express-handlebars";
 import * as Winston from "winston";
 import Less from "less-middleware";
 import Session from "express-session";
-import SessionFileStore from "session-file-store";
 import Moment from "moment";
 import ExpressWS from "express-ws";
 import colorify from "../colorbystring";
@@ -16,7 +15,6 @@ import ViewLog from "./log";
 import ViewQueue from "./queue";
 import ViewRSS from "./rss";
 
-
 import RouteMusic from "./music";
 import RouteApi from "./api";
 import RouteQuotes from "./quotes";
@@ -25,8 +23,6 @@ import RouteBass from "./bass";
 import RouteRecord from "./record";
 import RouteSounds from "./sounds";
 import RouteStats from "./stats";
-
-const FileStore = SessionFileStore(Session);
 
 const pages = [
 	{
@@ -111,6 +107,7 @@ class Website {
 	 * @param {Bot} bot - The bot to use this webpage with.
 	 */
 	constructor(bot) {
+		this.connections = new Set();
 		if(bot.options.mpd) {
 			pages.unshift({
 				url : "/music/",
@@ -161,13 +158,6 @@ class Website {
 		this.bot = bot;
 		this.app.use(Session({
 			secret: bot.options.website.sessionSecret,
-			store: new FileStore({
-				path : "session-store",
-				ttl : 315569260,
-				retries : 3,
-				minTimeout : 200,
-				maxTimeout : 1000
-			}),
 			resave: false,
 			saveUninitialized: true
 		}));
@@ -222,7 +212,20 @@ class Website {
 		this.server = this.app.listen(port);
 		const timeoutValue = 5000;
 		this.server.setTimeout(timeoutValue);
+		this.server.on("connection", (conn) => this._onConnection(conn));
 		Winston.info("Module started: Website, listening on port " + port);
+	}
+
+	/**
+	 * Called when a new connection was opened by the webserver.
+	 * @param {Socket} conn - The socket that was opened.
+	 * @return {undefined}
+	 */
+	_onConnection(conn) {
+		this.connections.add(conn);
+		conn.on("close", () => {
+			this.connections.delete(conn);
+		});
 	}
 
 	/**
@@ -231,9 +234,14 @@ class Website {
 	 */
 	shutdown() {
 		return new Promise((resolve, reject) => {
-			Winston.info("Stopping module: Website ...");
+			Winston.info("Stopping website ...");
 			this.server.close(() => {
-				Winston.info("Module stopped: Website.");
+				Winston.info("Terminating " + this.connections.length + " connections.");
+				for(const socket of this.connections) {
+					socket.destroy();
+					this.connections.delete(socket);
+				}
+				Winston.info("Website stopped.");
 				resolve();
 			});
 		});

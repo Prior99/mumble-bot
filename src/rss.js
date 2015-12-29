@@ -16,7 +16,7 @@ class RSS {
 	 */
 	constructor(bot) {
 		this.bot = bot;
-		setInterval(this.fetch.bind(this), bot.options.rssFetchInterval * msInS);
+		this._interval = setInterval(this.fetch.bind(this), bot.options.rssFetchInterval * msInS);
 		this.bot.newCommand("fetch-rss", this.fetch.bind(this), "Aktualisiert alle RSS Feeds.", "rss");
 	}
 
@@ -140,6 +140,13 @@ class RSS {
 	 */
 	hashArticle(article) {
 		return Crypto.createHash("md5").update(article.title + article.author + article.link).digest("hex");
+	}
+	/**
+	 * Stop the RSS module.
+	 * @return {undefined}
+	 */
+	stop() {
+		clearInterval(this._interval);
 	}
 }
 

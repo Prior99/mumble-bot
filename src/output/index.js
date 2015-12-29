@@ -37,10 +37,13 @@ class Output extends Stream.Writable {
 	//var PREBUFFER = 0.5; TODO see above
 
 	/**
-	 * TODO
+	 * Processes the buffer and keeps the stream to mumble filled.
 	 * @returns {undefined}
 	 */
 	_shiftBuffer() {
+		if(this.stopped) {
+			return;
+		}
 		if(this._lastBufferShift) {
 			const timePassed = (Date.now() - this._lastBufferShift) / msInS;
 			this._playbackAhead -= timePassed;
@@ -249,6 +252,23 @@ class Output extends Stream.Writable {
 	changeGender() {
 		this.speech.changeGender();
 		this.say("Geschlechtsumwandlung erfolgreich.");
+	}
+
+	/**
+	 * Stop all timeouts and shutdown everything.
+	 * @return {undefined}
+	 */
+	stop() {
+		this.stopped = true;
+		this.clear();
+		if(this._timeout) {
+			clearTimeout(this._timeout);
+		}
+		this.speech.stop();
+		this.sound.stop();
+		this.stream.close();
+		this.stream.end();
+		Winston.info("Output stopped.");
 	}
 }
 

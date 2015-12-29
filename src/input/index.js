@@ -1,14 +1,7 @@
-/*
- * Imports
- */
 import User from "./user"
 import Winston from "winston";
 import Util from "util";
 import EventEmitter from "events";
-
-/*
- * Code
- */
 
 /**
  * This class handles voice input for all users. It uses instances of user.js
@@ -87,8 +80,25 @@ class VoiceInput extends EventEmitter {
 	 * @returns {undefined}
 	 */
 	_removeUser(user) {
-		Winston.info("Input stopped for user " + user.name);
-		delete this.users[user.id];
+		const localUser = this.users[user.id];
+		if(localUser) {
+			this.users[user.id].stop();
+			delete this.users[user.id];
+		}
+	}
+
+	/**
+	 * Stop all timeouts and shutdown everything.
+	 * @return {undefined}
+	 */
+	stop() {
+		for(const u in this.users) {
+			if(this.users.hasOwnProperty(u)) {
+				const user = this.users[u];
+				user.stop();
+			}
+		}
+		Winston.info("Input stopped.");
 	}
 }
 

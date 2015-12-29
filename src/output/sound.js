@@ -120,6 +120,16 @@ class Sound extends EventEmitter {
 			this._next();
 		}
 	}
+
+	/**
+	 * Stop the sound submodule.
+	 * @return {undefined}
+	 */
+	stop() {
+		if(this._timeout) {
+			clearTimeout(this._timeout);
+		}
+	}
 }
 
 module.exports = Sound;

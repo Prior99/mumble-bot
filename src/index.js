@@ -1,7 +1,6 @@
 /*
  * Imports
  */
-import Util from "util";
 import Input from "./input";
 import Command from "./command";
 import Output from "./output";
@@ -55,8 +54,6 @@ class Bot extends EventEmitter {
 		this.command = new Command(this);
 		this.quotes = new Quotes(this);
 		this.permissions = new Permissions(database);
-
-		this._inputStream = mumble.inputStream();
 
 		this.website = new Website(this);
 
@@ -262,22 +259,34 @@ class Bot extends EventEmitter {
 	 * @return {undefined}
 	 */
 	async shutdown() {
-		await this.say("Herunterfahren initiiert.");
-		this._deleteAllCachedAudio(0);
-		await this.website.shutdown();
-		if(this.steam) {
-			this.steam.stop();
+		try {
+			this.beQuiet();
+			await this.say("Goodbye.");
+			this._deleteAllCachedAudio(0);
+			await this.website.shutdown();
+			if(this.steam) {
+				this.steam.stop();
+			}
+			if(this.minecraft) {
+				this.minecraft.stop();
+			}
+			if(this.mpd) {
+				this.mpd.stop();
+			}
+			if(this.music) {
+				this.music.stop();
+			}
+			if(this.rss) {
+				this.rss.stop();
+			}
+			this.output.stop();
+			this.input.stop();
+			this.afkObserver.stop();
+			this.emit("shutdown");
 		}
-		if(this.minecraft) {
-			this.minecraft.stop();
+		catch(err) {
+			Winston.error("Error during shutdown:", err);
 		}
-		if(this.mpd) {
-			this.mpd.stop();
-		}
-		if(this.music) {
-			this.music.stop();
-		}
-		this.emit("shutdown");
 	}
 
 	/**
@@ -295,6 +304,7 @@ class Bot extends EventEmitter {
 		this._rlStdin.on("line", (line) => {
 			this.command.process(line, "terminal", null);
 		});
+		Winston.info("Console input initialized.");
 	}
 
 	/**
@@ -367,39 +377,6 @@ class Bot extends EventEmitter {
 	}
 
 	/**
-	 * Will start echoing everything a user says.
-	 * This method is used so that anyone can hear which voice-command
-	 * is currently given to the bot and not just the bleeep and bloop sounds.
-	 * @param {MumbleUser} user - mumble user to start piping.
-	 * @return {undefined}
-	 */
-	startPipingUser(user) {
-		//console.log("Piping started");
-		if(this.music) {
-			this.music.mute();
-		}
-		this._pipeUserEvent = (chunk) => {
-			this._inputStream.write(chunk);
-		};
-		this._pipeUserStream = user.outputStream(true);
-		this._pipeUserStream.on("data", this._pipeUserEvent);
-	}
-
-	/**
-	 * Stop echoing the user which is currently being echoed.
-	 * @return {undefined}
-	 */
-	stopPipingUser() {
-		//console.log("Piping stopped");
-		if(this.music) {
-			this.music.unmute();
-		}
-		this._pipeUserStream.removeListener("data", this._pipeUserEvent);
-		this._pipeUserStream = undefined;
-		this._pipeUserEvent = undefined;
-	}
-
-	/**
 	 * Called when a registered command was executed. The arguments are the arguments passwd to the
 	 * command when called as well as the way the command was received (console, chat, steam, etc...) and
 	 * the user that invoked the command.
@@ -437,8 +414,18 @@ class Bot extends EventEmitter {
 	 * @return {undefined}
 	 */
 	join(cname) {
-		const channel = this.mumble.channelByName(cname);
-		channel.join();
+		try {
+			const channel = this.mumble.channelByName(cname);
+			if(!channel) {
+				Winston.error("Channel \"" + cname + "\" is unknown.");
+			}
+			else {
+				channel.join();
+			}
+		}
+		catch(err) {
+			Winston.error("Unable to join channel \"" + cname + "\":", err);
+		}
 	}
 
 	/**
