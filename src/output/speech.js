@@ -2,8 +2,6 @@ import * as ESpeak from "node-espeak";
 import * as Samplerate from "node-samplerate";
 import EventEmitter from "events";
 import * as Winston from "winston";
-import GoogleTTS from "./googletranslatetts";
-import BingTTS from "./bingtranslatetts";
 import ResponsiveTTS from "./responsivetts";
 import Sox from "sox-audio";
 import {PassThrough as PassThroughStream} from "stream";
@@ -27,8 +25,7 @@ class Speech extends EventEmitter {
 	 * @param {Channel} channel - Mumble channel this bot is currently in to send text as chat
 	 * 				    message to. This is really not a good idea to happen here
 	 * 					should be changed asap.
-	 * @param {Database} database - Instance of the database to work with for Google
-	 *								Translate TTS cache.
+	 * @param {Database} database - Instance of the database to work with for TTS cache.
 	 * @param {Bot} bot - The bot instance this speechdispatcher belongs to.
 	 */
 	constructor(stream, espeakData, channel, database, bot) {
@@ -64,23 +61,13 @@ class Speech extends EventEmitter {
 			});
 		}
 		this._sox.run();
-		this.engine = "google";
+		this.engine = "espeak";
 		if(bot.options.responsiveTTS) {
 			this._responsiveEngine = ResponsiveTTS(database);
 			this._responsiveEngine.on("data", this._onTTSData.bind(this));
 			this._responsiveEngine.on("speechDone", () => this._speakingStopped());
 			this.engine = "responsive";
 		}
-		if(bot.options.bingTTS) {
-			this._bingEngine = BingTTS(bot.options.bingTTS.clientID, bot.options.bingTTS.clientSecret, database);
-			this._bingEngine.on("data", this._onTTSData.bind(this));
-			this._bingEngine.setGender("female");
-			this._bingEngine.on("speechDone", () => this._speakingStopped());
-			this.engine = "bing";
-		}
-		this._googleEngine = GoogleTTS(database);
-		this._googleEngine.on("data", this._onTTSData.bind(this));
-		this._googleEngine.on("speechDone", () => this._speakingStopped());
 		this.busy = false;
 		this.current = null;
 		this.timeout = null;
@@ -198,7 +185,7 @@ class Speech extends EventEmitter {
 
 	/**
 	 * Changes the gender of the ESpeak TTS module from male to female and
-	 * vice-verse. Has no effect on the gender of the Google Translate TTS.
+	 * vice-verse. Has no effect on the gender of the TTS.
 	 * @return {undefined}
 	 */
 	changeGender() {
@@ -207,9 +194,6 @@ class Speech extends EventEmitter {
 		}
 		else {
 			this.gender = "male";
-		}
-		if(this._bingEngine) {
-			this._bingEngine.setGender(this.gender);
 		}
 		ESpeak.setGender(this.gender);
 	}
@@ -225,52 +209,18 @@ class Speech extends EventEmitter {
 	}
 
 	/**
-	 * Called when an error occured by google tts.
-	 * @param {object} err - The error that occured.
-	 * @param {string} text - The text that should have been spoken.
-	 * @return {undefined}
-	 */
-	_onGoogleTTSError(err, text) {
-		Winston.error("Received error from google tts. Using ESpeak instead. " + err);
-		this.speakUsingESpeak(text);
-	}
-
-	/**
 	 * Called when an error occured by responsive voice tts.
 	 * @param {object} err - The error that occured.
 	 * @param {string} text - The text that should have been spoken.
 	 * @return {undefined}
 	 */
 	_onResponsiveTTSError(err, text) {
-		Winston.error("Received error from responsive tts. Using Google instead. " + err);
-		this.speakUsingGoogle(text);
+		Winston.error("Received error from responsive tts. Using ESpeak instead. " + err);
+		this.speakUsingESpeak(text);
 	}
 
 	/**
-	 * Called when an error occured by bing tts.
-	 * @param {object} err - The error that occured.
-	 * @param {string} text - The text that should have been spoken.
-	 * @return {undefined}
-	 */
-	_onBingTTSError(err, text) {
-		Winston.error("Received error from bing tts. Using Google instead. " + err);
-		this.speakUsingGoogle(text);
-	}
-
-	/**
-	 * Synthesize a text specificly byusing Google Translate TTS.
-	 * @param {string} text - Text to synthesize.
-	 * @return {undefined}
-	 */
-	speakUsingGoogle(text) {
-		this._currentEngine = this._googleEngine;
-		this._googleEngine.removeAllListeners("error"); //TODO: This is a nasty dirty piece of shit code line
-		this._googleEngine.on("error", (err) => this._onGoogleTTSError(err, text));
-		this._googleEngine.tts(text);
-	}
-
-	/**
-	 * Synthesize a text specificly by using Google Translate TTS.
+	 * Synthesize a text specificly by using Responsive Voice TTS.
 	 * @param {string} text - Text to synthesize.
 	 * @return {undefined}
 	 */
@@ -282,32 +232,14 @@ class Speech extends EventEmitter {
 	}
 
 	/**
-	 * Synthesize a text specificly by using Bing TTS.
-	 * @param {string} text - Text to synthesize.
-	 * @return {undefined}
-	 */
-	speakUsingBing(text) {
-		this._currentEngine = this._bingEngine;
-		this._bingEngine.removeAllListeners("error"); //TODO: This is a nasty dirty piece of shit code line
-		this._bingEngine.on("error", (err) => this._onBingTTSError(err, text));
-		this._bingEngine.tts(text);
-	}
-
-	/**
 	 * Process the next item in the queue.
 	 * @return {undefined}
 	 */
 	_next() {
 		if(!this.speaking && this.queue.length !== 0) {
 			this.current = this.queue.shift();
-			if(this.engine === "google") {
-				this.speakUsingGoogle(this.current.text);
-			}
-			else if(this.engine === "espeak") {
+			if(this.engine === "espeak") {
 				this.speakUsingESpeak(this.current.text);
-			}
-			else if(this.engine === "bing") {
-				this.speakUsingBing(this.current.text);
 			}
 			else if(this.engine === "responsive") {
 				this.speakUsingResponsive(this.current.text);

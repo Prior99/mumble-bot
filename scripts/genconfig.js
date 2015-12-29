@@ -70,13 +70,6 @@ var schema = {
 			required : true,
 			default : false
 		},
-		bingTTS : {
-			pattern : /true|false/,
-			message : "This must be either true or false.",
-			description : "Do you want to use the microsoft translate api for tts?",
-			required : true,
-			default : false
-		},
 		minecraft : {
 			pattern : /true|false/,
 			message : "This must be either true or false.",
@@ -94,7 +87,7 @@ var schema = {
 		rssFetchInterval : {
 			required : true,
 			default : 300,
-			pattern : /\d=/,
+			pattern : /\d+/,
 			message : "How often should the rss feed be updated?"
 		}
 	}
@@ -126,20 +119,6 @@ var mpd = {
 		}
 	}
 };
-
-var bingTTS = {
-	properties : {
-		clientID : {
-			required : true,
-			message : "Enter the client id generated from the ms azure marketplace:"
-		},
-		clientSecret : {
-			required : true,
-			message : "Enter the client secret generated from the ms azure marketplace:"
-		}
-	}
-};
-
 
 var announce = {
 	properties : {
@@ -315,16 +294,6 @@ function getSteam(active, callback) {
 		});
 	}
 }
-function getBingTTS(active, callback) {
-	if(!active) {
-		callback(null);
-	}
-	else {
-		Prompt.get(bingTTS, function(err, bingTTS) {
-			callback(bingTTS);
-		});
-	}
-}
 function getAnnounce(callback) {
 	Prompt.get(announce, function(err, announce) {
 		callback(announce);
@@ -365,19 +334,8 @@ function startOver() {
 			else {
 				results.minecraft = minecraft;
 			}
-			getBingTTS(results.bingTTS === 'true', bingTTSDone);
-		}
-
-		function bingTTSDone(bingTTS)  {
-			if(!bingTTS) {
-				delete results.bingTTS;
-			}
-			else {
-				results.bingTTS = bingTTS;
-			}
 			getAnnounce(announceDone);
 		}
-
 
 		function announceDone(announce)  {
 			if(!announce) {

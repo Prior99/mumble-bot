@@ -36,11 +36,6 @@ if(config.mpd) {
 	check("directory", config.mpd);
 }
 
-if(config.bingTTS) {
-	check("clientID", config.bingTTS);
-	check("clientSecret", config.bingTTS);
-}
-
 if(config.minecraft) {
 	check("host", config.minecraft);
 	check("port", config.minecraft);
