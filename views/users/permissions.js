@@ -15,10 +15,10 @@ const revoke = function(checkbox, user) {
 			spawnNotification("success", "Die Berechtigung wurde erfolgreich entzogen!");
 			checkbox.prop("checked", false);
 		}
-		else {
-			spawnNotification("error", "Die Berechtigung konnte nicht entzogen werden!");
-			checkbox.prop("checked", true);
-		}
+	})
+	.error((res) => {
+		spawnNotification("error", "Die Berechtigung konnte nicht erteilt werden!");
+		checkbox.prop("checked", false);
 	});
 }
 
@@ -36,10 +36,10 @@ const grant = function(checkbox, user) {
 			spawnNotification("success", "Die Berechtigung wurde erfolgreich erteilt!");
 			checkbox.prop("checked", true);
 		}
-		else {
-			spawnNotification("error", "Die Berechtigung konnte nicht erteilt werden!");
-			checkbox.prop("checked", false);
-		}
+	})
+	.error((res) => {
+		spawnNotification("error", "Die Berechtigung konnte nicht erteilt werden!");
+		checkbox.prop("checked", false);
 	});
 }
 

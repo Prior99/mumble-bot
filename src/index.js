@@ -117,9 +117,9 @@ class Bot extends EventEmitter {
 			this.say(cmdSay + ". Ich habe diese Liste auch in den Chat geschrieben.");
 			this.mumble.user.channel.sendMessage(cmdWrite.substring(0, cmdWrite.length - 4));
 		}, "Gibt eine Liste aller Kommandos aus.", "list-ul");
-		this.newCommand("be quiet", this.beQuiet, "Sofort alles, was Geräusche verursacht abschalten.",
+		this.newCommand("be quiet", () => console.log("TESTEST!"), "Sofort alles, was Geräusche verursacht abschalten.",
 			"bell-slash", null, "be-quiet");
-		this.newCommand("shutdown", this.shutdown, "Fährt den bot herunter.", "power-off", null, "shutdown");
+		this.newCommand("shutdown", () => this.shutdown(), "Fährt den bot herunter.", "power-off", null, "shutdown");
 		this.mumble.users().forEach(this._addEventListenersToMumbleUser);
 	}
 

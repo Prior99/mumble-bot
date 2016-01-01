@@ -70,7 +70,12 @@ class Command {
 						this._logCommand(key, args, via, user);
 						args.unshift(via);
 						args.unshift(user);
-						method.apply(this, args);
+						try {
+							method(...args);
+						}
+						catch(err) {
+							Winston.error("Error executing command \"" + key + "\":", err);
+						}
 					}
 					found = true;
 					break;
@@ -101,8 +106,7 @@ class Command {
 		}
 		Winston.info("Issued command by user \"" + username +
 			"\" via " + via +
-			": \"" + command + (args.length > 0 ? " " : "") +
-			args.join(" ") + "\""
+			": \"" + command + "\" \"" + (args.length > 0 ? args.join(" ") : "")+ "\""
 		);
 	}
 
@@ -117,6 +121,7 @@ class Command {
 	newCommand(name, command, args, permission) {
 		if(permission) {
 			this.commands[name] = async (user, via, arg) => {
+				console.log("EXECUTING COMMAND!!", user, via, arg);
 				if(via === "terminal") {
 					command.apply(this, args);
 				}
@@ -125,9 +130,11 @@ class Command {
 						+ "\" which needs permission \"" + permission + "\".");
 				}
 				else {
+					console.log("fetching permission");
 					const hasPermission = await this.bot.permissions.hasPermission(user, permission);
+					console.log(user, permission, hasPermission);
 					if(hasPermission) {
-						command.apply(this, arguments);
+						command(...arguments);
 					}
 					else {
 						Winston.warn("User \"" + user.username + "\" tried to execute command \"" + name
