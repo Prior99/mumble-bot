@@ -27,7 +27,7 @@ d3.json("/api/stats/spokenperweekday", (err, data) => {
 	if(err) {
 		throw err;
 	}
-	const maxDate = d3.max(data, (d) => new Date(d.amount)).getTime();
+	const maxDate = d3.max(data, (d) => new Date(d.amount).getTime());
 	for(let i = 0; i < 7; i++) {
 		data[i].num = i;
 		data[i].amount = new Date(data[i].amount).getTime();

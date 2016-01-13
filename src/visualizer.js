@@ -45,6 +45,11 @@ const VisualizeAudioFile = function(filename, height, samplesPerPixel) {
 							if(i === 0 || value < min) { min = value; }
 							sum += value;
 						}
+						console.log({
+							avg : sum / currentBuffer.length,
+							max,
+							min
+						});
 						list.push({
 							avg : sum / currentBuffer.length,
 							max,
@@ -58,18 +63,20 @@ const VisualizeAudioFile = function(filename, height, samplesPerPixel) {
 				const canvas = new Canvas(width, height);
 				const ctx = canvas.getContext("2d");
 				const val = (v) => v * height;
-				ctx.beginPath();
-				ctx.moveTo(0, val(list[0].avg));
-				for(let i = 1; i < list.length; i++) {
-					ctx.lineTo(i, val(list[i].min));
+				if(list.length > 0) {
+					ctx.beginPath();
+					ctx.moveTo(0, val(list[0].avg));
+					for(let i = 1; i < list.length; i++) {
+						ctx.lineTo(i, val(list[i].min));
+					}
+					ctx.stroke();
+					ctx.beginPath();
+					ctx.moveTo(0, val(list[0].avg));
+					for(let i = 1; i < list.length; i++) {
+						ctx.lineTo(i, val(list[i].max));
+					}
+					ctx.stroke();
 				}
-				ctx.stroke();
-				ctx.beginPath();
-				ctx.moveTo(0, val(list[0].avg));
-				for(let i = 1; i < list.length; i++) {
-					ctx.lineTo(i, val(list[i].max));
-				}
-				ctx.stroke();
 				resolve(canvas.toBuffer());
 			});
 		}

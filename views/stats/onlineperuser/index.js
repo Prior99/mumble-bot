@@ -72,10 +72,10 @@ d3.json("/api/stats/onlineperuser", (err, data) => {
 		.style("fill", (d) => color(d.user));
 	const xOffset = (d) => x(new Date(d.amount)) + 10;
 	const yOffset = (d) => y(d.user) + y.rangeBand() / 2;
-	const days = Math.round((new Date(d.amount).getTime() / milliSecondsPerDay) * 10) / 10;
+	const days = (d) => Math.round((new Date(d.amount).getTime() / milliSecondsPerDay) * 10) / 10;
 	bar.append("text")
 		.attr("text-anchor", "middle")
 		.attr("transform", (d) => "translate(" + xOffset(d) + ", " + yOffset(d) + "), rotate(90)")
-		.text((d) => days + "d")
+		.text((d) => days(d) + "d")
 		.style("fill", "black");
 });

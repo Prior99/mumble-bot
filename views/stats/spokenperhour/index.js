@@ -36,7 +36,7 @@ d3.json("/api/stats/spokenperhour", (err, data) => {
 	if(err) {
 		throw err;
 	}
-	const maxDate = d3.max(data, (d) => new Date(d.amount)).getTime();
+	const maxDate = d3.max(data, (d) => new Date(d.amount).getTime());
 	const d = perUserPie.append("g")
 		.attr("class", "dat");
 	const g = d.selectAll(".arc")

@@ -42,7 +42,7 @@ d3.json("/api/stats/spokenperuser", (err, data) => {
 	if(err) {
 		throw err;
 	}
-	const amountOfTicks = Math.round((d3.max(data, (d) => new Date(d.amount)).getTime() / millisecondsPerHour) / 10);
+	const amountOfTicks = Math.round((d3.max(data, (d) => new Date(d.amount).getTime()) / millisecondsPerHour) / 10);
 	const yAxis = d3.svg.axis()
 		.scale(y)
 		.orient("left")
