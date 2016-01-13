@@ -33,7 +33,6 @@ class Permissions {
 			return false;
 		}
 		try {
-			debugger;
 			const has = await this.database.hasPermission(user.id, permission);
 			return has;
 		}
@@ -227,7 +226,6 @@ class Permissions {
 			const has = await this.hasPermission(user, permission.id);
 			obj[permission.id] = has;
 		}
-		console.log(obj);
 		return obj;
 	}
 }

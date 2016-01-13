@@ -65,6 +65,7 @@ class Command {
 					let args = [];
 					if(text.length >= 0) {
 						args = text.split(" ");
+						args = args.filter((arg) => arg !== "");
 					}
 					if(typeof method === "function") {
 						this._logCommand(key, args, via, user);
@@ -106,7 +107,7 @@ class Command {
 		}
 		Winston.info("Issued command by user \"" + username +
 			"\" via " + via +
-			": \"" + command + "\" \"" + (args.length > 0 ? args.join(" ") : "")+ "\""
+			": \"" + command + "\" " + (args.length > 0 ? "\"" + args.join(" ") + "\"" : "")
 		);
 	}
 
@@ -120,8 +121,7 @@ class Command {
 	 */
 	newCommand(name, command, args, permission) {
 		if(permission) {
-			this.commands[name] = async (user, via, arg) => {
-				console.log("EXECUTING COMMAND!!", user, via, arg);
+			this.commands[name] = async function(user, via, arg)  {
 				if(via === "terminal") {
 					command.apply(this, args);
 				}
@@ -130,9 +130,7 @@ class Command {
 						+ "\" which needs permission \"" + permission + "\".");
 				}
 				else {
-					console.log("fetching permission");
 					const hasPermission = await this.bot.permissions.hasPermission(user, permission);
-					console.log(user, permission, hasPermission);
 					if(hasPermission) {
 						command(...arguments);
 					}
@@ -141,7 +139,7 @@ class Command {
 							+ "\" which needs permission \"" + permission + "\".");
 					}
 				}
-			};
+			}.bind(this);
 		}
 		else {
 			this.commands[name] = command;

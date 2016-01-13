@@ -15,16 +15,13 @@ const ViewAPIRunCommand = function(bot) {
 		 */
 		const runCommand = function(command, argument) {
 			let string = command;
-			console.log(argument);
 			if(argument) {
 				string += " " + argument;
 			}
-			console.log("\"" + string + "\"");
 			bot.command.process(string, "website", req.session.user);
 		}
 
 		if(req.query.command) {
-			console.log(req.query);
 			runCommand(req.query.command, req.query.argument);
 			res.status(HTTPCodes.okay).send(JSON.stringify({
 				okay : true

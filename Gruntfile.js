@@ -3,9 +3,7 @@ module.exports = function(grunt) {
 		browserify: {
 			bundle: {
 				files : {
-					"dist/bundle.js": ["views/index.js",
-						"node_modules/tablesorter/dist/js/jquery.tablesorter.min.js",
-						"node_modules/tablesorter/dist/js/jquery.tablesorter.widgets.min.js"]
+					"dist/bundle.js": []
 				},
 				options: {
 					transform: [

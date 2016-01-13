@@ -45,11 +45,6 @@ const VisualizeAudioFile = function(filename, height, samplesPerPixel) {
 							if(i === 0 || value < min) { min = value; }
 							sum += value;
 						}
-						console.log({
-							avg : sum / currentBuffer.length,
-							max,
-							min
-						});
 						list.push({
 							avg : sum / currentBuffer.length,
 							max,
