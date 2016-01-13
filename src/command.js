@@ -121,7 +121,7 @@ class Command {
 	 */
 	newCommand(name, command, args, permission) {
 		if(permission) {
-			this.commands[name] = async function(user, via, arg)  {
+			this.commands[name] = async function(user, via, arg) {
 				if(via === "terminal") {
 					command.apply(this, args);
 				}
