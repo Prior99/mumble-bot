@@ -132,6 +132,17 @@ const loadData = function() {
 		}
 		$.ajax(query).done((res) => {
 			records = prefetched.concat(res.records);
+			records = records.filter((record1) => {
+				const filtered = records.filter((record2) => record2.id === record1.id);
+				if(filtered.length > 1) {
+					const newer = filtered.find((record2) => new Date(record2.changed) > new Date(record1.changed));
+					const newest = newer === undefined;
+					return newest;
+				}
+				else {
+					return true;
+				}
+			});
 			$("#loading").remove();
 			$("#records").show();
 			localStorage.setItem("record_storage_last_update", Date.now());
