@@ -3,11 +3,13 @@ import Winston from "winston"
 import Util from "util";
 import EventEmitter from "events";
 import FS from "fs";
-import Lame from "lame";
+import FFMpeg from "fluent-ffmpeg";
 import Stream from "stream";
+import {PassThrough as PassThroughStream} from "stream";
 
 const TIMEOUT_THRESHOLD = 300;
 const msInS = 1000;
+const audioFreq = 48000;
 
 if(!String.prototype.startsWith) {
 	String.prototype.startsWith = function(searchString, position) {
@@ -101,16 +103,15 @@ class VoiceInputUser extends Stream.Writable {
 			}
 			catch(err) { /* Ignored */ }
 			this._filename = "tmp/useraudio/" + this._user.id + "/" + Date.now() + ".mp3";
-			this._encoder = new Lame.Encoder({
-				channels : 1,
-				bitDepth : 16,
-				sampleRate : 48000,
-				bitRate : 128,
-				outSampleRate : 44100,
-				mode : Lame.MONO
-			});
-			this._recordStream = FS.createWriteStream(this._filename);
-			this._encoder.pipe(this._recordStream);
+			this._passthrough = new PassThroughStream();
+			this._encoder = FFMpeg(this._passthrough)
+			.inputOptions(
+				"-f", "s16le",
+				"-ar", audioFreq,
+				"-ac", "1"
+			)
+			.audioCodec("libmp3lame")
+			.save(this._filename);
 		}
 	}
 
@@ -122,7 +123,7 @@ class VoiceInputUser extends Stream.Writable {
 		this.speaking = false;
 		this.started = false;
 		if(this._databaseUser.settings.record === true) {
-			this._encoder.end();
+			this._passthrough.end();
 			this.bot.addCachedAudio(
 				this._filename,
 				this._databaseUser,
@@ -141,7 +142,7 @@ class VoiceInputUser extends Stream.Writable {
 	 */
 	_speechContinued(chunk) {
 		if(this._databaseUser.settings.record === true) {
-			this._encoder.write(chunk);
+			this._passthrough.write(chunk);
 		}
 		this._refreshTimeout();
 	}
