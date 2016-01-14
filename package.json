@@ -57,7 +57,7 @@
     "mineflayer": "^1.3.0",
     "moment": "^2.10.6",
     "multer": "^0.1.8",
-    "mumble": "^0.3.7",
+    "mumble": "git+https://github.com/Prior99/node-mumble.git",
     "musicmetadata": "^1.0.1",
     "node-espeak": "^0.2.0",
     "node-mpd": "0.0.1",
