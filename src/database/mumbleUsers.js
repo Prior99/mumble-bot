@@ -18,7 +18,7 @@ const MumbleUsersExtension = function(Database) {
 	Database.prototype.getLinkedMumbleUsers = async function() {
 		const rows = await this.connection.query(
 			"SELECT m.mumbleId AS id, u.username AS username " +
-			"FROM MumbleUsers m" +
+			"FROM MumbleUsers m " +
 			"LEFT JOIN Users u ON u.id = m.user"
 		);
 		return rows;
