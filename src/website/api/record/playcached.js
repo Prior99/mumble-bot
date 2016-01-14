@@ -11,7 +11,11 @@ const ViewPlayCached = function(bot) {
 		if(req.query.id) {
 			const sound = bot.getCachedAudioById(+req.query.id);
 			if(sound) {
-				bot.playSound(sound.file);
+				bot.playSound(sound.file, {
+					type : "cached",
+					details : sound,
+					user : req.session.user
+				});
 				Winston.log("verbose", req.session.user.username + " played back cached record #" + req.query.id);
 				res.status(HTTPCodes.okay).send({
 					okay : true

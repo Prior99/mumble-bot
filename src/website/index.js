@@ -7,6 +7,7 @@ import Moment from "moment";
 import ExpressWS from "express-ws";
 import colorify from "../colorbystring";
 import websocketCached from "./record/websocketcached";
+import websocketQueue from "./websocketqueue";
 
 import ViewDefault from "./default";
 import ViewSpeak from "./speak";
@@ -197,6 +198,7 @@ class Website {
 		this.app.use("/bass", RouteBass(bot));
 		this.app.use("/record", RouteRecord(bot));
 		this.app.ws("/record/cached", websocketCached(bot));
+		this.app.ws("/livequeue", websocketQueue(bot));
 		this.app.use("/quotes", RouteQuotes(bot));
 		this.app.use("/sounds", RouteSounds(bot));
 		this.app.use("/stats", RouteStats(bot));

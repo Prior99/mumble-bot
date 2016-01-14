@@ -372,8 +372,8 @@ class Bot extends EventEmitter {
 	 * @param {string} filename - Filename of the soundfile to play. Must be a mono-channel 48,000Hz WAV-File
 	 * @return {undefined}
 	 */
-	async playSound(filename) {
-		await this.output.playSound(filename);
+	async playSound(filename, meta) {
+		await this.output.playSound(filename, meta);
 	}
 
 	/**

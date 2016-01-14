@@ -10,9 +10,14 @@ const ViewPlay = function(bot) {
 	return async function(req, res) {
 		if(req.query.id) {
 			try {
+				const details = await bot.database.getRecord(req.query.id);
 				await bot.database.usedRecord(req.query.id);
 				Winston.log("verbose", req.session.user.username + " played back record #" + req.query.id);
-				bot.playSound("sounds/recorded/" + req.query.id);
+				bot.playSound("sounds/recorded/" + req.query.id, {
+					type : "record",
+					details,
+					user : req.session.user
+				});
 				res.status(HTTPCodes.okay).send({
 					okay : true
 				});

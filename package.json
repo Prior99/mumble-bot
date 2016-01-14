@@ -34,7 +34,7 @@
     "express": "^4.13.3",
     "express-handlebars": "^2.0.1",
     "express-session": "^1.11.3",
-    "express-ws": "^0.2.6",
+    "express-ws": "^1.0.0-rc.2",
     "feed-read": "0.0.1",
     "fluent-ffmpeg": "^2.0.1",
     "font-awesome": "^4.4.0",

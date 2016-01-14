@@ -11,8 +11,13 @@ const ViewSoundPlay = function(bot) {
 		if(req.query.id) {
 			try {
 				await bot.database.usedSound(req.query.id);
+				const details = await bot.database.getSound(req.query.id);
 				Winston.log("verbose", req.session.user.username + " played sound #" + req.query.id);
-				bot.playSound("sounds/uploaded/" + req.query.id);
+				bot.playSound("sounds/uploaded/" + req.query.id, {
+					type : "sound",
+					details,
+					user : req.session.user
+				});
 				res.status(HTTPCodes.okay).send({
 					okay : true
 				});

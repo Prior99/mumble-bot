@@ -29,7 +29,10 @@ const ViewPlayDialog = function(bot) {
 		 */
 		const playDialog = function(ids) {
 			const files = ids.map((id) => "sounds/recorded/" + id);
-			bot.output.playSounds(files);
+			bot.output.playSounds(files, {
+				type : "dialog",
+				user : req.session.user
+			});
 			reply(res, HTTPCodes.okay, true, {});
 		}
 

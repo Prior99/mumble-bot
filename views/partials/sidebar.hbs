@@ -1,3 +1,35 @@
+<script id="template-livequeue" type="text/x-handlebars-template">
+<p>\{{queue.length}} Items in der Queue.</p>
+<div class="livequeue">
+	<div class="elements">
+	\{{#if queue.length}}
+	\{{#each queue}}
+		<div class="queueitem">
+			<h1>
+				\{{#if this.meta.random}}
+				<span class="random"><i class="fa fa-random"></i></span>
+				\{{/if}}
+				<i class="fa fa-\{{queueSymbol this}}"></i>\{{queueTitle this}}
+			</h1>
+			<div class="content">
+				<p>\{{queueDescription this}}</p>
+			</div>
+			<div class="bottom">
+				<div class="row">
+					<div class="col-md-6">
+							<i class="fa fa-user"></i><b>:</b> \{{queueAuthor this}}
+					</div>
+					<div class="col-md-6"><i class="fa fa-clock-o"></i><b>:</b> \{{queueTime this}}</div>
+				</div>
+			</div>
+		</div>
+	\{{/each}}
+	\{{else}}
+	<p>Queue ist leer.</p>
+	\{{/if}}
+	</div>
+</div>
+</script>
 <h3>Aktionen</h3>
 <ul class="nav sidebar-nav nav-pills nav-stacked">
 	<li>
@@ -19,3 +51,6 @@
 	</li>
 </ul>
 <h3>Queue</h3>
+<div id="livequeuecontainer">
+</div>
+<script src="/dist/livequeue.js"></script>

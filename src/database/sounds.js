@@ -30,6 +30,21 @@ const SoundsExtension = function(Database) {
 	};
 
 	/**
+	 * <b>Async</b> Get details on sepcific sound.
+	 * @param {number} - Id of the sound to fetch details of.
+	 * @return {Sound} - Sound that was requested or null if no such sound was found.
+	 */
+	Database.prototype.getSound = async function(id) {
+		const rows = await this.connection.query("SELECT id, name, used FROM Sounds WHERE id = ?", [id]);
+		if(rows && rows.length > 0) {
+			return rows[0];
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
 	 * <b>Async</b> Update a sound to be played back one more times (Increase usages by one).
 	 * @param {number} id - Unique id of the sound to update.
 	 * @return {undefined}

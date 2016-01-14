@@ -13,7 +13,12 @@ const ViewRandomPlayback = function(bot) {
 			try {
 				await bot.database.usedRecord(record.id);
 				Winston.log("verbose", req.session.user.username + " played back random record  with id #" + record.id);
-				bot.playSound("sounds/recorded/" + record.id);
+				bot.playSound("sounds/recorded/" + record.id, {
+					type : "record",
+					details : record,
+					user : req.session.user,
+					random : true
+				});
 				res.status(HTTPCodes.okay).send({
 					okay : true
 				});

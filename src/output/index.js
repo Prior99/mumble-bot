@@ -1,5 +1,3 @@
-import Util from "util";
-import EventEmitter from "events";
 import Winston from "winston";
 import Sound from "./sound";
 import Speech from "./speech";
@@ -21,7 +19,6 @@ class Output extends Stream.Writable {
 	 */
 	constructor(bot) {
 		super(); // TODO
-		Stream.Writable.call(this);
 		this.bot = bot;
 		this.stream = bot.mumble.inputStream();
 		this.speech = new Speech(this, bot.options.espeakData, bot.mumble.user.channel, bot.database, bot);
@@ -101,6 +98,7 @@ class Output extends Stream.Writable {
 		this._bufferQueue = [];
 		this.speech.clear();
 		this.sound.clear();
+		this.emit("clear");
 	}
 
 	/**
@@ -110,6 +108,8 @@ class Output extends Stream.Writable {
 	_next() {
 		if(!this.busy && this.queue.length !== 0) {
 			this.current = this.queue.shift();
+			this.emit("change", this.queue);
+			this.emit("dequeue");
 			this._process(this.current);
 		}
 	}
@@ -167,14 +167,14 @@ class Output extends Stream.Writable {
 	 * Queue playing back a soundfile. The soundfile needs to be exactly: Raw PCM
 	 * audio data (*.wav is fine), 44,100Hz and mono-channel.
 	 * @param {string} file - Name of the soundfile to play.
-	 * @param {function} callback - Called after the soundfile was played. TODO type
 	 * @returns {Promise} - Resolved once the sound has finished playing.
 	 */
-	playSound(file, callback) {
+	playSound(file, meta) {
 		return new Promise((resolve, reject) => {
 			this._enqueue({
 				type : "sound",
 				file,
+				meta,
 				callback() {
 					resolve();
 				}
@@ -183,15 +183,16 @@ class Output extends Stream.Writable {
 	}
 
 	/**
-	 * Also enqueues sounds, but many at once (atomically?)
+	 * Also enqueues sounds, but many at once (automically?)
 	 * @param {string[]} filelist - The files to be played.
 	 * @returns {undefined}
 	 */
-	playSounds(filelist) { // callback TODO?
+	playSounds(filelist, meta) { // callback TODO?
 		for(let i=0; i<filelist.length; i++) {
 			this._enqueue({
 				type : "sound",
-				file : filelist[i]
+				file : filelist[i],
+				meta
 			});
 		}
 	}
@@ -238,7 +239,10 @@ class Output extends Stream.Writable {
 	 * @returns {undefined}
 	 */
 	_enqueue(workitem) {
+		workitem.time = new Date();
 		this.queue.push(workitem);
+		this.emit("enqueue", workitem);
+		this.emit("change", this.queue);
 		if(!this.busy) {
 			this._next();
 		}

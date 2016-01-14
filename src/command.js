@@ -83,9 +83,6 @@ class Command {
 				}
 			}
 		}
-		if(!found) {
-			this.bot.playSound("sounds/recognition_failure.wav");
-		}
 	}
 
 	/**

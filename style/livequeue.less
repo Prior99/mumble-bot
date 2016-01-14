@@ -1,0 +1,96 @@
+@queuecolor: black;
+@graycolor: lighten(@queuecolor, 35%);
+
+div.queueitem {
+	border: 2px solid @graycolor;
+	border-radius: 5px;
+	margin: 2px;
+	margin-bottom: 10px;
+	p {
+		padding: 0;
+		margin: 0;
+	}
+	h1 {
+		padding: 5px;
+		width: 100%;
+		font-size: 16pt;
+		margin: 0;
+		background: @graycolor;
+		border-bottom: 1px solid @graycolor;
+		color: white;
+		i {
+			margin-right: 0.5em;
+		}
+		span.random {
+			float: right;
+		}
+	}
+	.content {
+		color: @graycolor;
+		padding: 2px 5px 2px 5px;
+
+	}
+	.bottom {
+		border-top: 1px solid @graycolor;
+		padding: 2px 2px 2px 2px;
+		background: @graycolor;
+		font-size: 10pt;
+		color: white;
+		.left, .right {
+			padding: 2px;
+			display: inline;
+		}
+		.left {
+			margin-left: 1em;
+			float: left;
+		}
+		.right {
+			margin-right: 1em;
+			float: right;
+		}
+	}
+}
+
+div.livequeue {
+	margin: 5px;
+	margin-top: 25px;
+	background-color: white;
+	min-height: 30px;
+	position: relative;
+	/*border-style: solid;
+	border-width: 2px;
+	border-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 10px, black, rgba(0, 0, 0, 0) 10px) 1 100%;*/
+	div.elements {
+		height: 100%;
+		border-left: 2px solid black;
+		border-right: 2px solid black;
+		padding: 5px;
+	}
+	&:before, &:after {
+		position: absolute;
+		content: "";
+		left: 0;
+		z-index: -10;
+		width: 100%;
+		height: 20px;
+		border-width: 2px;
+		border-style: solid;
+	}
+	&:before {
+		top: 0;
+		margin-top: -18px;
+		background: linear-gradient(transparent, white);
+		border-image: linear-gradient(to bottom, transparent, black) 1 100%;
+		background-repeat: no-repeat;
+		border-image-slice: 1;
+	}
+	&:after {
+		bottom: 0;
+		margin-bottom: -18px;
+		background: linear-gradient(white, transparent);
+		border-image: linear-gradient(to bottom, black, transparent) 1 100%;
+		background-repeat: no-repeat;
+		border-image-slice: 1;
+	}
+
+}
