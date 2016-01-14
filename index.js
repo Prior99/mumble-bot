@@ -13,6 +13,8 @@ import Database from "./src/database";
  */
 import Mysql from "winston-mysql-transport";
 
+require('source-map-support').install();
+
 /**
  * Pads the given number with zeros in front.
  * @param {number} number - Number to pad with zeros.

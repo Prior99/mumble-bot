@@ -52,7 +52,7 @@ module.exports = function(grunt) {
 		},
 		watch: {
 			server: {
-				files: ["src/**/*.js"],
+				files: ["src/*.js", "src/**/*.js", "index.js"],
 				tasks: ["eslint", "babel"]
 			},
 			style : {
