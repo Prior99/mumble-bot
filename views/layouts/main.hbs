@@ -3,17 +3,19 @@
 {{> head}}
 <body>
 	{{> navigation}}
-	{{> notification}}
 	<div id="wrapper">
 		<div id="sidebar-wrapper">
 			{{> subnavigation}}
 		</div>
-		<script src="/dist/index.js"></script>
+		<div id="widgets-wrapper">
+			{{> sidebar}}
+		</div>
 		<div id="page-content-wrapper">
 			<div class="container-fluid">
 				{{{body}}}
 			</div>
 		</div>
+		<script src="/dist/index.js"></script>
 	</div>
 </body>
 </html>

@@ -7,12 +7,28 @@ import $ from "jquery";
 const initMenu = function() {
 	$("#menutoggle").click((e) => {
 		e.preventDefault();
-		$("#wrapper").toggleClass("toggled");
+		if($("#wrapper").hasClass("left-toggled")) {
+			$("#wrapper").removeClass("left-toggled");
+		}
+		else {
+			$("#wrapper").addClass("left-toggled");
+			$("#wrapper").removeClass("right-toggled");
+		}
 	});
-	$("#menu ul").hide();
-	$("#menu ul").children(".current").parent().show();
+	$("#widgetstoggle").click((e) => {
+		e.preventDefault();
+		if($("#wrapper").hasClass("right-toggled")) {
+			$("#wrapper").removeClass("right-toggled");
+		}
+		else {
+			$("#wrapper").addClass("right-toggled");
+			$("#wrapper").removeClass("left-toggled");
+		}
+	});
+	/*$(".menu ul").hide();
+	$(".menu ul").children(".current").parent().show();
 	//$("#menu ul:first").show();
-	$("#menu li a").click(function() {
+	$(".menu li a").click(function() {
 		const checkElement = $(this).next();
 		if((checkElement.is("ul")) && (checkElement.is(":visible"))) {
 			return false;
@@ -22,7 +38,7 @@ const initMenu = function() {
 			checkElement.slideDown("normal");
 			return false;
 		}
-	});
+	});*/
 }
 
 $(document).ready(() => initMenu());

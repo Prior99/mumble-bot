@@ -1,20 +1,22 @@
+@background-color: #DDD;
+@menu-toggle: #AAA;
+
 #wrapper {
 	padding-left: 0;
+	padding-right: 0;
 	-webkit-transition: all 0.5s ease;
 	-moz-transition: all 0.5s ease;
 	-o-transition: all 0.5s ease;
 	transition: all 0.5s ease;
-
 }
-#sidebar-wrapper {
+
+.bar {
 	z-index: 1000;
+	width: 40px;
 	position: fixed;
-	left: 250px;
-	width: 50px;
 	height: 100%;
-	margin-left: -250px;
 	overflow-y: auto;
-	background: #DDD;
+	background: @background-color;
 	-webkit-transition: all 0.5s ease;
 	-moz-transition: all 0.5s ease;
 	-o-transition: all 0.5s ease;
@@ -27,14 +29,30 @@
 		-o-transition: padding-left 0.5s ease;
 		transition: padding-left 0.5s ease;
 	}
+}
+
+#widgets-wrapper {
+	.bar;
+	right: 250px;
+	margin-right: -250px;
+
+	#widgetstoggle {
+		background: @menu-toggle;
+	}
+
+}
+
+#sidebar-wrapper {
+	.bar;
+	left: 250px;
+	margin-left: -250px;
 
 	#menutoggle {
-		background: #AAA;
+		background: @menu-toggle;
 	}
 }
 
-
-#wrapper.toggled{
+#wrapper.left-toggled{
 	padding-left: 250px;
 	#sidebar-wrapper {
 		width: 250px;
@@ -44,7 +62,23 @@
 	}
 	#page-content-wrapper {
 		margin-right: -250px;
+		margin-left: auto;
 		padding-left: 0;
+	}
+}
+
+#wrapper.right-toggled{
+	padding-right: 250px;
+	#widgets-wrapper {
+		width: 250px;
+		ul li a {
+			padding-left: 15px;
+		}
+	}
+	#page-content-wrapper {
+		margin-left: -250px;
+		margin-right: auto;
+		padding-right: 0;
 	}
 }
 
@@ -53,6 +87,7 @@
 	position: absolute;
 	padding: 15px;
 	padding-left: 50px;
+	padding-right: 50px;
 	-webkit-transition: all 0.5s ease;
 	-moz-transition: all 0.5s ease;
 	-o-transition: all 0.5s ease;
@@ -64,16 +99,26 @@
 }
 /* Sidebar Styles */
 
+#widgets-wrapper, #sidebar-wrapper {
+	h3 {
+		display: none;
+	}
+}
+
+.sidebar-box {
+	width: 230px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
 .sidebar-nav {
-	position: absolute;
-	top: 0;
 	width: 250px;
 	margin: 0;
 	padding: 0;
 	list-style: none;
 	margin-top: 0px;
 	li {
-		text-indent: 15px;
+		text-indent: 5px;
 		line-height: 40px;
 		a {
 			display: block;
@@ -116,21 +161,30 @@ body {
 @media(min-width: 1024px) {
 	#wrapper {
 		padding-left: 250px;
+		padding-right: 250px;
 	}
 
 	.fixed-brand {
 		width: 250px;
 	}
 
-	#sidebar-wrapper {
+	#sidebar-wrapper, #widgets-wrapper {
 		width: 250px;
+		ul li a {
+			padding-left: 15px;
+		}
+		h3 {
+			padding-left: 10px;
+			padding-right: 10px;
+			display: block;
+		}
 	}
 
-	#menutoggle {
+	#menutoggle, #widgetstoggle {
 		display: none;
 	}
 
-	#wrapper.toggled {
+	#wrapper.left-toggled {
 		padding-left: 0;
 		#sidebar-wrapper {
 			width: 250px;
@@ -139,6 +193,18 @@ body {
 			position: relative;
 			margin-right: 0;
 			padding-left: 250px;
+		}
+	}
+
+	#wrapper.right-toggled {
+		padding-right: 0;
+		#widgets-wrapper {
+			width: 250px;
+		}
+		#page-content-wrapper {
+			position: relative;
+			margin-left: 0;
+			padding-right: 250px;
 		}
 	}
 
