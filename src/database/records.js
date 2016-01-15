@@ -117,7 +117,7 @@ const RecordsExtension = function(Database) {
 	 * @return {undefined}
 	 */
 	Database.prototype.usedRecord = async function(id) {
-		await this.connection.query("UPDATE Records SET used = used +1 WHERE id = ?", [id]);
+		await this.connection.query("UPDATE Records SET used = used +1, changed = ? WHERE id = ?", [new Date(), id]);
 	};
 	/**
 	 * A label with which the records can be tagged.
