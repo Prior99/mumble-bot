@@ -24,37 +24,6 @@
 	</tr>
 </table>
 
-<h2>Aufnahmen</h2>
-<table class="table-responsice table-striped tablesorter">
-	<thead>
-		<th>Zeitpunkt</th>
-		<th>Text</th>
-		<th>Benutzt</th>
-		<th class="no-sort"></th>
-		<th class="no-sort"></th>
-		<th class="no-sort"></th>
-	</thead>
-	<tbody>
-		{{#each records}}
-		<tr>
-			<td>{{formatDate submitted}} {{formatTime submitted}}</td>
-			<td>
-				<p>{{quote}}</p>
-				<p>
-				{{#each labels}}
-					<a class="label" style="background: {{colorify this.name}};" href="/record/stored/?search=tag:{{this.name}}">{{this.name}}</a>
-				{{/each}}
-				</p>
-			</td>
-			<td>{{used}}</td>
-			<td><a recordId="{{this.id}}" class="playrecord quote-btn btn btn-xs btn-success"><span class="fa fa-volume-down" aria-hidden="true"></span></a></td>
-			<td><a href="/api/record/download?id={{this.id}}" class="quote-btn btn btn-xs btn-default"><span class="fa fa-download" aria-hidden="true"></span></a></td>
-			<td><a href="/record/edit/?id={{this.id}}" class="quote-btn btn btn-xs btn-default"><span class="fa fa-edit" aria-hidden="true"></span></a></td>
-		</tr>
-		{{/each}}
-	</tbody>
-</table>
-
 <h2>Gelinkte Mumble-Benutzer</h2>
 <ul id="linked-mumble-users" class="list-group">
 	{{#each linkedUsers}}
