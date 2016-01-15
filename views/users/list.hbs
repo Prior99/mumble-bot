@@ -4,7 +4,6 @@
 	<thead>
 		<tr>
 			<th>Benutzername</th>
-			<th>Kennung</th>
 			<th class="no-sort"></th>
 		</tr>
 	</thead>
@@ -12,7 +11,6 @@
 		{{#each users}}
 		<tr>
 			<td>{{this.username}}</td>
-			<td>{{this.identifier}}</td>
 			<td>
 				<div class="btn-group" role="group">
 					<a type="button" class="btn btn-sm btn-default" href="/users/profile/{{this.username}}"><i class="fa fa-user"></i></a>

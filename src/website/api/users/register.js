@@ -1,4 +1,4 @@
-import * as Steam64 from "../../../steam64id";
+import Steam64 from "../../../steam64id";
 import * as Winston from "winston";
 
 /**
@@ -42,7 +42,6 @@ const ViewRegister = function(bot) {
 						email : data.email,
 						username : data.username,
 						password : data.password,
-						identifier : data.identifier,
 						steamid,
 						minecraft : data.minecraft
 					});

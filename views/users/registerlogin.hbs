@@ -1,12 +1,12 @@
 <div class="jumbotron vertical-center">
-<div class="container">
+<div class="container" >
 	<div class="form-signin">
 		{{> notification}}
-		<ul class="nav nav-tabs">
-			<li class="active"><a href="#login" data-toggle="tab">Anmelden</a></li>
-			<li><a href="#register" data-toggle="tab">Registrieren</a></li>
+		<ul class="nav nav-tabs" id="tabscontainer">
+			<li class="active"><a href="#login" data-toggle="tab" aria-controls="login" role="tab">Anmelden</a></li>
+			<li><a href="#register" data-toggle="tab" aria-controls="register" role="tab">Registrieren</a></li>
 		</ul>
-		<div id="myTabContent" class="tab-content">
+		<div id="registerLoginTab" class="tab-content">
 			<div class="tab-pane active in" id="login">
 				{{> loginform}}
 			</div>
@@ -16,3 +16,4 @@
 		</div>
 	</div>
 </div>
+<script src="/dist/users/registerlogin.js"></script>

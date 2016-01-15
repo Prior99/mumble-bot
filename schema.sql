@@ -12,22 +12,13 @@ CREATE TABLE IF NOT EXISTS TTSCache (
 	api				VARCHAR(16) NOT NULL DEFAULT 'google'
 );
 
-CREATE TABLE IF NOT EXISTS Identifiers (
-	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	identifier		VARCHAR(64),
-	UNIQUE(identifier)
-);
-
 CREATE TABLE IF NOT EXISTS Users (
 	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	username		VARCHAR(64) NOT NULL,
 	password		VARCHAR(72) NOT NULL,
 	steamid			VARCHAR(24),
-	identifier		INT NOT NULL,
 	minecraft		VARCHAR(64),
-	email			VARCHAR(64) NOT NULL,
-	UNIQUE(identifier),
-	FOREIGN KEY (identifier) REFERENCES Identifiers(id)
+	email			VARCHAR(64) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Permissions (
@@ -169,26 +160,3 @@ INSERT IGNORE INTO BassEffects (effect) VALUES
 ("wubsch"),
 ("wobbel"),
 ("lublub");
-
-INSERT IGNORE INTO Identifiers (identifier) VALUES
-("orange"),
-("apple"),
-("tomato"),
-("pine"),
-("chocolate"),
-("strawberry"),
-("chicken"),
-("sandwich"),
-("cat"),
-("dog"),
-("turtle"),
-("bear"),
-("bee"),
-("bread"),
-("pizza"),
-("cheese"),
-("cake"),
-("cookie"),
-("rabbit"),
-("elephant"),
-("cucumber");

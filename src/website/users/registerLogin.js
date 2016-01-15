@@ -8,17 +8,9 @@ import * as Winston from "winston";
  */
 const ViewUsersRegisterLogin = function(bot) {
 	return async function(req, res) {
-		try {
-			const identifiers = await bot.database.getFreeIdentifiers();
-			res.locals.identifiers = identifiers;
-			res.render("users/registerlogin", {
-				layout : "registerlogin"
-			});
-		}
-		catch(err) {
-			Winston.error("Unable to fetch list of identifiers", err);
-			res.locals.identifiers = [];
-		}
+		res.render("users/registerlogin", {
+			layout : "registerlogin"
+		});
 	}
 };
 

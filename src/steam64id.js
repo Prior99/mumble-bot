@@ -2,7 +2,7 @@
  * Includes
  */
 import {parseString as parseXML} from "xml2js";
-import * as Request from "request";
+import Request from "request";
 import HTTPCodes from "./website/httpcodes";
 /*
  * Code
