@@ -17,3 +17,8 @@ CREATE TABLE IF NOT EXISTS VersionInfo(
 	migrated	DATETIME
 );
 INSERT INTO VersionInfo(version, migrated) VALUES("0.4.0", CURRENT_TIME());
+ALTER TABLE Records ADD COLUMN reporter INT NOT NULL;
+UPDATE Records SET reporter = user;
+ALTER TABLE Records ADD CONSTRAINT records_reporter_fk FOREIGN KEY(reporter) REFERENCES Users(id);
+ALTER TABLE Users ADD COLUMN money INT NOT NULL DEFAULT 100;
+UPDATE Records SET changed = CURRENT_TIME();

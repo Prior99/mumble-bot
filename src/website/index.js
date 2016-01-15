@@ -212,7 +212,7 @@ class Website {
 		this.app.get("/rss", ViewRSS(bot));
 		const port = this.bot.options.website.port;
 		this.server = this.app.listen(port);
-		const timeoutValue = 5000;
+		const timeoutValue = 30000; // 30 seconds timeout
 		this.server.setTimeout(timeoutValue);
 		this.server.on("connection", (conn) => this._onConnection(conn));
 		Winston.info("Module started: Website, listening on port " + port);

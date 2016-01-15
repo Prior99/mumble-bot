@@ -22,7 +22,7 @@ const ViewSave = function(bot) {
 				}
 			}
 			try {
-				const id = await bot.database.addRecord(quote, sound.user, sound.date, labels, sound.duration);
+				const id = await bot.database.addRecord(quote, sound.user, sound.date, labels, sound.duration, req.session.user);
 				try {
 					await FS.rename(sound.file, "sounds/recorded/" + id);
 					await FS.rename(sound.file + ".png", "sounds/visualized/" + id + ".png");

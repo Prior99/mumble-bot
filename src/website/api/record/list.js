@@ -1,5 +1,6 @@
 import * as Winston from "winston";
 import HTTPCodes from "../../httpcodes";
+import {PassThrough as PassThroughStream} from "stream";
 
 /**
  * List all records.
@@ -13,11 +14,16 @@ const ViewList = function(bot) {
 			if(req.query.since) {
 				since = new Date(+req.query.since);
 			}
+			const stream = new PassThroughStream();
+			res.status(HTTPCodes.okay);
+			res.set("Content-type", "application/json");
+			stream.pipe(res);
 			const records = await bot.database.listRecords(since);
-			res.status(HTTPCodes.okay).send({
+			stream.write(JSON.stringify({
 				okay : true,
 				records
-			});
+			}));
+			stream.end();
 		}
 		catch(err) {
 			Winston.error("Error listing records", err);

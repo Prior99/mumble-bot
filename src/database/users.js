@@ -57,7 +57,8 @@ const UsersExtension = function(Database) {
 				"u.minecraft AS minecraft, " +
 				"u.id AS id, " +
 				"u.username as username, " +
-				"u.steamid AS steamid "+
+				"u.steamid AS steamid, " +
+				"u.money AS money " +
 			"FROM Users u " +
 			"WHERE u.id = ?",
 			[id]

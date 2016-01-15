@@ -1,11 +1,14 @@
 <script id="template-list" type="text/x-handlebars-template">
 \{{#each records}}
 	<tr>
-		<td width="20" style="border-right: 1px solid #EEE;">
-			<p class="text-center"><a class="username" userName="\{{user.username}}">\{{user.username}}</a></p>
-			<p class="text-nowrap text-center"><small>\{{formatDate submitted}} \{{formatTime submitted}}</small></p>
-			<p class="text-nowrap text-center">\{{fixed2 duration}}s</p>
+		<td width="120" style="border-right: 1px solid #EEE;">
+			<p class="text-nowrap"><i class="fa fa-user"></i> <a class="username" userName="\{{user.username}}">\{{user.username}}</a></p>
+			<p class="text-nowrap"><i class="fa fa-plus"></i> <a class="reporter" reporterName="\{{reporter.username}}">\{{reporter.username}}</a></p>
 		</td>
+			<td width="120" style="border-right: 1px solid #EEE;">
+				<p class="text-nowrap"><i class="fa fa-clock-o"></i> <small>\{{formatDate submitted}} \{{formatTime submitted}}</small></p>
+				<p class="text-nowrap"><i class="fa fa-hourglass-half"></i> \{{fixed2 duration}}s</p>
+			</td>
 		<td>
 			<p>
 				\{{quote}}
@@ -85,6 +88,7 @@
 	<table class="table table-responsive table-striped">
 		<thead>
 			<th>Benutzer</th>
+			<th>Zeit</th>
 			<th>Text</th>
 			<th><i class="fa fa-hand-spock-o"></i></th>
 			<th><i class="fa fa-repeat"></i></th>

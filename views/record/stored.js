@@ -13,7 +13,8 @@ Handlebars.registerHelper("fixed2", (number) => number.toFixed(2));
 const ListTemplate = Handlebars.compile($("#template-list").html());
 const PageinationTemplate = Handlebars.compile($("#template-pageination").html());
 
-const recordsPerPage = 20;
+const recordsPerPage = 40;
+const oneminute = 60000;
 
 const hash = {};
 let records;
@@ -130,7 +131,10 @@ const loadData = function() {
 		else {
 			prefetched = [];
 		}
-		$.ajax(query).done((res) => {
+		$.ajax({
+			url : query,
+			timeout: oneminute
+		}).done((res) => {
 			records = prefetched.concat(res.records);
 			records = records.filter((record1) => {
 				const filtered = records.filter((record2) => record2.id === record1.id);

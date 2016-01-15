@@ -11,12 +11,13 @@ const RecordsExtension = function(Database) {
 	 * @param {date} date - The date and time the record was recorded.
 	 * @param {string[]} labels - A list of labels with which this record was tagged.
 	 * @param {number} duration - The duration of the sample in seconds.
+	 * @param {DatabaseUser} reporter - Who ever added this record.
 	 * @return {number} - The unique id of the new record.
 	 */
-	Database.prototype.addRecord = async function(quote, user, date, labels, duration) {
+	Database.prototype.addRecord = async function(quote, user, date, labels, duration, reporter) {
 		const result = await this.connection.query(
 			"INSERT INTO Records(quote, user, submitted, changed, duration) VALUES(?, ?, ?, ?, ?)",
-			[quote, user.id, date, new Date(), duration]
+			[quote, user.id, date, new Date(), duration, reporter.id]
 		);
 		labels.forEach((label) => this.addRecordToLabel(result.insertId, label));
 		return result.insertId;
@@ -142,7 +143,7 @@ const RecordsExtension = function(Database) {
 	 */
 	Database.prototype.getRecord = async function(id) {
 		const rows = await this.connection.query(
-			"SELECT id, quote, used, user, submitted, duration, changed " +
+			"SELECT id, quote, used, user, submitted, duration, changed, reporter " +
 			"FROM Records " +
 			"WHERE id = ?", [id]
 		);
@@ -150,6 +151,8 @@ const RecordsExtension = function(Database) {
 			const record = rows[0];
 			const user = await this.getUserById(record.user);
 			const labels = await this.getLabelsOfRecord(record.id);
+			const reporter = await this.getUserById(record.reporter);
+			record.reporter = reporter;
 			record.user = user;
 			record.labels = labels;
 			return record;
