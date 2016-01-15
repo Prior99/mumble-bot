@@ -26,7 +26,7 @@ const ViewSave = function(bot) {
 			try {
 				const id = await bot.database.addRecord(quote, sound.user, sound.date, labels, sound.duration, req.session.user);
 				try {
-					await bot.database.giveUserMoney(req.session.user, money);
+					await bot.database.giveUserMoney(req.session.user, moneyPerSave);
 					await FS.rename(sound.file, "sounds/recorded/" + id);
 					await FS.rename(sound.file + ".png", "sounds/visualized/" + id + ".png");
 					if(bot.removeCachedAudio(sound)) {
