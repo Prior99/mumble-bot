@@ -8,7 +8,7 @@ import CachedWebTTS from "./cachedwebtts";
 const ResponsiveVoiceTTS = function(database) {
 	return new CachedWebTTS({
 		url : "https://code.responsivevoice.org/getvoice.php?tl=de&sv=&vn=&pitch=0.5&rate=0.5&vol=1&t=",
-		cacheDir : "rsponsive-tts-cache",
+		cacheDir : "responsive-tts-cache",
 		splitAfter : 90,
 		header : {
 			"Host" : "code.responsivevoice.org",
