@@ -1,6 +1,9 @@
 import * as Winston from "winston";
 import HTTPCodes from "../../httpcodes";
 
+const moneyPerPlayReporter = 1;
+const moneyPerPlayUser = 1;
+
 /**
  * This view is responsible for playing back a stored record.
  * @param {Bot} bot - Bot the webpage belongs to.
@@ -11,6 +14,12 @@ const ViewPlay = function(bot) {
 		if(req.query.id) {
 			try {
 				const details = await bot.database.getRecord(req.query.id);
+				if(req.session.user.id !== details.reporter.id) {
+					await bot.database.giveUserMoney(details.reporter, moneyPerPlayReporter);
+				}
+				if(req.session.user.id !== details.user.id) {
+					await bot.database.giveUserMoney(details.user, moneyPerPlayUser);
+				}
 				await bot.database.usedRecord(req.query.id);
 				Winston.log("verbose", req.session.user.username + " played back record #" + req.query.id);
 				bot.playSound("sounds/recorded/" + req.query.id, {

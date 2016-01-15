@@ -30,6 +30,15 @@
 	</div>
 </div>
 </script>
+<h3>Info</h3>
+<ul class="nav sidebar-nav nav-pills nav-stacked">
+	<li>
+		<p><span class="fa-stack fa-lg pull-left"><i class="fa fa-money"></i></span> {{formatMoney session.user.money}}</p>
+	</li>
+	<li>
+		<p><span class="fa-stack fa-lg pull-left"><i class="fa fa-user"></i></span> {{session.user.username}}</p>
+	</li>
+</ul>
 <h3>Aktionen</h3>
 <ul class="nav sidebar-nav nav-pills nav-stacked">
 	<li>
@@ -40,9 +49,6 @@
 		<a id="quiet-nav-btn"><span class="fa-stack fa-lg pull-left"><i class="fa fa-bell-slash"></i></span> Stumm</a>
 	</li>
 	{{/if}}
-	<li>
-		<a href="/users/profile/{{session.user.username}}"><span class="fa-stack fa-lg pull-left"><i class="fa fa-user"></i></span> {{session.user.username}}</a>
-	</li>
 	<li>
 		<a href="/users/settings"><span class="fa-stack fa-lg pull-left"><i class="fa fa-cogs"></i></span> Einstellungen</a>
 	</li>

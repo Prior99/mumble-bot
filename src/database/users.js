@@ -75,6 +75,16 @@ const UsersExtension = function(Database) {
 	};
 
 	/**
+	 * <b>Async</b> Give (Or take with negative number) a user a specified amount of money.
+	 * @param {DatabaseUser} user - The user to manipulate the money of.
+	 * @param {number} amount - The amount of money to change.
+	 * @return {undefined}
+	 */
+	Database.prototype.giveUserMoney = async function(user, amount) {
+		await this.connection.query("UPDATE Users SET money = money + ? WHERE id = ?", [amount, user.id]);
+	};
+
+	/**
 	 * <b>Async</b> Retrieves details about a user by his steam Id.
 	 * @param {string} steamId - The steamid of the user to retrieve.
 	 * @return {DatabaseUser} - The user related to this steam id.

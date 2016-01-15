@@ -138,6 +138,10 @@ class Website {
 				"isSound" : function(a, block) { //eslint-disable-line object-shorthand
 					return a.type === "sound" ? block.fn(this) : undefined;
 				},
+				"formatMoney" : money => {
+					let m = money / 100;
+					return m.toFixed(2) + "€";
+				},
 				"bootstrapClassByLogLevel" : level => {
 					if(level === "info") {
 						return "success";
@@ -168,6 +172,7 @@ class Website {
 			res.locals.session = req.session;
 			res.locals.subpages = subpages;
 			if(req.session.user) {
+				req.session.user = await bot.database.getUserById(req.session.user.id); // refresh user each session
 				const permissions = await bot.permissions.listPermissionsAssocForUser(req.session.user);
 				res.locals.userPermissions = permissions;
 				next();

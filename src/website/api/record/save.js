@@ -2,6 +2,8 @@ import * as Winston from "winston";
 import * as FS from "fs-promise";
 import HTTPCodes from "../../httpcodes";
 
+const moneyPerSave = 200;
+
 /**
  * View for saving a record.
  * @param {Bot} bot - Bot the webpage belongs to.
@@ -24,6 +26,7 @@ const ViewSave = function(bot) {
 			try {
 				const id = await bot.database.addRecord(quote, sound.user, sound.date, labels, sound.duration, req.session.user);
 				try {
+					await bot.database.giveUserMoney(req.session.user, money);
 					await FS.rename(sound.file, "sounds/recorded/" + id);
 					await FS.rename(sound.file + ".png", "sounds/visualized/" + id + ".png");
 					if(bot.removeCachedAudio(sound)) {

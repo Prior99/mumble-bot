@@ -16,7 +16,7 @@ const RecordsExtension = function(Database) {
 	 */
 	Database.prototype.addRecord = async function(quote, user, date, labels, duration, reporter) {
 		const result = await this.connection.query(
-			"INSERT INTO Records(quote, user, submitted, changed, duration) VALUES(?, ?, ?, ?, ?)",
+			"INSERT INTO Records(quote, user, submitted, changed, duration, reporter) VALUES(?, ?, ?, ?, ?, ?)",
 			[quote, user.id, date, new Date(), duration, reporter.id]
 		);
 		labels.forEach((label) => this.addRecordToLabel(result.insertId, label));
