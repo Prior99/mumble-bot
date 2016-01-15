@@ -211,7 +211,7 @@ class Bot extends EventEmitter {
 				if(has) {
 					try {
 						const ids = await this.database.getLinkedMumbleUsersOfUser(potential.username);
-						for(id of ids) {
+						for(const id of ids) {
 							const mumbleUser = this.mumble.userById(id.id);
 							if(mumbleUser) {
 								mumbleUser.sendMessage(message);
