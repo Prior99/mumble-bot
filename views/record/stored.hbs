@@ -21,11 +21,19 @@
 			<div class="visualization" style="background-image: url('/api/record/visualized?id=\{{id}}')"></div>
 		</td>
 		<td width="5">
-			<div class="btn-group-vertical buttons" role="group">
-				<a recordId="\{{id}}" class="playrecord quote-btn btn btn-xs btn-success"> <i class="fa fa-volume-down" aria-hidden="true"></i> </a>
-				<a href="/api/record/download?id=\{{id}}" class="quote-btn btn btn-xs btn-info"> <i class="fa fa-download" aria-hidden="true"></i> </a>
-				<a href="/record/edit/?id=\{{id}}" class="quote-btn btn btn-xs btn-warning"> <i class="fa fa-edit" aria-hidden="true"></i> </a>
-			</div>
+			<table>
+				<tr>
+					<td colspan="2"><a recordId="\{{id}}" class="playrecord quote-btn btn btn-xs btn-success"> <i class="fa fa-volume-down" aria-hidden="true"></i> </a></td>
+				</tr>
+				<tr>
+					<td><a href="/api/record/download?id=\{{id}}" class="quote-btn btn btn-xs btn-default"> <i class="fa fa-download" aria-hidden="true"></i> </a></td>
+					<td><a href="/record/edit/?id=\{{id}}" class="quote-btn btn btn-xs btn-default"> <i class="fa fa-edit" aria-hidden="true"></i> </a></td>
+				</tr>
+				<tr>
+					<td><a class="quote-btn btn btn-xs btn-default preview-record" recordId="\{{id}}"> <i class="fa fa-eye" aria-hidden="true"></i> </a></td>
+					<td><a class="quote-btn btn btn-xs btn-default"> <i class="fa fa-code-fork" aria-hidden="true"></i> </a></td>
+				</tr>
+			</table>
 		</td>
 		<td width="5" style="border-left: 1px solid #EEE;"><strong>\{{used}}</strong></td>
 	</tr>

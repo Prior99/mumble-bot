@@ -212,6 +212,12 @@ $(document).on("click", "a.label", (e) => {
 	search();
 });
 
+$(document).on("click", "a.preview-record", (e) => {
+	const id = $(e.currentTarget).attr("recordId");
+	const audio = new Audio("/api/record/download?id=" + id);
+	audio.play();
+});
+
 $(document).on("click", "a.username", (e) => {
 	const label = $(e.currentTarget).attr("userName").toLowerCase();
 	const sval = $("#search").val();
