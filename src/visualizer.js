@@ -33,7 +33,7 @@ const VisualizeAudioFile = function(filename, height, samplesPerPixel) {
 			stream.on("end", () => {
 				const width = Math.min(analyzer.list.length);
 				const canvas = new Canvas(width, height);
-				analyzer.finish(canvas);
+				analyzer.draw(canvas);
 				resolve(canvas.toBuffer());
 			});
 		}

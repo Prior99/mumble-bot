@@ -3,54 +3,43 @@ import spawnNotification from "../notification";
 import AudioAnalyzer from "../../src/audioanalyzer";
 import Get from "../get";
 
-const recordId = Get()["id"];
-const context = new (window.AudioContext || window.webkitAudioContext)(); // Create the audio context.
+const BUFFER_SIZE = 4096;
+
 const jqCanvas = $("#fork-canvas");
 const canvas = jqCanvas[0];
-const ctx = canvas.getContext("2d");
 const width = canvas.width = jqCanvas.width();
 const height = canvas.height = jqCanvas.height();
-let audioBuffer;
-let analyzer;
+const ctx = canvas.getContext("2d");
 
-const scriptNode = context.createScriptProcessor(4096, 1, 1);
-scriptNode.onaudioprocess = (evt) => {
-	const inputBuffer = evt.inputBuffer.getChannelData(0);
-	const outputBuffer = evt.outputBuffer.getChannelData(0);
-	analyzer.analyze(inputBuffer);
-	canvas.getContext("2d").clearRect(0, 0, width, height);
-	analyzer.finish(canvas);
-	for(let i = 0; i < inputBuffer.length; i++) {
-		outputBuffer[i] = inputBuffer[i];
-	}
-};
+const recordId = Get()["id"];
 
-const audioDecoded = (buffer) => {
-	audioBuffer = buffer;
-	let samplesPerPixel = parseInt(buffer.length / width);
-	analyzer = new AudioAnalyzer(samplesPerPixel);
-	const source = context.createBufferSource();
-	source.buffer = buffer;
+const context = new (window.AudioContext || window.webkitAudioContext)();
+
+const loadAudio = function(record) {
+	const samples = Math.ceil(context.sampleRate * record.duration);
+	const samplesPerPixel = parseInt(samples / width);
+	const list = [];
+	const audio = new Audio("/api/record/download?id=" + recordId);
+	const source = context.createMediaElementSource(audio);
+	const scriptNode = context.createScriptProcessor(BUFFER_SIZE, 1, 1);
+	const analyzer = new AudioAnalyzer(samplesPerPixel);
+	scriptNode.onaudioprocess = (evt) => {
+		if(evt.inputBuffer.length > 0) {
+			const inputBuffer = evt.inputBuffer.getChannelData(0);
+			const outputBuffer = evt.outputBuffer.getChannelData(0);
+			analyzer.analyze(inputBuffer);
+			analyzer.draw(canvas);
+			for(let i = 0; i < inputBuffer.length; i++) {
+				outputBuffer[i] = inputBuffer[i];
+			}
+		}
+	};
 	source.connect(scriptNode);
 	scriptNode.connect(context.destination);
-	source.onended = () => analyzer.finish(canvas);
-	source.start(0);
+	audio.play();
+	window.doNotGarbageCollectMe = scriptNode; // Workaround for garbagecollector.
 };
 
-const loadAudio = (data) => {
-	context.decodeAudioData(data, (buffer) => {
-		if(!buffer) {
-			spawnNotification("error", "Fehler beim Decodieren der Aufnahme.")
-		}
-		else {
-			audioDecoded(buffer);
-		}
-	});
-};
-
-const request = new XMLHttpRequest();
-request.open("GET", "/api/record/download?id=" + recordId, true);
-request.responseType = "arraybuffer";
-request.onload = () => loadAudio(request.response);
-request.onerror = () => spawnNotification("error", "Konnte Aufnahme nicht laden.");
-request.send();
+$.ajax("/api/record/get?id=" + recordId)
+.done((res) => loadAudio(res.record))
+.error(() => spawnNotification("error", "Konnte Metadaten nicht laden."));

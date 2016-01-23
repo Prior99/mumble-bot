@@ -10,7 +10,12 @@ class AudioAnalyzer {
 	constructor(samplesPerPixel) {
 		this.samplesTotal = 0;
 		this.turn = 0;
-		this.list = [];
+		this.pixelOffset = 0;
+		this.list = [{
+			avg : 0.5,
+			min : 0.5,
+			max : 0.5
+		}];
 		this.currentBuffer = new Float32Array(samplesPerPixel);
 		this.samplesPerPixel = samplesPerPixel;
 	}
@@ -56,7 +61,7 @@ class AudioAnalyzer {
 	 * @param {Canvas} canvas - A HTML5 canvas region to draw on.
 	 * @return {undefined}
 	 */
-	finish(canvas) {
+	draw(canvas) {
 		const width = this.list.length;
 		const height = canvas.height;
 		const ctx = canvas.getContext("2d");
@@ -64,17 +69,19 @@ class AudioAnalyzer {
 		const val = (v) => v * height;
 		if(this.list.length > 0) {
 			ctx.beginPath();
-			ctx.moveTo(0, val(this.list[0].avg));
+			ctx.moveTo(this.pixelOffset - 1, val(this.list[0].min));
 			for(let i = 1; i < this.list.length; i++) {
-				ctx.lineTo(i, val(this.list[i].min));
+				ctx.lineTo(this.pixelOffset + i - 1, val(this.list[i].min));
 			}
 			ctx.stroke();
 			ctx.beginPath();
-			ctx.moveTo(0, val(this.list[0].avg));
+			ctx.moveTo(this.pixelOffset - 1, val(this.list[0].max));
 			for(let i = 1; i < this.list.length; i++) {
-				ctx.lineTo(i, val(this.list[i].max));
+				ctx.lineTo(this.pixelOffset + i - 1, val(this.list[i].max));
 			}
 			ctx.stroke();
+			this.pixelOffset += this.list.length - 1;
+			this.list = [this.list.pop()];
 		}
 	}
 };
