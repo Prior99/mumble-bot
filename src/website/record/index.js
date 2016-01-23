@@ -7,6 +7,7 @@ import ViewLabels from "./labels";
 import ViewEdit from "./edit";
 import ViewOverview from "./overview";
 import ViewDialogs from "./dialogs.js";
+import ViewDefault from "../default.js";
 import ViewCreateDialog from "./createDialog.js";
 
 const pages = [{
@@ -43,6 +44,7 @@ const RouteRecord = function(bot) {
 	router.get("/cached", ViewCurrentCached(bot));
 	router.get("/save", ViewSave(bot));
 	router.get("/labels", ViewLabels(bot));
+	router.get("/fork", ViewDefault("record/fork"));
 	router.get("/edit", ViewEdit(bot));
 	router.get("/stored", ViewStored(bot));
 	router.get("/dialogs", ViewDialogs(bot));

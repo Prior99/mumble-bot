@@ -3,6 +3,7 @@ import Moment from "moment";
 import $ from "jquery";
 import spawnNotification from "../notification";
 import colorify from "../../src/colorbystring";
+import Get from "../get";
 
 Handlebars.registerHelper("paginate", require("handlebars-paginate"));
 Handlebars.registerHelper("formatDate", (date) => Moment(date).format("DD.MM.YY"));
@@ -16,14 +17,9 @@ const PageinationTemplate = Handlebars.compile($("#template-pageination").html()
 const recordsPerPage = 40;
 const oneminute = 60000;
 
-const hash = {};
+const hash = Get();
 let records;
 let currentList;
-
-location.search.substr(1).split("&").forEach((item) => {
-	const kv = item.split("=");
-	hash[kv[0]] = decodeURI(kv[1]);
-});
 
 let query = hash.search ? hash.search : "";
 let page = +(hash.page ? hash.page : 1);
