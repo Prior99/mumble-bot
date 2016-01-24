@@ -19,6 +19,8 @@ let dragStart, slideTarget;
 const sliderBegin = $(".slider-begin");
 const sliderEnd = $(".slider-end");
 const sliderIndicator = $(".slider-indicator");
+const boxLeft = $(".box-left");
+const boxRight = $(".box-right");
 let position = {
 	begin : 0.1,
 	end : 0.9,
@@ -51,17 +53,28 @@ const updateSliderPositions = function() {
 	if(position.end > 1) { position.end = 1; }
 	if(position.end < 0) { position.end = 0; }
 	if(position.begin > position.end) { [position.end, position.begin] = [position.begin, position.end]; }
+	const leftSliderCSSPosition = (position.begin * width);
+	const rightSliderCSSPosition = (position.end * width);
 	sliderBegin.css({
-		left : (position.begin * width) + "px"
+		left : leftSliderCSSPosition + "px"
 	})
 	.find(".head").html(relativeTime(position.begin));
 	sliderEnd.css({
-		left : (position.end * width) + "px"
+		left : rightSliderCSSPosition + "px"
 	})
 	.find(".head").html(relativeTime(position.end));
 	sliderIndicator.css({
 		left : (position.indicator * width) + "px"
 	});
+	boxLeft.css({
+		left : "0px",
+		width : leftSliderCSSPosition + "px"
+	});
+	boxRight.css({
+		left : rightSliderCSSPosition + "px",
+		width : (width - rightSliderCSSPosition) + "px"
+	});
+
 };
 
 
