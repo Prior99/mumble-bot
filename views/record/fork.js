@@ -13,6 +13,69 @@ const ctx = canvas.getContext("2d");
 
 const recordId = Get()["id"];
 
+
+
+const sliderBegin = $(".slider-begin");
+const sliderEnd = $(".slider-end");
+let position = {
+	begin : 0.1,
+	end : 0.9
+};
+
+const relativeTime = function(rel) {
+	const time = rel * audio.duration;
+	return time.toFixed(1) + "s";
+}
+
+const updateSliderPositions = function() {
+	if(position.begin > 1) { position.begin = 1; }
+	if(position.begin < 0) { position.begin = 0; }
+	if(position.end > 1) { position.end = 1; }
+	if(position.end < 0) { position.end = 0; }
+	if(position.begin > position.end) { [position.end, position.begin] = [position.begin, position.end]; }
+	sliderBegin.css({
+		left : (position.begin * width) + "px"
+	})
+	.find(".head").html(relativeTime(position.begin));
+	sliderEnd.css({
+		left : (position.end * width) + "px"
+	})
+	.find(".head").html(relativeTime(position.end));
+};
+
+let dragStart, slideTarget;
+
+sliderBegin.on("mousedown", (evt) => {
+	evt.preventDefault();
+	evt.stopPropagation();
+	dragStart = evt.clientX;
+	slideTarget = "begin";
+});
+sliderEnd.on("mousedown", (evt) => {
+	evt.preventDefault();
+	evt.stopPropagation();
+	dragStart = evt.clientX;
+	slideTarget = "end";
+});
+$(document).on("mouseup", (evt) => {
+	slideTarget = null;
+});
+
+$(document).on("mousemove", (evt) => {
+	const diff = evt.clientX - dragStart;
+	const relativeDiff = diff / width;
+	if(slideTarget === "begin") {
+		position.begin += relativeDiff;
+	}
+	else if(slideTarget === "end") {
+		position.end += relativeDiff;
+	}
+	console.log(position, relativeDiff);
+	dragStart = evt.clientX;
+	updateSliderPositions();
+});
+
+
 let audio;
 const context = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -82,6 +145,7 @@ const drawAudio = function(audioBuffer) {
 	analyzerNode.connect(context.destination);
 	source.start(0);
 	drawScale();
+	updateSliderPositions();
 };
 
 const request = new XMLHttpRequest();
