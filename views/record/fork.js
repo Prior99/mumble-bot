@@ -2,13 +2,20 @@ import $ from "jquery";
 import spawnNotification from "../notification";
 import Get from "../get";
 import AnalyzerNode from "./analyzernode";
+import Handlebars from "handlebars";
+import Moment from "moment";
+
+Handlebars.registerHelper("formatDate", (date) => Moment(date).format("DD.MM.YY"));
+Handlebars.registerHelper("formatTime", (date) => Moment(date).format("HH:mm"));
+Handlebars.registerHelper("fixed2", (number) => number.toFixed(2));
+const RecordInfoTemplate = Handlebars.compile($("#record-template").html());
 
 const BUFFER_SIZE = 4096;
 
 const jqCanvas = $("#fork-canvas");
 const canvas = jqCanvas[0];
-const width = canvas.width = jqCanvas.width();
-const height = canvas.height = jqCanvas.height();
+let width;
+let height;
 const ctx = canvas.getContext("2d");
 
 const recordId = Get()["id"];
@@ -16,11 +23,13 @@ let audio;
 const context = new (window.AudioContext || window.webkitAudioContext)();
 
 let dragStart, slideTarget;
+
 const sliderBegin = $(".slider-begin");
 const sliderEnd = $(".slider-end");
 const sliderIndicator = $(".slider-indicator");
 const boxLeft = $(".box-left");
 const boxRight = $(".box-right");
+
 let position = {
 	begin : 0.1,
 	end : 0.9,
@@ -28,7 +37,7 @@ let position = {
 };
 
 const createSliderScriptNode = function() {
-	const scriptNode = context.createScriptProcessor(4096, 1, 1);
+	const scriptNode = context.createScriptProcessor(1024, 1, 1);
 	scriptNode.onaudioprocess = (evt) => {
 		const inputBuffer = evt.inputBuffer.getChannelData(0);
 		const outputBuffer = evt.outputBuffer.getChannelData(0);
@@ -90,6 +99,7 @@ sliderEnd.on("mousedown", (evt) => {
 	dragStart = evt.clientX;
 	slideTarget = "end";
 });
+
 $(document).on("mouseup", (evt) => {
 	slideTarget = null;
 });
@@ -144,6 +154,8 @@ const playback = function(start, end, nodes) {
 }
 
 $("#play").click((evt) => {
+	evt.preventDefault();
+	evt.stopPropagation();
 	if($(evt.currentTarget).hasClass("disabled")) {
 		return;
 	}
@@ -153,7 +165,7 @@ $("#play").click((evt) => {
 });
 
 const loadAudio = function(buffer) {
-	context.decodeAudioData(request.response, (audioBuffer) => {
+	context.decodeAudioData(buffer, (audioBuffer) => {
 		if(audioBuffer) {
 			drawAudio(audioBuffer);
 		}
@@ -218,9 +230,19 @@ const drawAudio = function(audioBuffer) {
 	updateSliderPositions();
 };
 
-const request = new XMLHttpRequest();
-request.open("GET", "/api/record/download?id=" + recordId, true);
-request.responseType = "arraybuffer";
-request.onload = () => loadAudio(request.response);
-request.onerror = () => spawnNotification("error", "Konnte Audio nicht laden.");
-request.send();
+
+$.ajax("/api/record/get?id=" + recordId)
+.done((res) => {
+	$("#record-info").html(RecordInfoTemplate({
+		record : res.record
+	}));
+	$("#description").html("[Edited] " + res.record.quote);
+	width = canvas.width = jqCanvas.width();
+	height = canvas.height = jqCanvas.height();
+	const request = new XMLHttpRequest();
+	request.open("GET", "/api/record/download?id=" + recordId, true);
+	request.responseType = "arraybuffer";
+	request.onload = () => loadAudio(request.response);
+	request.onerror = () => spawnNotification("error", "Konnte Audio nicht laden.");
+	request.send();
+});

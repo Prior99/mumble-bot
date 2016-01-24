@@ -1,5 +1,33 @@
+<script id="record-template" type="text/x-handlebars-template">
+<table class="table table-striped">
+	<tr>
+		<th width="200">Author</th>
+		<td>\{{record.user.username}}</td>
+	</tr>
+	<tr>
+		<th width="200">Aufgenommen von</th>
+		<td>\{{record.reporter.username}}</td>
+	</tr>
+	<tr>
+		<th width="200">Aufgenommen am</th>
+		<td>\{{formatDate submitted}} \{{formatTime submitted}}</td>
+	</tr>
+	<tr>
+		<th width="200">Dauer</th>
+		<td>\{{fixed2 record.duration}}s</td>
+	</tr>
+	<tr>
+		<th width="200">Text</th>
+		<td>\{{record.quote}}</td>
+	</tr>
+</table>
+</script>
 <h1>Aufnahme Forken</h1>
 <p>Hier können Aufnahmen modifiziert und als neue Aufnahmen gespeichert werden.</p>
+<h2>Info</h2>
+<div id="record-info"></div>
+
+<h2>Editor</h2>
 <div class="fork-box">
 	<div class="slider slider-begin">
 		<div class="head">0.0s</div>
@@ -17,5 +45,36 @@
 	<canvas id="timeline-canvas"></canvas>
 	<canvas id="fork-canvas"></canvas>
 </div>
-<button class="btn btn-default btn-block disabled" id="play"><i class="fa fa-volume-up"></i> Play</button>
+
+<h2>Daten</h2>
+<form class="form-horizontal">
+	<div class="form-group">
+		<label for="play" class="col-sm-2 control-label">Abspielen</label>
+		<div class="col-sm-10">
+			<button class="btn btn-primary disabled" id="play"> <i class="fa fa-volume-up"></i> Play</button>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="overwrite" class="col-sm-2 control-label">Überschreiben</label>
+		<div class="col-sm-10">
+			<input type="checkbox" value="overwrite" id="overwrite"/>
+			Aktivieren, wenn die originale Aufnahme durch diese Aufnahme überschrieben werden soll, anstatt eine neue Aufnahme anzulegen.
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="description" class="col-sm-2 control-label">Beschreibung</label>
+		<div class="col-sm-10">
+			<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-edit"></i></span>
+				<textarea style="resize: none;" rows="3" name="description" class="form-control" id="description"></textarea>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="save" class="col-sm-2 control-label">Speichern</label>
+		<div class="col-sm-10">
+			<button class="btn btn-success" type="button" id="submit"><i class="fa fa-save"></i> Speichern</button>
+		</div>
+	</div>
+</form>
 <script src="/dist/record/fork.js"></script>
