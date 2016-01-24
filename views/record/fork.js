@@ -78,14 +78,14 @@ $(document).on("mousemove", (evt) => {
 });
 
 $("#play").click((evt) => {
-	/*if($(evt.currentTarget).hasClass("disabled")) {
+	if($(evt.currentTarget).hasClass("disabled")) {
 		return;
-	}*/
+	}
 	const begin = position.begin * audio.duration;
 	const end = position.end * audio.duration;
 	const source = context.createBufferSource();
 	source.buffer = audio;
-	source.onended = () => $("#play").removeClass("disabled");
+	setTimeout(() => $("#play").removeClass("disabled"), (end - begin) * 1000);
 	source.connect(context.destination);
 	source.start(0, begin, end - begin);
 	$("#play").addClass("disabled");
@@ -156,10 +156,7 @@ const drawAudio = function(audioBuffer) {
 	source.buffer = audioBuffer;
 	source.connect(analyzerNode);
 	analyzerNode.connect(context.destination);
-	source.onended = () => {
-		console.log("Onended");
-		$("#play").removeClass("disabled");
-	};
+	setTimeout(() => $("#play").removeClass("disabled"), audioBuffer.duration * 1000);
 	source.start(0);
 	drawScale();
 	updateSliderPositions();
