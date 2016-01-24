@@ -12,9 +12,10 @@ const height = canvas.height = jqCanvas.height();
 const ctx = canvas.getContext("2d");
 
 const recordId = Get()["id"];
+let audio;
+const context = new (window.AudioContext || window.webkitAudioContext)();
 
-
-
+let dragStart, slideTarget;
 const sliderBegin = $(".slider-begin");
 const sliderEnd = $(".slider-end");
 let position = {
@@ -43,7 +44,6 @@ const updateSliderPositions = function() {
 	.find(".head").html(relativeTime(position.end));
 };
 
-let dragStart, slideTarget;
 
 sliderBegin.on("mousedown", (evt) => {
 	evt.preventDefault();
@@ -62,6 +62,9 @@ $(document).on("mouseup", (evt) => {
 });
 
 $(document).on("mousemove", (evt) => {
+	if(!audio) {
+		return;
+	}
 	const diff = evt.clientX - dragStart;
 	const relativeDiff = diff / width;
 	if(slideTarget === "begin") {
@@ -70,14 +73,23 @@ $(document).on("mousemove", (evt) => {
 	else if(slideTarget === "end") {
 		position.end += relativeDiff;
 	}
-	console.log(position, relativeDiff);
 	dragStart = evt.clientX;
 	updateSliderPositions();
 });
 
-
-let audio;
-const context = new (window.AudioContext || window.webkitAudioContext)();
+$("#play").click((evt) => {
+	/*if($(evt.currentTarget).hasClass("disabled")) {
+		return;
+	}*/
+	const begin = position.begin * audio.duration;
+	const end = position.end * audio.duration;
+	const source = context.createBufferSource();
+	source.buffer = audio;
+	source.onended = () => $("#play").removeClass("disabled");
+	source.connect(context.destination);
+	source.start(0, begin, end - begin);
+	$("#play").addClass("disabled");
+});
 
 const loadAudio = function(buffer) {
 	context.decodeAudioData(request.response, (audioBuffer) => {
@@ -140,9 +152,14 @@ const drawScale = function() {
 const drawAudio = function(audioBuffer) {
 	const source = context.createBufferSource();
 	const analyzerNode = AnalyzerNode(context, canvas, audioBuffer);
-	source.buffer = audio = audioBuffer;
+	audio = audioBuffer;
+	source.buffer = audioBuffer;
 	source.connect(analyzerNode);
 	analyzerNode.connect(context.destination);
+	source.onended = () => {
+		console.log("Onended");
+		$("#play").removeClass("disabled");
+	};
 	source.start(0);
 	drawScale();
 	updateSliderPositions();
