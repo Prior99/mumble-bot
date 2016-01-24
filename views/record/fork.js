@@ -1,7 +1,7 @@
 import $ from "jquery";
 import spawnNotification from "../notification";
-import AudioAnalyzer from "../../src/audioanalyzer";
 import Get from "../get";
+import AnalyzerNode from "./analyzernode";
 
 const BUFFER_SIZE = 4096;
 
@@ -13,33 +13,80 @@ const ctx = canvas.getContext("2d");
 
 const recordId = Get()["id"];
 
+let audio;
 const context = new (window.AudioContext || window.webkitAudioContext)();
 
-const loadAudio = function(record) {
-	const samples = Math.ceil(context.sampleRate * record.duration);
-	const samplesPerPixel = parseInt(samples / width);
-	const list = [];
-	const audio = new Audio("/api/record/download?id=" + recordId);
-	const source = context.createMediaElementSource(audio);
-	const scriptNode = context.createScriptProcessor(BUFFER_SIZE, 1, 1);
-	const analyzer = new AudioAnalyzer(samplesPerPixel);
-	scriptNode.onaudioprocess = (evt) => {
-		if(evt.inputBuffer.length > 0) {
-			const inputBuffer = evt.inputBuffer.getChannelData(0);
-			const outputBuffer = evt.outputBuffer.getChannelData(0);
-			analyzer.analyze(inputBuffer);
-			analyzer.draw(canvas);
-			for(let i = 0; i < inputBuffer.length; i++) {
-				outputBuffer[i] = inputBuffer[i];
-			}
+const loadAudio = function(buffer) {
+	context.decodeAudioData(request.response, (audioBuffer) => {
+		if(audioBuffer) {
+			drawAudio(audioBuffer);
 		}
-	};
-	source.connect(scriptNode);
-	scriptNode.connect(context.destination);
-	audio.play();
-	window.doNotGarbageCollectMe = scriptNode; // Workaround for garbagecollector.
+		else {
+			spawnNotification("error", "Konnte Audio nicht dekodieren.");
+		}
+	});
 };
 
-$.ajax("/api/record/get?id=" + recordId)
-.done((res) => loadAudio(res.record))
-.error(() => spawnNotification("error", "Konnte Metadaten nicht laden."));
+const drawScale = function() {
+	const grayHeight = 40;
+	const ticks = audio.duration / 100;
+
+	const jqScaleCanvas = $("#timeline-canvas");
+	const scaleCanvas = jqScaleCanvas[0];
+	const scaleCtx = scaleCanvas.getContext("2d");
+	// Set height of canvas fitting css dimensions
+	scaleCanvas.width = jqScaleCanvas.width();
+	scaleCanvas.height = jqScaleCanvas.height();
+	// Fill top rect
+	scaleCtx.fillStyle = "#555"
+	scaleCtx.fillRect(0, 0, scaleCanvas.width, grayHeight);
+	// Configure font on context
+	scaleCtx.strokeStyle = scaleCtx.fillStyle = "white";
+	scaleCtx.font = (grayHeight / 2 - 2) + "px Helvetica";
+	scaleCtx.textAlign = "center";
+
+	const pixelsPerSecond = scaleCanvas.width / audio.duration;
+	for(let i = 0; i < 100; i++) {
+		let y;
+		const x = i * ticks * pixelsPerSecond;
+		if(i % 10 === 0) { // Every 10 ticks draw a major tick
+			scaleCtx.lineWidth = 2;
+			y = grayHeight / 2;
+			if(i != 0 && i != 100) {
+				const text = i * ticks;
+				scaleCtx.fillText(text.toFixed(1) + "s", x, grayHeight / 2 - 4);
+			}
+		}
+		else {
+			y = (grayHeight / 4) * 3;
+			scaleCtx.lineWidth = 1;
+		}
+		// Draw top line
+		scaleCtx.beginPath();
+		scaleCtx.strokeStyle = "white";
+		scaleCtx.moveTo(x, y);
+		scaleCtx.lineTo(x, grayHeight);
+		scaleCtx.stroke();
+		// Draw bottom line
+		scaleCtx.strokeStyle = "#DDD";
+		scaleCtx.lineTo(x, scaleCanvas.height);
+		scaleCtx.stroke();
+	}
+};
+
+const drawAudio = function(audioBuffer) {
+	const source = context.createBufferSource();
+	const analyzerNode = AnalyzerNode(context, canvas, audioBuffer);
+	source.buffer = audio = audioBuffer;
+	source.connect(analyzerNode);
+	analyzerNode.connect(context.destination);
+	source.start(0);
+	drawScale();
+};
+
+const request = new XMLHttpRequest();
+request.open("GET", "/api/record/download?id=" + recordId, true);
+request.responseType = "arraybuffer";
+request.onload = () => loadAudio(request.response);
+request.onerror = () => spawnNotification("error", "Konnte Audio nicht laden.");
+request.send();
