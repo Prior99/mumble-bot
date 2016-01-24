@@ -18,15 +18,32 @@ const context = new (window.AudioContext || window.webkitAudioContext)();
 let dragStart, slideTarget;
 const sliderBegin = $(".slider-begin");
 const sliderEnd = $(".slider-end");
+const sliderIndicator = $(".slider-indicator");
 let position = {
 	begin : 0.1,
-	end : 0.9
+	end : 0.9,
+	indicator: 0.0
+};
+
+const createSliderScriptNode = function() {
+	const scriptNode = context.createScriptProcessor(4096, 1, 1);
+	scriptNode.onaudioprocess = (evt) => {
+		const inputBuffer = evt.inputBuffer.getChannelData(0);
+		const outputBuffer = evt.outputBuffer.getChannelData(0);
+		position.indicator += evt.inputBuffer.duration / audio.duration;
+		updateSliderPositions();
+		for(let i = 0; i < inputBuffer.length; i++) {
+			outputBuffer[i] = inputBuffer[i];
+		}
+	};
+	window.fixGarbageCollectionBug = scriptNode;
+	return scriptNode;
 };
 
 const relativeTime = function(rel) {
 	const time = rel * audio.duration;
 	return time.toFixed(1) + "s";
-}
+};
 
 const updateSliderPositions = function() {
 	if(position.begin > 1) { position.begin = 1; }
@@ -42,6 +59,9 @@ const updateSliderPositions = function() {
 		left : (position.end * width) + "px"
 	})
 	.find(".head").html(relativeTime(position.end));
+	sliderIndicator.css({
+		left : (position.indicator * width) + "px"
+	});
 };
 
 
@@ -77,18 +97,46 @@ $(document).on("mousemove", (evt) => {
 	updateSliderPositions();
 });
 
+const playback = function(start, end, nodes) {
+	if(typeof start === "undefined") {
+		start = 0;
+	}
+	if(typeof end === "undefined") {
+		end = audio.duration;
+	}
+	if(!nodes) {
+		nodes = [];
+	}
+	position.indicator = start / audio.duration;
+	const source = context.createBufferSource();
+	source.buffer = audio;
+	setTimeout(() => {
+		$("#play").removeClass("disabled");
+		position.indicator = 0;
+		for(const node of nodes) {
+			node.disconnect();
+		}
+		source.stop();
+	}, (end - start) * 1000);
+	const indicatorUpdateNode = createSliderScriptNode();
+	nodes.push(indicatorUpdateNode);
+	let lastNode = source;
+	for(const node of nodes) {
+		lastNode.connect(node);
+		lastNode = node;
+	}
+	lastNode.connect(context.destination);
+	source.start(0, start, end - start);
+	$("#play").addClass("disabled");
+}
+
 $("#play").click((evt) => {
 	if($(evt.currentTarget).hasClass("disabled")) {
 		return;
 	}
 	const begin = position.begin * audio.duration;
 	const end = position.end * audio.duration;
-	const source = context.createBufferSource();
-	source.buffer = audio;
-	setTimeout(() => $("#play").removeClass("disabled"), (end - begin) * 1000);
-	source.connect(context.destination);
-	source.start(0, begin, end - begin);
-	$("#play").addClass("disabled");
+	playback(begin, end);
 });
 
 const loadAudio = function(buffer) {
@@ -150,14 +198,9 @@ const drawScale = function() {
 };
 
 const drawAudio = function(audioBuffer) {
-	const source = context.createBufferSource();
 	const analyzerNode = AnalyzerNode(context, canvas, audioBuffer);
 	audio = audioBuffer;
-	source.buffer = audioBuffer;
-	source.connect(analyzerNode);
-	analyzerNode.connect(context.destination);
-	setTimeout(() => $("#play").removeClass("disabled"), audioBuffer.duration * 1000);
-	source.start(0);
+	playback(0, audio.duration, [analyzerNode]);
 	drawScale();
 	updateSliderPositions();
 };

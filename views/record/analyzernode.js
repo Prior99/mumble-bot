@@ -5,9 +5,10 @@ window._analyzerNodesDoNotGarbageCollect = [];
 export default function(context, canvas, audioBuffer) {
 	const samples = audioBuffer.length;
 	const samplesPerPixel = parseInt(samples / canvas.width);
-	const scriptNode = context.createScriptProcessor();
+	const scriptNode = context.createScriptProcessor(4096, 1, 1);
 	const analyzer = new AudioAnalyzer(samplesPerPixel);
 	scriptNode.onaudioprocess = (evt) => {
+		console.log("ANALYZER EVENT");
 		if(evt.inputBuffer.length > 0) {
 			const inputBuffer = evt.inputBuffer.getChannelData(0);
 			const outputBuffer = evt.outputBuffer.getChannelData(0);
