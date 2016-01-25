@@ -17,7 +17,6 @@ const VisualizeAudioFile = function(filename, height, samplesPerPixel) {
 	return new Promise((resolve, reject) => {
 		try {
 			const analyzer = new AudioAnalyzer(samplesPerPixel);
-			console.log("sperp", samplesPerPixel);
 			const ffmpeg = FFMpeg(filename);
 			const stream = ffmpeg.format("u8")
 				.audioChannels(1)

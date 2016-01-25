@@ -16,6 +16,7 @@ import ViewLookup from "./lookup";
 import ViewGet from "./get";
 import ViewVisualized from "./visualized";
 import ViewVisualizedCached from "./visualizedcached";
+import ViewFork from "./fork";
 
 /**
  * Router for all API callbacks related to /api/record/.
@@ -41,6 +42,7 @@ const RouteRecords = function(bot) {
 	router.use("/play_dialog", ViewPlayDialog(bot));
 	router.use("/visualized", ViewVisualized(bot));
 	router.use("/visualizedcached", ViewVisualizedCached(bot));
+	router.use("/fork", ViewFork(bot));
 
 	return router;
 };

@@ -90,12 +90,12 @@ const RecordsExtension = function(Database) {
 	 */
 	Database.prototype.listRecords = async function(since) {
 		let rows;
-		if(since) {
-			rows = await this.connection.query("SELECT id FROM Records WHERE changed >= ? ORDER BY used DESC", since);
-		}
-		else {
-			rows = await this.connection.query("SELECT id FROM Records ORDER BY used DESC");
-		}
+		rows = await this.connection.query(
+			"SELECT id " +
+			"FROM Records " +
+			"WHERE id NOT IN (SELECT parent FROM Records WHERE overwrite = TRUE) " +
+			(since ? "AND changed >= ? " : "") +
+			"ORDER BY used DESC", since);
 		const records = await this._completeRecords(rows);
 		return records;
 	};
@@ -132,6 +132,8 @@ const RecordsExtension = function(Database) {
 	 * @property {string} quote - The quote for this record (textual description).
 	 * @property {number} used - How often this record was already used.
 	 * @property {DatabaseUser} user - The user who said this record.
+	 * @property {boolean} overwrite - Whether this forked record overwrites the original one.
+	 * @property {number} parent - Id of the record this record is forked from or null if its an original one.
 	 * @property {date} submitted - When the record was originally recorded.
 	 * @property {Label[]} labels - A list of all labels with which this record was tagged.
 	 */
@@ -143,7 +145,7 @@ const RecordsExtension = function(Database) {
 	 */
 	Database.prototype.getRecord = async function(id) {
 		const rows = await this.connection.query(
-			"SELECT id, quote, used, user, submitted, duration, changed, reporter " +
+			"SELECT id, quote, used, user, submitted, duration, changed, reporter, overwrite, parent " +
 			"FROM Records " +
 			"WHERE id = ?", [id]
 		);
@@ -287,6 +289,25 @@ const RecordsExtension = function(Database) {
 			"GROUP BY user"
 		);
 		return rows;
+	};
+
+	/**
+	 * Forks a record after it was edited.
+	 * @param {DatabaseUser} user - User who spoke the record.
+	 * @param {Date} submitted - The date the record was submitted.
+	 * @param {string} quote - New quote of the record.
+	 * @param {number} parent - Parent record this record was forked from (id).
+	 * @param {boolean} overwrite -Whether the original record should be shadowed by this one.
+	 * @param {DatabaseUser} reporter - The user that forked this record.
+	 * @param {number} duration - New duration of this record.
+	 * @return {number} id of the new record.
+	 */
+	Database.prototype.forkRecord = async function(user, submitted, quote, parent, overwrite, reporter, duration) {
+		const result = await this.connection.query(
+			"INSERT INTO Records(user, submitted, reporter, duration, quote, changed, overwrite, parent) " +
+			"VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+			[user.id, submitted, reporter.id, duration, quote, new Date(), overwrite, parent]);
+		return result.insertId;
 	};
 };
 
