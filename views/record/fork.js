@@ -230,6 +230,24 @@ const drawAudio = function(audioBuffer) {
 	updateSliderPositions();
 };
 
+$("#submit").click((evt) => {
+	evt.preventDefault();
+	evt.stopPropagation();
+	const actions = [{
+		action : "crop",
+		begin : position.begin * audio.duration,
+		end : position.end * audio.duration
+	}];
+	const url = "/api/record/fork?id="  + recordId +
+		"&actions=" + encodeURI(JSON.stringify(actions)) +
+		"&overwrite=" + $("#overwrite").prop("checked") +
+		"&quote=" + encodeURI($("#description").val());
+	$.ajax(url)
+	.done((res) => {
+		window.location.href = "/record/";
+	})
+	.error((res) => spawnNotification("error", "Konnte bearbeitete Aufnahme nicht speichern."));
+});
 
 $.ajax("/api/record/get?id=" + recordId)
 .done((res) => {
