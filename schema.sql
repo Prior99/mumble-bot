@@ -84,6 +84,8 @@ CREATE TABLE IF NOT EXISTS Records (
 	used			INT NOT NULL DEFAULT 0,
 	changed			DATETIME NOT NULL,
 	duration		FLOAT NOT NULL,
+	parent			INT,
+	overwrite		BOOLEAN NOT NULL DEFAULT FALSE,
 	FOREIGN KEY(user) REFERENCES Users(id)
 );
 
