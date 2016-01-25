@@ -36,21 +36,6 @@ let position = {
 	indicator: 0.0
 };
 
-const createSliderScriptNode = function() {
-	const scriptNode = context.createScriptProcessor(1024, 1, 1);
-	scriptNode.onaudioprocess = (evt) => {
-		const inputBuffer = evt.inputBuffer.getChannelData(0);
-		const outputBuffer = evt.outputBuffer.getChannelData(0);
-		position.indicator += evt.inputBuffer.duration / audio.duration;
-		updateSliderPositions();
-		for(let i = 0; i < inputBuffer.length; i++) {
-			outputBuffer[i] = inputBuffer[i];
-		}
-	};
-	window.fixGarbageCollectionBug = scriptNode;
-	return scriptNode;
-};
-
 const relativeTime = function(rel) {
 	const time = rel * audio.duration;
 	return time.toFixed(1) + "s";
@@ -83,9 +68,22 @@ const updateSliderPositions = function() {
 		left : rightSliderCSSPosition + "px",
 		width : (width - rightSliderCSSPosition) + "px"
 	});
-
 };
 
+const createSliderScriptNode = function() {
+	const scriptNode = context.createScriptProcessor(1024, 1, 1);
+	scriptNode.onaudioprocess = (evt) => {
+		const inputBuffer = evt.inputBuffer.getChannelData(0);
+		const outputBuffer = evt.outputBuffer.getChannelData(0);
+		position.indicator += evt.inputBuffer.duration / audio.duration;
+		updateSliderPositions();
+		for(let i = 0; i < inputBuffer.length; i++) {
+			outputBuffer[i] = inputBuffer[i];
+		}
+	};
+	window.fixGarbageCollectionBug = scriptNode;
+	return scriptNode;
+};
 
 sliderBegin.on("mousedown", (evt) => {
 	evt.preventDefault();
@@ -164,16 +162,6 @@ $("#play").click((evt) => {
 	playback(begin, end);
 });
 
-const loadAudio = function(buffer) {
-	context.decodeAudioData(buffer, (audioBuffer) => {
-		if(audioBuffer) {
-			drawAudio(audioBuffer);
-		}
-		else {
-			spawnNotification("error", "Konnte Audio nicht dekodieren.");
-		}
-	});
-};
 
 const drawScale = function() {
 	const grayHeight = 40;
@@ -228,6 +216,17 @@ const drawAudio = function(audioBuffer) {
 	playback(0, audio.duration, [analyzerNode]);
 	drawScale();
 	updateSliderPositions();
+};
+
+const loadAudio = function(buffer) {
+	context.decodeAudioData(buffer, (audioBuffer) => {
+		if(audioBuffer) {
+			drawAudio(audioBuffer);
+		}
+		else {
+			spawnNotification("error", "Konnte Audio nicht dekodieren.");
+		}
+	});
 };
 
 $("#submit").click((evt) => {
