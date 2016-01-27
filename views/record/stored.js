@@ -10,6 +10,8 @@ Handlebars.registerHelper("formatDate", (date) => Moment(date).format("DD.MM.YY"
 Handlebars.registerHelper("formatTime", (date) => Moment(date).format("HH:mm"));
 Handlebars.registerHelper("colorify", (string) => colorify(string));
 Handlebars.registerHelper("fixed2", (number) => number.toFixed(2));
+Handlebars.registerHelper("isFork", (record, block) => record.parent ? block.fn(record) : undefined);
+Handlebars.registerHelper("isNotOverwritten", (record, block) => !record.overwrite ? block.fn(record) : undefined);
 
 const ListTemplate = Handlebars.compile($("#template-list").html());
 const PageinationTemplate = Handlebars.compile($("#template-pageination").html());
@@ -107,6 +109,10 @@ const search = function() {
 				const user = part.substr(5);
 				return record.user.username.toLowerCase() === user;
 			}
+			else if(part.substr(0, 3) === "id:") {
+				const id = +part.substr(3);
+				return record.id === id;
+			}
 			else {
 				return record.quote.toLowerCase().indexOf(part) !== -1;
 			}
@@ -193,6 +199,19 @@ $(document).on("click", "a.playrecord", (e) => {
 	$.ajax("/api/record/play?id=" + id)
 	.done((res) => spawnNotification("success", "Aufnahme erfolgreich wiedergegeben."))
 	.error(() => spawnNotification("error", "Konnte Aufnahme nicht abspielen."));
+});
+
+$(document).on("click", "a.forkLink", (e) => {
+	const id = $(e.currentTarget).attr("forkId");
+	const sval = $("#search").val();
+	if(sval.length) {
+		$("#search").val($("#search").val() + " id:" + id)
+	}
+	else {
+		$("#search").val("id:" + id);
+	}
+	query = $("#search").val();
+	search();
 });
 
 $(document).on("click", "a.label", (e) => {

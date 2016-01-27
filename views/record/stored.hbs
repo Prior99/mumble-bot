@@ -4,6 +4,18 @@
 		<td width="120" style="border-right: 1px solid #EEE;">
 			<p class="text-nowrap"><i class="fa fa-user"></i> <a class="username" userName="\{{user.username}}">\{{user.username}}</a></p>
 			<p class="text-nowrap"><i class="fa fa-plus"></i> <a class="reporter" reporterName="\{{reporter.username}}">\{{reporter.username}}</a></p>
+			\{{#isFork this}}
+				<p class="text-nowrap">
+					<i class="fa fa-code-fork"></i>
+					\{{#isNotOverwritten this}}
+					<a class="forkLink" forkId="\{{parent}}"\>
+					\{{/isNotOverwritten}}
+						\{{this.parent}}
+					\{{#isNotOverwritten this}}
+					</a>
+					\{{/isNotOverwritten}}
+				</p>
+			\{{/isFork}}
 		</td>
 			<td width="120" style="border-right: 1px solid #EEE;">
 				<p class="text-nowrap"><i class="fa fa-clock-o"></i> <small>\{{formatDate submitted}} \{{formatTime submitted}}</small></p>
