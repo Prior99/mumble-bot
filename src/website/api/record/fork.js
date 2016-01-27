@@ -21,6 +21,7 @@ const ViewFork = function(bot) {
 		Winston.verbose(req.session.user.username +" is forking record #" + id);
 		let newId, record, duration;
 		try {
+			// Calculate new duration
 			record = await bot.database.getRecord(id);
 			duration = record.duration;
 			for(const action of actions) {
@@ -28,7 +29,16 @@ const ViewFork = function(bot) {
 					duration = action.end - action.begin;
 				}
 			}
-			newId = await bot.database.forkRecord(record.user, record.submitted, quote, id, overwrite, req.session.user, duration);
+			// Fork in the database
+			newId = await bot.database.forkRecord(
+				record.user,
+				record.submitted,
+				quote,
+				id,
+				overwrite,
+				req.session.user,
+				duration
+			);
 		}
 		catch(err) {
 			Winston.error("Error occured while metadata on fork of record: ", err);
@@ -36,49 +46,18 @@ const ViewFork = function(bot) {
 			return;
 		}
 
-		const crop = (begin, end) => {
-			return new Promise((resolve, reject) => {
-				let frames = 0;
-				const beginByte = audioFreq * begin * 4; // 4 because of the bytes/floats
-				const endByte = audioFreq * end * 4;
-				const passthrough = new PassThroughStream();
-				const inputFile = "sounds/recorded/" + id;
-				const outputFile = "sounds/recorded/" + newId;
-				Winston.verbose("Cropping file " + inputFile + " to file " + outputFile);
-				const encoder = FFMpeg(passthrough)
-					.inputOptions(
-						"-f", "s32le",
-						"-ar", audioFreq,
-						"-ac", "1"
-					)
-					.audioCodec("libmp3lame")
-					.on("error", (err) => reject(err))
-					.save(outputFile);
-				const decoder = FFMpeg(inputFile);
-				const stream = decoder
-					.format("s32le")
-					.audioChannels(1)
-					.audioFrequency(audioFreq)
-					.on("error", (err) => reject(err))
-					.stream();
-				stream.on("data", (chunk) => {
-					if(frames + chunk.length >= beginByte && frames <= endByte) {
-						const startSlice = Math.max(0, beginByte - frames);
-						const endSlice = Math.min(chunk.length, endByte - frames);
-						const slice = chunk.slice(startSlice, endSlice);
-						console.log(slice);
-						passthrough.write(slice);
-					}
-					frames += chunk.length;
-				})
-				.on("end", () => {
-					passthrough.end();
-					resolve();
-				});
-			});
-		};
+		const crop = (begin, end) => new Promise((resolve, reject) => {
+			const transcoder = FFMpeg("sounds/recorded/" + id)
+				.seekInput(begin)
+				.duration(end - begin)
+				.format("mp3")
+				.audioCodec("libmp3lame")
+				.on("error", (err) => reject(err))
+				.save("sounds/recorded/" + newId);
+		});
 
 		try {
+			// Perform the actual modifications
 			for(const action of actions) {
 				if(action.action === "crop") {
 					await crop(+action.begin, +action.end);
