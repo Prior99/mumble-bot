@@ -53,7 +53,8 @@ const ViewFork = function(bot) {
 				.format("mp3")
 				.audioCodec("libmp3lame")
 				.on("error", (err) => reject(err))
-				.save("sounds/recorded/" + newId);
+				.save("sounds/recorded/" + newId)
+				.on("end", () => resolve());
 		});
 
 		try {
