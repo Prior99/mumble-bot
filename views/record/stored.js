@@ -148,6 +148,10 @@ const loadData = function() {
 				else {
 					return true;
 				}
+			})
+			.filter((record1) => {
+				const filtered = records.filter((record2) => record2.parent === record1.id && record2.overwrite);
+				return filtered.length === 0;
 			});
 			$("#loading").remove();
 			$("#records").show();
