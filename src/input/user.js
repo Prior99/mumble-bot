@@ -152,6 +152,7 @@ class VoiceInputUser extends Stream.Writable {
 	 * @return {undefined}
 	 */
 	stop() {
+		this._encoder.kill();
 		this.end();
 		if(this._timeout) {
 			clearTimeout(this._timeout);
