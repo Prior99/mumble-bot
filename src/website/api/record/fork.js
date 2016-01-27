@@ -32,7 +32,7 @@ const ViewFork = function(bot) {
 			// Fork in the database
 			newId = await bot.database.forkRecord(
 				record.user,
-				record.submitted,
+				new Date(),
 				quote,
 				id,
 				overwrite,
