@@ -64,7 +64,9 @@ class AFKObserver {
 	 */
 	refreshChannel(newc) {
 		this.times = [];
-		newc.users.forEach(this.registerUser.bind(this));
+		if(newc) {
+			newc.users.forEach(this.registerUser.bind(this));
+		}
 	}
 
 	/**
