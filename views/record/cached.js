@@ -166,6 +166,13 @@ $(document).on("click", "a.deletebutton", (e) => {
 		.done((response) => spawnNotification("success", "Aufnahme gelöscht."))
 		.error(() => spawnNotification("error", "Konnte Aufnahme nicht löschen."));
 });
+
+$(document).on("click", "a.previewbutton", (e) => {
+	const id = $(e.currentTarget).attr("soundId");
+	const audio = new Audio("/api/record/downloadcached?id=" + id);
+	audio.play();
+});
+
 $(document).on("click", "a.playbutton", (e) => {
 	const id = $(e.currentTarget).attr("soundId");
 	$.ajax("/api/record/playcached?id=" + id)
