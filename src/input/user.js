@@ -110,6 +110,7 @@ class VoiceInputUser extends Stream.Writable {
 				"-ar", audioFreq,
 				"-ac", "1"
 			)
+			.on("error", (err) => Winston.error("Encoder for user " + this._user.username + " crashed."))
 			.audioCodec("libmp3lame")
 			.save(this._filename);
 		}
