@@ -15,12 +15,21 @@
 		\{{/if}}
 		</td>
 		<td>
-			<div class="btn-group">
-				<a soundId="\{{this.id}}" class="deletebutton btn btn-danger btn-xs"><i class="fa fa-remove" aria-hidden="true"></i></a>
-				<a soundId="\{{this.id}}" class="protectbutton btn btn-warning btn-xs"><i class="fa fa-lock" aria-hidden="true"></i></a>
-				<a soundId="\{{this.id}}" class="playbutton btn btn-info btn-xs"><i class="fa fa-volume-down" aria-hidden="true"></i></a>
-				<a soundId="\{{this.id}}" class="previewbutton btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i></a>
-				<a href="/record/save?id=\{{this.id}}" class="btn btn-success btn-xs"><i class="fa fa-save" aria-hidden="true"></i></a>
+			<div class="row">
+				<div class="btn-group">
+					<a href="/record/save?id=\{{this.id}}" class="btn btn-success btn-xs"><i class="fa fa-save" aria-hidden="true"></i></a>
+					\{{#if this.protected}}
+					<a soundId="\{{this.id}}" class="deletebutton btn btn-danger btn-xs"><i class="fa fa-remove" aria-hidden="true"></i></a>
+					\{{else}}
+					<a soundId="\{{this.id}}" class="protectbutton btn btn-warning btn-xs"><i class="fa fa-lock" aria-hidden="true"></i></a>
+					\{{/if}}
+				</div>
+			</div>
+			<div class="row">
+				<div class="btn-group">
+					<a soundId="\{{this.id}}" class="previewbutton btn btn-default btn-xs"><i class="fa fa-eye" aria-hidden="true"></i></a>
+					<a soundId="\{{this.id}}" class="playbutton btn btn-default btn-xs"><i class="fa fa-volume-down" aria-hidden="true"></i></a>
+				</div>
 			</div>
 		</td>
 	</tr>
