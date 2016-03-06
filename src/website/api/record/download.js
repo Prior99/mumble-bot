@@ -29,7 +29,7 @@ const ViewDownload = function(bot) {
 				try {
 					const record = await bot.database.getRecord(req.query.id);
 					res.status(HTTPCodes.okay).setHeader(
-						"Content-disposition", "attachment; filename=" + record.quote + ".mp3"
+						"Content-disposition", "attachment; filename='" + record.quote + ".mp3'"
 					);
 					stream.pipe(res);
 				}
