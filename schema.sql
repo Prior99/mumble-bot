@@ -1,17 +1,3 @@
-CREATE TABLE IF NOT EXISTS Quotes (
-	id              INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	author			VARCHAR(128) NOT NULL,
-	quote			TEXT,
-	submitted		DATETIME,
-	used			INT NOT NULL DEFAULT 0
-);
-
-CREATE TABLE IF NOT EXISTS TTSCache (
-	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	text			TEXT NOT NULL,
-	api				VARCHAR(16) NOT NULL DEFAULT 'google'
-);
-
 CREATE TABLE IF NOT EXISTS Users (
 	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	username		VARCHAR(64) NOT NULL,
@@ -50,17 +36,6 @@ CREATE TABLE IF NOT EXISTS MumbleUsers (
 	FOREIGN KEY (user) REFERENCES Users(id)
 );
 
-CREATE TABLE IF NOT EXISTS BassEffects (
-	effect			VARCHAR(128) NOT NULL PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS AutoComplete (
-	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	sentence		VARCHAR(100) NOT NULL,
-	used			INT DEFAULT 1,
-	UNIQUE(sentence)
-);
-
 CREATE TABLE IF NOT EXISTS Sounds (
 	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	name			VARCHAR(64) NOT NULL,
@@ -87,18 +62,6 @@ CREATE TABLE IF NOT EXISTS Records (
 	parent			INT,
 	overwrite		BOOLEAN NOT NULL DEFAULT FALSE,
 	FOREIGN KEY(user) REFERENCES Users(id)
-);
-
-CREATE TABLE IF NOT EXISTS RSS (
-	id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	url				TEXT NOT NULL,
-	name			VARCHAR(32) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS KnownRSSEntries (
-	hash			VARCHAR(32) NOT NULL PRIMARY KEY,
-	url				TEXT NOT NULL,
-	seen			DATETIME NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS RecordLabels (
@@ -151,14 +114,4 @@ INSERT IGNORE INTO Permissions (id, name, description, icon) VALUES
 ("upload-music", "Musik hochladen", "Diese Berechtigung wird benötigt, um Musik hochzuladen, oder aus Youtube zu extrahieren.", "upload"),
 ("kick", "Kicken", "Mit dieser Berechtigung ist es möglich, Benutzer in Mumble aus ihrem Channel zu kicken.", "legal"),
 ("be-quiet", "Stumm Stellen", "Mit dieser Berechtigung kann ein Nutzer die gesamte Ausgabequeue des Bots leeren und so die aktuelle Wiedergabe unterbrechen.", "bell-slash"),
-("log", "Log anzeigen", "Erlaubt es einem Benutzer, die Logausgabe des Bots zu betrachten.", "file-text"),
-("rss", "RSS Feed abonnieren", "Mit dieser Berechtigung darf ein Nutzer RSS-Feeds abonnieren.", "rss");
-
-INSERT IGNORE INTO BassEffects (effect) VALUES
-("Drop den Bass"),
-("härter"),
-("Schlampe"),
-("Put your hands up in the air"),
-("wubsch"),
-("wobbel"),
-("lublub");
+("log", "Log anzeigen", "Erlaubt es einem Benutzer, die Logausgabe des Bots zu betrachten.", "file-text");

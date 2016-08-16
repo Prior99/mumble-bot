@@ -4,6 +4,7 @@ import HTTPCodes from "../httpcodes";
 import ViewTree from "./channeltree";
 import ViewCommand from "./command";
 import ViewGoogleLookup from "./googlelookup";
+import ViewLog from "./log";
 
 import RouteMusic from "./music";
 import RouteUsers from "./users";
@@ -91,6 +92,7 @@ const RouteAPI = function(bot) {
 	router.use("/record", RouteRecord(bot));
 	router.use("/rss", RouteRSS(bot));
 	router.use("/stats", RouteStats(bot));
+	router.use("/log", ViewLog(bot));
 
 	return router;
 };

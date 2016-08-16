@@ -8,13 +8,17 @@ const ViewUsersList = function(bot) {
 	return async function(req, res) {
 		try {
 			const users = await bot.database.listUsers();
-			res.locals.users = users;
+			res.send({
+				okay: true,
+				users
+			});
 		}
 		catch(err) {
 			Winston.error("Error fetching list of users", err);
-			res.locals.users = [];
+			res.status(HTTPCodes.internalError).send(JSON.stringify({
+				okay : false
+			}));
 		}
-		res.render("users/list");
 	};
 };
 

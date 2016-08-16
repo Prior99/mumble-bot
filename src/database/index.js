@@ -5,18 +5,13 @@ import Winston from "winston";
 import * as MySQL from "promise-mysql";
 import * as FS from "fs-promise";
 
-import QuotesExtension from "./quotes.js";
-import TTSCacheExtension from "./ttscache.js";
 import UsersExtension from "./users.js";
 import PermissionsExtension from "./permissions.js";
 import MumbleUsersExtension from "./mumbleUsers.js";
-import BassExtension from "./bass.js";
-import AutocompleteExtension from "./autocomplete.js";
 import SoundsExtension from "./sounds.js";
 import RecordsExtension from "./records.js";
 import SettingsExtension from "./settings.js";
 import LogExtension from "./log.js";
-import RSSExtension from "./rss.js";
 import DialogsExtension from "./dialogs.js";
 import UserStatsExtension from "./userstats.js";
 
@@ -92,18 +87,13 @@ class Database {
 	}
 }
 
-QuotesExtension(Database);
-TTSCacheExtension(Database);
 UsersExtension(Database);
 PermissionsExtension(Database);
 MumbleUsersExtension(Database);
-BassExtension(Database);
-AutocompleteExtension(Database);
 SoundsExtension(Database);
 RecordsExtension(Database);
 SettingsExtension(Database);
 LogExtension(Database);
-RSSExtension(Database);
 DialogsExtension(Database);
 UserStatsExtension(Database);
 

@@ -7,21 +7,27 @@ import HTTPCodes from "./httpcodes";
  */
 const Log = function(bot) {
 	return async function(req, res) {
-		let entries;
 		try {
-			entries = await bot.database.listLog();
+			const has = await bot.permissions.hasPermission(req.session.user, "log");
+			const entries = await bot.database.listLog();
+			if(has) {
+				res.send({
+					okay: true,
+					entries
+				});
+			}
+			else {
+				res.send({
+					okay: false,
+					reason: "insufficient_permission"
+				});
+			}
 		}
 		catch(err) {
 			Winston.error("Unabled to fetch logentries from database.", err);
-			entries = [];
-		}
-		const has = await bot.permissions.hasPermission(req.session.user, "log");
-		if(has) {
-			res.locals.log = entries;
-			res.render("log");
-		}
-		else {
-			res.status(HTTPCodes.forbidden).send("Forbidden.");
+			res.status(HTTPCodes.internalError).send(JSON.stringify({
+				okay : false
+			}));
 		}
 	};
 };

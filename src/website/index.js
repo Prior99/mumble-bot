@@ -14,32 +14,18 @@ import ViewSpeak from "./speak";
 import ViewRegisterLogin from "./users/registerLogin";
 import ViewLog from "./log";
 import ViewQueue from "./queue";
-import ViewRSS from "./rss";
 
-import RouteMusic from "./music";
 import RouteApi from "./api";
-import RouteQuotes from "./quotes";
 import RouteUsers from "./users";
-import RouteBass from "./bass";
 import RouteRecord from "./record";
 import RouteSounds from "./sounds";
 import RouteStats from "./stats";
 
 const pages = [
 	{
-		url : "/quotes/",
-		name : "Zitate",
-		icon : "commenting"
-	},
-	{
 		url : "/users/",
 		name : "Benutzer",
 		icon : "group"
-	},
-	{
-		url : "/bass/",
-		name : "Bass",
-		icon : "play-circle"
 	},
 	{
 		url : "/record/",
@@ -70,21 +56,6 @@ const subpages = [
 		icon : "sitemap"
 	},
 	{
-		url : "/commands/",
-		name : "Befehle",
-		icon : "cogs"
-	},
-	{
-		url : "/speak/",
-		name : "Sprich!",
-		icon : "comment"
-	},
-	{
-		url : "/google/",
-		name : "Google Instant",
-		icon : "google"
-	},
-	{
 		url : "/log/",
 		name : "Log",
 		icon : "file-text"
@@ -109,20 +80,6 @@ class Website {
 	 */
 	constructor(bot) {
 		this.connections = new Set();
-		if(bot.options.mpd) {
-			pages.unshift({
-				url : "/music/",
-				name : "Musik",
-				icon : "music"
-			});
-		}
-		if(bot.options.rss) {
-			subpages.unshift({
-				url : "/rss/",
-				name : "RSS Feeds",
-				icon : "rss"
-			});
-		}
 		this.app = Express();
 		ExpressWS(this.app);
 		this.app.engine(".hbs", ExpHbs({
@@ -132,9 +89,6 @@ class Website {
 				"colorify" : string => colorify(string),
 				"formatDate" : date => Moment(date).format("DD.MM.YY"),
 				"formatTime" : date => Moment(date).format("HH:mm"),
-				"isSpeech" : function(a, block) { //eslint-disable-line object-shorthand
-					return a.type === "speech" ? block.fn(this) : undefined;
-				},
 				"isSound" : function(a, block) { //eslint-disable-line object-shorthand
 					return a.type === "sound" ? block.fn(this) : undefined;
 				},
@@ -198,23 +152,17 @@ class Website {
 				return ViewRegisterLogin(bot)(req, res);
 			}
 		});
-		this.app.use("/music", RouteMusic(bot));
 		this.app.use("/users", RouteUsers(bot));
-		this.app.use("/bass", RouteBass(bot));
 		this.app.use("/record", RouteRecord(bot));
 		this.app.ws("/record/cached", websocketCached(bot));
 		this.app.ws("/livequeue", websocketQueue(bot));
 		this.app.use("/quotes", RouteQuotes(bot));
 		this.app.use("/sounds", RouteSounds(bot));
 		this.app.use("/stats", RouteStats(bot));
-		this.app.use("/commands", ViewDefault("commands"));
 		this.app.get("/tree", ViewDefault("channeltree"));
 		this.app.get("/", ViewDefault("home"));
-		this.app.get("/speak", ViewSpeak(bot));
-		this.app.get("/google", ViewDefault("googlelookup"));
 		this.app.get("/log", ViewLog(bot));
 		this.app.get("/queue", ViewQueue(bot));
-		this.app.get("/rss", ViewRSS(bot));
 		const port = this.bot.options.website.port;
 		this.server = this.app.listen(port);
 		const timeoutValue = 30000; // 30 seconds timeout

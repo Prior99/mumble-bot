@@ -9,11 +9,17 @@ const Sounds = function(bot) {
 	return async function(req, res) {
 		try {
 			const sounds = await bot.database.listSounds();
-			res.locals.sounds = sounds;
+			res.send({
+				okay: true,
+				sounds
+			})
 		}
 		catch(err) {
 			Winston.error("Could not get list of sounds", err);
-			res.locals.sounds = [];
+			res.status(HTTPCodes.internalError).send({
+				okay: false,
+				reason : "internal_error"
+			});
 		}
 		res.render("sounds/sounds");
 	};

@@ -1,6 +1,5 @@
 import Winston from "winston";
 import Sound from "./sound";
-import Speech from "./speech";
 import Stream from "stream";
 
 const PREBUFFER = 0.5;
@@ -21,15 +20,12 @@ class Output extends Stream.Writable {
 		super(); // TODO
 		this.bot = bot;
 		this.stream = bot.mumble.inputStream();
-		this.speech = new Speech(this, bot.options.espeakData, bot.mumble.user.channel, bot.database, bot);
 		this.sound = new Sound(this);
 		this.busy = false;
 		this.queue = [];
 		this.current = null;
 		this._bufferQueue = [];
 		this._playbackAhead = 0;
-		this.bot.newCommand("change voice", this.changeGender.bind(this),
-			"Deprecated. Changes the gender of the voice.", "venus-mars");
 	}
 	//var PREBUFFER = 0.5; TODO see above
 
@@ -96,7 +92,6 @@ class Output extends Stream.Writable {
 	clear() {
 		this.queue = [];
 		this._bufferQueue = [];
-		this.speech.clear();
 		this.sound.clear();
 		this.emit("clear");
 	}
@@ -120,23 +115,10 @@ class Output extends Stream.Writable {
 	 */
 	_process() {
 		this._processStarted();
-		if(this.current.type === "speech") {
-			this.speech.enqueue({
-				text : this.current.text,
-				print : this.current.print,
-				callback : this._processStopped.bind(this)
-			});
-		}
-		else if(this.current.type === "sound") {
-			this.sound.enqueue({
-				file : this.current.file,
-				callback : this._processStopped.bind(this)
-			});
-		}
-		else {
-			Winston.error("Unkown type of workitem: \"" + this.current.type + "\"");
-			this._processStopped();
-		}
+		this.sound.enqueue({
+			file : this.current.file,
+			callback : this._processStopped.bind(this)
+		});
 	}
 
 	/**
@@ -172,7 +154,6 @@ class Output extends Stream.Writable {
 	playSound(file, meta) {
 		return new Promise((resolve, reject) => {
 			this._enqueue({
-				type : "sound",
 				file,
 				meta,
 				callback() {
@@ -190,47 +171,10 @@ class Output extends Stream.Writable {
 	playSounds(filelist, meta) { // callback TODO?
 		for(let i=0; i<filelist.length; i++) {
 			this._enqueue({
-				type : "sound",
 				file : filelist[i],
 				meta
 			});
 		}
-	}
-
-	/**
-	 * lSay something using TTS.
-	 * @param {string} text -  Text to say viw TTS.
-	 * @returns {Promise} - Will be resolved once the speech was dispatched.
-	 */
-	say(text) {
-		return new Promise((resolve, reject) => {
-			this._enqueue({
-				type : "speech",
-				print : true,
-				text,
-				callback() {
-					resolve();
-				}
-			});
-		});
-	}
-
-	/**
-	 * Say something using TTS, don't print it to the chat.
-	 * @param {string} text -  Text to say viw TTS.
-	 * @returns {Promise} - Will be resolved once the speech was dispatched.
-	 */
-	sayOnlyVoice(text) {
-		return new Promise((resolve, reject) => {
-			this._enqueue({
-				type : "speech",
-				print : false,
-				text,
-				callback() {
-					resolve();
-				}
-			});
-		});
 	}
 
 	/**
