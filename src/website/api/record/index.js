@@ -4,6 +4,7 @@ import ViewPlayCached from "./playcached";
 import ViewSave from "./save";
 import ViewPlay from "./play";
 import ViewDownload from "./download";
+import ViewDownloadCached from "./downloadcached";
 import ViewDeleteCached from "./deletecached";
 import ViewProtect from "./protect";
 import ViewAddLabel from "./addlabel";
@@ -30,6 +31,7 @@ const RouteRecords = function(bot) {
 	router.use("/play", ViewPlay(bot));
 	router.use("/playcached", ViewPlayCached(bot));
 	router.use("/download", ViewDownload(bot));
+	router.use("/downloadcached", ViewDownloadCached(bot));
 	router.use("/protect", ViewProtect(bot));
 	router.use("/deletecached", ViewDeleteCached(bot));
 	router.use("/addlabel", ViewAddLabel(bot));

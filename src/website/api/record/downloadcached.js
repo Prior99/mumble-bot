@@ -3,23 +3,24 @@ import * as FS from "fs";
 import HTTPCodes from "../../httpcodes";
 
 /**
- * This view handles the downloading of records.
+ * This view handles the downloading of cached records.
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewDownload = function(bot) {
+const ViewDownloadCached = function(bot) {
 	return function(req, res) {
 		if(req.query.id) {
-			const stream = FS.createReadStream("sounds/recorded/" + req.query.id)
+			const sound = bot.getCachedAudioById(+req.query.id);
+			const stream = FS.createReadStream(sound.file)
 			.on("error", (err) => {
 				if(err.code === "ENOENT") {
 					res.status(HTTPCodes.notFound).send({
 						okay : false,
-						reason : "no_such_record"
+						reason : "no_such_cached_record"
 					});
 				}
 				else {
-					Winston.error("Error occured when trying to read record with id", req.query.id);
+					Winston.error("Error occured when trying to read cached record with id", req.query.id);
 					res.status(HTTPCodes.internalError).send({
 						okay : false,
 						reason : "internal_error"
@@ -27,9 +28,8 @@ const ViewDownload = function(bot) {
 				}
 			}).on("readable", async () => {
 				try {
-					const record = await bot.database.getRecord(req.query.id);
 					res.status(HTTPCodes.okay).setHeader(
-						"Content-disposition", "attachment; filename='" + record.quote + ".mp3'"
+						"Content-disposition", "attachment; filename='cached_" + req.query.id + ".mp3'"
 					);
 					stream.pipe(res);
 				}
@@ -54,4 +54,4 @@ const ViewDownload = function(bot) {
 	};
 };
 
-export default ViewDownload;
+export default ViewDownloadCached;
