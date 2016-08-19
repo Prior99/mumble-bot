@@ -2,7 +2,6 @@
  * Imports
  */
 import "babel-polyfill";
-import "array.prototype.find";
 import Mumble from "mumble";
 import Bot from "./src";
 import Winston from "winston";
@@ -60,7 +59,7 @@ Winston.add(Winston.transports.File, {
 /*
  * Code
  */
-const options = require("../../config.json");
+const options = require("./config.json");
 
 const mumbleOptions = {};
 

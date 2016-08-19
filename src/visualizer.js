@@ -5,6 +5,7 @@ import AudioAnalyzer from "./audioanalyzer";
 
 const maxUnsignedByte = 240;
 const audioFreq = 44100;
+const maxByte = 255;
 
 /**
  * <b>Async</b> Visualize an audiofile and return the buffer holding a generated png image.
@@ -25,7 +26,7 @@ const VisualizeAudioFile = function(filename, height, samplesPerPixel) {
 			stream.on("data", (chunk) => {
 				const arr = new Float32Array(chunk.length);
 				for(let i = 0; i < chunk.length; i++) {
-					arr[i] = (chunk[i] / 255) * 2 - 1;
+					arr[i] = (chunk[i] / maxByte) * 2 - 1;
 				}
 				analyzer.analyze(arr)
 			});

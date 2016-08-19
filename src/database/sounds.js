@@ -31,7 +31,7 @@ const SoundsExtension = function(Database) {
 
 	/**
 	 * <b>Async</b> Get details on sepcific sound.
-	 * @param {number} - Id of the sound to fetch details of.
+	 * @param {number} id - Id of the sound to fetch details of.
 	 * @return {Sound} - Sound that was requested or null if no such sound was found.
 	 */
 	Database.prototype.getSound = async function(id) {

@@ -140,8 +140,8 @@ class Permissions {
 	 */
 	async getPermission(permission) {
 		try {
-			const permission = await this.database.getPermission(permission);
-			return permission;
+			const databasePermission = await this.database.getPermission(permission);
+			return databasePermission;
 		}
 		catch(err) {
 			Winston.error("Error when getting permission \"" + permission + "\".", err);
@@ -220,7 +220,7 @@ class Permissions {
 	 */
 	async listPermissionsAssocForUser(user) {
 		const obj = {};
-		const permissions = await this.listPermissions(permissions);
+		const permissions = await this.listPermissions();
 		while(permissions.length) {
 			const permission = permissions.shift();
 			const has = await this.hasPermission(user, permission.id);

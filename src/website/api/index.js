@@ -2,18 +2,11 @@ import Express from "express";
 import HTTPCodes from "../httpcodes";
 
 import ViewTree from "./channeltree";
-import ViewCommand from "./command";
-import ViewGoogleLookup from "./googlelookup";
 import ViewLog from "./log";
 
-import RouteMusic from "./music";
 import RouteUsers from "./users";
-import RouteQuotes from "./quotes";
-import RouteBass from "./bass";
-import RouteSpeak from "./speak";
 import RouteSounds from "./sounds";
 import RouteRecord from "./record";
-import RouteRSS from "./rss";
 import RouteStats from "./stats";
 
 /**
@@ -81,16 +74,9 @@ const RouteAPI = function(bot) {
 			loginByQueryString(req, res, next);
 		}
 	});
-	router.use("/music", RouteMusic(bot));
 	router.use("/tree", ViewTree(bot));
-	router.use("/command", ViewCommand(bot));
-	router.use("/quotes", RouteQuotes(bot));
-	router.use("/bass", RouteBass(bot));
-	router.use("/speak", RouteSpeak(bot));
 	router.use("/sounds", RouteSounds(bot));
-	router.use("/google", ViewGoogleLookup(bot));
 	router.use("/record", RouteRecord(bot));
-	router.use("/rss", RouteRSS(bot));
 	router.use("/stats", RouteStats(bot));
 	router.use("/log", ViewLog(bot));
 

@@ -89,8 +89,7 @@ const RecordsExtension = function(Database) {
 	 * @return {Record[]} - List of all records in the database.
 	 */
 	Database.prototype.listRecords = async function(since) {
-		let rows;
-		rows = await this.connection.query(
+		const rows = await this.connection.query(
 			"SELECT id " +
 			"FROM Records " +
 			"WHERE id NOT IN (SELECT parent FROM Records WHERE overwrite = TRUE) " +

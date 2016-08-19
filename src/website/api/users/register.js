@@ -1,4 +1,3 @@
-import Steam64 from "../../../steam64id";
 import * as Winston from "winston";
 
 /**
@@ -21,56 +20,38 @@ const ViewRegister = function(bot) {
 		}
 	}
 
-	return function(req, res) {
+	return async function(req, res) {
 		const data = req.query;
-		Steam64(data.steamusername, async (err, steamid) => {
-			if(err && data.steamusername) {
-				res.send({
-					okay : false,
-					reason : "error_fetching_steamid"
-				});
+		try {
+			const id = await bot.database.registerUser({
+				email : data.email,
+				username : data.username,
+				password : data.password
+			});
+			Winston.debug("verbose", "A new user registered: " + data.username);
+			res.send({
+				okay : true,
+				id
+			});
+			if(id === 1) {
+				grantAll();
 			}
-			else if(!steamid && data.steamusername) {
+		}
+		catch(err) {
+			if(err.code === "ER_DUP_ENTRY") {
 				res.send({
 					okay : false,
-					reason : "unknown_steam_username"
+					reason : "username_taken"
 				});
 			}
 			else {
-				try {
-					const id = await bot.database.registerUser({
-						email : data.email,
-						username : data.username,
-						password : data.password,
-						steamid,
-						minecraft : data.minecraft
-					});
-					Winston.debug("verbose", "A new user registered: " + data.username);
-					res.send({
-						okay : true,
-						id
-					});
-					if(id === 1) {
-						grantAll();
-					}
-				}
-				catch(err) {
-					if(err.code === "ER_DUP_ENTRY") {
-						res.send({
-							okay : false,
-							reason : "username_taken"
-						});
-					}
-					else {
-						Winston.error("Error registering new user: ", err);
-						res.send({
-							okay : false,
-							reason : "internal_error"
-						});
-					}
-				}
+				Winston.error("Error registering new user: ", err);
+				res.send({
+					okay : false,
+					reason : "internal_error"
+				});
 			}
-		});
+		}
 	}
 };
 export default ViewRegister;

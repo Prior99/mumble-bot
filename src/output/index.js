@@ -149,6 +149,7 @@ class Output extends Stream.Writable {
 	 * Queue playing back a soundfile. The soundfile needs to be exactly: Raw PCM
 	 * audio data (*.wav is fine), 44,100Hz and mono-channel.
 	 * @param {string} file - Name of the soundfile to play.
+	 * @param {Object} meta - Metadata displayed in queue.
 	 * @returns {Promise} - Resolved once the sound has finished playing.
 	 */
 	playSound(file, meta) {
@@ -166,6 +167,7 @@ class Output extends Stream.Writable {
 	/**
 	 * Also enqueues sounds, but many at once (automically?)
 	 * @param {string[]} filelist - The files to be played.
+	 * @param {Object} meta - Metadata displayed in queue.
 	 * @returns {undefined}
 	 */
 	playSounds(filelist, meta) { // callback TODO?

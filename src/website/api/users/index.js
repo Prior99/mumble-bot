@@ -1,7 +1,6 @@
 import Express from "express";
 
 import ViewAvailable from "./usernameavailable";
-import ViewSteam64Id from "./steam64id";
 import ViewRegister from "./register";
 import ViewLogin from "./login";
 import ViewLogout from "./logout";
@@ -22,7 +21,6 @@ import ViewSettings from "./settings";
 const RouterUsers = function(bot) {
 	const router = Express.Router();
 	router.use("/usernameAvailable", ViewAvailable(bot));
-	router.use("/steam64id", ViewSteam64Id());
 	router.use("/register", ViewRegister(bot));
 	router.use("/login", ViewLogin(bot));
 	router.use("/logout", ViewLogout());

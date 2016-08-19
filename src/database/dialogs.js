@@ -1,5 +1,4 @@
 import Winston from "winston";
-import Promise from "promise";
 /**
  * Extends the database with methods for dialogs.
  * @param {Database} Database - The Database class to extend.

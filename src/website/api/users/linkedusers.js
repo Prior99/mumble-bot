@@ -2,7 +2,6 @@ import * as Winston from "winston";
 import HTTPCodes from "../httpcodes";
 
 const ViewLinkedUsers = function(bot) {
-
 	return async function(req, res) {
 		try {
 			user = await bot.database.getUserByUsername(user.username); //Reload user from database

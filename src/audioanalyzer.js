@@ -84,6 +84,6 @@ class AudioAnalyzer {
 			this.list = [this.list.pop()];
 		}
 	}
-};
+}
 
 export default AudioAnalyzer;

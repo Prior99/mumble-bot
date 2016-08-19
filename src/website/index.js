@@ -1,25 +1,14 @@
 import Express from "express";
-import ExpHbs from "express-handlebars";
 import * as Winston from "winston";
-import Less from "less-middleware";
-import Session from "express-session";
 import Moment from "moment";
 import ExpressWS from "express-ws";
 import colorify from "../colorbystring";
 import websocketCached from "./record/websocketcached";
 import websocketQueue from "./websocketqueue";
 
-import ViewDefault from "./default";
-import ViewSpeak from "./speak";
-import ViewRegisterLogin from "./users/registerLogin";
-import ViewLog from "./log";
-import ViewQueue from "./queue";
-
 import RouteApi from "./api";
-import RouteUsers from "./users";
-import RouteRecord from "./record";
-import RouteSounds from "./sounds";
-import RouteStats from "./stats";
+
+const maxPercent = 100;
 
 const pages = [
 	{
@@ -82,44 +71,7 @@ class Website {
 		this.connections = new Set();
 		this.app = Express();
 		ExpressWS(this.app);
-		this.app.engine(".hbs", ExpHbs({
-			defaultLayout : "main",
-			extname: ".hbs",
-			helpers : {
-				"colorify" : string => colorify(string),
-				"formatDate" : date => Moment(date).format("DD.MM.YY"),
-				"formatTime" : date => Moment(date).format("HH:mm"),
-				"isSound" : function(a, block) { //eslint-disable-line object-shorthand
-					return a.type === "sound" ? block.fn(this) : undefined;
-				},
-				"formatMoney" : money => {
-					let m = money / 100;
-					return m.toFixed(2) + "€";
-				},
-				"bootstrapClassByLogLevel" : level => {
-					if(level === "info") {
-						return "success";
-					}
-					else if(level === "warn") {
-						return "warning";
-					}
-					else if(level === "error") {
-						return "danger";
-					}
-					else {
-						return "";
-					}
-				},
-				"bootstrapClassIfProtected" : audio => audio.protected ? "warning" : ""
-			}
-		}));
-		this.app.set("view engine", ".hbs");
 		this.bot = bot;
-		this.app.use(Session({
-			secret: bot.options.website.sessionSecret,
-			resave: false,
-			saveUninitialized: true
-		}));
 		this.app.use(async (req, res, next) => {
 			res.locals.bot = bot;
 			res.locals.pages = pages;
@@ -135,34 +87,7 @@ class Website {
 				next();
 			}
 		});
-		this.app.use("/bootstrap", Express.static("node_modules/bootstrap/dist/"));
-		this.app.use("/fontawesome", Express.static("node_modules/font-awesome/"));
-		this.app.use("/typeahead", Express.static("node_modules/typeahead.js/dist/"));
-		this.app.use("/bootswatch", Express.static("node_modules/bootswatch/"));
-		this.app.use("/typeahead-bootstrap", Express.static("node_modules/typeahead.js-bootstrap3.less/"));
-		this.app.use("/tablesorter", Express.static("node_modules/tablesorter/dist/"));
-		this.app.use("/favicon.ico", Express.static("favicon.ico"));
-		this.app.use("/dist/", Express.static("dist/"));
 		this.app.use("/api", RouteApi(bot));
-		this.app.use((req, res, next) => {
-			if(req.session.user) {
-				next();
-			}
-			else {
-				return ViewRegisterLogin(bot)(req, res);
-			}
-		});
-		this.app.use("/users", RouteUsers(bot));
-		this.app.use("/record", RouteRecord(bot));
-		this.app.ws("/record/cached", websocketCached(bot));
-		this.app.ws("/livequeue", websocketQueue(bot));
-		this.app.use("/quotes", RouteQuotes(bot));
-		this.app.use("/sounds", RouteSounds(bot));
-		this.app.use("/stats", RouteStats(bot));
-		this.app.get("/tree", ViewDefault("channeltree"));
-		this.app.get("/", ViewDefault("home"));
-		this.app.get("/log", ViewLog(bot));
-		this.app.get("/queue", ViewQueue(bot));
 		const port = this.bot.options.website.port;
 		this.server = this.app.listen(port);
 		const timeoutValue = 30000; // 30 seconds timeout

@@ -30,9 +30,12 @@ const SettingsExtension = function(Database) {
 	 */
 	Database.prototype.getSettings = async function(user) {
 		const rows = await this.connection.query("SELECT setting, value FROM UserSettings WHERE user = ?", [user.id]);
-		const settings = {};
-		rows.forEach((row) => settings[row.setting] = JSON.parse(row.value));
-		return settings;
+		return rows.reduce((result, row) => {
+			return {
+				...result,
+				[row.setting]: JSON.parse(row.value)
+			};
+		}, {});
 	};
 
 	/**

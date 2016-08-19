@@ -24,7 +24,8 @@ const ViewSave = function(bot) {
 				}
 			}
 			try {
-				const id = await bot.database.addRecord(quote, sound.user, sound.date, labels, sound.duration, req.session.user);
+				const id = await bot.database.addRecord(quote, sound.user, sound.date,
+					labels, sound.duration, req.session.user);
 				try {
 					await bot.database.giveUserMoney(req.session.user, moneyPerSave);
 					await FS.rename(sound.file, "sounds/recorded/" + id);

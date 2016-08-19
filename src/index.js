@@ -46,9 +46,6 @@ class Bot extends EventEmitter {
 
 		this.website = new Website(this);
 
-		this._initChatInput();
-		this._initPromptInput();
-
 		this.output = new Output(this);
 		if(options.audioCacheAmount) {
 			this.audioCacheAmount = options.audioCacheAmount;
@@ -121,6 +118,7 @@ class Bot extends EventEmitter {
 	/**
 	 * Plays a sound in the mumble server.
 	 * @param {string} filename - Filename of the soundfile to play. Must be a mono-channel 48,000Hz WAV-File
+	 * @param {Object} meta - Metadata passed to the output module.
 	 * @return {undefined}
 	 */
 	async playSound(filename, meta) {
