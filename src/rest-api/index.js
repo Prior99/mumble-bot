@@ -6,60 +6,21 @@ import colorify from "../colorbystring";
 import websocketCached from "./record/websocketcached";
 import websocketQueue from "./websocketqueue";
 
-import RouteApi from "./api";
+import Record from './record';
+import Sound from './sound';
+import Stats from './stats';
+import User from './user';
+
+import ChannelTree from './channeltree';
+import Log from './log';
+import WebsocketQueue from './websocketqueue';
 
 const maxPercent = 100;
-
-const pages = [
-	{
-		url : "/users/",
-		name : "Benutzer",
-		icon : "group"
-	},
-	{
-		url : "/record/",
-		name : "Aufnahmen",
-		icon : "microphone"
-	},
-	{
-		url : "/sounds/",
-		name : "Sounds",
-		icon : "volume-down"
-	},
-	{
-		url : "/",
-		name : "Sonstiges",
-		icon : "dashboard"
-	},
-	{
-		url : "/stats",
-		name : "Statistiken",
-		icon : "pie-chart"
-	}
-];
-
-const subpages = [
-	{
-		url : "/tree/",
-		name : "Channel-Struktur",
-		icon : "sitemap"
-	},
-	{
-		url : "/log/",
-		name : "Log",
-		icon : "file-text"
-	},
-	{
-		url : "/queue/",
-		name : "Queue",
-		icon : "road"
-	}
-];
 
 /**
  * TODO
  */
-class Website {
+class Api {
 	/**
 	 * Handles the whole website stuff for the bot. Using express and handlebars
 	 * provides the backend for all data and the interface between the webpage and
@@ -74,9 +35,6 @@ class Website {
 		this.bot = bot;
 		this.app.use(async (req, res, next) => {
 			res.locals.bot = bot;
-			res.locals.pages = pages;
-			res.locals.session = req.session;
-			res.locals.subpages = subpages;
 			if(req.session.user) {
 				req.session.user = await bot.database.getUserById(req.session.user.id); // refresh user each session
 				const permissions = await bot.permissions.listPermissionsAssocForUser(req.session.user);
@@ -87,13 +45,19 @@ class Website {
 				next();
 			}
 		});
-		this.app.use("/api", RouteApi(bot));
+		this.app.use("/sound", Sound(bot));
+		this.app.use("/record", Record(bot));
+		this.app.use("/stats", Stats(bot));
+		this.app.use("/user", User(bot));
+		this.app.get("/channelTree", ChannelTree(bot));
+		this.app.get("/log", ChannelTree(bot));
+		this.app.ws("/queue", WebsocketQueue(bot));
 		const port = this.bot.options.website.port;
 		this.server = this.app.listen(port);
 		const timeoutValue = 30000; // 30 seconds timeout
 		this.server.setTimeout(timeoutValue);
 		this.server.on("connection", (conn) => this._onConnection(conn));
-		Winston.info("Module started: Website, listening on port " + port);
+		Winston.info("Module started: Api, listening on port " + port);
 	}
 
 	/**

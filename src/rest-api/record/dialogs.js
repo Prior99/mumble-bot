@@ -1,4 +1,5 @@
 import * as Winston from "winston";
+import HTTPCodes from "../../httpcodes";
 
 /**
  * <b>/record/dialogs/</b> Page for list of dialogs.
@@ -9,13 +10,18 @@ const ViewDialogs = function(bot) {
 	return async function(req, res) {
 		try {
 			const dialogs = await bot.database.listDialogs();
-			res.locals.dialogs = dialogs;
-			res.render("record/dialogs");
+			res.send({
+				okay: true,
+				dialogs
+			});
 		}
 		catch(err) {
 			Winston.error("Error listing dialogs", err);
 			res.locals.dialogs = [];
-			res.render("record/dialogs");
+			res.status(HTTPCodes.internalError).render({
+				okay: false,
+				reason: "internal_error"
+			});
 		}
 	}
 };

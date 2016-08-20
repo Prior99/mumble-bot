@@ -4,7 +4,7 @@
 import Input from "./input";
 import Output from "./output";
 import Winston from "winston";
-import Website from "./website";
+import Api from "./rest-api";
 import FS from "fs-promise";
 import EventEmitter from "events";
 import Permissions from "./permissions";
@@ -44,7 +44,7 @@ class Bot extends EventEmitter {
 
 		this.permissions = new Permissions(database);
 
-		this.website = new Website(this);
+		this.api = new Api(this);
 
 		this.output = new Output(this);
 		if(options.audioCacheAmount) {
@@ -97,7 +97,7 @@ class Bot extends EventEmitter {
 			this.beQuiet();
 			await this.say("Goodbye.");
 			this._deleteAllCachedAudio(0);
-			await this.website.shutdown();
+			await this.api.shutdown();
 			this.output.stop();
 			this.input.stop();
 			this.emit("shutdown");

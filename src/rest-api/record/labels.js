@@ -1,4 +1,5 @@
 import * as Winston from "winston";
+import HTTPCodes from "../../httpcodes";
 
 /**
  * <b>/record/labels/</b> Page for listing and creating labels.
@@ -9,13 +10,18 @@ const ViewLabels = function(bot) {
 	return async function(req, res) {
 		try {
 			const labels = await bot.database.listLabels();
-			res.locals.labels = labels;
+			res.send({
+				okay: true,
+				labels
+			});
 		}
 		catch(err) {
 			Winston.error("Error listing labels", err);
-			res.locals.labels = [];
+			res.status(HTTPCodes.internalError).send({
+				okay: false,
+				reason: "missing_arguments"
+			});
 		}
-		res.render("record/labels");
 	}
 };
 
