@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import HTTPCodes from "../httpcodes";
+import HTTPCodes from "./http-codes";
 /**
  * This handles the /log endpoint with the list of the latest log entries when the needed permission is given.
  * @param {object} bot - Pointer to the main bot instance.
@@ -8,17 +8,13 @@ import HTTPCodes from "../httpcodes";
 const Log = function(bot) {
 	return async function(req, res) {
 		try {
-			const has = await bot.permissions.hasPermission(req.session.user, "log");
-			const entries = await bot.database.listLog();
-			if(has) {
+			if(await bot.permissions.hasPermission(req.user, "log")) {
 				res.send({
-					okay: true,
-					entries
+					entries: await bot.database.listLog()
 				});
 			}
 			else {
 				res.send({
-					okay: false,
 					reason: "insufficient_permission"
 				});
 			}
@@ -26,7 +22,7 @@ const Log = function(bot) {
 		catch(err) {
 			Winston.error("Unabled to fetch logentries from database.", err);
 			res.status(HTTPCodes.internalError).send(JSON.stringify({
-				okay : false
+				reason: "internal_error"
 			}));
 		}
 	};

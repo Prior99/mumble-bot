@@ -1,7 +1,7 @@
 import * as Winston from "winston";
 import FS from "fs-promise";
-import HTTPCodes from "../../httpcodes";
-import VisualizeAudioFile from "../../../visualizer";
+import HTTPCodes from "../http-codes";
+import VisualizeAudioFile from "../../visualizer";
 
 const height = 32;
 const samplesPerPixel = 400;

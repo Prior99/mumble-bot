@@ -14,7 +14,7 @@ const RouteSounds = function(bot) {
 
 	router.use("/add", Add(bot, router));
 	router.use("/list", List(bot));
-	router.use("/play", wPlay(bot));
+	router.use("/play", Play(bot));
 
 	return router;
 };

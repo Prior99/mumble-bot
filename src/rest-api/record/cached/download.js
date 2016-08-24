@@ -1,6 +1,6 @@
 import * as Winston from "winston";
 import * as FS from "fs";
-import HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../http-codes";
 
 /**
  * This view handles the downloading of cached records.

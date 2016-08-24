@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import HTTPCodes from "../httpcodes";
+import HTTPCodes from "../../http-codes";
 
 const LinkedUsers = function(bot) {
 	return async function(req, res) {

@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../http-codes";
 
 /**
  * View for playing back a cached audio

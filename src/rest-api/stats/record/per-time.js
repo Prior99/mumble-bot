@@ -1,20 +1,19 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../http-codes";
 
 /**
- * API endpoint for statistics about speech per user.
- * server this bot is connected to.
+ * This view displays the statistics for the records per time endpoint.
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const SpokenPerUser = function(bot) {
+const RecordsPerTime = function(bot) {
 	return async function(req, res) {
 		try {
-			const spoken = await bot.database.getSpokenPerUser();
+			const spoken = await bot.database.getRecordCountByDays();
 			res.status(HTTPCodes.okay).send(spoken);
 		}
 		catch(err) {
-			Winston.error("Could not get amount of speech by user.", err);
+			Winston.error("Could not get record count by days.", err);
 			res.status(HTTPCodes.internalError).send({
 				reason: "internal_error"
 			});
@@ -22,4 +21,4 @@ const SpokenPerUser = function(bot) {
 	};
 };
 
-export default SpokenPerUser;
+export default RecordsPerTime;

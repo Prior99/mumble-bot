@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
+const DashboardPlugin = require('webpack-dashboard/plugin');
 
 module.exports = {
 	target: 'node',
@@ -11,6 +12,9 @@ module.exports = {
 		filename: 'bundle.js'
 	},
 	externals: [nodeExternals()],
+	plugins: [
+		new DashboardPlugin()
+	],
 	module: {
 		loaders: [
 			{

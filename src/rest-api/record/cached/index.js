@@ -17,7 +17,6 @@ import Websocket from "./websocket";
 const RouteCached = function(bot) {
 	const router = Express.Router();
 
-	router.use("/fork", Fork(bot));
 	router.ws("/websocket", Websocket(bot));
 	router.use("/visualize", Visualize(bot));
 	router.use("/save", Save(bot));

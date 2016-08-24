@@ -1,6 +1,5 @@
 import * as Winston from "winston";
-import reply from "../util.js";
-import HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../http-codes";
 
 /**
  * View for saving a new dialog.

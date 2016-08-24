@@ -1,6 +1,6 @@
 import * as Winston from "winston";
 import * as FS from "fs-promise";
-import HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../http-codes";
 
 const moneyPerSave = 200;
 

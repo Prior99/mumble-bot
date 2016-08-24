@@ -56,9 +56,6 @@ Winston.add(Winston.transports.File, {
 	colorize: true,
 	timestamp: timestampFunction
 });
-/*
- * Code
- */
 const options = require("./config.json");
 
 const mumbleOptions = {};

@@ -1,6 +1,6 @@
 import * as Winston from "winston";
 import * as FS from "fs";
-import HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../http-codes";
 
 /**
  * This is the view for the api for editing records.

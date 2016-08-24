@@ -1,6 +1,5 @@
 import * as Winston from "winston";
-import reply from "../util.js";
-import HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../http-codes";
 import FFMpeg from "fluent-ffmpeg";
 import * as FS from "fs";
 import {PassThrough as PassThroughStream} from "stream";

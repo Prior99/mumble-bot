@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../../http-codes";
 
 /**
  * Statistics view for playbacks per user.
@@ -16,7 +16,7 @@ const RecordPlaybacksPerUser = function(bot) {
 			Winston.error("Could not get playbacks of records by user.", err);
 			res.status(HTTPCodes.internalError).send({
 				reason: "internal_error"
-			}
+			});
 		}
 	};
 };

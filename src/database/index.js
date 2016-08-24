@@ -15,10 +15,6 @@ import LogExtension from "./log.js";
 import DialogsExtension from "./dialogs.js";
 import UserStatsExtension from "./userstats.js";
 
-/*
- * Code
- */
-
 const timeout = 4000;
 
 /**

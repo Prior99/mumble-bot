@@ -1,6 +1,6 @@
 import * as Winston from "winston";
-import * as colorify from "../../../colorbystring";
-import HTTPCodes from "../../httpcodes";
+import * as colorify from "../../colorbystring";
+import HTTPCodes from "../http-codes";
 
 /**
  * This endpoint handles adding labels to the database..

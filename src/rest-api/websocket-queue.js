@@ -1,7 +1,7 @@
 import * as Winston from "winston";
 
 /**
- * <b>/record/cached/</b> Handler for the WEBSOCKET handler for this endpoint.
+ * <b>/queue/</b> Handler for the WEBSOCKET handler for this endpoint.
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - Websocket handler for this page.
  */

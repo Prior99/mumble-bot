@@ -3,10 +3,6 @@
  */
 import Winston from "winston";
 
-/*
- * Code
- */
-
 /**
  * Handles permissions in the bot.
  * This is basically just a nicer-to-use interface to the database.

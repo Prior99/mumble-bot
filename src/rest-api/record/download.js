@@ -1,6 +1,6 @@
 import * as Winston from "winston";
 import * as FS from "fs";
-import HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../http-codes";
 
 /**
  * This view handles the downloading of records.
@@ -11,7 +11,7 @@ const Download = function(bot) {
 	return function(req, res) {
 		if(req.body.id) {
 			const id = parseInt(req.body.id);
-			const stream = FS.createReadStream(`sounds/recorded/${req.body.id}`;
+			const stream = FS.createReadStream(`sounds/recorded/${req.body.id}`);
 			stream.on("error", (err) => {
 				if(err.code === "ENOENT") {
 					res.status(HTTPCodes.notFound).send({

@@ -1,18 +1,11 @@
 import Express from "express";
 
-import ViewAvailable from "./usernameavailable";
-import ViewRegister from "./register";
-import ViewLogin from "./login";
-import ViewLogout from "./logout";
-import ViewPermissions from "./permissions";
-import ViewGrant from "./grantpermission";
-import ViewRevoke from "./revokepermission";
-import ViewLinkMumbleUser from "./linkmumbleuser";
-import ViewSettings from "./settings";
-/*
- * Code
- */
-
+import Available from "./username-available";
+import Register from "./register";
+import Permissions from "./permission";
+import SetSettings from "./set-settings";
+import Mumble from "./mumble";
+import List from "./list";
 /**
  * Routes all requests related to the user api commands in the /api/users/ endpoint.
  * @param {Bot} bot - Bot the webpage belongs to.
@@ -20,15 +13,12 @@ import ViewSettings from "./settings";
  */
 const RouterUsers = function(bot) {
 	const router = Express.Router();
-	router.use("/usernameAvailable", ViewAvailable(bot));
-	router.use("/register", ViewRegister(bot));
-	router.use("/login", ViewLogin(bot));
-	router.use("/logout", ViewLogout());
-	router.use("/permissions", ViewPermissions(bot));
-	router.get("/grantPermission", ViewGrant(bot));
-	router.get("/revokePermission", ViewRevoke(bot));
-	router.get("/linkMumbleUser", ViewLinkMumbleUser(bot));
-	router.get("/settings", ViewSettings(bot));
+	router.use("/usernameAvailable", Available(bot));
+	router.use("/register", Register(bot));
+	router.use("/permission", Permissions(bot));
+	router.get("/setSettings", SetSettings(bot));
+	router.use("/mumble", Mumble(bot));
+	router.use("/list", List(bot))
 	return router;
 };
 

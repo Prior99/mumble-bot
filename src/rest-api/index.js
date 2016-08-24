@@ -4,23 +4,20 @@ import Moment from "moment";
 import ExpressWS from "express-ws";
 import BodyParser from "body-parser";
 import colorify from "../colorbystring";
-import websocketCached from "./record/websocketcached";
-import websocketQueue from "./websocketqueue";
+import HTTPCodes from "./http-codes";
+
 
 import Record from './record';
 import Sound from './sound';
 import Stats from './stats';
 import User from './user';
 
-import ChannelTree from './channeltree';
+import ChannelTree from './channel-tree';
 import Log from './log';
-import WebsocketQueue from './websocketqueue';
+import WebsocketQueue from './websocket-queue';
 
 const maxPercent = 100;
 
-/**
- * TODO
- */
 class Api {
 	/**
 	 * Handles the whole website stuff for the bot. Using express and handlebars
@@ -36,25 +33,46 @@ class Api {
 		this.app.use(BodyParser.json());
 		this.app.use(async (req, res, next) => {
 			if (req.headers.authorization) {
-				const token = new Buffer(req.headers.authorization, 'base64').toString('utf8');
+				if (req.headers.authorization.substr(0, 5).toLowerCase() !== "basic") {
+					res.status(HTTPCodes.forbidden).send({
+						reason: "invalid_authorization_method"
+					});
+					return;
+				}
+				const token = new Buffer(req.headers.authorization.substr(6), 'base64').toString('utf8');
 				const [username, password] = token.split(':');
 				if (await bot.database.checkLoginData(username, password)) {
-					const user = await bot.database.getUserByUsername(username); // refresh user each session
-					const permissions = await bot.permissions.listPermissionsAssocForUser(req.session.user);
-					req.login = true;
-					req.user = user;
-					req.permissions = permissions;
+					try {
+						const user = await bot.database.getUserByUsername(username); // refresh user each session
+						const permissions = await bot.permissions.listPermissionsAssocForUser(user);
+						req.login = true;
+						req.user = user;
+						req.permissions = permissions;
+					} catch(err) {
+						Winston.error(`Error when loading data for user ${username}`, err);
+						res.status(HTTPCodes.internalError).send({
+							reason: "internal_error"
+						});
+					}
+					return next();
+				} else {
+					Winston.verbose(`User '${username}' failed to login.`);
+					res.status(HTTPCodes.forbidden).send({
+						reason: "invalid_login"
+					});
+					return;
 				}
-				req.login = false;
 			}
-			next();
+			res.status(HTTPCodes.forbidden).send({
+				reason: "authorization_required"
+			});
 		});
 		this.app.use("/sound", Sound(bot));
 		this.app.use("/record", Record(bot));
 		this.app.use("/stats", Stats(bot));
 		this.app.use("/user", User(bot));
 		this.app.get("/channelTree", ChannelTree(bot));
-		this.app.get("/log", ChannelTree(bot));
+		this.app.get("/log", Log(bot));
 		this.app.ws("/queue", WebsocketQueue(bot));
 
 		const port = bot.options.website.port;
@@ -99,4 +117,4 @@ class Api {
 	}
 }
 
-export default Website;
+export default Api;

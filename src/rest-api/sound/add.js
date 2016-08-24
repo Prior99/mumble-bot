@@ -1,7 +1,7 @@
 import * as Winston from "winston";
 import Multer from "multer";
 import * as FS from "fs";
-import HTTPCodes from "../../httpcodes";
+import HTTPCodes from "../http-codes";
 
 /**
  * View for playback endpoint of sound section.

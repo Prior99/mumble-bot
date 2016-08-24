@@ -1,9 +1,8 @@
 import Express from "express";
 
-import Online from "./online";
-import Spoken from "./spoken";
-import Record from "./record";
-
+import PlaybackPerUser from "./playback-per-user";
+import PerTime from "./per-time";
+import PerUser from "./per-user";
 
 /**
  * Routes all requests related to the stats api commands in the /api/stats/ endpoint.
@@ -12,10 +11,9 @@ import Record from "./record";
  */
 const RouteStats = function(bot) {
 	const router = Express.Router();
-
-	router.use("/online", Online(bot));
-	router.use("/spoken", Spoken(bot));
-	router.use("/record", Record(bot));
+	router.use("/perUser", PerUser(bot));
+	router.use("/perTime", PerTime(bot));
+	router.use("/playbackPerUser", PlaybackPerUser(bot));
 
 	return router;
 };
