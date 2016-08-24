@@ -9,10 +9,9 @@ import HTTPCodes from "../../httpcodes";
  */
 const AddLabel = function(bot) {
 	return async function(req, res) {
-		if(req.query.name && req.query.name.trim().length > 0) {
-			if(req.query.name.indexOf(" ") !== -1) {
+		if(req.body.name && req.body.name.trim().length > 0) {
+			if(req.body.indexOf(" ") !== -1) {
 				res.status(HTTPCodes.invalidArgument).send({
-					okay : false,
 					reason : "invalid_argument"
 				});
 				return;
@@ -21,7 +20,6 @@ const AddLabel = function(bot) {
 				const id = await bot.database.addRecordLabel(req.query.name);
 				Winston.log("verbose", `${req.user.username} added new label for records: "${req.query.name}"`);
 				res.status(HTTPCodes.okay).send({
-					okay : true,
 					color : colorify(req.query.name),
 					id
 				});
@@ -29,14 +27,12 @@ const AddLabel = function(bot) {
 			catch(err) {
 				Winston.error("Unabled to add new label", err);
 				res.status(HTTPCodes.internalError).send({
-					okay : false,
 					reason : "internal_error"
 				});
 			}
 		}
 		else {
 			res.status(HTTPCodes.invalidRequest).send({
-				okay : false,
 				reason : "missing_arguments"
 			})
 		}

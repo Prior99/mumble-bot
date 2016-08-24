@@ -6,28 +6,24 @@ import HTTPCodes from "../../httpcodes";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewDeleteCached = function(bot) {
+const DeleteCached = function(bot) {
 	return function(req, res) {
-		if(req.query.id) {
-			if(bot.removeCachedAudioById(req.query.id)) {
-				res.status(HTTPCodes.okay).send({
-					okay : true
-				});
+		if(req.body.id) {
+			if(bot.removeCachedAudioById(req.body.id)) {
+				res.status(HTTPCodes.okay).send(true);
 			}
 			else {
 				res.status(HTTPCodes.internalError).send({
-					okay : false,
 					reason : "internal_error"
 				});
 			}
 		}
 		else {
 			res.status(HTTPCodes.missingArguments).send({
-				okay : false,
 				reason : "missing_arguments"
 			});
 		}
 	};
 };
 
-export default ViewDeleteCached;
+export default DeleteCached;

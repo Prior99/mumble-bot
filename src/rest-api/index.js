@@ -2,6 +2,7 @@ import Express from "express";
 import * as Winston from "winston";
 import Moment from "moment";
 import ExpressWS from "express-ws";
+import BodyParser from "body-parser";
 import colorify from "../colorbystring";
 import websocketCached from "./record/websocketcached";
 import websocketQueue from "./websocketqueue";
@@ -32,18 +33,21 @@ class Api {
 		this.connections = new Set();
 		this.app = Express();
 		ExpressWS(this.app);
-		this.bot = bot;
+		this.app.use(BodyParser.json());
 		this.app.use(async (req, res, next) => {
-			res.locals.bot = bot;
-			if(req.session.user) {
-				req.session.user = await bot.database.getUserById(req.session.user.id); // refresh user each session
-				const permissions = await bot.permissions.listPermissionsAssocForUser(req.session.user);
-				res.locals.userPermissions = permissions;
-				next();
+			if (req.headers.authorization) {
+				const token = new Buffer(req.headers.authorization, 'base64').toString('utf8');
+				const [username, password] = token.split(':');
+				if (await bot.database.checkLoginData(username, password)) {
+					const user = await bot.database.getUserByUsername(username); // refresh user each session
+					const permissions = await bot.permissions.listPermissionsAssocForUser(req.session.user);
+					req.login = true;
+					req.user = user;
+					req.permissions = permissions;
+				}
+				req.login = false;
 			}
-			else {
-				next();
-			}
+			next();
 		});
 		this.app.use("/sound", Sound(bot));
 		this.app.use("/record", Record(bot));
@@ -52,11 +56,14 @@ class Api {
 		this.app.get("/channelTree", ChannelTree(bot));
 		this.app.get("/log", ChannelTree(bot));
 		this.app.ws("/queue", WebsocketQueue(bot));
-		const port = this.bot.options.website.port;
+
+		const port = bot.options.website.port;
 		this.server = this.app.listen(port);
+	
 		const timeoutValue = 30000; // 30 seconds timeout
 		this.server.setTimeout(timeoutValue);
 		this.server.on("connection", (conn) => this._onConnection(conn));
+
 		Winston.info("Module started: Api, listening on port " + port);
 	}
 

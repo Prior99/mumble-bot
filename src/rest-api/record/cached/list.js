@@ -5,11 +5,10 @@ import * as Winston from "winston";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewCached = function(bot) {
+const Cached = function(bot) {
 	return function(req, res) {
 		const copy = bot.cachedAudios.slice();
 		res.send({
-			okay: true,
 			cached: copy.sort((a, b) => {
 				if(a.protected === b.protected) {
 					return a.date > b.date ? -1 : 1;
@@ -22,4 +21,4 @@ const ViewCached = function(bot) {
 	}
 };
 
-export default ViewCached;
+export default Cached;

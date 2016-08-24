@@ -7,7 +7,7 @@ import HTTPCodes from "../../httpcodes";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewRecordsPerUser = function(bot) {
+const RecordsPerUser = function(bot) {
 	return async function(req, res) {
 		try {
 			const arr = await bot.database.getRecordCountByUsers();
@@ -15,9 +15,11 @@ const ViewRecordsPerUser = function(bot) {
 		}
 		catch(err) {
 			Winston.error("Could not get record count by users.", err);
-			res.status(HTTPCodes.internalError).send(arr);
+			res.status(HTTPCodes.internalError).send({
+				reason: "internal_error"
+			});
 		}
 	};
 };
 
-export default ViewRecordsPerUser;
+export default RecordsPerUser;

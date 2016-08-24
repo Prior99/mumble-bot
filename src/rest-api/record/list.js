@@ -7,12 +7,12 @@ import {PassThrough as PassThroughStream} from "stream";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewList = function(bot) {
+const List = function(bot) {
 	return async function(req, res) {
 		try {
 			let since;
-			if(req.query.since) {
-				since = new Date(+req.query.since);
+			if(req.body.since) {
+				since = new Date(+req.body.since);
 			}
 			const stream = new PassThroughStream();
 			res.status(HTTPCodes.okay);
@@ -20,7 +20,6 @@ const ViewList = function(bot) {
 			stream.pipe(res);
 			const records = await bot.database.listRecords(since);
 			stream.write(JSON.stringify({
-				okay : true,
 				records
 			}));
 			stream.end();
@@ -28,11 +27,10 @@ const ViewList = function(bot) {
 		catch(err) {
 			Winston.error("Error listing records", err);
 			res.status(HTTPCodes.internalError).send({
-				okay : false,
 				reason : "internal_error"
 			});
 		}
 	};
 };
 
-export default ViewList;
+export default List;

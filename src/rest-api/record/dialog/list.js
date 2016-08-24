@@ -6,24 +6,19 @@ import HTTPCodes from "../../httpcodes";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewDialogs = function(bot) {
+const Dialogs = function(bot) {
 	return async function(req, res) {
 		try {
 			const dialogs = await bot.database.listDialogs();
-			res.send({
-				okay: true,
-				dialogs
-			});
+			res.send({ dialogs });
 		}
 		catch(err) {
 			Winston.error("Error listing dialogs", err);
-			res.locals.dialogs = [];
 			res.status(HTTPCodes.internalError).render({
-				okay: false,
 				reason: "internal_error"
 			});
 		}
 	}
 };
 
-export default ViewDialogs;
+export default Dialogs;

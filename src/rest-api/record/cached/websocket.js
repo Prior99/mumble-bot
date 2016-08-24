@@ -5,30 +5,30 @@ import * as Winston from "winston";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - Websocket handler for this page.
  */
-const WebsocketOverview = function(bot) {
+const WebSocketOverview = function(bot) {
 	return function(ws, req) {
-		const onAdd = function(audio) {
+		const onAdd = audio => {
 			ws.send(JSON.stringify({
-				type : "add",
+				type: "add",
 				audio
 			}));
 		};
-		const onRemoveAudio = function(audio) {
+		const onRemoveAudio = audio => {
 			ws.send(JSON.stringify({
-				type : "remove",
-				id : audio.id
+				type: "remove",
+				id: audio.id
 			}));
 		};
-		const onProtect = function(audio) {
+		const onProtect = audio => {
 			ws.send(JSON.stringify({
-				type : "protect",
-				id : audio.id
+				type: "protect",
+				id: audio.id
 			}));
 		};
 		ws.send(JSON.stringify({
-			type : "init",
-			cacheAmount : bot.audioCacheAmount,
-			list : bot.cachedAudios
+			type: "init",
+			cacheAmount: bot.audioCacheAmount,
+			list: bot.cachedAudios
 		}));
 		bot.on("cached-audio", onAdd);
 		bot.on("removed-cached-audio", onRemoveAudio);
@@ -41,4 +41,6 @@ const WebsocketOverview = function(bot) {
 	}
 };
 
-export default WebsocketOverview;
+export default WebSocketOverview;
+	
+

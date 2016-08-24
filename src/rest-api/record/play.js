@@ -9,42 +9,38 @@ const moneyPerPlayUser = 1;
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewPlay = function(bot) {
+const Play = function(bot) {
 	return async function(req, res) {
-		if(req.query.id) {
+		if(req.body.id) {
 			try {
-				const details = await bot.database.getRecord(req.query.id);
-				if(req.session.user.id !== details.reporter.id) {
+				const details = await bot.database.getRecord(req.body.id);
+				if(req.user.id !== details.reporter.id) {
 					await bot.database.giveUserMoney(details.reporter, moneyPerPlayReporter);
 				}
-				if(req.session.user.id !== details.user.id) {
+				if(req.user.id !== details.user.id) {
 					await bot.database.giveUserMoney(details.user, moneyPerPlayUser);
 				}
-				await bot.database.usedRecord(req.query.id);
-				Winston.log("verbose", req.session.user.username + " played back record #" + req.query.id);
-				bot.playSound("sounds/recorded/" + req.query.id, {
-					type : "record",
+				await bot.database.usedRecord(req.body.id);
+				Winston.log("verbose", `${req.user.username} played back record #${req.body.id}`);
+				bot.playSound("sounds/recorded/" + req.body.id, {
+					type: "record",
 					details,
-					user : req.session.user
+					user: req.user
 				});
-				res.status(HTTPCodes.okay).send({
-					okay : true
-				});
+				res.status(HTTPCodes.okay).send(true);
 			}
 			catch(err) {
 				Winston.error("Could not increase usages of record", err);
 				res.status(HTTPCodes.internalError).send({
-					okay: false,
-					reason : "internal_error"
+					reason: "internal_error"
 				});
 			}
 		}
 		else {
 			res.status(HTTPCodes.missingArguments).send({
-				okay : false,
-				reason : "missing_arguments"
-			})
+				reason: "missing_arguments"
+			});
 		}
 	};
 };
-export default ViewPlay;
+export default Play;

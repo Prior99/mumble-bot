@@ -9,14 +9,14 @@ import HTTPCodes from "../../httpcodes";
  * @param {object} router - Express router this view is connected to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewSoundAdd = function(bot, router) {
+const SoundAdd = function(bot, router) {
 	router.use(Multer({
 		dest: bot.options.website.tmp,
 		rename(fieldname, filename) {
 			return filename + Date.now();
 		}
 	}));
-
+	
 	/**
 	 * Handle a file upload.
 	 * @param {object} file - File from multer.
@@ -36,18 +36,16 @@ const ViewSoundAdd = function(bot, router) {
 		}
 		try {
 			const id = await bot.database.addSound(file.originalname);
-			Winston.log("verbose", "added new sound #" + id);
-			FS.renameSync(file.path, "sounds/uploaded/" + id);
+			Winston.log("verbose", `added new sound #${id}`);
+			FS.renameSync(file.path, `sounds/uploaded/${id}`);
 			res.status(HTTPCodes.okay).send({
-				okay : true,
 				id
 			});
 		}
 		catch(err) {
 			Winston.error("Could not add sound to database", err);
 			res.status(HTTPCodes.internalError).send({
-				okay : false,
-				reason : "internal_error"
+				reason: "internal_error"
 			});
 		}
 	}
@@ -57,4 +55,4 @@ const ViewSoundAdd = function(bot, router) {
 	};
 };
 
-export default ViewSoundAdd;
+export default SoundAdd;

@@ -9,7 +9,7 @@ const weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Fr
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewSpokenPerWeekday = function(bot) {
+const SpokenPerWeekday = function(bot) {
 	return async function(req, res) {
 		try {
 			const spoken = await bot.database.getSpokenPerWeekday();
@@ -22,9 +22,11 @@ const ViewSpokenPerWeekday = function(bot) {
 		}
 		catch(err) {
 			Winston.error("Could not get speech amount per weekday.", err);
-			res.status(HTTPCodes.internalError).send([]);
+			res.status(HTTPCodes.internalError).send({
+				reason: "internal_error"
+			});
 		}
 	};
 };
 
-export default ViewSpokenPerWeekday;
+export default SpokenPerWeekday;

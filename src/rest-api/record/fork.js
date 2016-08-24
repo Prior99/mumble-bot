@@ -12,13 +12,13 @@ const audioFreq = 48000;
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewFork = function(bot) {
+const Fork = function(bot) {
 	return async function(req, res) {
-		const id = +req.query.id;
-		const quote = req.query.quote;
-		const actions = JSON.parse(req.query.actions);
-		const overwrite = JSON.parse(req.query.overwrite);
-		Winston.verbose(req.session.user.username +" is forking record #" + id);
+		const id = +req.body.id;
+		const quote = req.body.quote;
+		const actions = JSON.parse(req.body.actions);
+		const overwrite = JSON.parse(req.body.overwrite);
+		Winston.verbose(`${req.user.username} is forking record #${id}`);
 		let newId, record, duration;
 		try {
 			// Calculate new duration
@@ -36,7 +36,7 @@ const ViewFork = function(bot) {
 				quote,
 				id,
 				overwrite,
-				req.session.user,
+				req.user,
 				duration
 			);
 		}
@@ -47,13 +47,13 @@ const ViewFork = function(bot) {
 		}
 
 		const crop = (begin, end) => new Promise((resolve, reject) => {
-			const transcoder = FFMpeg("sounds/recorded/" + id)
+			const transcoder = FFMpeg(`sounds/recorded/${id}`)
 				.seekInput(begin)
 				.duration(end - begin)
 				.format("mp3")
 				.audioCodec("libmp3lame")
 				.on("error", (err) => reject(err))
-				.save("sounds/recorded/" + newId)
+				.save(`sounds/recorded/${newId}`)
 				.on("end", () => resolve());
 		});
 
@@ -73,4 +73,4 @@ const ViewFork = function(bot) {
 	};
 };
 
-export default ViewFork;
+export default Fork;

@@ -7,7 +7,7 @@ import HTTPCodes from "../../httpcodes";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewSpokenPerUser = function(bot) {
+const SpokenPerUser = function(bot) {
 	return async function(req, res) {
 		try {
 			const spoken = await bot.database.getSpokenPerUser();
@@ -15,9 +15,11 @@ const ViewSpokenPerUser = function(bot) {
 		}
 		catch(err) {
 			Winston.error("Could not get amount of speech by user.", err);
-			res.status(HTTPCodes.internalError).send([]);
+			res.status(HTTPCodes.internalError).send({
+				reason: "internal_error"
+			});
 		}
 	};
 };
 
-export default ViewSpokenPerUser;
+export default SpokenPerUser;

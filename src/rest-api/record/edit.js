@@ -7,34 +7,30 @@ import HTTPCodes from "../../httpcodes";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewEdit = function(bot) {
+const Edit = function(bot) {
 	return async function(req, res) {
-		if(req.query.id && req.query.quote && req.query.labels) {
-			const labels = JSON.parse(req.query.labels);
-			const quote = req.query.quote;
-			const id = req.query.id;
+		if(req.body.id && req.body.quote && req.body.labels) {
+			const labels = JSON.parse(req.body.labels);
+			const quote = req.body.quote;
+			const id = req.body.id;
 			try {
 				await bot.database.updateRecord(id, quote, labels);
-				Winston.log("verbose", req.session.user.username + " edited record #" + id);
-				res.status(HTTPCodes.okay).send({
-					okay : true
-				});
+				Winston.log("verbose", `${req.user.username} edited record #${id}`);
+				res.status(HTTPCodes.okay).send(true);
 			}
 			catch(err) {
 				Winston.error("Could not edit record in database", err);
 				res.status(HTTPCodes.internalError).send({
-					okay : false,
 					reason : "internal_error"
 				});
 			}
 		}
 		else {
 			res.status(HTTPCodes.missingArguments).send({
-				okay : false,
 				reason : "missing_arguments"
 			});
 		}
 	};
 };
 
-export default ViewEdit;
+export default Edit;

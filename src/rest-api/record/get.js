@@ -7,13 +7,13 @@ import HTTPCodes from "../../httpcodes";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewGet = function(bot) {
+const Get = function(bot) {
 	return async function(req, res) {
-		const id = req.query.id;
+		const id = req.body.id;
 		if(id) {
 			try {
-				const rec = await bot.database.getRecord(id);
-				reply(res, HTTPCodes.okay, true, { record : rec });
+				const record = await bot.database.getRecord(id);
+				reply(res, HTTPCodes.okay, true, { record });
 			}
 			catch(err) {
 				Winston.error("Error while getting record", err);
@@ -26,4 +26,4 @@ const ViewGet = function(bot) {
 	};
 };
 
-export default ViewGet;
+export default Get;

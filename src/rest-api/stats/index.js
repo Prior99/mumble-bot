@@ -1,12 +1,12 @@
 import Express from "express";
 
-import ViewRecordsPerUser from "./recordsperuser";
-import ViewRecordsPerTime from "./recordspertime";
-import ViewSpokenPerHour from "./spokenperhour";
-import ViewSpokenPerUser from "./spokenperuser";
-import ViewSpokenPerWeekday from "./spokenperweekday";
-import ViewOnlinePerUser from "./onlineperuser";
-import ViewRecordPlaybacksPerUser from "./recordplaybacksperuser";
+import RecordsPerUser from "./recordsperuser";
+import RecordsPerTime from "./recordspertime";
+import SpokenPerHour from "./spokenperhour";
+import SpokenPerUser from "./spokenperuser";
+import SpokenPerWeekday from "./spokenperweekday";
+import OnlinePerUser from "./onlineperuser";
+import RecordPlaybacksPerUser from "./recordplaybacksperuser";
 
 /**
  * Routes all requests related to the stats api commands in the /api/stats/ endpoint.
@@ -16,13 +16,13 @@ import ViewRecordPlaybacksPerUser from "./recordplaybacksperuser";
 const RouteStats = function(bot) {
 	const router = Express.Router();
 
-	router.use("/recordsperuser", ViewRecordsPerUser(bot));
-	router.use("/recordspertime", ViewRecordsPerTime(bot));
-	router.use("/spokenperhour", ViewSpokenPerHour(bot));
-	router.use("/spokenperuser", ViewSpokenPerUser(bot));
-	router.use("/spokenperweekday", ViewSpokenPerWeekday(bot));
-	router.use("/onlineperuser", ViewOnlinePerUser(bot));
-	router.use("/recordplaybacksperuser", ViewRecordPlaybacksPerUser(bot));
+	router.use("/recordsperuser", RecordsPerUser(bot));
+	router.use("/recordspertime", RecordsPerTime(bot));
+	router.use("/spokenperhour", SpokenPerHour(bot));
+	router.use("/spokenperuser", SpokenPerUser(bot));
+	router.use("/spokenperweekday", SpokenPerWeekday(bot));
+	router.use("/onlineperuser", OnlinePerUser(bot));
+	router.use("/recordplaybacksperuser", RecordPlaybacksPerUser(bot));
 
 	return router;
 };

@@ -7,30 +7,26 @@ import HTTPCodes from "../../httpcodes";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewAPIUsersLinkMumbleUser = function(bot) {
+const LinkMumbleUser = function(bot) {
 	return async function(req, res) {
-		if(req.session.user.username === req.query.username) {
+		if(req.user.username === req.body.username) {
 			try {
-				await bot.database.linkMumbleUser(req.query.id, req.query.username);
-				Winston.log("verbose", req.session.user.username + " linked mumble user with id " + req.query.id);
-				res.status(HTTPCodes.okay).send({
-					okay : true
-				});
+				await bot.database.linkMumbleUser(req.body.id, req.body.username);
+				Winston.log("verbose", `${req.user.username} linked mumble user with id ${req.body.id}`);
+				res.status(HTTPCodes.okay).send(true);
 			}
 			catch(err) {
 				res.status(HTTPCodes.internalError).send({
-					okay : false,
 					reason : "internal_error"
 				});
 			}
 		}
 		else {
 			res.status(HTTPCodes.invalidRequest).send({
-				okay : false,
 				reason : "invalid_user"
 			});
 		}
 	};
 };
 
-export default ViewAPIUsersLinkMumbleUser;
+export default LinkMumbleUser;

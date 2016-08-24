@@ -6,7 +6,7 @@ import HTTPCodes from "../../httpcodes";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewRecordsPerTime = function(bot) {
+const RecordsPerTime = function(bot) {
 	return async function(req, res) {
 		try {
 			const spoken = await bot.database.getRecordCountByDays();
@@ -14,9 +14,11 @@ const ViewRecordsPerTime = function(bot) {
 		}
 		catch(err) {
 			Winston.error("Could not get record count by days.", err);
-			res.status(HTTPCodes.okay).send([]);
+			res.status(HTTPCodes.internalError).send({
+				reason: "internal_error"
+			});
 		}
 	};
 };
 
-export default ViewRecordsPerTime;
+export default RecordsPerTime;

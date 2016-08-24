@@ -10,15 +10,13 @@ const Sounds = function(bot) {
 		try {
 			const sounds = await bot.database.listSounds();
 			res.send({
-				okay: true,
 				sounds
-			})
+			});
 		}
 		catch(err) {
 			Winston.error("Could not get list of sounds", err);
 			res.status(HTTPCodes.internalError).send({
-				okay: false,
-				reason : "internal_error"
+				reason: "internal_error"
 			});
 		}
 		res.render("sounds/sounds");

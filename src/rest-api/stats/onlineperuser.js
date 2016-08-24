@@ -6,7 +6,7 @@ import HTTPCodes from "../../httpcodes";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewOnlinePerUser = function(bot) {
+const OnlinePerUser = function(bot) {
 	return async function(req, res) {
 		try {
 			const spoken = await bot.database.getOnlinePerUser();
@@ -14,9 +14,11 @@ const ViewOnlinePerUser = function(bot) {
 		}
 		catch(err) {
 			Winston.error("Could not get amount of online time by user.", err);
-			res.status(HTTPCodes.internalError).send(spoken);
+			res.status(HTTPCodes.internalError).send({
+				reason: "internal_error"
+			});
 		}
 	};
 };
 
-export default ViewOnlinePerUser;
+export default OnlinePerUser;

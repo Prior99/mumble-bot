@@ -7,23 +7,27 @@ import HTTPCodes from "../../httpcodes";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ViewSaveDialog = function(bot) {
+const SaveDialog = function(bot) {
 	return async function(req, res) {
-		const ids = JSON.parse(req.query.dialog);
-		if(ids) {
+		const dialog = req.body;
+		if(dialog) {
 			try {
-				await bot.database.addDialog(ids);
-				reply(res, HTTPCodes.okay, true, {});
+				await bot.database.addDialog(dialog);
+				res.status(HTTPCodes.okay).send(true);
 			}
 			catch(err) {
 				Winston.error("Error while saving dialog", err);
-				reply(res, HTTPCodes.internalError, false, { reason : "internal_error" });
+				res.status(HTTPCodes.internalError).send({
+					reason: "internal_error"
+				});
 			}
 		}
 		else {
-			reply(res, HTTPCodes.missingArguments, false, { reason : "missing_argument" });
+			res.status(HTTPCodes.missingArguments).send({
+				reason: "missing_argument"
+			});
 		}
 	};
 };
 
-export default ViewSaveDialog;
+export default SaveDialog;
