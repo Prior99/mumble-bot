@@ -13,7 +13,11 @@
 const buildChannelTree = function(root) {
 	return {
 		name: root.name,
-		users: [...root.users],
+		users: [...root.users.map(user => ({
+			name: user.name,
+			id: user.id,
+			session: user.session
+		}))],
 		children: root.children.map(buildChannelTree)
 	};
 }
