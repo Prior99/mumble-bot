@@ -195,16 +195,6 @@ class Output extends Stream.Writable {
     }
 
     /**
-     * Changes the voice of the ESpeak TTS from female to male and vice-verse.
-     * @deprecated Is no longer needed as Google Translate TTS is now used instead of ESpeak.
-     * @returns {undefined}
-     */
-    changeGender() {
-        this.speech.changeGender();
-        this.say("Geschlechtsumwandlung erfolgreich.");
-    }
-
-    /**
      * Stop all timeouts and shutdown everything.
      * @return {undefined}
      */

@@ -31,6 +31,16 @@ class Api {
         this.app = Express();
         ExpressWS(this.app);
         this.app.use(BodyParser.json());
+        this.app.use((req, res, next) => {
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+            if (req.method === "OPTIONS") {
+                res.sendStatus(200);
+                return;
+            }
+            next();
+        });
         this.app.use(async (req, res, next) => {
             if (req.headers.authorization) {
                 if (req.headers.authorization.substr(0, 5).toLowerCase() !== "basic") {
