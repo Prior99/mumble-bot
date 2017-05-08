@@ -17,22 +17,22 @@ import Dialog from "./dialog";
  * @return {Router} - router for the current section.
  */
 const RouteRecords = function(bot) {
-	const router = Express.Router();
+    const router = Express.Router();
 
-	router.use("/cached", Cached(bot));
-	router.use("/dialog", Dialog(bot));
+    router.use("/cached", Cached(bot));
+    router.use("/dialog", Dialog(bot));
 
-	router.use("/play", Play(bot));
-	router.use("/download", Download(bot));
-	router.use("/addlabel", AddLabel(bot));
-	router.use("/edit", Edit(bot));
-	router.use("/random", Random(bot));
-	router.use("/list", List(bot));
-	router.use("/get", Get(bot));
-	router.use("/visualize", Visualize(bot));
-	router.use("/fork", Fork(bot));
+    router.use("/play", Play(bot));
+    router.use("/download", Download(bot));
+    router.use("/addlabel", AddLabel(bot));
+    router.use("/edit", Edit(bot));
+    router.use("/random", Random(bot));
+    router.use("/list", List(bot));
+    router.use("/get", Get(bot));
+    router.use("/visualize", Visualize(bot));
+    router.use("/fork", Fork(bot));
 
-	return router;
+    return router;
 };
 
 export default RouteRecords;

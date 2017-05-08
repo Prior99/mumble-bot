@@ -12,64 +12,64 @@ const audioFreq = 48000;
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const Fork = function(bot) {
-	return async function(req, res) {
-		const id = +req.body.id;
-		const quote = req.body.quote;
-		const actions = JSON.parse(req.body.actions);
-		const overwrite = JSON.parse(req.body.overwrite);
-		Winston.verbose(`${req.user.username} is forking record #${id}`);
-		let newId, record, duration;
-		try {
-			// Calculate new duration
-			record = await bot.database.getRecord(id);
-			duration = record.duration;
-			for(const action of actions) {
-				if(action.action === "crop") {
-					duration = action.end - action.begin;
-				}
-			}
-			// Fork in the database
-			newId = await bot.database.forkRecord(
-				record.user,
-				new Date(),
-				quote,
-				id,
-				overwrite,
-				req.user,
-				duration
-			);
-		}
-		catch(err) {
-			Winston.error("Error occured while metadata on fork of record: ", err);
-			reply(res, HTTPCodes.internalError, false, { reason : "internal_error" });
-			return;
-		}
+    return async function(req, res) {
+        const id = +req.body.id;
+        const quote = req.body.quote;
+        const actions = JSON.parse(req.body.actions);
+        const overwrite = JSON.parse(req.body.overwrite);
+        Winston.verbose(`${req.user.username} is forking record #${id}`);
+        let newId, record, duration;
+        try {
+            // Calculate new duration
+            record = await bot.database.getRecord(id);
+            duration = record.duration;
+            for(const action of actions) {
+                if(action.action === "crop") {
+                    duration = action.end - action.begin;
+                }
+            }
+            // Fork in the database
+            newId = await bot.database.forkRecord(
+                record.user,
+                new Date(),
+                quote,
+                id,
+                overwrite,
+                req.user,
+                duration
+            );
+        }
+        catch(err) {
+            Winston.error("Error occured while metadata on fork of record: ", err);
+            reply(res, HTTPCodes.internalError, false, { reason : "internal_error" });
+            return;
+        }
 
-		const crop = (begin, end) => new Promise((resolve, reject) => {
-			const transcoder = FFMpeg(`sounds/recorded/${id}`)
-				.seekInput(begin)
-				.duration(end - begin)
-				.format("mp3")
-				.audioCodec("libmp3lame")
-				.on("error", (err) => reject(err))
-				.save(`sounds/recorded/${newId}`)
-				.on("end", () => resolve());
-		});
+        const crop = (begin, end) => new Promise((resolve, reject) => {
+            const transcoder = FFMpeg(`sounds/recorded/${id}`)
+                .seekInput(begin)
+                .duration(end - begin)
+                .format("mp3")
+                .audioCodec("libmp3lame")
+                .on("error", (err) => reject(err))
+                .save(`sounds/recorded/${newId}`)
+                .on("end", () => resolve());
+        });
 
-		try {
-			// Perform the actual modifications
-			for(const action of actions) {
-				if(action.action === "crop") {
-					await crop(+action.begin, +action.end);
-				}
-			}
-			reply(res, HTTPCodes.okay, true, {});
-		}
-		catch(err) {
-			Winston.error("Error occured while processing fork on record: ", err);
-			reply(res, HTTPCodes.internalError, false, { reason : "internal_error" });
-		}
-	};
+        try {
+            // Perform the actual modifications
+            for(const action of actions) {
+                if(action.action === "crop") {
+                    await crop(+action.begin, +action.end);
+                }
+            }
+            reply(res, HTTPCodes.okay, true, {});
+        }
+        catch(err) {
+            Winston.error("Error occured while processing fork on record: ", err);
+            reply(res, HTTPCodes.internalError, false, { reason : "internal_error" });
+        }
+    };
 };
 
 export default Fork;

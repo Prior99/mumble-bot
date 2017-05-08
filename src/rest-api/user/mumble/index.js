@@ -10,11 +10,11 @@ import ListLinkedUsers from "./list-linked-users";
  * @return {Router} - router for the current section.
  */
 const RouterUsers = function(bot) {
-	const router = Express.Router();
-	router.use("/link", Link(bot));
-	router.use("/listFreeUsers", ListFreeUsers(bot));
-	router.use("/listLinkedUsers", ListLinkedUsers(bot));
-	return router;
+    const router = Express.Router();
+    router.use("/link", Link(bot));
+    router.use("/listFreeUsers", ListFreeUsers(bot));
+    router.use("/listLinkedUsers", ListLinkedUsers(bot));
+    return router;
 };
 
 export default RouterUsers;

@@ -10,11 +10,11 @@ import Revoke from "./revoke";
  * @return {Router} - router for the current section.
  */
 const RouteMumble = function(bot) {
-	const router = Express.Router();
-	router.use("/revoke", Revoke(bot));
-	router.use("/listForUser", ListForUser(bot));
-	router.use("/grant", Grant(bot));
-	return router;
+    const router = Express.Router();
+    router.use("/revoke", Revoke(bot));
+    router.use("/listForUser", ListForUser(bot));
+    router.use("/grant", Grant(bot));
+    return router;
 };
 
 export default RouteMumble;

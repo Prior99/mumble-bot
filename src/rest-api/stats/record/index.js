@@ -10,12 +10,12 @@ import PerUser from "./per-user";
  * @return {Router} - router for the current section.
  */
 const RouteStats = function(bot) {
-	const router = Express.Router();
-	router.use("/perUser", PerUser(bot));
-	router.use("/perTime", PerTime(bot));
-	router.use("/playbackPerUser", PlaybackPerUser(bot));
+    const router = Express.Router();
+    router.use("/perUser", PerUser(bot));
+    router.use("/perTime", PerTime(bot));
+    router.use("/playbackPerUser", PlaybackPerUser(bot));
 
-	return router;
+    return router;
 };
 
 export default RouteStats;

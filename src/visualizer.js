@@ -15,32 +15,32 @@ const maxByte = 255;
  * @return {Buffer} - Buffer holding the generated png image.
  */
 const VisualizeAudioFile = function(filename, height, samplesPerPixel) {
-	return new Promise((resolve, reject) => {
-		try {
-			const analyzer = new AudioAnalyzer(samplesPerPixel);
-			const ffmpeg = FFMpeg(filename);
-			const stream = ffmpeg.format("u8")
-				.audioChannels(1)
-				.on("error", (err) => reject(err))
-				.audioFrequency(audioFreq).stream();
-			stream.on("data", (chunk) => {
-				const arr = new Float32Array(chunk.length);
-				for(let i = 0; i < chunk.length; i++) {
-					arr[i] = (chunk[i] / maxByte) * 2 - 1;
-				}
-				analyzer.analyze(arr)
-			});
-			stream.on("end", () => {
-				const width = Math.min(analyzer.list.length);
-				const canvas = new Canvas(width, height);
-				analyzer.draw(canvas);
-				resolve(canvas.toBuffer());
-			});
-		}
-		catch(err) {
-			reject(err);
-		}
-	});
+    return new Promise((resolve, reject) => {
+        try {
+            const analyzer = new AudioAnalyzer(samplesPerPixel);
+            const ffmpeg = FFMpeg(filename);
+            const stream = ffmpeg.format("u8")
+                .audioChannels(1)
+                .on("error", (err) => reject(err))
+                .audioFrequency(audioFreq).stream();
+            stream.on("data", (chunk) => {
+                const arr = new Float32Array(chunk.length);
+                for(let i = 0; i < chunk.length; i++) {
+                    arr[i] = (chunk[i] / maxByte) * 2 - 1;
+                }
+                analyzer.analyze(arr)
+            });
+            stream.on("end", () => {
+                const width = Math.min(analyzer.list.length);
+                const canvas = new Canvas(width, height);
+                analyzer.draw(canvas);
+                resolve(canvas.toBuffer());
+            });
+        }
+        catch(err) {
+            reject(err);
+        }
+    });
 };
 
 export default VisualizeAudioFile;

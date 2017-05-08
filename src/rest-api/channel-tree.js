@@ -11,15 +11,15 @@
  * @return {Channel} - Recursive tree of channels.
  */
 const buildChannelTree = function(root) {
-	return {
-		name: root.name,
-		users: [...root.users.map(user => ({
-			name: user.name,
-			id: user.id,
-			session: user.session
-		}))],
-		children: root.children.map(buildChannelTree)
-	};
+    return {
+        name: root.name,
+        users: [...root.users.map(user => ({
+            name: user.name,
+            id: user.id,
+            session: user.session
+        }))],
+        children: root.children.map(buildChannelTree)
+    };
 }
 
 /**
@@ -29,11 +29,11 @@ const buildChannelTree = function(root) {
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const APIChannelTree = function(bot) {
-	return function(req, res) {
-		res.send({
-			tree: buildChannelTree(bot.mumble.rootChannel)
-		});
-	}
+    return function(req, res) {
+        res.send({
+            tree: buildChannelTree(bot.mumble.rootChannel)
+        });
+    }
 };
 
 export default APIChannelTree;

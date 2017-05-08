@@ -10,12 +10,12 @@ import PerWeekday from "./per-weekday";
  * @return {Router} - router for the current section.
  */
 const RouteStats = function(bot) {
-	const router = Express.Router();
-	router.use("/perWeekday", PerWeekday(bot));
-	router.use("/perUser", PerUser(bot));
-	router.use("/perHour", PerHour(bot));
+    const router = Express.Router();
+    router.use("/perWeekday", PerWeekday(bot));
+    router.use("/perUser", PerUser(bot));
+    router.use("/perHour", PerHour(bot));
 
-	return router;
+    return router;
 };
 
 export default RouteStats;

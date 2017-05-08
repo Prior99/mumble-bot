@@ -11,13 +11,13 @@ import Record from "./record";
  * @return {Router} - router for the current section.
  */
 const RouteStats = function(bot) {
-	const router = Express.Router();
+    const router = Express.Router();
 
-	router.use("/online", Online(bot));
-	router.use("/spoken", Spoken(bot));
-	router.use("/record", Record(bot));
+    router.use("/online", Online(bot));
+    router.use("/spoken", Spoken(bot));
+    router.use("/record", Record(bot));
 
-	return router;
+    return router;
 };
 
 export default RouteStats;

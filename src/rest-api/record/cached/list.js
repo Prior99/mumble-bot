@@ -6,19 +6,19 @@ import * as Winston from "winston";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const Cached = function(bot) {
-	return function(req, res) {
-		const copy = bot.cachedAudios.slice();
-		res.send({
-			cached: copy.sort((a, b) => {
-				if(a.protected === b.protected) {
-					return a.date > b.date ? -1 : 1;
-				}
-				else {
-					return a.protected ? -1 : 1;
-				}
-			})
-		});
-	}
+    return function(req, res) {
+        const copy = bot.cachedAudios.slice();
+        res.send({
+            cached: copy.sort((a, b) => {
+                if(a.protected === b.protected) {
+                    return a.date > b.date ? -1 : 1;
+                }
+                else {
+                    return a.protected ? -1 : 1;
+                }
+            })
+        });
+    }
 };
 
 export default Cached;

@@ -15,18 +15,18 @@ import Websocket from "./websocket";
  * @return {Router} - router for the current section.
  */
 const RouteCached = function(bot) {
-	const router = Express.Router();
+    const router = Express.Router();
 
-	router.ws("/websocket", Websocket(bot));
-	router.use("/visualize", Visualize(bot));
-	router.use("/save", Save(bot));
-	router.use("/protect", Protect(bot));
-	router.use("/play", Play(bot));
-	router.use("/list", List(bot));
-	router.use("/download", Download(bot));
-	router.use("/delete", Delete(bot));
+    router.ws("/websocket", Websocket(bot));
+    router.use("/visualize", Visualize(bot));
+    router.use("/save", Save(bot));
+    router.use("/protect", Protect(bot));
+    router.use("/play", Play(bot));
+    router.use("/list", List(bot));
+    router.use("/download", Download(bot));
+    router.use("/delete", Delete(bot));
 
-	return router;
+    return router;
 };
 
 export default RouteCached;

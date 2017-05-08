@@ -6,26 +6,26 @@ import HTTPCodes from "./http-codes";
  * @return {ViewRenderer} - Feeded view renderer for this endpoint.
  */
 const Log = function(bot) {
-	return async function(req, res) {
-		try {
-			if(await bot.permissions.hasPermission(req.user, "log")) {
-				res.send({
-					entries: await bot.database.listLog()
-				});
-			}
-			else {
-				res.send({
-					reason: "insufficient_permission"
-				});
-			}
-		}
-		catch(err) {
-			Winston.error("Unabled to fetch logentries from database.", err);
-			res.status(HTTPCodes.internalError).send(JSON.stringify({
-				reason: "internal_error"
-			}));
-		}
-	};
+    return async function(req, res) {
+        try {
+            if(await bot.permissions.hasPermission(req.user, "log")) {
+                res.send({
+                    entries: await bot.database.listLog()
+                });
+            }
+            else {
+                res.send({
+                    reason: "insufficient_permission"
+                });
+            }
+        }
+        catch(err) {
+            Winston.error("Unabled to fetch logentries from database.", err);
+            res.status(HTTPCodes.internalError).send(JSON.stringify({
+                reason: "internal_error"
+            }));
+        }
+    };
 };
 
 export default Log;

@@ -10,13 +10,13 @@ import Save from "./save";
  * @return {Router} - router for the current section.
  */
 const RouteRecords = function(bot) {
-	const router = Express.Router();
+    const router = Express.Router();
 
-	router.use("/save", Save(bot));
-	router.use("/play", Play(bot));
-	router.use("/list", List(bot));
+    router.use("/save", Save(bot));
+    router.use("/play", Play(bot));
+    router.use("/list", List(bot));
 
-	return router;
+    return router;
 };
 
 export default RouteRecords;

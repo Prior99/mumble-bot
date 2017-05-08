@@ -12,14 +12,14 @@ import List from "./list";
  * @return {Router} - router for the current section.
  */
 const RouterUsers = function(bot) {
-	const router = Express.Router();
-	router.use("/usernameAvailable", Available(bot));
-	router.use("/register", Register(bot));
-	router.use("/permission", Permissions(bot));
-	router.get("/setSettings", SetSettings(bot));
-	router.use("/mumble", Mumble(bot));
-	router.use("/list", List(bot))
-	return router;
+    const router = Express.Router();
+    router.use("/usernameAvailable", Available(bot));
+    router.use("/register", Register(bot));
+    router.use("/permission", Permissions(bot));
+    router.get("/setSettings", SetSettings(bot));
+    router.use("/mumble", Mumble(bot));
+    router.use("/list", List(bot))
+    return router;
 };
 
 export default RouterUsers;

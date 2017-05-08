@@ -7,18 +7,18 @@ import HTTPCodes from "../../http-codes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const Dialogs = function(bot) {
-	return async function(req, res) {
-		try {
-			const dialogs = await bot.database.listDialogs();
-			res.send({ dialogs });
-		}
-		catch(err) {
-			Winston.error("Error listing dialogs", err);
-			res.status(HTTPCodes.internalError).render({
-				reason: "internal_error"
-			});
-		}
-	}
+    return async function(req, res) {
+        try {
+            const dialogs = await bot.database.listDialogs();
+            res.send({ dialogs });
+        }
+        catch(err) {
+            Winston.error("Error listing dialogs", err);
+            res.status(HTTPCodes.internalError).render({
+                reason: "internal_error"
+            });
+        }
+    }
 };
 
 export default Dialogs;

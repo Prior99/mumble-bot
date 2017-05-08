@@ -10,13 +10,13 @@ import List from "./list";
  * @return {Router} - router for the current section.
  */
 const RouteSounds = function(bot) {
-	const router = Express.Router();
+    const router = Express.Router();
 
-	router.use("/add", Add(bot, router));
-	router.use("/list", List(bot));
-	router.use("/play", Play(bot));
+    router.use("/add", Add(bot, router));
+    router.use("/list", List(bot));
+    router.use("/play", Play(bot));
 
-	return router;
+    return router;
 };
 
 export default RouteSounds;

@@ -10,49 +10,49 @@ import HTTPCodes from "../http-codes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const SoundAdd = function(bot, router) {
-	router.use(Multer({
-		dest: bot.options.website.tmp,
-		rename(fieldname, filename) {
-			return filename + Date.now();
-		}
-	}));
-	
-	/**
-	 * Handle a file upload.
-	 * @param {object} file - File from multer.
-	 * @param {object} file.path - Path of the temporary file.
-	 * @param {object} file.originalname - Original file name.
-	 * @param {object} res - Response from express to answer.
-	 * @return {undefined}
-	 */
-	const handleFile = async function(file, res) {
-		try {
-			FS.mkdirSync("sounds/uploaded");
-		}
-		catch(e) {
-			if(e.code !== "EEXIST") {
-				throw e;
-			}
-		}
-		try {
-			const id = await bot.database.addSound(file.originalname);
-			Winston.log("verbose", `added new sound #${id}`);
-			FS.renameSync(file.path, `sounds/uploaded/${id}`);
-			res.status(HTTPCodes.okay).send({
-				id
-			});
-		}
-		catch(err) {
-			Winston.error("Could not add sound to database", err);
-			res.status(HTTPCodes.internalError).send({
-				reason: "internal_error"
-			});
-		}
-	}
+    router.use(Multer({
+        dest: bot.options.website.tmp,
+        rename(fieldname, filename) {
+            return filename + Date.now();
+        }
+    }));
+    
+    /**
+     * Handle a file upload.
+     * @param {object} file - File from multer.
+     * @param {object} file.path - Path of the temporary file.
+     * @param {object} file.originalname - Original file name.
+     * @param {object} res - Response from express to answer.
+     * @return {undefined}
+     */
+    const handleFile = async function(file, res) {
+        try {
+            FS.mkdirSync("sounds/uploaded");
+        }
+        catch(e) {
+            if(e.code !== "EEXIST") {
+                throw e;
+            }
+        }
+        try {
+            const id = await bot.database.addSound(file.originalname);
+            Winston.log("verbose", `added new sound #${id}`);
+            FS.renameSync(file.path, `sounds/uploaded/${id}`);
+            res.status(HTTPCodes.okay).send({
+                id
+            });
+        }
+        catch(err) {
+            Winston.error("Could not add sound to database", err);
+            res.status(HTTPCodes.internalError).send({
+                reason: "internal_error"
+            });
+        }
+    }
 
-	return function(req, res) {
-		handleFile(req.files["upload"], res, req);
-	};
+    return function(req, res) {
+        handleFile(req.files["upload"], res, req);
+    };
 };
 
 export default SoundAdd;

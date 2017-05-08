@@ -8,29 +8,29 @@ import HTTPCodes from "../http-codes";
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
 const Edit = function(bot) {
-	return async function(req, res) {
-		if(req.body.id && req.body.quote && req.body.labels) {
-			const labels = JSON.parse(req.body.labels);
-			const quote = req.body.quote;
-			const id = req.body.id;
-			try {
-				await bot.database.updateRecord(id, quote, labels);
-				Winston.log("verbose", `${req.user.username} edited record #${id}`);
-				res.status(HTTPCodes.okay).send(true);
-			}
-			catch(err) {
-				Winston.error("Could not edit record in database", err);
-				res.status(HTTPCodes.internalError).send({
-					reason : "internal_error"
-				});
-			}
-		}
-		else {
-			res.status(HTTPCodes.missingArguments).send({
-				reason : "missing_arguments"
-			});
-		}
-	};
+    return async function(req, res) {
+        if(req.body.id && req.body.quote && req.body.labels) {
+            const labels = JSON.parse(req.body.labels);
+            const quote = req.body.quote;
+            const id = req.body.id;
+            try {
+                await bot.database.updateRecord(id, quote, labels);
+                Winston.log("verbose", `${req.user.username} edited record #${id}`);
+                res.status(HTTPCodes.okay).send(true);
+            }
+            catch(err) {
+                Winston.error("Could not edit record in database", err);
+                res.status(HTTPCodes.internalError).send({
+                    reason : "internal_error"
+                });
+            }
+        }
+        else {
+            res.status(HTTPCodes.missingArguments).send({
+                reason : "missing_arguments"
+            });
+        }
+    };
 };
 
 export default Edit;
