@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import HTTPCodes from "../http-codes";
+import * as HTTP from "http-status-codes";
+import { getUserByUsername } from "../../database";
 
 /**
  * Checks whether a username is available.
@@ -9,14 +10,14 @@ import HTTPCodes from "../http-codes";
 const UsernameAvailable = function(bot) {
     return async function(req, res) {
         try {
-            const user = await bot.database.getUserByUsername(req.body.username);
-            res.status(HTTPCodes.okay).send({
-                available : !Boolean(user)
+            const user = await getUserByUsername(req.body.username, bot.database);
+            res.status(HTTP.OK).send({
+                available: !Boolean(user)
             });
         }
-        catch(err) {
+        catch (err) {
             Winston.error("Error checking whether username is available", err);
-            res.status(HTTPCodes.internalError).send({
+            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
                 reason: "internal_error"
             });
         }

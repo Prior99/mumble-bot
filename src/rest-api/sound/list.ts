@@ -1,4 +1,6 @@
 import * as Winston from "winston";
+import * as HTTP from "http-status-codes";
+import { listSounds } from "../../database";
 
 /**
  * <b>/sounds/</b> Displays the home page for the /sounds/ endpoint (A list of all sounds).
@@ -8,14 +10,14 @@ import * as Winston from "winston";
 const Sounds = function(bot) {
     return async function(req, res) {
         try {
-            const sounds = await bot.database.listSounds();
+            const sounds = await listSounds(bot.database);
             res.send({
                 sounds
             });
         }
-        catch(err) {
+        catch (err) {
             Winston.error("Could not get list of sounds", err);
-            res.status(HTTPCodes.internalError).send({
+            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
                 reason: "internal_error"
             });
         }

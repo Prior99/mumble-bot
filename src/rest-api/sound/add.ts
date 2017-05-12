@@ -1,7 +1,8 @@
 import * as Winston from "winston";
-import Multer from "multer";
+import * as Multer from "multer";
 import * as FS from "fs";
-import HTTPCodes from "../http-codes";
+import * as HTTP from "http-status-codes";
+import { addSound } from "../../database";
 
 /**
  * View for playback endpoint of sound section.
@@ -11,12 +12,9 @@ import HTTPCodes from "../http-codes";
  */
 const SoundAdd = function(bot, router) {
     router.use(Multer({
-        dest: bot.options.website.tmp,
-        rename(fieldname, filename) {
-            return filename + Date.now();
-        }
-    }));
-    
+        dest: bot.options.website.tmp
+    }).array());
+
     /**
      * Handle a file upload.
      * @param {object} file - File from multer.
@@ -27,31 +25,29 @@ const SoundAdd = function(bot, router) {
      */
     const handleFile = async function(file, res) {
         try {
-            FS.mkdirSync("sounds/uploaded");
+            await FS.mkdir("sounds/uploaded");
         }
-        catch(e) {
-            if(e.code !== "EEXIST") {
+        catch (e) {
+            if (e.code !== "EEXIST") {
                 throw e;
             }
         }
         try {
-            const id = await bot.database.addSound(file.originalname);
+            const id = await addSound(file.originalname, bot.database);
             Winston.log("verbose", `added new sound #${id}`);
             FS.renameSync(file.path, `sounds/uploaded/${id}`);
-            res.status(HTTPCodes.okay).send({
-                id
-            });
+            res.status(HTTP.OK).send({ id });
         }
-        catch(err) {
+        catch (err) {
             Winston.error("Could not add sound to database", err);
-            res.status(HTTPCodes.internalError).send({
+            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
                 reason: "internal_error"
             });
         }
     }
 
     return function(req, res) {
-        handleFile(req.files["upload"], res, req);
+        handleFile(req.files["upload"], res);
     };
 };
 

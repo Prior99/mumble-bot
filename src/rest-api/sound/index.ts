@@ -1,4 +1,4 @@
-import Express from "express";
+import * as Express from "express";
 
 import Add from "./add";
 import Play from "./play";
@@ -9,7 +9,7 @@ import List from "./list";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {Router} - router for the current section.
  */
-const RouteSounds = function(bot) {
+export const RouteSounds = function(bot) {
     const router = Express.Router();
 
     router.use("/add", Add(bot, router));
@@ -18,5 +18,3 @@ const RouteSounds = function(bot) {
 
     return router;
 };
-
-export default RouteSounds;

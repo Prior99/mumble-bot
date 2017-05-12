@@ -10,7 +10,7 @@ const Cached = function(bot) {
         const copy = bot.cachedAudios.slice();
         res.send({
             cached: copy.sort((a, b) => {
-                if(a.protected === b.protected) {
+                if (a.protected === b.protected) {
                     return a.date > b.date ? -1 : 1;
                 }
                 else {

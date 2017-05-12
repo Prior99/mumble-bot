@@ -1,4 +1,4 @@
-import Express from "express";
+import * as Express from "express";
 
 import Delete from "./delete";
 import Download from "./download";
@@ -14,19 +14,17 @@ import Websocket from "./websocket";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {Router} - router for the current section.
  */
-const RouteCached = function(bot) {
+export const RouteCached = function(bot) {
     const router = Express.Router();
 
-    router.ws("/websocket", Websocket(bot));
-    router.use("/visualize", Visualize(bot));
-    router.use("/save", Save(bot));
-    router.use("/protect", Protect(bot));
-    router.use("/play", Play(bot));
-    router.use("/list", List(bot));
-    router.use("/download", Download(bot));
-    router.use("/delete", Delete(bot));
+    (router as any).ws("/websocket", Websocket(bot));
+    router.get("/:id/visualize", Visualize(bot));
+    router.post("/:id/save", Save(bot));
+    router.post("/:id/protect", Protect(bot));
+    router.post("/:id/play", Play(bot));
+    router.get("/", List(bot));
+    router.get("/:id/download", Download(bot));
+    router.delete("/:id", Delete(bot));
 
     return router;
 };
-
-export default RouteCached;

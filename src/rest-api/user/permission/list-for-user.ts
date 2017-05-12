@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../http-codes";
+import * as HTTP from "http-status-codes";
+import { getUserByUsername } from "../../../database";
 
 /**
  * List the permissions for one user.
@@ -9,22 +10,22 @@ import HTTPCodes from "../../http-codes";
 const Permissions = function(bot) {
     return async function(req, res) {
         try {
-            const user = await bot.database.getUserByUsername(req.body.username);
-            if(user) {
+            const user = await getUserByUsername(req.body.username, bot.database);
+            if (user) {
                 const permissions = await bot.permissions.listPermissionsForUser(req.user, user);
-                res.status(HTTPCodes.okay).send({
+                res.status(HTTP.OK).send({
                     permissions
                 });
             }
             else {
-                res.status(HTTPCodes.invalidRequest).send({
-                    reason : "missing_argument"
+                res.status(HTTP.BAD_REQUEST).send({
+                    reason: "missing_argument"
                 });
             }
         }
-        catch(err) {
-            res.status(HTTPCodes.internalError).send({
-                reason : "internal_error"
+        catch (err) {
+            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
+                reason: "internal_error"
             });
         }
     };

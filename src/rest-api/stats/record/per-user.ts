@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../http-codes";
+import * as HTTP from "http-status-codes";
+import { getRecordCountByUsers } from "../../../database";
 
 /**
  * API endpoint for statistics about speech per hour.
@@ -10,12 +11,12 @@ import HTTPCodes from "../../http-codes";
 const RecordsPerUser = function(bot) {
     return async function(req, res) {
         try {
-            const arr = await bot.database.getRecordCountByUsers();
-            res.status(HTTPCodes.okay).send(arr);
+            const arr = await getRecordCountByUsers(bot.database);
+            res.status(HTTP.OK).send(arr);
         }
-        catch(err) {
+        catch (err) {
             Winston.error("Could not get record count by users.", err);
-            res.status(HTTPCodes.internalError).send({
+            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
                 reason: "internal_error"
             });
         }

@@ -1,24 +1,27 @@
-import Express from "express";
+import * as Express from "express";
 import * as Winston from "winston";
-import Moment from "moment";
-import ExpressWS from "express-ws";
-import BodyParser from "body-parser";
-import colorify from "../colorbystring";
-import HTTPCodes from "./http-codes";
+import ExpressWS = require("express-ws");
+import * as BodyParser from "body-parser";
+import { colorify } from "../colorbystring";
+import * as HTTP from "http-status-codes";
+import { Server } from "http";
 
+import { RouteRecords } from './record';
+import { RouteSounds } from './sound';
+import { RouteStats } from './stats';
+import { RouteUsers } from './user';
 
-import Record from './record';
-import Sound from './sound';
-import Stats from './stats';
-import User from './user';
-
-import ChannelTree from './channel-tree';
-import Log from './log';
-import WebsocketQueue from './websocket-queue';
+import { ChannelTree } from './channel-tree';
+import { Log } from './log';
+import { WebsocketQueue } from './websocket-queue';
+import { checkLoginData, getUserByUsername } from "../database";
 
 const maxPercent = 100;
 
 class Api {
+    private connections: Set<any>;
+    private app: Express.Application;
+    private server: Server;
     /**
      * Handles the whole website stuff for the bot. Using express and handlebars
      * provides the backend for all data and the interface between the webpage and
@@ -42,54 +45,54 @@ class Api {
             next();
         });
         this.app.use(async (req, res, next) => {
-            if (req.headers.authorization) {
-                if (req.headers.authorization.substr(0, 5).toLowerCase() !== "basic") {
-                    res.status(HTTPCodes.forbidden).send({
+            const { authorization } = req.headers;
+            if (authorization) {
+                if (authorization.substr(0, 5).toLowerCase() !== "basic") {
+                    res.status(HTTP.FORBIDDEN).send({
                         reason: "invalid_authorization_method"
                     });
                     return;
                 }
-                const token = new Buffer(req.headers.authorization.substr(6), 'base64').toString('utf8');
+                const token = new Buffer(authorization.substr(6), 'base64').toString('utf8');
                 const [username, password] = token.split(':');
-                if (await bot.database.checkLoginData(username, password)) {
+                if (await checkLoginData(username, password, bot.database)) {
                     try {
-                        const user = await bot.database.getUserByUsername(username); // refresh user each session
+                        const user = await getUserByUsername(username, bot.database); // refresh user each session
                         const permissions = await bot.permissions.listPermissionsAssocForUser(user);
-                        req.login = true;
-                        req.user = user;
-                        req.permissions = permissions;
-                    } catch(err) {
+                        (req as any).user = user;
+                        (req as any).permissions = permissions;
+                    } catch (err) {
                         Winston.error(`Error when loading data for user ${username}`, err);
-                        res.status(HTTPCodes.internalError).send({
+                        res.status(HTTP.INTERNAL_SERVER_ERROR).send({
                             reason: "internal_error"
                         });
                     }
                     return next();
                 } else {
                     Winston.verbose(`User '${username}' failed to login.`);
-                    res.status(HTTPCodes.forbidden).send({
+                    res.status(HTTP.FORBIDDEN).send({
                         reason: "invalid_login"
                     });
                     return;
                 }
             }
-            res.status(HTTPCodes.forbidden).send({
+            res.status(HTTP.FORBIDDEN).send({
                 reason: "authorization_required"
             });
         });
-        this.app.use("/sound", Sound(bot));
-        this.app.use("/record", Record(bot));
-        this.app.use("/stats", Stats(bot));
-        this.app.use("/user", User(bot));
-        this.app.get("/channelTree", ChannelTree(bot));
+        this.app.use("/sounds", RouteSounds(bot));
+        this.app.use("/records", RouteRecords(bot));
+        this.app.use("/stats", RouteStats(bot));
+        this.app.use("/users", RouteUsers(bot));
+        this.app.get("/channel-tree", ChannelTree(bot));
         this.app.get("/log", Log(bot));
-        this.app.ws("/queue", WebsocketQueue(bot));
+        (this.app as any).ws("/queue", WebsocketQueue(bot));
 
         const port = bot.options.website.port;
         this.server = this.app.listen(port);
-    
+
         const timeoutValue = 30000; // 30 seconds timeout
-        this.server.setTimeout(timeoutValue);
+        this.server.setTimeout(timeoutValue, () => {});
         this.server.on("connection", (conn) => this._onConnection(conn));
 
         Winston.info("Module started: Api, listening on port " + port);
@@ -115,8 +118,8 @@ class Api {
         return new Promise((resolve, reject) => {
             Winston.info("Stopping website ...");
             this.server.close(() => {
-                Winston.info("Terminating " + this.connections.length + " connections.");
-                for(const socket of this.connections) {
+                Winston.info("Terminating " + this.connections.size + " connections.");
+                for (const socket of this.connections) {
                     socket.destroy();
                     this.connections.delete(socket);
                 }

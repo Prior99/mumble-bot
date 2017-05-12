@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../http-codes";
+import * as HTTP from "http-status-codes";
+import { usedDialog, getDialogParts } from "../../../database";
 
 /**
  * This view plays back saved dialogs.
@@ -8,26 +9,26 @@ import HTTPCodes from "../../http-codes";
  */
 const PlayDialog = function(bot) {
     return async function(req, res) {
-        if(req.body.id) {
+        if (req.body.id) {
             try {
-                await bot.database.usedDialog(req.body.id);
-                const parts = await bot.database.getDialogParts(req.body.id);
+                await usedDialog(req.body.id, bot.database);
+                const parts = await getDialogParts(req.body.id, bot.database);
                 const files = parts.map(part => `sounds/recorded/${part}`);
                 bot.output.playSounds(files, {
-                    type : "dialog",
-                    user : req.user
+                    type: "dialog",
+                    user: req.user
                 });
             }
-            catch(err) {
+            catch (err) {
                 Winston.error("Could not play dialog", err);
-                res.status(HTTPCodes.internalError).send({
-                    reason : "internal_error" 
+                res.status(HTTP.INTERNAL_SERVER_ERROR).send({
+                    reason: "internal_error"
                 });
             }
         }
         else {
-            res.status(HTTPCodes.missingArguments).send({
-                reason : "missing_arguments" 
+            res.status(HTTP.BAD_REQUEST).send({
+                reason: "missing_arguments"
             });
         }
     };

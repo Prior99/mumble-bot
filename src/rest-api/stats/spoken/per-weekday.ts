@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../http-codes";
+import * as HTTP from "http-status-codes";
+import { getSpokenPerWeekday } from "../../../database";
 
 const weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 
@@ -12,17 +13,17 @@ const weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Fr
 const SpokenPerWeekday = function(bot) {
     return async function(req, res) {
         try {
-            const spoken = await bot.database.getSpokenPerWeekday();
-            res.status(HTTPCodes.okay).send(
+            const spoken = await getSpokenPerWeekday(bot.database);
+            res.status(HTTP.OK).send(
                 spoken.map((elem) => ({
-                    "amount" : elem.amount,
-                    "day" : weekdays[elem.day - 1]
+                    "amount": elem.amount,
+                    "day": weekdays[elem.day - 1]
                 }))
             );
         }
-        catch(err) {
+        catch (err) {
             Winston.error("Could not get speech amount per weekday.", err);
-            res.status(HTTPCodes.internalError).send({
+            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
                 reason: "internal_error"
             });
         }

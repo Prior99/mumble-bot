@@ -1,4 +1,4 @@
-import Express from "express";
+import * as Express from "express";
 
 import List from "./list";
 import Play from "./play";
@@ -9,7 +9,7 @@ import Save from "./save";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {Router} - router for the current section.
  */
-const RouteRecords = function(bot) {
+export const RouteDialogs = function(bot) {
     const router = Express.Router();
 
     router.use("/save", Save(bot));
@@ -18,5 +18,3 @@ const RouteRecords = function(bot) {
 
     return router;
 };
-
-export default RouteRecords;

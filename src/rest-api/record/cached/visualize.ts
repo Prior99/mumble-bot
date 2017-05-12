@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../http-codes";
+import * as HTTP from "http-status-codes";
 import * as FS from "fs";
 
 /**
@@ -9,20 +9,20 @@ import * as FS from "fs";
  */
 const VisualizedCached = function(bot) {
     return function(req, res) {
-        if(req.body.id) {
+        if (req.body.id) {
             const sound = bot.getCachedAudioById(+req.body.id);
-            if(sound) {
-                res.status(HTTPCodes.okay);
+            if (sound) {
+                res.status(HTTP.OK);
                 FS.createReadStream(`${sound.file}.png`).pipe(res);
             }
             else {
-                res.status(HTTPCodes.invalidRequest).send({
+                res.status(HTTP.BAD_REQUEST).send({
                     reason: "invalid_argument"
                 });
             }
         }
         else {
-            res.status(HTTPCodes.missingArguments).send({
+            res.status(HTTP.BAD_REQUEST).send({
                 reason: "missing_arguments"
             });
         }

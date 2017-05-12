@@ -1,8 +1,8 @@
 import "babel-polyfill";
 
 import * as MySQL from "promise-mysql";
-import FS from "fs-promise";
-import Winston from "winston";
+import * as FS from "async-file";
+import * as Winston from "winston";
 const options = require("../../../config.json");
 
 Winston.remove(Winston.transports.Console);

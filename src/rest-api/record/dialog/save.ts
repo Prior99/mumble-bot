@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../http-codes";
+import * as HTTP from "http-status-codes";
+import { addDialog } from "../../../database";
 
 /**
  * View for saving a new dialog.
@@ -9,20 +10,20 @@ import HTTPCodes from "../../http-codes";
 const SaveDialog = function(bot) {
     return async function(req, res) {
         const dialog = req.body;
-        if(dialog) {
+        if (dialog) {
             try {
-                await bot.database.addDialog(dialog);
-                res.status(HTTPCodes.okay).send(true);
+                await addDialog(dialog, bot.database);
+                res.status(HTTP.OK).send(true);
             }
-            catch(err) {
+            catch (err) {
                 Winston.error("Error while saving dialog", err);
-                res.status(HTTPCodes.internalError).send({
+                res.status(HTTP.INTERNAL_SERVER_ERROR).send({
                     reason: "internal_error"
                 });
             }
         }
         else {
-            res.status(HTTPCodes.missingArguments).send({
+            res.status(HTTP.BAD_REQUEST).send({
                 reason: "missing_argument"
             });
         }

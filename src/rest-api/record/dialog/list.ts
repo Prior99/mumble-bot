@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../http-codes";
+import * as HTTP from "http-status-codes";
+import { listDialogs } from "../../../database";
 
 /**
  * <b>/record/dialogs/</b> Page for list of dialogs.
@@ -9,12 +10,12 @@ import HTTPCodes from "../../http-codes";
 const Dialogs = function(bot) {
     return async function(req, res) {
         try {
-            const dialogs = await bot.database.listDialogs();
+            const dialogs = await listDialogs(bot.database);
             res.send({ dialogs });
         }
-        catch(err) {
+        catch (err) {
             Winston.error("Error listing dialogs", err);
-            res.status(HTTPCodes.internalError).render({
+            res.status(HTTP.INTERNAL_SERVER_ERROR).render({
                 reason: "internal_error"
             });
         }

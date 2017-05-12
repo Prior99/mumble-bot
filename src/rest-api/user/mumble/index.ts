@@ -1,8 +1,8 @@
-import Express from "express";
+import * as Express from "express";
 
 import Link from "./link";
 import ListFreeUsers from "./list-free-users";
-import ListLinkedUsers from "./list-linked-users";
+import { ListLinkedUsers } from "./list-linked-users";
 
 /**
  * Routes all requests related to the user api commands in the /api/users/ endpoint.

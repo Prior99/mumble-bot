@@ -25,7 +25,7 @@ const VisualizeAudioFile = function(filename, height, samplesPerPixel) {
                 .audioFrequency(audioFreq).stream();
             stream.on("data", (chunk) => {
                 const arr = new Float32Array(chunk.length);
-                for(let i = 0; i < chunk.length; i++) {
+                for (let i = 0; i < chunk.length; i++) {
                     arr[i] = (chunk[i] / maxByte) * 2 - 1;
                 }
                 analyzer.analyze(arr)
@@ -37,7 +37,7 @@ const VisualizeAudioFile = function(filename, height, samplesPerPixel) {
                 resolve(canvas.toBuffer());
             });
         }
-        catch(err) {
+        catch (err) {
             reject(err);
         }
     });

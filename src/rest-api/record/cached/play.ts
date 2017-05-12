@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../http-codes";
+import * as HTTP from "http-status-codes";
 
 /**
  * View for playing back a cached audio
@@ -8,25 +8,25 @@ import HTTPCodes from "../../http-codes";
  */
 const PlayCached = function(bot) {
     return function(req, res) {
-        if(req.body.id) {
+        if (req.body.id) {
             const sound = bot.getCachedAudioById(+req.body.id);
-            if(sound) {
+            if (sound) {
                 bot.playSound(sound.file, {
                     type: "cached",
                     details: sound,
                     user: req.user
                 });
                 Winston.log("verbose", `${req.user.username} played back cached record #${req.body.id}`);
-                res.status(HTTPCodes.okay).send(true);
+                res.status(HTTP.OK).send(true);
             }
             else {
-                res.status(HTTPCodes.invalidRequest).send({
+                res.status(HTTP.BAD_REQUEST).send({
                     reason: "invalid_argument"
                 });
             }
         }
         else {
-            res.status(HTTPCodes.missingArguments).send({
+            res.status(HTTP.BAD_REQUEST).send({
                 reason: "missing_arguments"
             });
         }

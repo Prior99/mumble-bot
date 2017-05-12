@@ -1,4 +1,4 @@
-import Express from "express";
+import * as Express from "express";
 
 import Grant from "./grant";
 import ListForUser from "./list-for-user";

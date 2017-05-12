@@ -1,7 +1,7 @@
 import RNG from "rng-js";
 import Color from "onecolor";
 
-module.exports = function(string) {
+export function colorify(string) {
     const rng = new RNG(string);
     const hue = rng.uniform();
     const saturation = 1;

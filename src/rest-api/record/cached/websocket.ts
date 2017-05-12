@@ -42,5 +42,3 @@ const WebSocketOverview = function(bot) {
 };
 
 export default WebSocketOverview;
-    
-

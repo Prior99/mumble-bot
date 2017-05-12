@@ -1,96 +1,54 @@
 /*
  * Imports
  */
-import Winston from "winston";
+import * as Winston from "winston";
 import * as MySQL from "promise-mysql";
-import * as FS from "fs-promise";
+import * as FS from "async-file";
 
-import UsersExtension from "./users.js";
-import PermissionsExtension from "./permissions.js";
-import MumbleUsersExtension from "./mumbleUsers.js";
-import SoundsExtension from "./sounds.js";
-import RecordsExtension from "./records.js";
-import SettingsExtension from "./settings.js";
-import LogExtension from "./log.js";
-import DialogsExtension from "./dialogs.js";
-import UserStatsExtension from "./userstats.js";
+export * from "./dialogs";
+export * from "./log";
+export * from "./mumbleUsers";
+export * from "./permissions";
+export * from "./records";
+export * from "./settings";
+export * from "./sounds";
+export * from "./users";
+export * from "./userstats";
 
 const timeout = 4000;
 
-/**
- * Handles the connection to a MySQL-Database.
- */
-class Database {
-    /**
-     * @constructor
-     * @param {object} options - Options for connecting to the database.
-     */
-    constructor(options) {
-        this.options = options;
-    }
-
-    /**
-     * Connect to the database.
-     * @return {undefined}
-     */
-    async connect() {
-        try {
-            Winston.info(
-                "Connecting to database " +
-                "mysql://" + this.options.user + "@" + this.options.host + "/" + this.options.database + " ... "
-            );
-            const conn = await MySQL.createConnection({
-                host : this.options.host,
-                user : this.options.user,
-                password : this.options.password,
-                database : this.options.database,
-                multipleStatements : true,
-                connectTimeout : this.options.connectTimeout ? this.options.connectTimeout : timeout
-            });
-            Winston.info("Successfully connected to database!");
-            this.connection = conn;
-            await this._setupDatabase();
-        }
-        catch(err) {
-            Winston.error("Connecting to database failed!", err);
-            throw err;
-        }
-    }
-
-    /**
-     * Sets up the database based on the schema file "schema.sql".
-     * @return {undefined}
-     */
-    async _setupDatabase() {
-        const data = await FS.readFile("schema.sql", {encoding : "utf8"});
-        try {
-            await this.connection.query(data);
-            return;
-        }
-        catch(err) {
-            Winston.error("An error occured while configuring database:", err);
-            throw err;
-        }
-    }
-
-    /**
-     * Stops the database by disconnecting gently.
-     * @return {undefined}
-     */
-    async stop() {
-        this.connection.end();
+async function setupDatabase(connection) {
+    const data = await FS.readFile("schema.sql", { encoding: "utf8" });
+    try {
+        await connection.query(data);
         return;
+    }
+    catch (err) {
+        Winston.error("An error occured while configuring database:", err);
+        throw err;
     }
 }
 
-UsersExtension(Database);
-PermissionsExtension(Database);
-MumbleUsersExtension(Database);
-SoundsExtension(Database);
-RecordsExtension(Database);
-SettingsExtension(Database);
-LogExtension(Database);
-DialogsExtension(Database);
-UserStatsExtension(Database);
-
-export default Database;
+export async function connectDatabase(options) {
+    try {
+        Winston.info(
+            "Connecting to database " +
+            "mysql://" + options.user + "@" + options.host + "/" + options.database + " ... "
+        );
+        const conn = await MySQL.createConnection({
+            host: options.host,
+            user: options.user,
+            password: options.password,
+            database: options.database,
+            multipleStatements: true,
+            connectTimeout: options.connectTimeout ? options.connectTimeout : timeout
+        });
+        Winston.info("Successfully connected to database!");
+        await setupDatabase(conn);
+        return conn;
+    }
+    catch (err) {
+        Winston.error("Connecting to database failed!", err);
+        throw err;
+    }
+}

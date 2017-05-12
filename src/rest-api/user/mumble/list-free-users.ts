@@ -1,11 +1,12 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../http-codes";
+import * as HTTP from "http-status-codes";
+import { getLinkedMumbleUsers } from "../../../database";
 
 async function getMumbleUsersLinkingPossible(bot) {
     const mumbleUsers = bot.getRegisteredMumbleUsers();
     try {
         const arr = [];
-        const mumbleIds = await bot.database.getLinkedMumbleUsers();
+        const mumbleIds = await getLinkedMumbleUsers(bot.database);
         return mumbleUsers.reduce((result, user) => {
             const linked = mumbleIds.reduce((linkedId, id) => id.id === user.id || linkedId, false);
             if (!linked && user.id !== bot.mumble.user.id) {
@@ -14,7 +15,7 @@ async function getMumbleUsersLinkingPossible(bot) {
             return result;
         }, []);
     }
-    catch(err) {
+    catch (err) {
         Winston.error("Error fetching registered mumble users", err);
         return [];
     }
@@ -30,9 +31,9 @@ const FreeMumbleUsers = function(bot) {
                 users
             });
         }
-        catch(err) {
+        catch (err) {
             Winston.error("Error fetching unlinked users.", err);
-            res.status(HTTPCodes.internalError).send({
+            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
                 okay: false,
                 reason: "internal_error"
             });

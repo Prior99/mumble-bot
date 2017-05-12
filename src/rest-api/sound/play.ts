@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import HTTPCodes from "../http-codes";
+import * as HTTP from "http-status-codes";
+import { usedSound, getSound } from "../../database";
 
 /**
  * View for playback endpoint of sound section.
@@ -8,28 +9,28 @@ import HTTPCodes from "../http-codes";
  */
 const SoundPlay = function(bot) {
     return async function(req, res) {
-        if(req.body.id) {
+        if (req.body.id) {
             try {
-                await bot.database.usedSound(req.body.id);
-                const details = await bot.database.getSound(req.body.id);
+                await usedSound(req.body.id, bot.database);
+                const details = await getSound(req.body.id, bot.database);
                 Winston.log("verbose", `${req.session.user.username} played sound #${req.body.id}`);
                 bot.playSound(`sounds/uploaded/${req.body.id}`, {
                     type: "sound",
                     details,
                     user: req.user
                 });
-                res.status(HTTPCodes.okay).send({
+                res.status(HTTP.OK).send({
                 });
             }
-            catch(err) {
+            catch (err) {
                 Winston.error("Could not increase usages of sound", err);
-                res.status(HTTPCodes.internalError).send({
+                res.status(HTTP.INTERNAL_SERVER_ERROR).send({
                     reason: "internal_error"
                 });
             }
         }
         else {
-            res.status(HTTPCodes.missingArguments).send({
+            res.status(HTTP.BAD_REQUEST).send({
                 reason: "missing_arguments"
             })
         }

@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import HTTPCodes from "../http-codes";
+import * as HTTP from "http-status-codes";
+import { giveUserMoney, getRecord, usedRecord } from "../../database";
 
 const moneyPerPlayReporter = 1;
 const moneyPerPlayUser = 1;
@@ -9,31 +10,29 @@ const moneyPerPlayUser = 1;
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const Play = (bot) => ({ params, user }, res) => {
+export const Play = (bot) => async ({ params, user }, res) => {
     const { id } = params;
     try {
-        const details = await bot.database.getRecord(id);
-        if(user.id !== details.reporter.id) {
-            await bot.database.giveUserMoney(details.reporter, moneyPerPlayReporter);
+        const details = await getRecord(id, bot.database);
+        if (user.id !== details.reporter.id) {
+            await giveUserMoney(details.reporter, moneyPerPlayReporter, bot.database);
         }
-        if(user.id !== details.user.id) {
-            await bot.database.giveUserMoney(details.user, moneyPerPlayUser);
+        if (user.id !== details.user.id) {
+            await giveUserMoney(details.user, moneyPerPlayUser, bot.database);
         }
-        await bot.database.usedRecord(id);
+        await usedRecord(id, bot.database);
         Winston.log("verbose", `${user.username} played back record #${id}`);
         bot.playSound("sounds/recorded/" + id, {
             type: "record",
             details,
             user: user
         });
-        res.status(HTTPCodes.okay).send(true);
+        res.status(HTTP.OK).send(true);
     }
-    catch(err) {
+    catch (err) {
         Winston.error("Could not increase usages of record", err);
-        res.status(HTTPCodes.internalError).send({
+        res.status(HTTP.INTERNAL_SERVER_ERROR).send({
             reason: "internal_error"
         });
     }
 };
-
-export default Play;

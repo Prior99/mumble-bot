@@ -28,12 +28,10 @@ const buildChannelTree = function(root) {
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const APIChannelTree = function(bot) {
+export const ChannelTree = function(bot) {
     return function(req, res) {
         res.send({
             tree: buildChannelTree(bot.mumble.rootChannel)
         });
     }
 };
-
-export default APIChannelTree;

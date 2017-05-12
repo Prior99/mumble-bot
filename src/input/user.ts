@@ -1,17 +1,18 @@
 import Samplerate from "node-samplerate";
-import Winston from "winston"
-import Util from "util";
-import EventEmitter from "events";
-import FS from "fs";
-import FFMpeg from "fluent-ffmpeg";
-import Stream from "stream";
-import {PassThrough as PassThroughStream} from "stream";
+import * as Winston from "winston";
+import { EventEmitter } from "events";
+import * as FS from "fs";
+import * as FFMpeg from "fluent-ffmpeg";
+import * as Stream from "stream";
+import { PassThrough as PassThroughStream } from "stream";
+import { Bot } from "../index";
+import { writeUserStatsOnline, writeUserStatsSpeak } from "../database";
 
 const TIMEOUT_THRESHOLD = 300;
 const msInS = 1000;
 const audioFreq = 48000;
 
-if(!String.prototype.startsWith) {
+if (!String.prototype.startsWith) {
     String.prototype.startsWith = function(searchString, position) {
         position = position || 0;
         return this.lastIndexOf(searchString, position) === position;
@@ -22,7 +23,18 @@ if(!String.prototype.startsWith) {
  * This class belongs to the VoiceInput and handles the speech recognition for a
  * single user.
  */
-class VoiceInputUser extends Stream.Writable {
+export class VoiceInputUser extends Stream.Writable {
+    private bot: Bot;
+    private user: any;
+    private databaseUser: any;
+    private speaking: boolean = false;
+    private connectTime: Date;
+    private passthrough: PassThroughStream;
+    private timeout: number;
+    private speakStartTime: Date;
+    private filename: string;
+    private encoder: any;
+    private started: boolean;
     /**
      * @constructor
      * @param {MumbleUser} user - Mumble user to recognize the speech of.
@@ -31,13 +43,12 @@ class VoiceInputUser extends Stream.Writable {
      */
     constructor(user, databaseUser, bot) {
         super();
-        this._user = user;
+        this.user = user;
         this.bot = bot;
-        this._databaseUser = databaseUser;
-        this.speaking = false;
-        this._createNewRecordFile();
-        this._connectTime = new Date();
-        this._user.on("disconnect", this._onDisconnect.bind(this));
+        this.databaseUser = databaseUser;
+        this.createNewRecordFile();
+        this.connectTime = new Date();
+        this.user.on("disconnect", this.onDisconnect.bind(this));
     }
 
     /**
@@ -47,12 +58,13 @@ class VoiceInputUser extends Stream.Writable {
      * @param {function} done - callback.
      * @returns {undefined}
      */
-    _write(chunk, encoding, done) {
-        if(!this.speaking) {
-            this._speechStarted();
+    public _write(chunk: any, encoding?: string, done?: Function): boolean {
+        if (!this.speaking) {
+            this.speechStarted();
         }
-        this._speechContinued(chunk);
+        this.speechContinued(chunk);
         done();
+        return true;
     }
 
     /**
@@ -60,59 +72,59 @@ class VoiceInputUser extends Stream.Writable {
      * Updates the stats.
      * @returns {undefined}
      */
-    _onDisconnect() {
-        this.bot.database.writeUserStatsOnline(this._databaseUser, this._connectTime, new Date());
+    private onDisconnect() {
+        writeUserStatsOnline(this.databaseUser, this.connectTime, new Date(), this.bot.database);
     }
 
     /**
      * Refreshes the timeout of silence after which the audio will be sliced into different records.
      * @returns {undefined}
      */
-    _refreshTimeout() {
-        if(this._timeout) {
-            clearTimeout(this._timeout);
+    private refreshTimeout() {
+        if (this.timeout) {
+            clearTimeout(this.timeout);
         }
-        this._timeout = setTimeout(this._speechStopped.bind(this), TIMEOUT_THRESHOLD);
+        this.timeout = setTimeout(this.speechStopped.bind(this), TIMEOUT_THRESHOLD);
     }
 
     /**
      * When user started speaking.
      * @returns {undefined}
      */
-    _speechStarted() {
+    private speechStarted() {
         this.speaking = true;
-        this._speakStartTime = new Date();
+        this.speakStartTime = new Date();
     }
 
     /**
      * Creates a new temporary record file.
      * @returns {undefined}
      */
-    _createNewRecordFile() {
-        if(this._databaseUser.settings.record === true) {
+    private createNewRecordFile() {
+        if (this.databaseUser.settings.record === true) {
             try {
                 FS.mkdirSync("tmp");
             }
-            catch(err) { /* Ignored */ }
+            catch (err) { /* Ignored */ }
             try {
                 FS.mkdirSync("tmp/useraudio");
             }
-            catch(err) { /* Ignored */ }
+            catch (err) { /* Ignored */ }
             try {
-                FS.mkdirSync("tmp/useraudio/" + this._user.id);
+                FS.mkdirSync("tmp/useraudio/" + this.user.id);
             }
-            catch(err) { /* Ignored */ }
-            this._filename = "tmp/useraudio/" + this._user.id + "/" + Date.now() + ".mp3";
-            this._passthrough = new PassThroughStream();
-            this._encoder = FFMpeg(this._passthrough)
-            .inputOptions(
+            catch (err) { /* Ignored */ }
+            this.filename = "tmp/useraudio/" + this.user.id + "/" + Date.now() + ".mp3";
+            this.passthrough = new PassThroughStream();
+            this.encoder = FFMpeg(this.passthrough)
+                .inputOptions(
                 "-f", "s16le",
                 "-ar", audioFreq,
                 "-ac", "1"
-            )
-            .on("error", (err) => Winston.error("Encoder for user " + this._user.username + " crashed."))
-            .audioCodec("libmp3lame")
-            .save(this._filename);
+                )
+                .on("error", (err) => Winston.error("Encoder for user " + this.user.username + " crashed."))
+                .audioCodec("libmp3lame")
+                .save(this.filename);
         }
     }
 
@@ -120,19 +132,19 @@ class VoiceInputUser extends Stream.Writable {
      * When user stopped speaking.
      * @returns {undefined}
      */
-    _speechStopped() {
+    private speechStopped() {
         this.speaking = false;
         this.started = false;
-        if(this._databaseUser.settings.record === true) {
-            this._passthrough.end();
+        if (this.databaseUser.settings.record === true) {
+            this.passthrough.end();
             this.bot.addCachedAudio(
-                this._filename,
-                this._databaseUser,
-                (Date.now() - this._speakStartTime.getTime()) / msInS
+                this.filename,
+                this.databaseUser,
+                (Date.now() - this.speakStartTime.getTime()) / msInS
             );
-            this._createNewRecordFile();
+            this.createNewRecordFile();
         }
-        this.bot.database.writeUserStatsSpeak(this._databaseUser, this._speakStartTime, new Date());
+        writeUserStatsSpeak(this.databaseUser, this.speakStartTime, new Date(), this.bot.database);
     }
 
     /**
@@ -141,11 +153,11 @@ class VoiceInputUser extends Stream.Writable {
      * @param {Buffer} chunk - The user's speech buffer.
      * @returns {undefined}
      */
-    _speechContinued(chunk) {
-        if(this._databaseUser.settings.record === true) {
-            this._passthrough.write(chunk);
+    private speechContinued(chunk) {
+        if (this.databaseUser.settings.record === true) {
+            this.passthrough.write(chunk);
         }
-        this._refreshTimeout();
+        this.refreshTimeout();
     }
 
     /**
@@ -153,13 +165,11 @@ class VoiceInputUser extends Stream.Writable {
      * @return {undefined}
      */
     stop() {
-        this._encoder.kill();
+        this.encoder.kill();
         this.end();
-        if(this._timeout) {
-            clearTimeout(this._timeout);
+        if (this.timeout) {
+            clearTimeout(this.timeout);
         }
-        Winston.info("Input stopped for user " + this._user.name);
+        Winston.info("Input stopped for user " + this.user.name);
     }
 }
-
-module.exports = VoiceInputUser;

@@ -1,4 +1,4 @@
-import Express from "express";
+import * as Express from "express";
 
 import PlaybackPerUser from "./playback-per-user";
 import PerTime from "./per-time";

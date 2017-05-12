@@ -1,14 +1,15 @@
 /*
  * Imports
  */
-import Input from "./input";
-import Output from "./output";
-import Winston from "winston";
+import { VoiceInput } from "./input";
+import { Output } from "./output";
+import * as Winston from "winston";
 import Api from "./rest-api";
-import FS from "fs-promise";
-import EventEmitter from "events";
+import * as FS from "async-file";
+import { EventEmitter } from "events";
 import Permissions from "./permissions";
 import VisualizeAudioFile from "./visualizer";
+import { connectDatabase } from "./database";
 
 const AUDIO_CACHE_AMOUNT = 4;
 
@@ -26,7 +27,18 @@ const AUDIO_CACHE_AMOUNT = 4;
  * This is the main class of the bot instanciated from the loader and holding all relevant data,
  * systems and connections.
  */
-class Bot extends EventEmitter {
+export class Bot extends EventEmitter {
+    public options: any;
+    public database: any;
+    public mumble: any;
+    private cachedAudios: any[];
+    private permissions: Permissions;
+    private audioId: number;
+    private output: Output;
+    private input: VoiceInput;
+    private api: Api;
+    private audioCacheAmount: number;
+
     /**
      * This is the constructor of the bot.
      * @constructor
@@ -38,30 +50,29 @@ class Bot extends EventEmitter {
         super();
         this.options = options;
         this.mumble = mumble;
-        this.database = database;
         this.cachedAudios = [];
-        this._audioId = 0;
+        this.database = database;
 
         this.permissions = new Permissions(database);
 
         this.api = new Api(this);
 
         this.output = new Output(this);
-        if(options.audioCacheAmount) {
+        if (options.audioCacheAmount) {
             this.audioCacheAmount = options.audioCacheAmount;
         }
         else {
             this.audioCacheAmount = AUDIO_CACHE_AMOUNT;
         }
 
-        this._init();
+        this.init();
     }
     /**
      * Register commands and listeners and load all addons.
      * @return {undefined}
      */
-    async _init() {
-        this.input = new Input(this);
+    private async init() {
+        this.input = new VoiceInput(this);
     }
 
     /**
@@ -72,8 +83,8 @@ class Bot extends EventEmitter {
     getRegisteredMumbleUsers() {
         const users = this.mumble.users();
         const result = [];
-        for(const i in users) {
-            if(users[i].id) {
+        for (const i in users) {
+            if (users[i].id) {
                 result.push(users[i]);
             }
         }
@@ -95,14 +106,13 @@ class Bot extends EventEmitter {
     async shutdown() {
         try {
             this.beQuiet();
-            await this.say("Goodbye.");
-            this._deleteAllCachedAudio(0);
+            await this.deleteAllCachedAudio(0);
             await this.api.shutdown();
             this.output.stop();
             this.input.stop();
             this.emit("shutdown");
         }
-        catch(err) {
+        catch (err) {
             Winston.error("Error during shutdown:", err);
         }
     }
@@ -112,7 +122,7 @@ class Bot extends EventEmitter {
      * @return {Boolean} - If the bot is busy speaking or listening
      */
     busy() {
-        return this.output.busy || this.input.busy;
+        return this.output.busy;
     }
 
     /**
@@ -133,14 +143,14 @@ class Bot extends EventEmitter {
     join(cname) {
         try {
             const channel = this.mumble.channelByName(cname);
-            if(!channel) {
+            if (!channel) {
                 Winston.error("Channel \"" + cname + "\" is unknown.");
             }
             else {
                 channel.join();
             }
         }
-        catch(err) {
+        catch (err) {
             Winston.error("Unable to join channel \"" + cname + "\":", err);
         }
     }
@@ -154,12 +164,12 @@ class Bot extends EventEmitter {
      */
     async addCachedAudio(filename, user, duration) {
         const obj = {
-            file : filename,
-            date : new Date(),
+            file: filename,
+            date: new Date(),
             user,
-            id : this._audioId++,
+            id: this.audioId++,
             duration,
-            protected : false
+            protected: false
         };
         const height = 32;
         const samplesPerPixel = 400;
@@ -167,7 +177,7 @@ class Bot extends EventEmitter {
         await FS.writeFile(filename + ".png", buffer);
         this.cachedAudios.push(obj);
         this.emit("cached-audio", obj);
-        this._clearUpCachedAudio();
+        this.clearUpCachedAudio();
     }
 
     /**
@@ -189,10 +199,10 @@ class Bot extends EventEmitter {
      */
     getCachedAudioById(id) {
         id = +id;
-        for(const key in this.cachedAudios) {
-            if(this.cachedAudios.hasOwnProperty(key)) {
+        for (const key in this.cachedAudios) {
+            if (this.cachedAudios.hasOwnProperty(key)) {
                 const audio = this.cachedAudios[key];
-                if(audio.id === id) {
+                if (audio.id === id) {
                     return audio;
                 }
             }
@@ -207,7 +217,7 @@ class Bot extends EventEmitter {
      */
     protectCachedAudio(id) {
         const elem = this.getCachedAudioById(id);
-        if(!elem) {
+        if (!elem) {
             return false;
         }
         else {
@@ -224,7 +234,7 @@ class Bot extends EventEmitter {
      */
     removeCachedAudioById(id) {
         const elem = this.getCachedAudioById(id);
-        if(!elem) {
+        if (!elem) {
             return false;
         }
         else {
@@ -240,7 +250,7 @@ class Bot extends EventEmitter {
      */
     removeCachedAudio(audio) {
         const index = this.cachedAudios.indexOf(audio);
-        if(index !== -1) {
+        if (index !== -1) {
             this.cachedAudios.splice(index, 1);
             this.emit("removed-cached-audio", audio);
             return true;
@@ -254,8 +264,8 @@ class Bot extends EventEmitter {
      * Clears up the list of cached audios and keeps it to the specified maximum size.
      * @return {undefined}
      */
-    _clearUpCachedAudio() {
-        this._deleteAllCachedAudio(this.audioCacheAmount);
+    private clearUpCachedAudio() {
+        this.deleteAllCachedAudio(this.audioCacheAmount);
     }
 
     /**
@@ -264,26 +274,26 @@ class Bot extends EventEmitter {
      * @param {number} amount - AMount of audios to remove.
      * @return {undefined}
      */
-    _deleteAllCachedAudio(amount) {
+    private async deleteAllCachedAudio(amount) {
         const prot = [];
-        while(this.cachedAudios.length > amount) {
+        while (this.cachedAudios.length > amount) {
             const elem = this.cachedAudios.shift();
-            if(elem.protected) {
-                amount --;
+            if (elem.protected) {
+                amount--;
                 prot.push(elem);
             }
             else {
                 try {
-                    FS.unlinkSync(elem.file);
+                    await FS.unlink(elem.file);
                     this.emit("removed-cached-audio", elem);
                     Winston.info("Deleted cached audio file " + elem.file + ".");
                 }
-                catch(err) {
+                catch (err) {
                     Winston.error("Error when cleaning up cached audios!", err);
                 }
             }
         }
-        while(prot.length > 0) {
+        while (prot.length > 0) {
             this.cachedAudios.unshift(prot.pop());
         }
     }
@@ -299,10 +309,10 @@ class Bot extends EventEmitter {
         namePart = namePart.toLowerCase();
         const users = this.mumble.users();
         const found = [];
-        for(const key in users) {
-            if(users.hasOwnProperty(key)) {
+        for (const key in users) {
+            if (users.hasOwnProperty(key)) {
                 const user = users[key];
-                if(user.name.toLowerCase().indexOf(namePart) !== -1) {
+                if (user.name.toLowerCase().indexOf(namePart) !== -1) {
                     found.push(user);
                 }
             }

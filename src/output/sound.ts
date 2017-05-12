@@ -3,11 +3,10 @@
  */
 
 import Samplerate from "node-samplerate";
-import Util from "util";
-import Winston from "winston";
-import FS from "fs";
-import EventEmitter from "events";
-import FFMpeg from "fluent-ffmpeg";
+import * as Winston from "winston";
+import * as FS from "fs";
+import { EventEmitter } from "events";
+import * as FFMpeg from "fluent-ffmpeg";
 
 const msInS = 1000;
 const audioFreq = 48000;
@@ -17,17 +16,23 @@ const audioFreq = 48000;
  * 44,100Hz and mono-channel. This class is used by Output and is not intended
  * to be used seperatly.
  */
-class Sound extends EventEmitter {
+export class Sound extends EventEmitter {
+    public length: number;
+    private plaing: boolean = false;
+    private stream: any;
+    private queue: any[] = [];
+    private current: any = null;
+    private ffmpeg: any;
+    private timeout: number;
+    private playing: boolean;
+
     /**
      * @constructor
      * @param {WritableStream} stream - Stream to write the audio data to.
       */
     constructor(stream) {
         super();
-        this.playing = false;
         this.stream = stream;
-        this.current = null;
-        this.queue = [];
     }
 
     /**
@@ -39,20 +44,20 @@ class Sound extends EventEmitter {
         let samplesTotal = 0;
         const startTime = Date.now();
         this._playbackStarted();
-        this._ffmpeg = FFMpeg(filename)
-        .format("s16le")
-        .audioChannels(1)
-        .audioFrequency(audioFreq);
-        this._ffmpeg.stream().on("data", chunk => {
+        this.ffmpeg = FFMpeg(filename)
+            .format("s16le")
+            .audioChannels(1)
+            .audioFrequency(audioFreq);
+        this.ffmpeg.stream().on("data", chunk => {
             samplesTotal += chunk.length / 2;
             this.stream.write(chunk);
         })
-        .on("end", () => {
-            const timeAlreadyTaken = Date.now() - startTime;
-            const totalTime = (samplesTotal / audioFreq) * msInS;
-            const waitTime = totalTime - timeAlreadyTaken;
-            this._timeout = setTimeout(this._playbackStopped.bind(this), waitTime);
-        });
+            .on("end", () => {
+                const timeAlreadyTaken = Date.now() - startTime;
+                const totalTime = (samplesTotal / audioFreq) * msInS;
+                const waitTime = totalTime - timeAlreadyTaken;
+                this.timeout = setTimeout(this._playbackStopped.bind(this), waitTime);
+            });
     }
 
     /**
@@ -61,12 +66,12 @@ class Sound extends EventEmitter {
      */
     clear() {
         this.queue = [];
-        if(this._timeout) {
-            clearTimeout(this._timeout);
-            this._timeout = null;
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = null;
         }
-        if(this._ffmpeg) {
-            this._ffmpeg.kill();
+        if (this.ffmpeg) {
+            this.ffmpeg.kill();
         }
         this._playbackStopped();
     }
@@ -86,12 +91,12 @@ class Sound extends EventEmitter {
      */
     _playbackStopped() {
         this.playing = false;
-        if(this.current) {
+        if (this.current) {
             this.emit("stop");
             const callback = this.current.callback;
             this.current = null;
             this._next();
-            if(callback) {
+            if (callback) {
                 callback();
             }
         }
@@ -102,7 +107,7 @@ class Sound extends EventEmitter {
      * @returns {undefined}
      */
     _next() {
-        if(!this.playing && this.queue.length !== 0) {
+        if (!this.playing && this.queue.length !== 0) {
             this.current = this.queue.shift();
             this._play(this.current.file);
         }
@@ -116,7 +121,7 @@ class Sound extends EventEmitter {
      */
     enqueue(workitem) {
         this.queue.push(workitem);
-        if(!this.playing) {
+        if (!this.playing) {
             this._next();
         }
     }
@@ -126,10 +131,8 @@ class Sound extends EventEmitter {
      * @return {undefined}
      */
     stop() {
-        if(this._timeout) {
-            clearTimeout(this._timeout);
+        if (this.timeout) {
+            clearTimeout(this.timeout);
         }
     }
 }
-
-module.exports = Sound;

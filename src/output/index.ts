@@ -1,6 +1,7 @@
-import Winston from "winston";
-import Sound from "./sound";
-import Stream from "stream";
+import * as Winston from "winston";
+import { Sound } from "./sound";
+import * as Stream from "stream";
+import { Bot } from "..";
 
 const PREBUFFER = 0.5;
 const audioFreq = 48000;
@@ -10,22 +11,28 @@ const msInS = 1000;
  * Audio output for the bot. This class handles the whole audio output,
  * including both TTS and sounds.
  */
-class Output extends Stream.Writable {
-
+export class Output extends Stream.Writable {
+    public busy: boolean = false;
+    private bot: Bot;
+    private stream: any;
+    private sound: Sound;
+    private queue: Sound[] = [];
+    private current: any;
+    private bufferQueue: Sound[] = [];
+    private playbackAhead: number = 0;
+    private stopped: boolean = false;
+    private lastBufferShift: number;
+    private timeout: number;
     /**
      * @constructor
      * @param {Bot} bot - Bot this belongs to.
      */
-    constructor(bot) {
+    constructor(bot: Bot) {
         super(); // TODO
         this.bot = bot;
         this.stream = bot.mumble.inputStream();
         this.sound = new Sound(this);
-        this.busy = false;
-        this.queue = [];
         this.current = null;
-        this._bufferQueue = [];
-        this._playbackAhead = 0;
     }
     //var PREBUFFER = 0.5; TODO see above
 
@@ -33,40 +40,40 @@ class Output extends Stream.Writable {
      * Processes the buffer and keeps the stream to mumble filled.
      * @returns {undefined}
      */
-    _shiftBuffer() {
-        if(this.stopped) {
+    private shiftBuffer() {
+        if (this.stopped) {
             return;
         }
-        if(this._lastBufferShift) {
-            const timePassed = (Date.now() - this._lastBufferShift) / msInS;
-            this._playbackAhead -= timePassed;
+        if (this.lastBufferShift) {
+            const timePassed = (Date.now() - this.lastBufferShift) / msInS;
+            this.playbackAhead -= timePassed;
         }
-        if(this._bufferQueue.length > 0) {
+        if (this.bufferQueue.length > 0) {
             const start = Date.now();
-            if(this._playbackAhead < 0 && this._lastBufferShift) {
+            if (this.playbackAhead < 0 && this.lastBufferShift) {
                 Winston.warn("Buffer underflow.");
             }
-            while(this._playbackAhead < PREBUFFER && this._bufferQueue.length > 0) {
-                const b = this._bufferQueue.shift();
+            while (this.playbackAhead < PREBUFFER && this.bufferQueue.length > 0) {
+                const b = this.bufferQueue.shift();
                 const lengthOfBuffer = (b.length / 2) / audioFreq;
-                this._playbackAhead += lengthOfBuffer;
+                this.playbackAhead += lengthOfBuffer;
                 this.stream.write(b);
             }
             let waitFor;
-            const overfilled = this._playbackAhead - PREBUFFER;
-            if(overfilled > 0) {
+            const overfilled = this.playbackAhead - PREBUFFER;
+            if (overfilled > 0) {
                 waitFor = msInS * overfilled;
             }
             else {
                 waitFor = 100;
             }
-            this._timeout = setTimeout(this._shiftBuffer.bind(this), waitFor);
-            this._lastBufferShift = Date.now();
+            this.timeout = setTimeout(this.shiftBuffer.bind(this), waitFor);
+            this.lastBufferShift = Date.now();
         }
         else {
-            this._playbackAhead = 0;
-            this._lastBufferShift = null;
-            this._timeout = null;
+            this.playbackAhead = 0;
+            this.lastBufferShift = null;
+            this.timeout = null;
         }
     }
 
@@ -77,10 +84,10 @@ class Output extends Stream.Writable {
      * @param {VoidCallback} done - Called when the data is shifted into the queue.
      * @returns {undefined}
      */
-    _write(chunk, encoding, done) {
-        this._bufferQueue.push(chunk);
-        if(!this._timeout) {
-            this._shiftBuffer(); //Not currently processing queue? Sleeping? Wake up!
+    public _write(chunk, encoding, done) {
+        this.bufferQueue.push(chunk);
+        if (!this.timeout) {
+            this.shiftBuffer(); //Not currently processing queue? Sleeping? Wake up!
         }
         done();
     }
@@ -91,7 +98,7 @@ class Output extends Stream.Writable {
      */
     clear() {
         this.queue = [];
-        this._bufferQueue = [];
+        this.bufferQueue = [];
         this.sound.clear();
         this.emit("clear");
     }
@@ -100,12 +107,12 @@ class Output extends Stream.Writable {
      * Start processing the next item in the queue.
      * @returns {undefined}
      */
-    _next() {
-        if(!this.busy && this.queue.length !== 0) {
+    private next() {
+        if (!this.busy && this.queue.length !== 0) {
             this.current = this.queue.shift();
             this.emit("change", this.queue);
             this.emit("dequeue");
-            this._process(this.current);
+            this.process();
         }
     }
 
@@ -113,11 +120,11 @@ class Output extends Stream.Writable {
      * Process the next item.
      * @returns {undefined}
      */
-    _process() {
-        this._processStarted();
+    private process() {
+        this.processStarted();
         this.sound.enqueue({
-            file : this.current.file,
-            callback : this._processStopped.bind(this)
+            file: this.current.file,
+            callback: this.processStopped.bind(this)
         });
     }
 
@@ -125,7 +132,7 @@ class Output extends Stream.Writable {
      * When processing the next item started.
      * @returns {undefined}
      */
-    _processStarted() {
+    private processStarted() {
         this.busy = true;
         this.emit("start", this.current);
     }
@@ -134,15 +141,15 @@ class Output extends Stream.Writable {
      * When processing stopped.
      * @returns {undefined}
      */
-    _processStopped() {
+    private processStopped() {
         const callback = this.current.callback;
         this.current = null;
         this.busy = false;
         this.emit("stop");
-        if(callback) {
+        if (callback) {
             callback();
         }
-        this._next();
+        this.next();
     }
 
     /**
@@ -154,7 +161,7 @@ class Output extends Stream.Writable {
      */
     playSound(file, meta) {
         return new Promise((resolve, reject) => {
-            this._enqueue({
+            this.enqueue({
                 file,
                 meta,
                 callback() {
@@ -171,9 +178,9 @@ class Output extends Stream.Writable {
      * @returns {undefined}
      */
     playSounds(filelist, meta) { // callback TODO?
-        for(let i=0; i<filelist.length; i++) {
-            this._enqueue({
-                file : filelist[i],
+        for (let i = 0; i < filelist.length; i++) {
+            this.enqueue({
+                file: filelist[i],
                 meta
             });
         }
@@ -184,13 +191,13 @@ class Output extends Stream.Writable {
      * @param {object} workitem - The object to be enqueued.
      * @returns {undefined}
      */
-    _enqueue(workitem) {
+    private enqueue(workitem) {
         workitem.time = new Date();
         this.queue.push(workitem);
         this.emit("enqueue", workitem);
         this.emit("change", this.queue);
-        if(!this.busy) {
-            this._next();
+        if (!this.busy) {
+            this.next();
         }
     }
 
@@ -201,15 +208,12 @@ class Output extends Stream.Writable {
     stop() {
         this.stopped = true;
         this.clear();
-        if(this._timeout) {
-            clearTimeout(this._timeout);
+        if (this.timeout) {
+            clearTimeout(this.timeout);
         }
-        this.speech.stop();
         this.sound.stop();
         this.stream.close();
         this.stream.end();
         Winston.info("Output stopped.");
     }
 }
-
-module.exports = Output;

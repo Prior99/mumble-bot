@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../http-codes";
+import * as HTTP from "http-status-codes";
+import { linkMumbleUser } from "../../../database";
 
 /**
  * <b>/api/users/linkMumbleUser</b> Links a mumble user to a user.
@@ -9,21 +10,21 @@ import HTTPCodes from "../../http-codes";
  */
 const LinkMumbleUser = function(bot) {
     return async function(req, res) {
-        if(req.user.username === req.body.username) {
+        if (req.user.username === req.body.username) {
             try {
-                await bot.database.linkMumbleUser(req.body.id, req.body.username);
+                await linkMumbleUser(req.body.id, req.body.username, bot.database);
                 Winston.log("verbose", `${req.user.username} linked mumble user with id ${req.body.id}`);
-                res.status(HTTPCodes.okay).send(true);
+                res.status(HTTP.OK).send(true);
             }
-            catch(err) {
-                res.status(HTTPCodes.internalError).send({
-                    reason : "internal_error"
+            catch (err) {
+                res.status(HTTP.INTERNAL_SERVER_ERROR).send({
+                    reason: "internal_error"
                 });
             }
         }
         else {
-            res.status(HTTPCodes.invalidRequest).send({
-                reason : "invalid_user"
+            res.status(HTTP.BAD_REQUEST).send({
+                reason: "invalid_user"
             });
         }
     };

@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../http-codes";
+import * as HTTP from "http-status-codes";
 
 /**
  * View for portecting a cached record.
@@ -8,19 +8,19 @@ import HTTPCodes from "../../http-codes";
  */
 const ProtectCachedRecord = function(bot) {
     return function(req, res) {
-        if(req.body.id) {
-            if(bot.protectCachedAudio(req.body.id)) {
-                res.status(HTTPCodes.okay).send(true);
+        if (req.body.id) {
+            if (bot.protectCachedAudio(req.body.id)) {
+                res.status(HTTP.OK).send(true);
             }
             else {
-                res.status(HTTPCodes.internalError).send({
-                    reason : "internal_error"
+                res.status(HTTP.INTERNAL_SERVER_ERROR).send({
+                    reason: "internal_error"
                 });
             }
         }
         else {
-            res.status(HTTPCodes.missingArguments).send({
-                reason : "missing_arguments"
+            res.status(HTTP.BAD_REQUEST).send({
+                reason: "missing_arguments"
             });
         }
     };

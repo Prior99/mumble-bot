@@ -1,7 +1,7 @@
-import Express from "express";
+import * as Express from "express";
 
 import Available from "./username-available";
-import Register from "./register";
+import { Register } from "./register";
 import Permissions from "./permission";
 import SetSettings from "./set-settings";
 import Mumble from "./mumble";
@@ -11,7 +11,7 @@ import List from "./list";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {Router} - router for the current section.
  */
-const RouterUsers = function(bot) {
+export const RouteUsers = function(bot) {
     const router = Express.Router();
     router.use("/usernameAvailable", Available(bot));
     router.use("/register", Register(bot));
@@ -21,5 +21,3 @@ const RouterUsers = function(bot) {
     router.use("/list", List(bot))
     return router;
 };
-
-export default RouterUsers;

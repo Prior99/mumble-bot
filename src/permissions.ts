@@ -1,14 +1,12 @@
-/*
- * Includes
- */
-import Winston from "winston";
+import * as Winston from "winston";
+import { hasPermission, getPermission, listPermissions, grantPermission, revokePermission } from "./database";
 
 /**
  * Handles permissions in the bot.
  * This is basically just a nicer-to-use interface to the database.
  */
 class Permissions {
-
+    private database: any;
     /**
      * @param {Database} database - The database of the bot to use.
      * @constructor
@@ -25,14 +23,14 @@ class Permissions {
      * @returns {boolean} - Whether the permission was granted or whether not.
      */
     async hasPermission(user, permission) {
-        if(!user) {
+        if (!user) {
             return false;
         }
         try {
-            const has = await this.database.hasPermission(user.id, permission);
+            const has = await hasPermission(user.id, permission, this.database);
             return has;
         }
-        catch(err) {
+        catch (err) {
             Winston.error("Could not check whether user has permission", err);
             return false;
         }
@@ -47,20 +45,12 @@ class Permissions {
      * @returns {undefined}
      */
     requirePermission(user, permission, callback) {
-        if(!user) {
+        if (!user) {
             Winston.warn("Unknown user tried to execute something which required permission \"" + permission + "\"");
             return;
         }
         else {
-            this.hasPermission(user, permission, (has) => {
-                if(has) {
-                    callback();
-                }
-                else {
-                    Winston.warn("User " + user.username + " tried to execute something which required permission \""
-                        + permission + "\"");
-                }
-            });
+            this.hasPermission(user, permission);
         }
     }
 
@@ -76,13 +66,13 @@ class Permissions {
     async grantPermission(issuer, user, permission) {
         const grant = await this.hasPermission(issuer, "grant");
         const perm = await this.hasPermission(issuer, permission);
-        if(!issuer || (grant && perm)) {
+        if (!issuer || (grant && perm)) {
             try {
-                await this.database.grantPermission(user.id, permission);
+                await grantPermission(user.id, permission, this.database);
                 Winston.info("Permission \"" + permission + "\" was granted to user " + user.username);
                 return true;
             }
-            catch(err) {
+            catch (err) {
                 Winston.error("Error when granting permission \"" + permission + "\" to user "
                     + user.username + ".", err);
                 return false;
@@ -105,15 +95,15 @@ class Permissions {
     async revokePermission(issuer, user, permission) {
         const grant = await this.hasPermission(issuer, "grant");
         const perm = await this.hasPermission(issuer, permission);
-        if(!issuer || (grant && perm)) {
+        if (!issuer || (grant && perm)) {
             try {
-                await this.database.revokePermission(user.id, permission);
+                await revokePermission(user.id, permission, this.database);
                 Winston.info("Permission \"" + permission + "\" was revoked from user " + user.username);
                 return true;
             }
-            catch(err) {
+            catch (err) {
                 Winston.error("Error when revoking permission \"" + permission + "\" from user "
-                    + user.username + " by user " + issuer.username + ".", error);
+                    + user.username + " by user " + issuer.username + ".", err);
                 return false;
             }
         }
@@ -136,10 +126,10 @@ class Permissions {
      */
     async getPermission(permission) {
         try {
-            const databasePermission = await this.database.getPermission(permission);
+            const databasePermission = await getPermission(permission, this.database);
             return databasePermission;
         }
-        catch(err) {
+        catch (err) {
             Winston.error("Error when getting permission \"" + permission + "\".", err);
             return null;
         }
@@ -151,10 +141,10 @@ class Permissions {
      */
     async listPermissions() {
         try {
-            const permissions = await this.database.listPermissions();
+            const permissions = await listPermissions(this.database);
             return permissions;
         }
-        catch(err) {
+        catch (err) {
             Winston.error("Error when listing permissions.", err);
             return [];
         }
@@ -173,10 +163,10 @@ class Permissions {
     async grantAllPermissions(issuer, user, callback) {
         const permissions = await this.listPermissions();
         let okay = true;
-        while(permissions.length) {
+        while (permissions.length) {
             const permission = permissions.shift();
             const ok = await this.grantPermission(issuer, user, permission.id);
-            if(!ok) {
+            if (!ok) {
                 okay = false;
             }
         }
@@ -197,11 +187,11 @@ class Permissions {
         const array = [];
         const issuerCanGrant = await this.hasPermission(issuer, "grant");
         const permissions = await this.listPermissions();
-        while(permissions.length) {
+        while (permissions.length) {
             const permission = permissions.shift();
             let has = await this.hasPermission(user, permission.id);
             permission.granted = has;
-            has = this.hasPermission(issuer, permission.id);
+            has = await this.hasPermission(issuer, permission.id);
             permission.canGrant = has && issuerCanGrant;
             array.push(permission);
         }
@@ -217,7 +207,7 @@ class Permissions {
     async listPermissionsAssocForUser(user) {
         const obj = {};
         const permissions = await this.listPermissions();
-        while(permissions.length) {
+        while (permissions.length) {
             const permission = permissions.shift();
             const has = await this.hasPermission(user, permission.id);
             obj[permission.id] = has;

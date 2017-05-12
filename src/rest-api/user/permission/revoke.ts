@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../http-codes";
+import * as HTTP from "http-status-codes";
+import { getUserByUsername } from "../../../database";
 
 /**
  * Revoke a permission from a specific user.
@@ -10,27 +11,27 @@ const RevokePermission = function(bot) {
     return async function(req, res) {
         const { permission } = req.body;
         try {
-            const user = await bot.database.getUserByUsername(req.body.user);
-            if(user) {
-                if(await bot.permissions.revokePermission(req.user, user, permission)) {
-                    res.status(HTTPCodes.okay).send(true);
+            const user = await getUserByUsername(req.body.user, bot.database);
+            if (user) {
+                if (await bot.permissions.revokePermission(req.user, user, permission)) {
+                    res.status(HTTP.OK).send(true);
                 }
                 else {
-                    res.status(HTTPCodes.insufficientPermission).send({
-                        reason : "insufficient_permission"
+                    res.status(HTTP.FORBIDDEN).send({
+                        reason: "insufficient_permission"
                     });
                 }
             }
             else {
-                res.status(HTTPCodes.invalidRequest).send({
-                    reason : "unknown_user"
+                res.status(HTTP.BAD_REQUEST).send({
+                    reason: "unknown_user"
                 });
             }
         }
-        catch(err) {
+        catch (err) {
             Winston.error("Could not fetch user while granting permission", err);
-            res.status(HTTPCodes.internalError).send({
-                reason : "internal_error"
+            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
+                reason: "internal_error"
             });
         }
     }

@@ -1,4 +1,4 @@
-import Express from "express";
+import * as Express from "express";
 
 import PerHour from "./per-hour";
 import PerUser from "./per-user";

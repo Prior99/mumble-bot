@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import HTTPCodes from "../../http-codes";
+import * as HTTP from "http-status-codes";
+import { getSpokenPerHour } from "../../../database";
 
 /**
  * API endpoint for statistics about speech per hour.
@@ -10,12 +11,12 @@ import HTTPCodes from "../../http-codes";
 const SpokenPerHour = function(bot) {
     return async function(req, res) {
         try {
-            const arr = await bot.database.getSpokenPerHour();
-            res.status(HTTPCodes.okay).send(arr);
+            const arr = await getSpokenPerHour(bot.database);
+            res.status(HTTP.OK).send(arr);
         }
-        catch(err) {
+        catch (err) {
             Winston.error("Could not get amount of speech by hour of the day.", err);
-            res.status(HTTPCodes.internalError).send({
+            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
                 reason: "internal_error"
             });
         }

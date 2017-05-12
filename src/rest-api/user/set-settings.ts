@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import HTTPCodes from "../http-codes";
+import * as HTTP from "http-status-codes";
+import { setSetting } from "../../database";
 
 /**
  * Apply the settings from the api callback to the database and reload the session.
@@ -9,26 +10,26 @@ import HTTPCodes from "../http-codes";
 const Settings = function(bot) {
     return async function(req, res) {
         const settings = [];
-        if(req.body.record) {
-            settings.push({ key : "record", val : req.body.record });
+        if (req.body.record) {
+            settings.push({ key: "record", val: req.body.record });
         }
         try {
-            const promises = settings.map(setting => bot.database.setSetting(req.user, setting.key, setting.val));
+            const promises = settings.map(setting => setSetting(req.user, setting.key, setting.val, bot.database));
             await Promise.all(promises);
             try {
-                res.status(HTTPCodes.okay).send(true);
+                res.status(HTTP.OK).send(true);
             }
-            catch(err) {
+            catch (err) {
                 Winston.error("Error reloading user into session.", err);
-                res.status(HTTPCodes.internalError).send({
-                    reason : "internal_error"
+                res.status(HTTP.INTERNAL_SERVER_ERROR).send({
+                    reason: "internal_error"
                 });
             }
         }
-        catch(err) {
+        catch (err) {
             Winston.error("An error occured while saving settings for user " + req.user.username, err);
-            res.status(HTTPCodes.internalError).send({
-                reason : "internal_error"
+            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
+                reason: "internal_error"
             });
         }
     };
