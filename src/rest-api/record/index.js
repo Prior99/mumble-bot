@@ -4,7 +4,6 @@ import Play from "./play";
 import Download from "./download";
 import AddLabel from "./add-label";
 import Edit from "./edit";
-import Random from "./random";
 import List from "./list";
 import Get from "./get";
 import Visualize from "./visualize";
@@ -22,15 +21,14 @@ const RouteRecords = function(bot) {
     router.use("/cached", Cached(bot));
     router.use("/dialog", Dialog(bot));
 
-    router.use("/play", Play(bot));
-    router.use("/download", Download(bot));
-    router.use("/addlabel", AddLabel(bot));
-    router.use("/edit", Edit(bot));
-    router.use("/random", Random(bot));
-    router.use("/list", List(bot));
-    router.use("/get", Get(bot));
-    router.use("/visualize", Visualize(bot));
-    router.use("/fork", Fork(bot));
+    router.get("/", List(bot));
+    router.get("/:id", Get(bot));
+    router.get("/:id/play", Play(bot));
+    router.get("/:id/download", Download(bot));
+    router.post("/:id/addlabel", AddLabel(bot));
+    router.post("/:id/edit", Edit(bot));
+    router.get("/:id/visualize", Visualize(bot));
+    router.post("/:id/fork", Fork(bot));
 
     return router;
 };

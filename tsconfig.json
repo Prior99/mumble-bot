@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "experimentalDecorators": true,
+        "noLib": false,
+        "jsx": "react",
+        "outDir": "dist",
+        "lib": ["es2016", "dom"],
+        "typeRoots": ["node_modules/@types"]
+    },
+    "include": [
+        "typings/*",
+        "src/**/*.ts?"
+    ]
+}
