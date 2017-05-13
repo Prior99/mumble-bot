@@ -285,6 +285,6 @@ export async function forkRecording(
     const result = await connection.query(
         "INSERT INTO Recordings(user, submitted, reporter, duration, quote, changed, overwrite, parent) " +
         "VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-        [user.id, submitted, reporter.id, duration, quote, new Date(), overwrite, parent]);
+        [user, submitted, reporter, duration, quote, new Date(), overwrite, parent]);
     return result.insertId;
 };

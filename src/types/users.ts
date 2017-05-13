@@ -18,6 +18,6 @@ export interface DatabaseUser {
     /**
      * The custom settings of the user are stored key-value-wise in this object.
      */
-    settings: object;
+    settings: any;
 }
 

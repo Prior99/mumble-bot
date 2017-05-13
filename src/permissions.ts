@@ -1,5 +1,6 @@
 import * as Winston from "winston";
 import { hasPermission, getPermission, listPermissions, grantPermission, revokePermission } from "./database";
+import { AssociatedPermission, Permission, UserPermission } from "./types";
 
 /**
  * Handles permissions in the bot.
@@ -22,7 +23,7 @@ class Permissions {
      * @param {string} permission - Permission to check.
      * @returns {boolean} - Whether the permission was granted or whether not.
      */
-    async hasPermission(user, permission) {
+    public async hasPermission(user, permission) {
         if (!user) {
             return false;
         }
@@ -44,7 +45,7 @@ class Permissions {
      * @param {VoidCallback} callback - This callback is only called when the permission was available.
      * @returns {undefined}
      */
-    requirePermission(user, permission, callback) {
+    public requirePermission(user, permission, callback) {
         if (!user) {
             Winston.warn("Unknown user tried to execute something which required permission \"" + permission + "\"");
             return;
@@ -63,7 +64,7 @@ class Permissions {
      * @param {string} permission - Permission to grant to the user.
      * @returns {boolean} - True when the permission was granted and false otherwise.
      */
-    async grantPermission(issuer, user, permission) {
+    public async grantPermission(issuer, user, permission) {
         const grant = await this.hasPermission(issuer, "grant");
         const perm = await this.hasPermission(issuer, permission);
         if (!issuer || (grant && perm)) {
@@ -92,7 +93,7 @@ class Permissions {
      * @param {string} permission - Permission to grant to the user.
      * @returns {boolean} - True when the permission was revoked and false otherwise.
      */
-    async revokePermission(issuer, user, permission) {
+    public async revokePermission(issuer, user, permission) {
         const grant = await this.hasPermission(issuer, "grant");
         const perm = await this.hasPermission(issuer, permission);
         if (!issuer || (grant && perm)) {
@@ -124,7 +125,7 @@ class Permissions {
      * @param {string} permission - Permission to gather information about.
      * @returns {Permission} - An object holding information about the permission that was requested.
      */
-    async getPermission(permission) {
+    public async getPermission(permission) {
         try {
             const databasePermission = await getPermission(permission, this.database);
             return databasePermission;
@@ -139,7 +140,7 @@ class Permissions {
      * Retrieve an array containing all permissions known to this bot.
      * @returns {Permission[]} - An array holding objects holding information about the permissions.
      */
-    async listPermissions() {
+    public async listPermissions() {
         try {
             const permissions = await listPermissions(this.database);
             return permissions;
@@ -176,24 +177,24 @@ class Permissions {
     /**
      * Lists all permissions from the view of a single user. Information about
      * whether the user has the permission and whether the issuer can grant it will be added.
-     * @param {User} issuer - User that issued the command and of which it should be
-     *                 checked whether he can grant the permissions.
-     * @param {User} user - User of which it should be checked whether he has the permissions.
-     * @returns {Permission[]} - List of all permissions for a user. Each permission object has two additional
-     *                           properties: "has" which indicates whether the user has the permission and "canGrant"
-     *                           to determine whether the issuer can grant the permission.
+     * @param issuer User that issued the command and of which it should be
+     *   checked whether he can grant the permissions.
+     * @param user User of which it should be checked whether he has the permissions.
+     * @returns List of all permissions for a user. Each permission object has two additional
+     *   properties: "has" which indicates whether the user has the permission and "canGrant"
+     *   to determine whether the issuer can grant the permission.
      */
-    async listPermissionsForUser(issuer, user) {
+    public async listPermissionsForUser(issuer, user): Promise<UserPermission[]> {
         const array = [];
         const issuerCanGrant = await this.hasPermission(issuer, "grant");
         const permissions = await this.listPermissions();
         while (permissions.length) {
             const permission = permissions.shift();
-            let has = await this.hasPermission(user, permission.id);
-            permission.granted = has;
-            has = await this.hasPermission(issuer, permission.id);
-            permission.canGrant = has && issuerCanGrant;
-            array.push(permission);
+            array.push({
+                ...permission,
+                granted: await this.hasPermission(user, permission.id),
+                canGrant: await this.hasPermission(issuer, permission.id) && issuerCanGrant
+            });
         }
         return array;
     }
@@ -204,7 +205,7 @@ class Permissions {
      * @param {User} user - The user to fetch the object for.
      * @returns {object} - The object as described.
      */
-    async listPermissionsAssocForUser(user) {
+    public async listPermissionsAssocForUser(user): Promise<AssociatedPermission> {
         const obj = {};
         const permissions = await this.listPermissions();
         while (permissions.length) {

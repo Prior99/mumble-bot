@@ -8,7 +8,7 @@ import { Bot } from "../../../index";
 /**
  * Routes all requests related to the mumble user api.
  */
-const RouterUsers = (bot: Bot) => {
+export const Mumble = (bot: Bot) => {
     const router = Express.Router();
 
     router.post("/link", Link(bot));

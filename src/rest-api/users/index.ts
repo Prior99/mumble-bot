@@ -3,7 +3,7 @@ import { Bot } from "../..";
 
 import { UsernameAvailable } from "./username-available";
 import { Register } from "./register";
-import { Permissions } from "./permission";
+import { Permissions } from "./permissions";
 import { SetSettings } from "./set-settings";
 import { Mumble } from "./mumble";
 import { List } from "./list";
@@ -11,7 +11,7 @@ import { List } from "./list";
 /**
  * Routes all requests related to the user api.
  */
-export const RouteUsers = (bot: Bot) => {
+export const Users = (bot: Bot) => {
     const router = Express.Router();
 
     router.use("/permission", Permissions(bot));

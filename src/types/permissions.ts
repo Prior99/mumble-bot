@@ -19,3 +19,12 @@ export interface Permission {
      */
     icon: string;
 }
+
+export interface AssociatedPermission {
+    [permission: string]: boolean;
+}
+
+export interface UserPermission extends Permission {
+    granted: boolean;
+    canGrant: boolean;
+}

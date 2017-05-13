@@ -8,7 +8,7 @@ import { Revoke } from "./revoke";
 /**
  * Routes all requests related to the permission api.
  */
-const RouteMumble = (bot: Bot) => {
+export const Permissions = (bot: Bot) => {
     const router = Express.Router();
 
     router.post("/revoke", Revoke(bot));

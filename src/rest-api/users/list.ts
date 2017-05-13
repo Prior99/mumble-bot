@@ -7,7 +7,7 @@ import { internalError } from "../utils";
 /**
  * Returns a list of users.
  */
-export const UsersList: ApiEndpoint = (bot: Bot) => async (req, res) => {
+export const List: ApiEndpoint = (bot: Bot) => async (req, res) => {
     try {
         const users = await listUsers(bot.database);
         res.send({

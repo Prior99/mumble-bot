@@ -6,15 +6,16 @@ import { colorify } from "../colorbystring";
 import * as HTTP from "http-status-codes";
 import { Server } from "http";
 
-import { RouteRecordings } from './recordings';
-import { RouteSounds } from './sound';
-import { RouteStats } from './stats';
-import { RouteUsers } from './users';
+import { Recordings } from './recordings';
+import { Sounds } from './sound';
+import { Stats } from './stats';
+import { Users } from './users';
 
 import { ChannelTree } from './channel-tree';
 import { Log } from './log';
 import { WebsocketQueue } from './websocket-queue';
 import { checkLoginData, getUserByUsername } from "../database";
+import { Bot } from "../index";
 
 const maxPercent = 100;
 
@@ -80,13 +81,13 @@ class Api {
                 reason: "authorization_required"
             });
         });
-        this.app.use("/sounds", RouteSounds(bot: Bot));
-        this.app.use("/records", RouteRecordings(bot: Bot));
-        this.app.use("/stats", RouteStats(bot: Bot));
-        this.app.use("/users", RouteUsers(bot: Bot));
-        this.app.get("/channel-tree", ChannelTree(bot: Bot));
-        this.app.get("/log", Log(bot: Bot));
-        (this.app as any).ws("/queue", WebsocketQueue(bot: Bot));
+        this.app.use("/sounds", Sounds(bot));
+        this.app.use("/records", Recordings(bot));
+        this.app.use("/stats", Stats(bot));
+        this.app.use("/users", Users(bot));
+        this.app.get("/channel-tree", ChannelTree(bot));
+        this.app.get("/log", Log(bot));
+        (this.app as any).ws("/queue", WebsocketQueue(bot));
 
         const port = bot.options.website.port;
         this.server = this.app.listen(port);
