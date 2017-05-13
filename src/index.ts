@@ -4,7 +4,7 @@
 import { VoiceInput } from "./input";
 import { Output } from "./output";
 import * as Winston from "winston";
-import Api from "./rest-api";
+import { Api } from "./rest-api";
 import * as FS from "async-file";
 import { EventEmitter } from "events";
 import Permissions from "./permissions";
