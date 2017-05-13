@@ -1,13 +1,13 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { listUsers } from "../../database";
-import { ApiEndpoint } from "../types";
+import { AuthorizedApiEndpoint } from "../types";
 import { Bot } from "../..";
 import { internalError } from "../utils";
 /**
  * Returns a list of users.
  */
-export const List: ApiEndpoint = (bot: Bot) => async (req, res) => {
+export const List: AuthorizedApiEndpoint = (bot: Bot) => async (req, res) => {
     try {
         const users = await listUsers(bot.database);
         res.send({

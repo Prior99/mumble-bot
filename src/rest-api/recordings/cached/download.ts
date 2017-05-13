@@ -1,14 +1,14 @@
 import * as Winston from "winston";
 import * as FS from "fs";
 import * as HTTP from "http-status-codes";
-import { ApiEndpoint } from "../../types";
+import { AuthorizedApiEndpoint } from "../../types";
 import { Bot } from "../../..";
 import { internalError, notFound } from "../../utils";
 
 /**
  * This view handles the downloading of cached records.
  */
-export const Download: ApiEndpoint = (bot: Bot) => ({ params }, res) => {
+export const Download: AuthorizedApiEndpoint = (bot: Bot) => ({ params }, res) => {
     const id: number = parseInt(params.id);
     const sound = bot.getCachedAudioById(id);
     const stream = FS.createReadStream(sound.file)

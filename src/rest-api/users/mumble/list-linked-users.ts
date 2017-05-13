@@ -1,11 +1,11 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { getLinkedMumbleUsersOfUser, getUserById } from "../../../database";
-import { ApiEndpoint } from "../../types/index";
+import { AuthorizedApiEndpoint } from "../../types/index";
 import { Bot } from "../../../index";
 import { notFound, okay, internalError } from "../../utils";
 
-export const ListLinkedUsers: ApiEndpoint = (bot: Bot) => async ({ body }, res) => {
+export const ListLinkedUsers: AuthorizedApiEndpoint = (bot: Bot) => async ({ body }, res) => {
     try {
         const id = parseInt(body.id);
         const user = await getUserById(id, bot.database); //Reload user from database

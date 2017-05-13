@@ -1,14 +1,14 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { linkMumbleUser } from "../../../database";
-import { ApiEndpoint } from "../../types";
+import { AuthorizedApiEndpoint } from "../../types";
 import { Bot } from "../../..";
 import { internalError, forbidden, okay, badRequest } from "../../utils";
 
 /**
  * Links a mumble user to a user.
  */
-export const Link: ApiEndpoint = (bot: Bot) => async ({ body, user }, res) => {
+export const Link: AuthorizedApiEndpoint = (bot: Bot) => async ({ body, user }, res) => {
     if (!body.userId || !body.mumbleId) {
         return badRequest(res);
     }

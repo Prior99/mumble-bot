@@ -1,14 +1,14 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { setSetting } from "../../database";
-import { ApiEndpoint } from "../types";
+import { AuthorizedApiEndpoint } from "../types";
 import { Bot } from "../..";
 import { internalError, okay } from "../utils";
 
 /**
  * Apply the settings from the api callback to the database and reload the session.
  */
-export const SetSettings: ApiEndpoint = (bot: Bot) => async ({ body, user }, res) => {
+export const SetSettings: AuthorizedApiEndpoint = (bot: Bot) => async ({ body, user }, res) => {
     const settings = [];
     const { record } = body;
     if (record) {

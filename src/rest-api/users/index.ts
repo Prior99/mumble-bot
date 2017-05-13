@@ -1,5 +1,6 @@
 import * as Express from "express";
 import { Bot } from "../..";
+import { authorized } from "../utils";
 
 import { UsernameAvailable } from "./username-available";
 import { Register } from "./register";
@@ -14,12 +15,12 @@ import { List } from "./list";
 export const Users = (bot: Bot) => {
     const router = Express.Router();
 
-    router.use("/permission", Permissions(bot));
-    router.use("/mumble", Mumble(bot));
-    router.get("/username-available", UsernameAvailable(bot));
-    router.post("/", Register(bot));
-    router.get("/", List(bot))
-    router.post("/set-settings", SetSettings(bot));
+    router.use("/permission", authorized(Permissions)(bot));
+    router.use("/mumble", authorized(Mumble)(bot));
+    router.get("/username-available", authorized(UsernameAvailable)(bot));
+    router.post("/", authorized(Register)(bot));
+    router.get("/", authorized(List)(bot))
+    router.post("/set-settings", authorized(SetSettings)(bot));
 
     return router;
 };

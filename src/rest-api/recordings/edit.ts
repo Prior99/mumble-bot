@@ -3,7 +3,7 @@ import * as FS from "fs";
 import * as HTTP from "http-status-codes";
 import { updateRecording } from "../../database";
 import { Bot } from "../..";
-import { ApiEndpoint } from "../types";
+import { AuthorizedApiEndpoint } from "../types";
 import { internalError, okay, missingArguments } from "../utils";
 
 /**
@@ -11,7 +11,7 @@ import { internalError, okay, missingArguments } from "../utils";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-export const Edit: ApiEndpoint = (bot: Bot) => async ({ body, params, user }, res) => {
+export const Edit: AuthorizedApiEndpoint = (bot: Bot) => async ({ body, params, user }, res) => {
     const id = parseInt(params.id);
     const { quote, labels } = body;
     if (!quote || ! labels) {

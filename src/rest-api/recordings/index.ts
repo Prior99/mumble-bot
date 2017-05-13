@@ -12,6 +12,7 @@ import { List } from "./list";
 import { Get } from "./get";
 import { Visualize } from "./visualize";
 import { Fork } from "./fork";
+import { authorized } from "../utils";
 /**
  * Router for all API callbacks related to recordings.
  */
@@ -21,14 +22,14 @@ export const Recordings: ApiRoute = (bot: Bot) => {
     router.use("/cached", Cached(bot));
     router.use("/dialogs", Dialogs(bot));
 
-    router.get("/", List(bot));
-    router.get("/:id", Get(bot));
-    router.get("/:id/play", Play(bot));
-    router.get("/:id/download", Download(bot));
-    router.post("/:id/addlabel", AddLabel(bot));
-    router.post("/:id/edit", Edit(bot));
+    router.get("/", authorized(List)(bot));
+    router.get("/:id", authorized(Get)(bot));
+    router.get("/:id/play", authorized(Play)(bot));
+    router.get("/:id/download", authorized(Download)(bot));
+    router.post("/:id/addlabel", authorized(AddLabel)(bot));
+    router.post("/:id/edit", authorized(Edit)(bot));
     router.get("/:id/visualize", Visualize(bot));
-    router.post("/:id/fork", Fork(bot));
+    router.post("/:id/fork", authorized(Fork)(bot));
 
     return router;
 };

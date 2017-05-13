@@ -1,14 +1,14 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { getRecordingCountByUsers } from "../../../database";
-import { ApiEndpoint } from "../../types";
+import { AuthorizedApiEndpoint } from "../../types";
 import { Bot } from "../../..";
 import { okay, internalError } from "../../utils";
 
 /**
  * Api endpoint for statistics about speech per hour.
  */
-export const PerUser: ApiEndpoint = (bot: Bot) => async (req, res) => {
+export const PerUser: AuthorizedApiEndpoint = (bot: Bot) => async (req, res) => {
     try {
         const arr = await getRecordingCountByUsers(bot.database);
         return okay(res, arr);

@@ -1,18 +1,18 @@
 import * as Winston from "winston";
 import * as FS from "async-file";
 import * as HTTP from "http-status-codes";
-import VisualizeAudioFile from "../../visualizer";
+import { visualizeAudioFile } from "../../visualizer";
 import { Bot } from "../..";
 import { internalError } from "../utils";
-import { ApiEndpoint } from "../types";
+import { AuthorizedApiEndpoint } from "../types";
 
-const height = 32;
+const height = 100;
 const samplesPerPixel = 400;
 
 /**
  * This view handles the downloading of visualizations of the records.
  */
-export const Visualize: ApiEndpoint = (bot: Bot) => async ({ params }, res) => {
+export const Visualize: AuthorizedApiEndpoint = (bot: Bot) => async ({ params }, res) => {
     const id = parseInt(params.id);
     const sendFile = stream => {
         res.status(HTTP.OK);
@@ -48,7 +48,7 @@ export const Visualize: ApiEndpoint = (bot: Bot) => async ({ params }, res) => {
         }
         Winston.info(`Visualizing audio file "${soundFileName}" to "${fileName}".`);
         try {
-            const buffer = await VisualizeAudioFile(soundFileName, height, samplesPerPixel);
+            const buffer = await visualizeAudioFile(soundFileName, height, samplesPerPixel);
             await FS.writeFile(fileName, buffer);
             try {
                 const stream = FS.createReadStream(fileName);

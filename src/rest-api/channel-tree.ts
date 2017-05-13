@@ -1,4 +1,4 @@
-import { ApiEndpoint } from "./types/index";
+import { AuthorizedApiEndpoint } from "./types/index";
 import { Bot } from "../index";
 import { okay } from "./utils";
 
@@ -43,7 +43,7 @@ const buildChannelTree = function(root: Channel): Channel {
 /**
  * Generates a tree with all channels and users in the mumble.
  */
-export const ChannelTree: ApiEndpoint = (bot: Bot) => (req, res) => {
+export const ChannelTree: AuthorizedApiEndpoint = (bot: Bot) => (req, res) => {
     okay(res, {
         tree: buildChannelTree(bot.mumble.rootChannel)
     });

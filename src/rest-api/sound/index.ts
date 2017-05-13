@@ -2,6 +2,7 @@ import * as Express from "express";
 import * as Multer from "multer";
 import { Bot } from "../..";
 import { ApiRoute } from "../types";
+import { authorized } from "../utils";
 
 import { Add } from "./add";
 import { Play } from "./play";
@@ -16,9 +17,9 @@ export const Sounds: ApiRoute = (bot: Bot) => {
         dest: bot.options.website.tmp
     }).array());
 
-    router.put("/", Add(bot));
-    router.get("/", List(bot));
-    router.get("/:id/play", Play(bot));
+    router.put("/", authorized(Add)(bot));
+    router.get("/", authorized(List)(bot));
+    router.get("/:id/play", authorized(Play)(bot));
 
     return router;
 };

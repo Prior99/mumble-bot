@@ -1,5 +1,5 @@
-import Canvas from "canvas";
-import FFMpeg from "fluent-ffmpeg";
+import * as Canvas from "canvas";
+import * as FFMpeg from "fluent-ffmpeg";
 import * as FS from "fs";
 import AudioAnalyzer from "./audioanalyzer";
 
@@ -14,7 +14,7 @@ const maxByte = 255;
  * @param {number} samplesPerPixel - Number of samples per pixel (determines the width of the image).
  * @return {Buffer} - Buffer holding the generated png image.
  */
-const VisualizeAudioFile = function(filename, height, samplesPerPixel) {
+export const visualizeAudioFile = function(filename, height, samplesPerPixel) {
     return new Promise((resolve, reject) => {
         try {
             const analyzer = new AudioAnalyzer(samplesPerPixel);
@@ -42,5 +42,3 @@ const VisualizeAudioFile = function(filename, height, samplesPerPixel) {
         }
     });
 };
-
-export default VisualizeAudioFile;

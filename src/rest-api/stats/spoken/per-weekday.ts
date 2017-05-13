@@ -1,7 +1,7 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { getSpokenPerWeekday } from "../../../database";
-import { ApiEndpoint } from "../../types";
+import { AuthorizedApiEndpoint } from "../../types";
 import { Bot } from "../../..";
 import { okay, internalError } from "../../utils";
 
@@ -10,7 +10,7 @@ const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Frida
 /**
  * Api endpoint for statistics about speech per weekday.
  */
-export const PerWeekday: ApiEndpoint = (bot: Bot) => async (req, res) => {
+export const PerWeekday: AuthorizedApiEndpoint = (bot: Bot) => async (req, res) => {
     try {
         const spoken = await getSpokenPerWeekday(bot.database);
         return okay(res, spoken.map((elem) => ({

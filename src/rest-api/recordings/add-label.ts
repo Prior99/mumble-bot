@@ -2,14 +2,14 @@ import * as Winston from "winston";
 import { colorify } from "../../colorbystring";
 import * as HTTP from "http-status-codes";
 import { addRecordingLabel } from "../../database";
-import { ApiEndpoint } from "../types";
+import { AuthorizedApiEndpoint } from "../types";
 import { Bot } from "../..";
 import { badRequest, okay, internalError } from "../utils";
 
 /**
  * This endpoint handles adding labels to the database..
  */
-export const AddLabel: ApiEndpoint = (bot: Bot) => async ({ body, user }, res) => {
+export const AddLabel: AuthorizedApiEndpoint = (bot: Bot) => async ({ body, user }, res) => {
     const { name } = body;
     if (!name || name.trim().length === 0) {
         return badRequest(res);

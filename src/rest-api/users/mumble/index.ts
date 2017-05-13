@@ -1,4 +1,5 @@
 import * as Express from "express";
+import { authorized } from "../../utils";
 
 import { Link } from "./link";
 import { ListFreeUsers } from "./list-free-users";
@@ -11,9 +12,9 @@ import { Bot } from "../../../index";
 export const Mumble = (bot: Bot) => {
     const router = Express.Router();
 
-    router.post("/link", Link(bot));
-    router.get("/free-users", ListFreeUsers(bot));
-    router.get("/linked-users", ListLinkedUsers(bot));
+    router.post("/link", authorized(Link)(bot));
+    router.get("/free-users", authorized(ListFreeUsers)(bot));
+    router.get("/linked-users", authorized(ListLinkedUsers)(bot));
 
     return router;
 };

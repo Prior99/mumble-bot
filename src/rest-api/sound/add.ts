@@ -2,13 +2,13 @@ import * as Winston from "winston";
 import * as FS from "fs";
 import * as HTTP from "http-status-codes";
 import { addSound } from "../../database";
-import { ApiEndpoint } from "../types";
+import { AuthorizedApiEndpoint } from "../types";
 import { internalError, okay } from "../utils";
 
 /**
  * Api endpoint for playback endpoint of sound section.
  */
-export const Add: ApiEndpoint = (bot) => async ({ files }, res) => {
+export const Add: AuthorizedApiEndpoint = (bot) => async ({ files }, res) => {
     try {
         await FS.mkdir("sounds/uploaded");
     }

@@ -6,13 +6,14 @@ import { PassThrough as PassThroughStream } from "stream";
 import { getRecording, forkRecording } from "../../database";
 import { Bot } from "../..";
 import { missingArguments, internalError, okay } from "../utils";
+import { AuthorizedApiEndpoint } from "../types/index";
 
 const audioFreq = 48000;
 
 /**
  * This api endpoint is responsible for forking records.
  */
-export const Fork = (bot: Bot) => async ({ params, body, user }, res) => {
+export const Fork: AuthorizedApiEndpoint = (bot: Bot) => async ({ params, body, user }, res) => {
     const id = parseInt(params.id);
     const { quote, actions, overwrite } = body;
     if (!quote || !actions || !overwrite) {

@@ -2,12 +2,12 @@ import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { Bot } from "../../..";
 import { okay, notFound } from "../../utils";
-import { ApiEndpoint } from "../../types";
+import { AuthorizedApiEndpoint } from "../../types";
 
 /**
  * Api endpoint for playing back a cached audio
  */
-export const Play: ApiEndpoint = (bot: Bot) => ({ params, user }, res) => {
+export const Play: AuthorizedApiEndpoint = (bot: Bot) => ({ params, user }, res) => {
     const id = parseInt(params.id);
     const sound = bot.getCachedAudioById(id);
     if (sound) {

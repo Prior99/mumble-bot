@@ -3,7 +3,7 @@ import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { getLinkedMumbleUsers } from "../../../database";
 import { internalError, okay } from "../../utils";
-import { ApiEndpoint } from "../../types";
+import { AuthorizedApiEndpoint } from "../../types";
 
 async function getMumbleUsersLinkingPossible(bot: Bot) {
     const mumbleUsers = bot.getRegisteredMumbleUsers();
@@ -24,7 +24,7 @@ async function getMumbleUsersLinkingPossible(bot: Bot) {
     }
 }
 
-export const ListFreeUsers: ApiEndpoint = (bot: Bot) => async (req, res) => {
+export const ListFreeUsers: AuthorizedApiEndpoint = (bot: Bot) => async (req, res) => {
     try {
         const users = await getMumbleUsersLinkingPossible(bot);
         okay(res, { users });

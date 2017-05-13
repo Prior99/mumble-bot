@@ -1,14 +1,14 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { getRecordingCountByDays } from "../../../database";
-import { ApiEndpoint } from "../../types";
+import { AuthorizedApiEndpoint } from "../../types";
 import { Bot } from "../../..";
 import { internalError, okay } from "../../utils";
 
 /**
  * This api endpoint returns the statistics for the records per time.
  */
-export const PerTime: ApiEndpoint = (bot: Bot) => async (req, res) => {
+export const PerTime: AuthorizedApiEndpoint = (bot: Bot) => async (req, res) => {
     try {
         const spoken = await getRecordingCountByDays(bot.database);
         return okay(res, { spoken });

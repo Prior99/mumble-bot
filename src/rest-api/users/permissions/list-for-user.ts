@@ -1,14 +1,14 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { getUserById } from "../../../database";
-import { ApiEndpoint } from "../../types";
+import { AuthorizedApiEndpoint } from "../../types";
 import { Bot } from "../../..";
 import { internalError, badRequest, okay } from "../../utils";
 
 /**
  * List the permissions for one user.
  */
-export const ListForUser: ApiEndpoint = (bot: Bot) => async ({ body, user: listingUser }, res) => {
+export const ListForUser: AuthorizedApiEndpoint = (bot: Bot) => async ({ body, user: listingUser }, res) => {
     try {
         const id = parseInt(body.id);
         const listedUser = await getUserById(id, bot.database);

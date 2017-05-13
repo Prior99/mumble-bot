@@ -1,14 +1,14 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { getUserById } from "../../../database";
-import { ApiEndpoint } from "../../types";
+import { AuthorizedApiEndpoint } from "../../types";
 import { Bot } from "../../..";
 import { forbidden, okay, internalError, badRequest } from "../../utils";
 
 /**
  * Revoke a permission from a specific user.
  */
-export const Revoke: ApiEndpoint = (bot: Bot) => async ({ body, user: revokingUser }, res) => {
+export const Revoke: AuthorizedApiEndpoint = (bot: Bot) => async ({ body, user: revokingUser }, res) => {
     const { permission } = body;
     try {
         const id = parseInt(body.id);

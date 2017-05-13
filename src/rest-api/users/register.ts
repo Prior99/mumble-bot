@@ -1,6 +1,6 @@
 import * as Winston from "winston";
 import { getUserById, registerUser } from "../../database";
-import { ApiEndpoint } from "../types";
+import { AuthorizedApiEndpoint } from "../types";
 import { Bot } from "../..";
 import { internalError, conflict, okay } from "../utils";
 
@@ -20,7 +20,7 @@ async function grantAll(bot: Bot) {
 /**
  * Register a new user on the server.
  */
-export const Register: ApiEndpoint = (bot: Bot) => async ({ body }, res) => {
+export const Register: AuthorizedApiEndpoint = (bot: Bot) => async ({ body }, res) => {
     const { email, username, password } = body;
     try {
         const id = await registerUser({ email, username, password }, bot.database);

@@ -1,14 +1,14 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { listRecordings } from "../../database";
-import { ApiEndpoint } from "../types";
+import { AuthorizedApiEndpoint } from "../types";
 import { Bot } from "../..";
 import { okay, internalError } from "../utils";
 
 /**
  * List all records.
  */
-export const List: ApiEndpoint = (bot: Bot) => async ({ query }, res) => {
+export const List: AuthorizedApiEndpoint = (bot: Bot) => async ({ query }, res) => {
     try {
         const since = query.since ? new Date(query.since) : undefined;
         const records = await listRecordings(since, bot.database);

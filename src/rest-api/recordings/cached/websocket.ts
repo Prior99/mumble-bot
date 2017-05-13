@@ -1,11 +1,11 @@
 import * as Winston from "winston";
-import { ApiWsEndpoint } from "../../types";
+import { AuthorizedApiWsEndpoint } from "../../types";
 import { Bot } from "../../..";
 
 /**
  * Api endpoint for the WEBSOCKET handler for this endpoint.
  */
-export const Websocket: ApiWsEndpoint = (bot: Bot) => (ws, req) => {
+export const Websocket: AuthorizedApiWsEndpoint = (bot: Bot) => (ws, req) => {
     const onAdd = audio => {
         ws.send(JSON.stringify({
             type: "add",

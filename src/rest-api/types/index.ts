@@ -3,12 +3,16 @@ import * as Ws from "ws";
 import { Bot } from "../..";
 import { DatabaseUser } from "../../types";
 
-interface ExtendedRequest extends Request {
+export interface AuthorizedRequest extends Request {
     user: DatabaseUser;
 }
 
-export type ApiWsEndpoint = (bot: Bot) => (ws: Ws, req: ExtendedRequest) => void;
+export type ApiWsEndpoint = (bot: Bot) => (ws: Ws, req: Request) => void;
 
-export type ApiEndpoint = (bot: Bot) => (req: ExtendedRequest, res?: Response, next?: NextFunction) => void;
+export type ApiEndpoint = (bot: Bot) => (req: Request, res?: Response, next?: NextFunction) => void;
+
+export type AuthorizedApiEndpoint = (bot: Bot) => (req: AuthorizedRequest, res?: Response, next?: NextFunction) => void;
+
+export type AuthorizedApiWsEndpoint = (bot: Bot) => (ws: Ws, req: AuthorizedRequest, next?: NextFunction) => void;
 
 export type ApiRoute = (bot: Bot) => Router;

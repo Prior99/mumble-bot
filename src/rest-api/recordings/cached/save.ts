@@ -2,7 +2,7 @@ import * as Winston from "winston";
 import * as FS from "async-file";
 import * as HTTP from "http-status-codes";
 import { addRecording, giveUserMoney } from "../../../database";
-import { ApiEndpoint } from "../../types";
+import { AuthorizedApiEndpoint } from "../../types";
 import { Bot } from "../../..";
 import { internalError, okay, badRequest } from "../../utils";
 
@@ -11,7 +11,7 @@ const moneyPerSave = 200;
 /**
  * Api endpoint for saving a record.
  */
-export const Save: ApiEndpoint = (bot: Bot) => async ({ body, user }, res) => {
+export const Save: AuthorizedApiEndpoint = (bot: Bot) => async ({ body, user }, res) => {
     const { id, quote, labels } = body;
 
     if (!id || !quote || !labels) {

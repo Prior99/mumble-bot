@@ -1,6 +1,3 @@
-/*
- * Imports
- */
 import { VoiceInput } from "./input";
 import { Output } from "./output";
 import * as Winston from "winston";

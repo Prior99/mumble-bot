@@ -16,7 +16,7 @@ import { Log } from './log';
 import { WebsocketQueue } from './websocket-queue';
 import { checkLoginData, getUserByUsername } from "../database";
 import { Bot } from "../index";
-import { forbidden, internalError } from "./utils";
+import { forbidden, internalError, authorizedWebsocket, authorized, notFound } from "./utils";
 
 const maxPercent = 100;
 
@@ -41,14 +41,14 @@ export class Api {
 
         this.app.use(BodyParser.json());
         this.app.use(this.handleCORS);
-        this.app.use(this.handleAuthorization);
         this.app.use("/sounds", Sounds(bot));
-        this.app.use("/records", Recordings(bot));
-        this.app.use("/stats", Stats(bot));
+        this.app.use("/recordings", Recordings(bot));
+        this.app.use("/statistics", Stats(bot));
         this.app.use("/users", Users(bot));
         this.app.get("/channel-tree", ChannelTree(bot));
-        this.app.get("/log", Log(bot));
-        (this.app as any).ws("/queue", WebsocketQueue(bot));
+        this.app.get("/log", authorized(Log)(bot));
+        (this.app as any).ws("/queue", authorizedWebsocket(WebsocketQueue)(bot));
+        this.app.use("*", (req, res) => notFound(res));
 
         const port = bot.options.website.port;
         this.server = this.app.listen(port);
@@ -69,30 +69,6 @@ export class Api {
             return;
         }
         return next();
-    }
-
-    private handleAuthorization: Express.Handler = async (req, res, next) => {
-        const { authorization } = req.headers;
-        if (!authorization) {
-            return forbidden(res);
-        }
-        if (!authorization.toLowerCase().startsWith("basic")) {
-            return forbidden(res);
-        }
-        const token = new Buffer(authorization.substr(6), 'base64').toString('utf8');
-        const [username, password] = token.split(':');
-        if (await checkLoginData(username, password, this.bot.database)) {
-            try {
-                (req as any).user = await getUserByUsername(username, this.bot.database);
-            } catch (err) {
-                Winston.error(`Error when loading data for user ${username}`, err);
-                return internalError(res)
-            }
-            return next();
-        } else {
-            Winston.verbose(`User '${username}' failed to login.`);
-            return forbidden(res);
-        }
     }
 
     /**
