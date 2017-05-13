@@ -1,34 +1,26 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
-import { getUserByUsername } from "../../../database";
+import { getUserById } from "../../../database";
+import { ApiEndpoint } from "../../types";
+import { Bot } from "../../..";
+import { internalError, badRequest, okay } from "../../utils";
 
 /**
  * List the permissions for one user.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const Permissions = function(bot) {
-    return async function(req, res) {
-        try {
-            const user = await getUserByUsername(req.body.username, bot.database);
-            if (user) {
-                const permissions = await bot.permissions.listPermissionsForUser(req.user, user);
-                res.status(HTTP.OK).send({
-                    permissions
-                });
-            }
-            else {
-                res.status(HTTP.BAD_REQUEST).send({
-                    reason: "missing_argument"
-                });
-            }
+export const ListForUser: ApiEndpoint = (bot: Bot) => async ({ body, user: listingUser }, res) => {
+    try {
+        const id = parseInt(body.id);
+        const listedUser = await getUserById(id, bot.database);
+        if (listedUser) {
+            const permissions = await bot.permissions.listPermissionsForUser(listingUser, listedUser);
+            return okay(res, { permissions });
         }
-        catch (err) {
-            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-                reason: "internal_error"
-            });
+        else {
+            return badRequest(res);
         }
-    };
+    }
+    catch (err) {
+        return internalError(res);
+    }
 };
-
-export default Permissions;

@@ -1,27 +1,20 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { getRecordingCountByUsers } from "../../../database";
+import { ApiEndpoint } from "../../types";
+import { Bot } from "../../..";
+import { okay, internalError } from "../../utils";
 
 /**
- * API endpoint for statistics about speech per hour.
- * server this bot is connected to.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
+ * Api endpoint for statistics about speech per hour.
  */
-const RecordingsPerUser = function(bot) {
-    return async function(req, res) {
-        try {
-            const arr = await getRecordingCountByUsers(bot.database);
-            res.status(HTTP.OK).send(arr);
-        }
-        catch (err) {
-            Winston.error("Could not get record count by users.", err);
-            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-                reason: "internal_error"
-            });
-        }
-    };
+export const PerUser: ApiEndpoint = (bot: Bot) => async (req, res) => {
+    try {
+        const arr = await getRecordingCountByUsers(bot.database);
+        return okay(res, arr);
+    }
+    catch (err) {
+        Winston.error("Could not get record count by users.", err);
+        return internalError(res);
+    }
 };
-
-export default RecordingsPerUser;
-

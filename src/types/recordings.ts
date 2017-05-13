@@ -20,6 +20,10 @@ export interface Recording {
      */
     user: number;
     /**
+     * The user who reported the record.
+     */
+    reporter: number;
+    /**
      * Whether this forked record overwrites the original one.
      */
     overwrite: boolean;
@@ -35,4 +39,8 @@ export interface Recording {
      * A list of all labels with which this record was tagged.
      */
     labels: number;
+    /**
+     * Duration in seconds of this recording.
+     */
+    duration: number;
 }

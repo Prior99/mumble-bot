@@ -1,19 +1,20 @@
 import { getSettings } from "./";
 import { DatabaseUser } from "../types";
 
-interface FullDatabaseUser extends DatabaseUser {
+interface RegisterData  {
     email: string;
     password: string;
+    username: string;
 }
 /**
  * Register a new user in the database.
  * @param user User which should be inserted into the database.
  * @return Unique id of the newly generated user.
  */
-export async function registerUser(user: FullDatabaseUser, connection) {
+export async function registerUser(user: RegisterData, connection) {
     const result = await connection.query(
-        "INSERT INTO Users(email, username, password, steamid, minecraft) VALUES(?, ?, ?, ?, ?)",
-        [user.email, user.username, user.password, user.steamid, user.minecraft]
+        "INSERT INTO Users(email, username, password) VALUES(?, ?, ?, ?, ?)",
+        [user.email, user.username, user.password]
     );
     return result.insertId;
 };

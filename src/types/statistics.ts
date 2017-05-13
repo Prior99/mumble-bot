@@ -69,9 +69,9 @@ export interface StatObjectSpeechPerUser {
 }
 export interface StatObjectSpeechPerWeekday {
     /**
-     * Name of the user this object is representing.
+     * Name of the weekday this object is representing.
      */
-    user: string;
+    day: number;
     /**
      * Amount of speech in this hour.
      */

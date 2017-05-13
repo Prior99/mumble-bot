@@ -7,13 +7,13 @@ import * as FS from "async-file";
 
 export * from "./dialogs";
 export * from "./log";
-export * from "./mumbleUsers";
+export * from "./mumble-users";
 export * from "./permissions";
 export * from "./recordings";
 export * from "./settings";
 export * from "./sounds";
 export * from "./users";
-export * from "./userstats";
+export * from "./user-stats";
 
 const timeout = 4000;
 

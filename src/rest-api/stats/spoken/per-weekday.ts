@@ -1,33 +1,25 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { getSpokenPerWeekday } from "../../../database";
+import { ApiEndpoint } from "../../types";
+import { Bot } from "../../..";
+import { okay, internalError } from "../../utils";
 
-const weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 /**
- * API endpoint for statistics about speech per weekday.
- * server this bot is connected to.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
+ * Api endpoint for statistics about speech per weekday.
  */
-const SpokenPerWeekday = function(bot) {
-    return async function(req, res) {
-        try {
-            const spoken = await getSpokenPerWeekday(bot.database);
-            res.status(HTTP.OK).send(
-                spoken.map((elem) => ({
-                    "amount": elem.amount,
-                    "day": weekdays[elem.day - 1]
-                }))
-            );
-        }
-        catch (err) {
-            Winston.error("Could not get speech amount per weekday.", err);
-            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-                reason: "internal_error"
-            });
-        }
-    };
-};
-
-export default SpokenPerWeekday;
+export const PerWeekday: ApiEndpoint = (bot: Bot) => async (req, res) => {
+    try {
+        const spoken = await getSpokenPerWeekday(bot.database);
+        return okay(res, spoken.map((elem) => ({
+            amount: elem.amount,
+            day: weekdays[elem.day - 1]
+        })));
+    }
+    catch (err) {
+        Winston.error("Could not get speech amount per weekday.", err);
+        return internalError(res);
+    }
+};;

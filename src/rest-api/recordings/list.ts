@@ -1,33 +1,21 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
-import { PassThrough as PassThroughStream } from "stream";
 import { listRecordings } from "../../database";
+import { ApiEndpoint } from "../types";
+import { Bot } from "../..";
+import { okay, internalError } from "../utils";
 
 /**
  * List all records.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
  */
-export const List = (bot) => async (req, res) => {
+export const List: ApiEndpoint = (bot: Bot) => async ({ query }, res) => {
     try {
-        let since;
-        if (req.body.since) {
-            since = new Date(+req.body.since);
-        }
-        const stream = new PassThroughStream();
-        res.status(HTTP.OK);
-        res.set("Content-type", "application/json");
-        stream.pipe(res);
+        const since = query.since ? new Date(query.since) : undefined;
         const records = await listRecordings(since, bot.database);
-        stream.write(JSON.stringify({
-            records
-        }));
-        stream.end();
+        return okay(res, { records })
     }
     catch (err) {
         Winston.error("Error listing records", err);
-        res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-            reason: "internal_error"
-        });
+        return internalError(res);
     }
 };

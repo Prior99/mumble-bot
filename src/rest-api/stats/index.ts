@@ -1,20 +1,20 @@
 import * as Express from "express";
+import { ApiRoute } from "../types";
+import { Bot } from "../..";
 
-import Online from "./online";
-import Spoken from "./spoken";
-import Recording from "./recordings";
+import { Online } from "./online";
+import { Spoken } from "./spoken";
+import { Recordings } from "./recordings";
 
 /**
- * Routes all requests related to the stats api commands in the /api/stats/ endpoint.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {Router} - router for the current section.
+ * Routes all requests related to the stats api.
  */
-export const RouteStats = function(bot) {
+export const Stats: ApiRoute = (bot: Bot) => {
     const router = Express.Router();
 
-    router.use("/online", Online(bot));
+    router.get("/online", Online(bot));
     router.use("/spoken", Spoken(bot));
-    router.use("/recordings", Recording(bot));
+    router.use("/recordings", Recordings(bot));
 
     return router;
 };

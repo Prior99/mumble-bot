@@ -1,23 +1,24 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { giveUserMoney, getRecording, usedRecording } from "../../database";
+import { Bot } from "../..";
+import { ApiEndpoint } from "../types";
+import { internalError, okay } from "../utils";
 
 const moneyPerPlayReporter = 1;
 const moneyPerPlayUser = 1;
 
 /**
- * This view is responsible for playing back a stored record.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
+ * This api endpoint is responsible for playing back a stored record.
  */
-export const Play = (bot) => async ({ params, user }, res) => {
-    const { id } = params;
+export const Play: ApiEndpoint = (bot: Bot) => async ({ params, user }, res) => {
+    const id = parseInt(params.id);
     try {
         const details = await getRecording(id, bot.database);
-        if (user.id !== details.reporter.id) {
+        if (user.id !== details.reporter) {
             await giveUserMoney(details.reporter, moneyPerPlayReporter, bot.database);
         }
-        if (user.id !== details.user.id) {
+        if (user.id !== details.user) {
             await giveUserMoney(details.user, moneyPerPlayUser, bot.database);
         }
         await usedRecording(id, bot.database);
@@ -27,12 +28,10 @@ export const Play = (bot) => async ({ params, user }, res) => {
             details,
             user: user
         });
-        res.status(HTTP.OK).send(true);
+        return okay(res);
     }
     catch (err) {
         Winston.error("Could not increase usages of record", err);
-        res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-            reason: "internal_error"
-        });
+        return internalError(res);
     }
 };

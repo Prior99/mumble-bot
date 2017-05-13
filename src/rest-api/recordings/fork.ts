@@ -4,25 +4,26 @@ import FFMpeg from "fluent-ffmpeg";
 import * as FS from "fs";
 import { PassThrough as PassThroughStream } from "stream";
 import { getRecording, forkRecording } from "../../database";
+import { Bot } from "../..";
+import { missingArguments, internalError, okay } from "../utils";
 
 const audioFreq = 48000;
 
 /**
- * This view is responsible for forking records.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
+ * This api endpoint is responsible for forking records.
  */
-export const Fork = (bot) => async (req, res) => {
-    const id = +req.body.id;
-    const quote = req.body.quote;
-    const actions = JSON.parse(req.body.actions);
-    const overwrite = JSON.parse(req.body.overwrite);
-    Winston.verbose(`${req.user.username} is forking record #${id}`);
-    let newId, record, duration;
+export const Fork = (bot: Bot) => async ({ params, body, user }, res) => {
+    const id = parseInt(params.id);
+    const { quote, actions, overwrite } = body;
+    if (!quote || !actions || !overwrite) {
+        return missingArguments(res);
+    }
+    Winston.verbose(`${user.username} is forking record #${id}`);
+    let newId;
     try {
         // Calculate new duration
-        record = await getRecording(id, bot.database);
-        duration = record.duration;
+        const record = await getRecording(id, bot.database);
+        let { duration } = record;
         for (const action of actions) {
             if (action.action === "crop") {
                 duration = action.end - action.begin;
@@ -35,19 +36,18 @@ export const Fork = (bot) => async (req, res) => {
             quote,
             id,
             overwrite,
-            req.user,
+            user.id,
             duration,
             bot.database
         );
     }
     catch (err) {
         Winston.error("Error occured while metadata on fork of record: ", err);
-        res.status(HTTP.INTERNAL_SERVER_ERROR).send({ reason: "internal_error" });
-        return;
+        return internalError(res);
     }
 
     const crop = (begin, end) => new Promise((resolve, reject) => {
-        const transcoder = FFMpeg(`sounds/recorded/${id}`)
+        FFMpeg(`sounds/recorded/${id}`)
             .seekInput(begin)
             .duration(end - begin)
             .format("mp3")
@@ -64,10 +64,10 @@ export const Fork = (bot) => async (req, res) => {
                 await crop(+action.begin, +action.end);
             }
         }
-        res.status(HTTP.OK).send({});
+        return okay(res);
     }
     catch (err) {
         Winston.error("Error occured while processing fork on record: ", err);
-        res.status(HTTP.INTERNAL_SERVER_ERROR).send({ reason: "internal_error" });
+        return internalError(res);
     }
 };

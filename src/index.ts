@@ -10,18 +10,9 @@ import { EventEmitter } from "events";
 import Permissions from "./permissions";
 import VisualizeAudioFile from "./visualizer";
 import { connectDatabase } from "./database";
+import { CachedAudio } from "./types";
 
 const AUDIO_CACHE_AMOUNT = 4;
-
-/**
- * A callback without any parameters.
- * @callback VoidCallback
- */
-
-/**
- * A user from the Mumble server. Refer to documentation of node-mumble.
- * @typedef {object} MumbleUser
- */
 
 /**
  * This is the main class of the bot instanciated from the loader and holding all relevant data,
@@ -31,20 +22,20 @@ export class Bot extends EventEmitter {
     public options: any;
     public database: any;
     public mumble: any;
-    private cachedAudios: any[];
-    private permissions: Permissions;
+    public cachedAudios: CachedAudio[];
+    public audioCacheAmount: number;
+    public output: Output;
+    public permissions: Permissions;
     private audioId: number;
-    private output: Output;
     private input: VoiceInput;
     private api: Api;
-    private audioCacheAmount: number;
 
     /**
      * This is the constructor of the bot.
      * @constructor
-     * @param {MumbleConnection} mumble - already set up mumble connection (MumbleClient)
-     * @param {Config} options - Options read from the config.json
-     * @param {Database} database - Started connection to database.
+     * @param mumble already set up mumble connection (MumbleClient)
+     * @param options Options read from the config.json
+     * @param database Started connection to database.
      */
     constructor(mumble, options, database) {
         super();
@@ -78,9 +69,8 @@ export class Bot extends EventEmitter {
     /**
      * Returns only those users which have a unique id and are thous registered on
      * the mumble server.
-     * @returns {undefined}
      */
-    getRegisteredMumbleUsers() {
+    public getRegisteredMumbleUsers() {
         const users = this.mumble.users();
         const result = [];
         for (const i in users) {
@@ -93,17 +83,15 @@ export class Bot extends EventEmitter {
 
     /**
      * Instantly shutdown everything which could cause noises.
-     * @return {undefined}
      */
-    beQuiet() {
+    public beQuiet() {
         this.output.clear();
     }
 
     /**
      * Gently shutdown the whole bot.
-     * @return {undefined}
      */
-    async shutdown() {
+    public async shutdown() {
         try {
             this.beQuiet();
             await this.deleteAllCachedAudio(0);
@@ -119,50 +107,47 @@ export class Bot extends EventEmitter {
 
     /**
      * Will return whether the bot is busy speaking or listening to anyone.
-     * @return {Boolean} - If the bot is busy speaking or listening
+     * @return If the bot is busy speaking or listening
      */
-    busy() {
+    public busy(): boolean {
         return this.output.busy;
     }
 
     /**
      * Plays a sound in the mumble server.
-     * @param {string} filename - Filename of the soundfile to play. Must be a mono-channel 48,000Hz WAV-File
-     * @param {Object} meta - Metadata passed to the output module.
-     * @return {undefined}
+     * @param filename Filename of the soundfile to play. Must be a mono-channel 48,000Hz WAV-File
+     * @param meta Metadata passed to the output module.
      */
-    async playSound(filename, meta) {
+    async playSound(filename: string, meta: any): Promise<void> {
         await this.output.playSound(filename, meta);
     }
 
     /**
      * Makes the bot join a specific channel in mumble.
-     * @param {string} cname - Name of the channel to join.
-     * @return {undefined}
+     * @param cname Name of the channel to join.
      */
-    join(cname) {
+    public join(cname: string) {
         try {
             const channel = this.mumble.channelByName(cname);
             if (!channel) {
-                Winston.error("Channel \"" + cname + "\" is unknown.");
+                Winston.error(`Channel "${cname}" is unknown.`);
             }
             else {
                 channel.join();
             }
         }
         catch (err) {
-            Winston.error("Unable to join channel \"" + cname + "\":", err);
+            Winston.error(`Unable to join channel "${cname}":`, err);
         }
     }
 
     /**
      * Add an audio file to the list of cached audios.
-     * @param {string} filename - Filename of the cached audio file.
-     * @param {DatabaseUser} user - User that emitted the audio.
-     * @param {number} duration - Duration of the audio.
-     * @return {undefined}
+     * @param filename Filename of the cached audio file.
+     * @param user User that emitted the audio.
+     * @param duration Duration of the audio.
      */
-    async addCachedAudio(filename, user, duration) {
+    public async addCachedAudio(filename: string, user: number, duration: number): Promise<void> {
         const obj = {
             file: filename,
             date: new Date(),
@@ -180,42 +165,23 @@ export class Bot extends EventEmitter {
         this.clearUpCachedAudio();
     }
 
-    /**
-     * A cached audio.
-     * @typedef {object} CachedAudio
-     * @property {string} file - The filename of the audio.
-     * @property {date} date - The date the audio was recorded.
-     * @property {DatabaseUser} user - The user from which the audio was recorded.
-     * @property {number} id - The id of the cached audio.
-     * @property {number} duration - The duration of the audio in seconds.
-     * @property {boolean} protected - Whether the audio was protected by someone or not.
-     */
 
     /**
      * Retrieve the cached audio by its id. Returns the audio when the id was valid
      * and null otherwise.
-     * @param {number} id - Id of the audio to look up.
-     * @return {CachedAudio} - The cached audio or null when the id was invalid.
+     * @param id Id of the audio to look up.
+     * @return The cached audio or null when the id was invalid.
      */
-    getCachedAudioById(id) {
-        id = +id;
-        for (const key in this.cachedAudios) {
-            if (this.cachedAudios.hasOwnProperty(key)) {
-                const audio = this.cachedAudios[key];
-                if (audio.id === id) {
-                    return audio;
-                }
-            }
-        }
-        return;
+    public getCachedAudioById(id: number): CachedAudio {
+        return this.cachedAudios.find(audio => audio.id === id);
     }
 
     /**
      * Protected the cached audio with the given id.
-     * @param {number} id - Id of the audio to protect.
-     * @return {boolean} - False when the id was invalid.
+     * @param id Id of the audio to protect.
+     * @return False when the id was invalid.
      */
-    protectCachedAudio(id) {
+    public protectCachedAudio(id: number): boolean {
         const elem = this.getCachedAudioById(id);
         if (!elem) {
             return false;
@@ -229,10 +195,10 @@ export class Bot extends EventEmitter {
 
     /**
      * Removes the cached audio with the given id.
-     * @param {number} id - Id of the audio to remove.
-     * @return {boolean} - False when the id was invalid.
+     * @param id Id of the audio to remove.
+     * @return False when the id was invalid.
      */
-    removeCachedAudioById(id) {
+    public removeCachedAudioById(id: number): boolean {
         const elem = this.getCachedAudioById(id);
         if (!elem) {
             return false;
@@ -245,10 +211,10 @@ export class Bot extends EventEmitter {
 
     /**
      * Removes the cached audio by audio object.
-     * @param {CachedAudio} audio - audio object to remove.
-     * @return {boolean} - False when the id was invalid.
+     * @param audio audio object to remove.
+     * @return False when the id was invalid.
      */
-    removeCachedAudio(audio) {
+    public removeCachedAudio(audio: CachedAudio): boolean {
         const index = this.cachedAudios.indexOf(audio);
         if (index !== -1) {
             this.cachedAudios.splice(index, 1);
@@ -262,7 +228,6 @@ export class Bot extends EventEmitter {
 
     /**
      * Clears up the list of cached audios and keeps it to the specified maximum size.
-     * @return {undefined}
      */
     private clearUpCachedAudio() {
         this.deleteAllCachedAudio(this.audioCacheAmount);
@@ -271,10 +236,9 @@ export class Bot extends EventEmitter {
     /**
      * Delete the specified amount of audios from the list of cached audios starting with the oldest
      * and skipping protected audios.
-     * @param {number} amount - AMount of audios to remove.
-     * @return {undefined}
+     * @param amount Amount of audios to remove.
      */
-    private async deleteAllCachedAudio(amount) {
+    private async deleteAllCachedAudio(amount): Promise<void> {
         const prot = [];
         while (this.cachedAudios.length > amount) {
             const elem = this.cachedAudios.shift();
@@ -300,24 +264,16 @@ export class Bot extends EventEmitter {
 
     /**
      * Find all users in mumble which contain the supplied string in their name.
-     * For example: ```bot.findUsers("merlin");``` will find "Merlin | LÖML | Mörrrlin".
+     * For example:
+     * ```
+     *     bot.findUsers("merlin");
+     * ```
+     * will find "Merlin | LÖML | Mörrrlin".
      * This method is used in *certain* methods.
-     * @param {string} namePart - Text to search for.
-     * @return {undefined}
+     * @param namePart Text to search for.
      */
-    findUsers(namePart) {
-        namePart = namePart.toLowerCase();
-        const users = this.mumble.users();
-        const found = [];
-        for (const key in users) {
-            if (users.hasOwnProperty(key)) {
-                const user = users[key];
-                if (user.name.toLowerCase().indexOf(namePart) !== -1) {
-                    found.push(user);
-                }
-            }
-        }
-        return found;
+    public findUsers(namePart: string): any[] {
+        return this.mumble.users.filter(user => user.name.toLowerCase.includes(namePart.toLowerCase()));
     }
 }
 

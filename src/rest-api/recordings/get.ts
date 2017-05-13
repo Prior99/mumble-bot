@@ -1,25 +1,21 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { getRecording } from "../../database";
+import { Bot } from "../..";
+import { ApiEndpoint } from "../types";
+import { okay, internalError } from "../utils";
 
 /**
- * This view returns the details to one specific record.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
+ * This api endpoint returns the details to one specific record.
  */
-export const Get = (bot) => async (req, res) => {
-    const id = req.body.id;
-    if (id) {
-        try {
-            const record = await getRecording(id, bot.database);
-            res.status(HTTP.OK).send({ record })
-        }
-        catch (err) {
-            Winston.error("Error while getting record", err);
-            res.status(HTTP.INTERNAL_SERVER_ERROR).send({ reason: "internal_error" });
-        }
+export const Get: ApiEndpoint = (bot: Bot) => async ({ params }, res) => {
+    const id = parseInt(params.id);
+    try {
+        const record = await getRecording(id, bot.database);
+        return okay(res, { record });
     }
-    else {
-        res.status(HTTP.BAD_REQUEST).send({ reason: "missing_argument" });
+    catch (err) {
+        Winston.error("Error while getting record", err);
+        return internalError(res);
     }
-};;
+};

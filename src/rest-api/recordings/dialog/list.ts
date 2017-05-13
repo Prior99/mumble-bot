@@ -1,25 +1,20 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { listDialogs } from "../../../database";
+import { ApiEndpoint } from "../../types";
+import { Bot } from "../../..";
+import { okay, internalError } from "../../utils";
 
 /**
- * <b>/record/dialogs/</b> Page for list of dialogs.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
+ * Api endpoint for list of dialogs.
  */
-const Dialogs = function(bot) {
-    return async function(req, res) {
-        try {
-            const dialogs = await listDialogs(bot.database);
-            res.send({ dialogs });
-        }
-        catch (err) {
-            Winston.error("Error listing dialogs", err);
-            res.status(HTTP.INTERNAL_SERVER_ERROR).render({
-                reason: "internal_error"
-            });
-        }
+export const List: ApiEndpoint = (bot: Bot) => async (req, res) => {
+    try {
+        const dialogs = await listDialogs(bot.database);
+        return okay(res, { dialogs });
+    }
+    catch (err) {
+        Winston.error("Error listing dialogs", err);
+        return internalError(res);
     }
 };
-
-export default Dialogs;

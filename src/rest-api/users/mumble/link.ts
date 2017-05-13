@@ -1,33 +1,30 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { linkMumbleUser } from "../../../database";
+import { ApiEndpoint } from "../../types";
+import { Bot } from "../../..";
+import { internalError, forbidden, okay, badRequest } from "../../utils";
 
 /**
- * <b>/api/users/linkMumbleUser</b> Links a mumble user to a user.
- * server this bot is connected to.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
+ * Links a mumble user to a user.
  */
-const LinkMumbleUser = function(bot) {
-    return async function(req, res) {
-        if (req.user.username === req.body.username) {
-            try {
-                await linkMumbleUser(req.body.id, req.body.username, bot.database);
-                Winston.log("verbose", `${req.user.username} linked mumble user with id ${req.body.id}`);
-                res.status(HTTP.OK).send(true);
-            }
-            catch (err) {
-                res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-                    reason: "internal_error"
-                });
-            }
+export const Link: ApiEndpoint = (bot: Bot) => async ({ body, user }, res) => {
+    if (!body.userId || !body.mumbleId) {
+        return badRequest(res);
+    }
+    const mumbleId = parseInt(body.mumbleId);
+    const userId = parseInt(body.userId);
+    if (user.id === userId) {
+        try {
+            await linkMumbleUser(mumbleId, userId, bot.database);
+            Winston.log("verbose", `${user.username} linked mumble user with id ${mumbleId} to user ${userId}`);
+            return okay(res);
         }
-        else {
-            res.status(HTTP.BAD_REQUEST).send({
-                reason: "invalid_user"
-            });
+        catch (err) {
+            return internalError(res);
         }
-    };
-};
-
-export default LinkMumbleUser;
+    }
+    else {
+        return forbidden(res);
+    }
+};;

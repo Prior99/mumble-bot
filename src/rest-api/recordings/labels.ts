@@ -1,20 +1,20 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
+import { Bot } from "../..";
+import { listLabels } from "../../database";
+import { ApiEndpoint } from "../types";
+import { internalError, okay } from "../utils";
 
 /**
- * <b>/record/labels/</b> Page for listing and creating labels.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
+ * Api endpoint for listing and creating labels.
  */
-export const Labels = (bot) => async (req, res) => {
+export const Labels: ApiEndpoint = (bot: Bot) => async (req, res) => {
     try {
         const labels = await listLabels(bot.database);
-        res.send({ labels });
+        return okay(res, { labels });
     }
     catch (err) {
         Winston.error("Error listing labels", err);
-        res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-            reason: "missing_arguments"
-        });
+        return internalError(res);
     }
 };

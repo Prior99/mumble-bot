@@ -160,7 +160,7 @@ class Permissions {
      * @param {GrantPermissionCallback} callback - Called once all permissions were processed.
      * @returns {boolean} - If everything has gone right.
      */
-    async grantAllPermissions(issuer, user, callback) {
+    async grantAllPermissions(issuer, user) {
         const permissions = await this.listPermissions();
         let okay = true;
         while (permissions.length) {

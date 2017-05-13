@@ -17,28 +17,28 @@ export async function getLinkedMumbleUsers(connection): Promise<MumbleDatabaseUs
 
 /**
  * Returns all mumble user ids of mumble users which are linked to the specified user.
- * @param username Name of the user of which the ids should be fetched.
+ * @param id id of the user of which the ids should be fetched.
  * @return The linked users of the requested database user.
  */
-export async function getLinkedMumbleUsersOfUser(username: string, connection): Promise<MumbleDatabaseUser[]> {
+export async function getLinkedMumbleUsersOfUser(id: number, connection): Promise<MumbleDatabaseUser[]> {
     const rows = await connection.query(
         "SELECT m.mumbleId AS id, u.username AS username " +
         "FROM MumbleUsers m " +
-        "LEFT JOIN Users u ON u.id = m.user WHERE u.username = ?",
-        [username]
+        "LEFT JOIN Users u ON u.id = m.user WHERE u.id = ?",
+        [id]
     );
     return rows;
 };
 
 /**
  * Links a mumble user to a user in this bot.
- * @param id Id of the mumble user to link.
- * @param username User to which the mumble user should be linked.
+ * @param mumbleId Id of the mumble user to link.
+ * @param userId Id of the user to which the mumble user should be linked.
  */
-export async function linkMumbleUser(id: number, username: string, connection): Promise<void> {
+export async function linkMumbleUser(mumbleId: number, userId: number, connection): Promise<void> {
     await connection.query(
-        "INSERT INTO MumbleUsers(mumbleId, user) VALUES(?, (SELECT id FROM Users WHERE username = ?))",
-        [id, username]
+        "INSERT INTO MumbleUsers(mumbleId, user) VALUES(?, ?)",
+        [mumbleId, userId]
     );
 }
 

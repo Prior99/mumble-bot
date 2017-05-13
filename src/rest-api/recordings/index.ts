@@ -1,25 +1,25 @@
 import * as Express from "express";
+import { ApiRoute } from "../types";
+import { Bot } from "../..";
 
+import { Cached } from "./cached";
+import { Dialogs } from "./dialog";
 import { Play } from "./play";
 import { Download } from "./download";
 import { AddLabel } from "./add-label";
 import { Edit } from "./edit";
 import { List } from "./list";
 import { Get } from "./get";
-import { Visualized } from "./visualize";
+import { Visualize } from "./visualize";
 import { Fork } from "./fork";
-import { RouteCached } from "./cached";
-import { RouteDialogs } from "./dialog";
 /**
- * Router for all API callbacks related to /api/record/.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {Router} - router for the current section.
+ * Router for all API callbacks related to recordings.
  */
-export const RouteRecordings = function(bot) {
+export const Recordings: ApiRoute = (bot: Bot) => {
     const router = Express.Router();
 
-    router.use("/cached", RouteCached(bot));
-    router.use("/dialog", RouteDialogs(bot));
+    router.use("/cached", Cached(bot));
+    router.use("/dialogs", Dialogs(bot));
 
     router.get("/", List(bot));
     router.get("/:id", Get(bot));
@@ -27,7 +27,7 @@ export const RouteRecordings = function(bot) {
     router.get("/:id/download", Download(bot));
     router.post("/:id/addlabel", AddLabel(bot));
     router.post("/:id/edit", Edit(bot));
-    router.get("/:id/visualize", Visualized(bot));
+    router.get("/:id/visualize", Visualize(bot));
     router.post("/:id/fork", Fork(bot));
 
     return router;

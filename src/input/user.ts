@@ -5,7 +5,7 @@ import * as FS from "fs";
 import * as FFMpeg from "fluent-ffmpeg";
 import * as Stream from "stream";
 import { PassThrough as PassThroughStream } from "stream";
-import { Bot } from "../index";
+import { Bot } from "..";
 import { writeUserStatsOnline, writeUserStatsSpeak } from "../database";
 
 const TIMEOUT_THRESHOLD = 300;

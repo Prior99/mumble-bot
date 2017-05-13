@@ -2,32 +2,28 @@ import * as Winston from "winston";
 import * as FS from "fs";
 import * as HTTP from "http-status-codes";
 import { updateRecording } from "../../database";
+import { Bot } from "../..";
+import { ApiEndpoint } from "../types";
+import { internalError, okay, missingArguments } from "../utils";
 
 /**
  * This is the view for the api for editing records.
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-export const Edit = (bot) => async (req, res) => {
-    if (req.body.id && req.body.quote && req.body.labels) {
-        const labels = JSON.parse(req.body.labels);
-        const quote = req.body.quote;
-        const id = req.body.id;
-        try {
-            await updateRecording(id, quote, labels, bot.database);
-            Winston.log("verbose", `${req.user.username} edited record #${id}`);
-            res.status(HTTP.OK).send(true);
-        }
-        catch (err) {
-            Winston.error("Could not edit record in database", err);
-            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-                reason: "internal_error"
-            });
-        }
+export const Edit: ApiEndpoint = (bot: Bot) => async ({ body, params, user }, res) => {
+    const id = parseInt(params.id);
+    const { quote, labels } = body;
+    if (!quote || ! labels) {
+        return missingArguments(res);
     }
-    else {
-        res.status(HTTP.BAD_REQUEST).send({
-            reason: "missing_arguments"
-        });
+    try {
+        await updateRecording(id, quote, labels, bot.database);
+        Winston.log("verbose", `${user.username} edited record #${id}`);
+        return okay(res);
+    }
+    catch (err) {
+        Winston.error("Could not edit record in database", err);
+        return internalError(res);
     }
 };

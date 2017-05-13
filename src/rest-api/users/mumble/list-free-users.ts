@@ -1,8 +1,11 @@
+import { Bot } from "../../..";
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { getLinkedMumbleUsers } from "../../../database";
+import { internalError, okay } from "../../utils";
+import { ApiEndpoint } from "../../types";
 
-async function getMumbleUsersLinkingPossible(bot) {
+async function getMumbleUsersLinkingPossible(bot: Bot) {
     const mumbleUsers = bot.getRegisteredMumbleUsers();
     try {
         const arr = [];
@@ -21,24 +24,13 @@ async function getMumbleUsersLinkingPossible(bot) {
     }
 }
 
-const FreeMumbleUsers = function(bot) {
-
-    return async function(req, res) {
-        try {
-            const users = await getMumbleUsersLinkingPossible(bot);
-            res.send({
-                okay: true,
-                users
-            });
-        }
-        catch (err) {
-            Winston.error("Error fetching unlinked users.", err);
-            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-                okay: false,
-                reason: "internal_error"
-            });
-        }
-    };
+export const ListFreeUsers: ApiEndpoint = (bot: Bot) => async (req, res) => {
+    try {
+        const users = await getMumbleUsersLinkingPossible(bot);
+        okay(res, { users });
+    }
+    catch (err) {
+        Winston.error("Error fetching unlinked users.", err);
+        return internalError(res);
+    }
 };
-
-export default FreeMumbleUsers;

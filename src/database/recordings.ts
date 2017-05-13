@@ -19,16 +19,17 @@ import {
  * @param reporter Who ever added this record.
  * @return The unique id of the new record.
  */
-export async function addRecording(quote: string,
-        user: DatabaseUser,
+export async function addRecording(
+        quote: string,
+        user: number,
         date: Date,
         labels: number[],
         duration: number,
-        reporter: DatabaseUser,
+        reporter: number,
         connection): Promise<number> {
     const result = await connection.query(
         "INSERT INTO Recordings(quote, user, submitted, changed, duration, reporter) VALUES(?, ?, ?, ?, ?, ?)",
-        [quote, user.id, date, new Date(), duration, reporter.id]
+        [quote, user, date, new Date(), duration, reporter]
     );
     labels.forEach((label) => addRecordingToLabel(result.insertId, label, connection));
     return result.insertId;
@@ -130,13 +131,9 @@ export async function getRecording(id: number, connection): Promise<Recording> {
     );
     if (rows && rows.length > 0) {
         const record = rows[0];
-        const user = await getUserById(record.user, connection);
         const labels = await getLabelsOfRecording(record.id, connection);
-        const reporter = await getUserById(record.reporter, connection);
         return {
             ...record,
-            reporter: reporter,
-            user: user,
             labels: labels
         };
     }
@@ -277,12 +274,12 @@ export async function getRecordingPlaybackCountPerUser(connection): Promise<Play
  * @return id of the new record.
  */
 export async function forkRecording(
-        user: DatabaseUser,
+        user: number,
         submitted: Date,
         quote: string,
         parent: number,
         overwrite: boolean,
-        reporter: DatabaseUser,
+        reporter: number,
         duration: number,
         connection): Promise<number> {
     const result = await connection.query(

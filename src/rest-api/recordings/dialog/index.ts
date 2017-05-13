@@ -1,20 +1,20 @@
 import * as Express from "express";
+import { Bot } from "../../..";
+import { ApiRoute } from "../../types";
 
-import List from "./list";
-import Play from "./play";
-import Save from "./save";
+import { List } from "./list";
+import { Play } from "./play";
+import { Save } from "./save";
 
 /**
- * Router for all API callbacks related to /api/record/.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {Router} - router for the current section.
+ * Router for all API callbacks related to dialogs.
  */
-export const RouteDialogs = function(bot) {
+export const Dialogs: ApiRoute = (bot: Bot) => {
     const router = Express.Router();
 
-    router.use("/save", Save(bot));
-    router.use("/play", Play(bot));
-    router.use("/list", List(bot));
+    router.post("/save", Save(bot));
+    router.post("/:id/play", Play(bot));
+    router.get("/", List(bot));
 
     return router;
 };

@@ -7,3 +7,4 @@ export * from "./recordings";
 export * from "./settings";
 export * from "./statistics";
 export * from "./users";
+export * from "./cached-audio";

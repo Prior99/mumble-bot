@@ -1,41 +1,32 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
-import { getUserByUsername } from "../../../database";
+import { getUserById } from "../../../database";
+import { ApiEndpoint } from "../../types";
+import { Bot } from "../../..";
+import { okay, forbidden, internalError, badRequest } from "../../utils";
 
 /**
  * Grant a permission to a specific user.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const GrantPermission = function(bot) {
-    return async function(req, res) {
-
-        const permission = req.body.permission;
-        try {
-            const user = await getUserByUsername(req.body.user, bot.database);
-            if (user) {
-                if (await bot.permissions.grantPermission(req.user, user, permission)) {
-                    res.status(HTTP.OK).send(true);
-                }
-                else {
-                    res.status(HTTP.FORBIDDEN).send({
-                        reason: "insufficient_permission"
-                    });
-                }
+export const Grant: ApiEndpoint = (bot: Bot) => async ({ body, user: grantingUser }, res) => {
+    const { permission } = body;
+    const id = parseInt(body.id);
+    try {
+        const grantedUser = await getUserById(id, bot.database);
+        if (grantedUser) {
+            if (await bot.permissions.grantPermission(grantingUser, grantedUser, permission)) {
+                return okay(res);
             }
             else {
-                res.status(HTTP.BAD_REQUEST).send({
-                    reason: "unknown_user"
-                });
+                return forbidden(res);
             }
         }
-        catch (err) {
-            Winston.error("Could not fetch user while granting permission", err);
-            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-                reason: "internal_error"
-            });
+        else {
+            return badRequest(res);
         }
     }
+    catch (err) {
+        Winston.error("Could not fetch user while granting permission", err);
+        return internalError(res);
+    }
 };
-
-export default GrantPermission;

@@ -6,10 +6,10 @@ import { colorify } from "../colorbystring";
 import * as HTTP from "http-status-codes";
 import { Server } from "http";
 
-import { RouteRecordings } from './record';
+import { RouteRecordings } from './recordings';
 import { RouteSounds } from './sound';
 import { RouteStats } from './stats';
-import { RouteUsers } from './user';
+import { RouteUsers } from './users';
 
 import { ChannelTree } from './channel-tree';
 import { Log } from './log';
@@ -29,7 +29,7 @@ class Api {
      * @constructor
      * @param {Bot} bot - The bot to use this webpage with.
      */
-    constructor(bot) {
+    constructor(bot: Bot) {
         this.connections = new Set();
         this.app = Express();
         ExpressWS(this.app);
@@ -80,13 +80,13 @@ class Api {
                 reason: "authorization_required"
             });
         });
-        this.app.use("/sounds", RouteSounds(bot));
-        this.app.use("/records", RouteRecordings(bot));
-        this.app.use("/stats", RouteStats(bot));
-        this.app.use("/users", RouteUsers(bot));
-        this.app.get("/channel-tree", ChannelTree(bot));
-        this.app.get("/log", Log(bot));
-        (this.app as any).ws("/queue", WebsocketQueue(bot));
+        this.app.use("/sounds", RouteSounds(bot: Bot));
+        this.app.use("/records", RouteRecordings(bot: Bot));
+        this.app.use("/stats", RouteStats(bot: Bot));
+        this.app.use("/users", RouteUsers(bot: Bot));
+        this.app.get("/channel-tree", ChannelTree(bot: Bot));
+        this.app.get("/log", Log(bot: Bot));
+        (this.app as any).ws("/queue", WebsocketQueue(bot: Bot));
 
         const port = bot.options.website.port;
         this.server = this.app.listen(port);

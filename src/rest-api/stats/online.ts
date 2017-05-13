@@ -1,25 +1,20 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { getOnlinePerUser } from "../../database";
+import { Bot } from "../..";
+import { ApiEndpoint } from "../types";
+import { okay, internalError } from "../utils";
 
 /**
- * Statistics view for playbacks per user.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
+ * Statistics view for online time per user.
  */
-const OnlinePerUser = function(bot) {
-    return async function(req, res) {
-        try {
-            const spoken = await getOnlinePerUser(bot.database);
-            res.status(HTTP.OK).send(spoken);
-        }
-        catch (err) {
-            Winston.error("Could not get amount of online time by user.", err);
-            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-                reason: "internal_error"
-            });
-        }
-    };
+export const Online: ApiEndpoint = (bot: Bot) => async (req, res) => {
+    try {
+        const spoken = await getOnlinePerUser(bot.database);
+        return okay(res, { spoken });
+    }
+    catch (err) {
+        Winston.error("Could not get amount of online time by user.", err);
+        return internalError(res);
+    }
 };
-
-export default OnlinePerUser;

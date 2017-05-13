@@ -1,26 +1,21 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { listUsers } from "../../database";
+import { ApiEndpoint } from "../types";
+import { Bot } from "../..";
+import { internalError } from "../utils";
 /**
- * <b>/users/list/</b> Displays a list of users.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - Renderer for the content.
+ * Returns a list of users.
  */
-const UsersList = function(bot) {
-    return async function(req, res) {
-        try {
-            const users = await listUsers(bot.database);
-            res.send({
-                users
-            });
-        }
-        catch (err) {
-            Winston.error("Error fetching list of users", err);
-            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-                reason: "internal_error"
-            });
-        }
-    };
+export const UsersList: ApiEndpoint = (bot: Bot) => async (req, res) => {
+    try {
+        const users = await listUsers(bot.database);
+        res.send({
+            users
+        });
+    }
+    catch (err) {
+        Winston.error("Error fetching list of users", err);
+        return internalError(res);
+    }
 };
-
-export default UsersList;

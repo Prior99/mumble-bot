@@ -1,35 +1,33 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
-import { getLinkedMumbleUsersOfUser, getUserByUsername } from "../../../database";
+import { getLinkedMumbleUsersOfUser, getUserById } from "../../../database";
+import { ApiEndpoint } from "../../types/index";
+import { Bot } from "../../../index";
+import { notFound, okay, internalError } from "../../utils";
 
-export const ListLinkedUsers = (bot) => async (req, res) => {
+export const ListLinkedUsers: ApiEndpoint = (bot: Bot) => async ({ body }, res) => {
     try {
-        const user = await getUserByUsername(req.body.user.username, bot.database); //Reload user from database
+        const id = parseInt(body.id);
+        const user = await getUserById(id, bot.database); //Reload user from database
+        if (!user) {
+            return notFound(res);
+        }
         if (user) {
             try {
-                const linkedUsers = await getLinkedMumbleUsersOfUser(user.username, bot.database);
+                const linkedUsers = await getLinkedMumbleUsersOfUser(id, bot.database);
                 const users = linkedUsers.map(user => bot.mumble.userById(user.id));
-                res.send({
+                return okay(res, {
                     users
                 });
             }
             catch (err) {
                 Winston.error(`Unabled to fetch linked mumble users of user ${user.username, err}`);
-                res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-                    reason: "internal_error"
-                });
+                return internalError(res);
             }
-        }
-        else {
-            res.status(HTTP.NOT_FOUND).send({
-                reason: "invalid_argument"
-            });
         }
     }
     catch (err) {
         Winston.error(`Error fetching user.`, err);
-        res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-            reason: "internal_error"
-        });
+        return internalError(res);
     }
 };

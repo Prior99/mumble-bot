@@ -1,20 +1,19 @@
 import * as Express from "express";
+import { Bot } from "../../..";
 
-import Grant from "./grant";
-import ListForUser from "./list-for-user";
-import Revoke from "./revoke";
+import { Grant } from "./grant";
+import { ListForUser } from "./list-for-user";
+import { Revoke } from "./revoke";
 
 /**
- * Routes all requests related to the user api commands in the /api/users/ endpoint.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {Router} - router for the current section.
+ * Routes all requests related to the permission api.
  */
-const RouteMumble = function(bot) {
+const RouteMumble = (bot: Bot) => {
     const router = Express.Router();
-    router.use("/revoke", Revoke(bot));
-    router.use("/listForUser", ListForUser(bot));
-    router.use("/grant", Grant(bot));
+
+    router.post("/revoke", Revoke(bot));
+    router.get("/:id", ListForUser(bot));
+    router.post("/grant", Grant(bot));
+
     return router;
 };
-
-export default RouteMumble;

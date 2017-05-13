@@ -1,21 +1,20 @@
 import * as Express from "express";
+import { Bot } from "../../..";
+import { ApiRoute } from "../../types";
 
-import PerHour from "./per-hour";
-import PerUser from "./per-user";
-import PerWeekday from "./per-weekday";
+import { PerHour } from "./per-hour";
+import { PerUser } from "./per-user";
+import { PerWeekday } from "./per-weekday";
 
 /**
- * Routes all requests related to the stats api commands in the /api/stats/ endpoint.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {Router} - router for the current section.
+ * Routes all requests related to the spoken statistics api.
  */
-const RouteStats = function(bot) {
+export const Spoken: ApiRoute = (bot: Bot) => {
     const router = Express.Router();
-    router.use("/perWeekday", PerWeekday(bot));
-    router.use("/perUser", PerUser(bot));
-    router.use("/perHour", PerHour(bot));
+
+    router.get("/per-weekday", PerWeekday(bot));
+    router.get("/per-user", PerUser(bot));
+    router.get("/per-hour", PerHour(bot));
 
     return router;
 };
-
-export default RouteStats;

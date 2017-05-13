@@ -1,30 +1,16 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
+import { Bot } from "../../..";
+import { okay, internalError } from "../../utils";
+import { ApiEndpoint } from "../../types";
 
 /**
- * View for portecting a cached record.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
+ * Api endpoint for portecting a cached record.
  */
-const ProtectCachedRecording = function(bot) {
-    return function(req, res) {
-        if (req.body.id) {
-            if (bot.protectCachedAudio(req.body.id)) {
-                res.status(HTTP.OK).send(true);
-            }
-            else {
-                res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-                    reason: "internal_error"
-                });
-            }
-        }
-        else {
-            res.status(HTTP.BAD_REQUEST).send({
-                reason: "missing_arguments"
-            });
-        }
-    };
+export const Protect: ApiEndpoint = (bot: Bot) => ({ params }, res) => {
+    const id = parseInt(params.id);
+    if (bot.protectCachedAudio(id)) {
+        return okay(res);
+    }
+    return internalError(res);
 };
-
-export default ProtectCachedRecording;
-

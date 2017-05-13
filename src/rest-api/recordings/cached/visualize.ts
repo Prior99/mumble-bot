@@ -1,31 +1,20 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import * as FS from "fs";
+import { ApiEndpoint } from "../../types";
+import { Bot } from "../../..";
+import { badRequest, notFound } from "../../utils";
 
 /**
- * View for the visualization of a cached audio
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
+ * Api endpoint for the visualization of a cached audio
  */
-const VisualizedCached = function(bot) {
-    return function(req, res) {
-        if (req.body.id) {
-            const sound = bot.getCachedAudioById(+req.body.id);
-            if (sound) {
-                res.status(HTTP.OK);
-                FS.createReadStream(`${sound.file}.png`).pipe(res);
-            }
-            else {
-                res.status(HTTP.BAD_REQUEST).send({
-                    reason: "invalid_argument"
-                });
-            }
-        }
-        else {
-            res.status(HTTP.BAD_REQUEST).send({
-                reason: "missing_arguments"
-            });
-        }
-    };
+export const Visualize: ApiEndpoint = (bot: Bot) => ({ params }, res) => {
+    const id = parseInt(params.id);
+    const sound = bot.getCachedAudioById(id);
+    if (sound) {
+        res.status(HTTP.OK);
+        FS.createReadStream(`${sound.file}.png`).pipe(res);
+        return;
+    }
+    return notFound(res, "Could not find cached audio with specified id.");
 };
-export default VisualizedCached;

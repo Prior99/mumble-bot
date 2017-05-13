@@ -20,7 +20,7 @@ export class VoiceInput extends EventEmitter {
      * @constructor
      * @param {Bot} bot - Instance of the bot this belongs to.
      */
-    constructor(bot) {
+    constructor(bot: Bot) {
         super();
         this.bot = bot;
         this._initConnectedUsers(bot.mumble.users());

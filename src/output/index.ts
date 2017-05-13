@@ -13,10 +13,10 @@ const msInS = 1000;
  */
 export class Output extends Stream.Writable {
     public busy: boolean = false;
+    public queue: Sound[] = [];
     private bot: Bot;
     private stream: any;
     private sound: Sound;
-    private queue: Sound[] = [];
     private current: any;
     private bufferQueue: Sound[] = [];
     private playbackAhead: number = 0;

@@ -1,27 +1,22 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { getUserByUsername } from "../../database";
+import { ApiEndpoint } from "../types";
+import { Bot } from "../..";
+import { internalError, okay } from "../utils";
 
 /**
  * Checks whether a username is available.
- * @param {object} bot - Pointer to the main bot instance.
- * @return {ViewRenderer} - Feeded view renderer for this endpoint.
  */
-const UsernameAvailable = function(bot) {
-    return async function(req, res) {
-        try {
-            const user = await getUserByUsername(req.body.username, bot.database);
-            res.status(HTTP.OK).send({
-                available: !Boolean(user)
-            });
-        }
-        catch (err) {
-            Winston.error("Error checking whether username is available", err);
-            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-                reason: "internal_error"
-            });
-        }
+export const UsernameAvailable: ApiEndpoint = (bot: Bot) => async (req, res) => {
+    try {
+        const user = await getUserByUsername(req.body.username, bot.database);
+        return okay(res, {
+            available: !Boolean(user)
+        });
+    }
+    catch (err) {
+        Winston.error("Error checking whether username is available", err);
+        return internalError(res);
     }
 };
-
-export default UsernameAvailable;

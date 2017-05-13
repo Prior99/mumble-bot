@@ -1,16 +1,34 @@
-/**
- * @typedef Channel
- * @property {string[]} users - List of users in the channel.
- * @property {Channel[]} children - List of child channels of this channel.
- * @property {string} name - Name of this channel.
- */
+import { ApiEndpoint } from "./types/index";
+import { Bot } from "../index";
+import { okay } from "./utils";
+
+interface MumbleUser {
+    name: string;
+    id: number;
+    session: number;
+}
+
+interface Channel {
+    /**
+     * List of users in the channel.
+     */
+    users: MumbleUser[];
+    /**
+     * List of child channels of this channel.
+     */
+    children: Channel[];
+    /**
+     * Name of this channel.
+     */
+    name: string;
+}
 /**
  * Generates an object representing the tree of channels and users of the mumble
  * server this bot is connected to.
- * @param {Channel} root - Root channel to start build the tree from.
- * @return {Channel} - Recursive tree of channels.
+ * @param root Root channel to start build the tree from.
+ * @return Recursive tree of channels.
  */
-const buildChannelTree = function(root) {
+const buildChannelTree = function(root: Channel): Channel {
     return {
         name: root.name,
         users: [...root.users.map(user => ({
@@ -23,15 +41,10 @@ const buildChannelTree = function(root) {
 }
 
 /**
- * <b>/api/tree/</b> Generates a tree with all channels and users in the mumble
- * server this bot is connected to.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - View renderer for this endpoint.
+ * Generates a tree with all channels and users in the mumble.
  */
-export const ChannelTree = function(bot) {
-    return function(req, res) {
-        res.send({
-            tree: buildChannelTree(bot.mumble.rootChannel)
-        });
-    }
+export const ChannelTree: ApiEndpoint = (bot: Bot) => (req, res) => {
+    okay(res, {
+        tree: buildChannelTree(bot.mumble.rootChannel)
+    });
 };

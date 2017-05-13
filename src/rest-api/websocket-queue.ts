@@ -1,11 +1,11 @@
 import * as Winston from "winston";
+import { ApiWsEndpoint } from "./types/index";
+import { Bot } from "../index";
 
 /**
- * <b>/queue/</b> Handler for the WEBSOCKET handler for this endpoint.
- * @param {Bot} bot - Bot the webpage belongs to.
- * @return {ViewRenderer} - Websocket handler for this page.
+ * Handler for the WEBSOCKET at this endpoint.
  */
-export const WebsocketQueue = (bot) => (ws, req) => {
+export const WebsocketQueue: ApiWsEndpoint = (bot: Bot) => (ws, req) => {
     try {
         ws.send(JSON.stringify({
             action: "initial",
