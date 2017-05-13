@@ -4,7 +4,7 @@ import { Dialog, Recording } from "../types";
 
 /**
  * Create a new dialog in the database.
- * @param dialog - Array of ids of the records in the dialog.
+ * @param dialog Array of ids of the records in the dialog.
  */
 export async function addDialog(dialog: number[], connection): Promise<void> {
     const result = await connection.query("INSERT INTO Dialogs(submitted) VALUES(?)", [new Date()]);
@@ -17,8 +17,8 @@ export async function addDialog(dialog: number[], connection): Promise<void> {
 
 /**
  * Get the parts of a dialog (The single records).
- * @param dialogId - Id of the dialog to fetch the parts from.
- * @return - List of all ids of the records in the dialog in the correct order.
+ * @param dialogId Id of the dialog to fetch the parts from.
+ * @return List of all ids of the records in the dialog in the correct order.
  */
 export async function getDialogParts(dialogId: number, connection): Promise<number[]> {
     const list = await connection.query(
@@ -29,8 +29,8 @@ export async function getDialogParts(dialogId: number, connection): Promise<numb
 
 /**
  * Get the single records from a dialog based on its id.
- * @param dialogId - The id of the dialog to get the records from.
- * @return - List of all records belonging to this dialog.
+ * @param dialogId The id of the dialog to get the records from.
+ * @return List of all records belonging to this dialog.
  */
 export async function getDialogRecordings(dialogId: number, connection): Promise<Recording[]> {
     const ids = await getDialogParts(dialogId, connection);
@@ -39,7 +39,7 @@ export async function getDialogRecordings(dialogId: number, connection): Promise
 
 /**
  * Grab a whole dialog by id, including all records belonging to this dialog.
- * @param id - Id of the dialog to fetch.
+ * @param id Id of the dialog to fetch.
  * @return The dialog which was fetched.
  */
 export async function getDialog(id: number, connection): Promise<Dialog> {
@@ -68,7 +68,7 @@ export async function listDialogs(connection): Promise<Dialog[]> {
 
 /**
  * Update a dialog to be used. (Increment the usages by one)
- * @param id - Id of the dialog which was used.
+ * @param id Id of the dialog which was used.
  */
 export async function usedDialog(id: number, connection): Promise<void> {
     await connection.query("UPDATE Dialogs SET used = used +1 WHERE id = ?", [id]);

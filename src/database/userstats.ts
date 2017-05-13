@@ -1,13 +1,15 @@
 import * as Winston from "winston";
+import { DatabaseUser, StatObjectSpeechPerHour, StatObjectSpeechPerUser, StatObjectSpeechPerWeekday, StatObjectOnlinePerUser } from "../types";
+
 const millisecondsPerSecond = 1000;
+
 /**
  * Write a new set of statistics into the database when a user has spoken.
- * @param {DatabaseUser} user - User that has spoken.
- * @param {date} started - When the speech has started.
- * @param {date} ended - When the speech has ended.
- * @return {undefined}
+ * @param user User that has spoken.
+ * @param started When the speech has started.
+ * @param ended When the speech has ended.
  */
-export async function writeUserStatsSpeak(user, started, ended, connection) {
+export async function writeUserStatsSpeak(user: DatabaseUser, started: Date, ended: Date, connection): Promise<void> {
     await connection.query(
         "INSERT INTO UserStatsSpeaking(user, started, ended) VALUES(?, ?, ?)", [user.id, started, ended]
     );
@@ -15,27 +17,21 @@ export async function writeUserStatsSpeak(user, started, ended, connection) {
 
 /**
  * Write a new set of statistics into the database when a user is online.
- * @param {DatabaseUser} user - User that has spoken.
- * @param {date} started - When the user got online.
- * @param {date} ended - When the user got offline.
- * @return {undefined}
+ * @param user User that has spoken.
+ * @param started When the user got online.
+ * @param ended When the user got offline.
  */
-export async function writeUserStatsOnline(user, started, ended, connection) {
+export async function writeUserStatsOnline(user: DatabaseUser, started: Date, ended: Date, connection): Promise<void> {
     await connection.query(
         "INSERT INTO UserStatsOnline(user, started, ended) VALUES(?, ?, ?)", [user.id, started, ended]
     );
 };
 
 /**
- * @typedef StatObjectSpeechPerHour
- * @property {number} hour - The hour this object is representing.
- * @property {number} amount - Amount of speech in this hour.
- */
-/**
  * Get statistics about how much speech per hour was produced.
- * @return {StatObjectSpeechPerHour[]} - List of objects representing the statistics requested.
+ * @return List of objects representing the statistics requested.
  */
-export async function getSpokenPerHour(connection) {
+export async function getSpokenPerHour(connection): Promise<StatObjectSpeechPerHour[]> {
     const rows = await connection.query(
         "SELECT HOUR(started) AS hour, SUM(TIME_TO_SEC(ended-started)) AS amount " +
         "FROM UserStatsSpeaking GROUP BY HOUR(started)"
@@ -47,15 +43,10 @@ export async function getSpokenPerHour(connection) {
 };
 
 /**
- * @typedef StatObjectSpeechPerUser
- * @property {string} user - Name of the user this object is representing.
- * @property {number} amount - Amount of speech in this hour.
- */
-/**
  * Get statistics about the speech per user.
- * @return {StatObjectSpeechPerUser[]} - List of objects representing the statistics requested.
+ * @return List of objects representing the statistics requested.
  */
-export async function getSpokenPerUser(connection) {
+export async function getSpokenPerUser(connection): Promise<StatObjectSpeechPerUser[]> {
     const rows = await connection.query(
         "SELECT username AS user, SUM(TIME_TO_SEC(ended-started)) AS amount " +
         "FROM UserStatsSpeaking " +
@@ -68,15 +59,10 @@ export async function getSpokenPerUser(connection) {
 };
 
 /**
- * @typedef StatObjectSpeechPerWeekday
- * @property {string} user - Name of the user this object is representing.
- * @property {number} amount - Amount of speech in this hour.
- */
-/**
  * Get statistics about speech per weekday.
- * @return {StatObjectSpeechPerWeekday[]} - List of objects representing the statistics requested.
+ * @return List of objects representing the statistics requested.
  */
-export async function getSpokenPerWeekday(connection) {
+export async function getSpokenPerWeekday(connection): Promise<StatObjectSpeechPerWeekday[]> {
     const rows = await connection.query(
         "SELECT DAYOFWEEK(started) AS day, SUM(TIME_TO_SEC(ended-started)) AS amount " +
         "FROM UserStatsSpeaking " +
@@ -88,15 +74,10 @@ export async function getSpokenPerWeekday(connection) {
     }));
 };
 /**
- * @typedef StatObjectOnlinePerUser
- * @property {string} user - Name of the user this object is representing.
- * @property {number} amount - Amount of time the user was online in seconds.
- */
-/**
  * Get statistics about the online time per user.
- * @return {StatObjectOnlinePerUser[]} - List of objects representing the statistics requested.
+ * @return List of objects representing the statistics requested.
  */
-export async function getOnlinePerUser(connection) {
+export async function getOnlinePerUser(connection): Promise<StatObjectOnlinePerUser[]> {
     const rows = await connection.query(
         "SELECT username AS user, SUM(TIME_TO_SEC(ended-started)) AS amount " +
         "FROM UserStatsOnline " +

@@ -1,16 +1,31 @@
 import { getUserById } from "./";
+import {
+    Recording,
+    PlaybackCountByUserStat,
+    PlaybackCountByDateStat,
+    RecordingCountByUserStat,
+    RecordingCountByDateStat,
+    Label,
+    DatabaseUser
+} from "../types";
 
 /**
  * Add a new record to the database.
- * @param {string} quote - The quote of the record to be added.
- * @param {DatabaseUser} user - The user from whom the record was recorded.
- * @param {date} date - The date and time the record was recorded.
- * @param {string[]} labels - A list of labels with which this record was tagged.
- * @param {number} duration - The duration of the sample in seconds.
- * @param {DatabaseUser} reporter - Who ever added this record.
- * @return {number} - The unique id of the new record.
+ * @param quote The quote of the record to be added.
+ * @param user The user from whom the record was recorded.
+ * @param date The date and time the record was recorded.
+ * @param labels A list of labels with which this record was tagged.
+ * @param duration The duration of the sample in seconds.
+ * @param reporter Who ever added this record.
+ * @return The unique id of the new record.
  */
-export async function addRecording(quote, user, date, labels, duration, reporter, connection) {
+export async function addRecording(quote: string,
+        user: DatabaseUser,
+        date: Date,
+        labels: number[],
+        duration: number,
+        reporter: DatabaseUser,
+        connection): Promise<number> {
     const result = await connection.query(
         "INSERT INTO Recordings(quote, user, submitted, changed, duration, reporter) VALUES(?, ?, ?, ?, ?, ?)",
         [quote, user.id, date, new Date(), duration, reporter.id]
@@ -22,24 +37,19 @@ export async function addRecording(quote, user, date, labels, duration, reporter
 /**
  * Complete a list of records by adding all possible information to it by resolving ids of
  * user and labels etc.
- * @param {Recording[]} records - Uncompleted list of records which need to be recorded.
- * @return {Recording[]} - List of completed records.
+ * @param records Uncompleted list of records which need to be recorded.
+ * @return List of completed records.
  */
-async function completeRecordings(records, connection) {
-    const rs = await Promise.all(records.map((r) => getRecording(r.id, connection)));
-    return rs;
+async function completeRecordings(records: Recording[], connection): Promise<Recording[]> {
+    const promises: Promise<Recording>[] = records.map((r) => getRecording(r.id, connection));
+    return await Promise.all(promises);
 };
 
 /**
- * @typedef RecordingCountByUserStat
- * @property {number} amount - Amount of records this user has.
- * @property {string} user - Name of the user the records belong to.
- */
-/**
  * Get the amount of records by one single user.
- * @return {RecordingCountByUserStat[]} - List of users and the amount of records they have.
+ * @return List of users and the amount of records they have.
  */
-export async function getRecordingCountByUsers(connection) {
+export async function getRecordingCountByUsers(connection): Promise<RecordingCountByUserStat[]> {
     const rows = await connection.query(
         "SELECT COUNT(r.id) AS amount, u.username AS user " +
         "FROM Users u " +
@@ -47,17 +57,11 @@ export async function getRecordingCountByUsers(connection) {
         "GROUP BY u.id HAVING COUNT(r.id) > 0 ORDER BY amount DESC");
     return rows;
 };
-
-/**
- * @typedef RecordingCountByDateStat
- * @property {number} amount - Amount of records this user has.
- * @property {date} date - Date of the day this entry belongs to.
- */
 /**
  * Get the amount of records mapped to days of the week.
- * @return {RecordingCountByDateStat[]} - List of days and the amount of records recorded on that day.
+ * @return List of days and the amount of records recorded on that day.
  */
-export async function getRecordingCountByDays(connection) {
+export async function getRecordingCountByDays(connection): Promise<RecordingCountByDateStat[]> {
     const rows = await connection.query(
         "SELECT DATE(submitted) AS submitted, COUNT(id) AS amount " +
         "FROM Recordings " +
@@ -67,13 +71,12 @@ export async function getRecordingCountByDays(connection) {
 };
 /**
  * Update a record with a new quote and a new list of labels.
- * @param {number} id - The unique id of the record which is to be updated.
- * @param {string} quote - The new quote to set.
- * @param {string[]} labels - List of the names of labels which should REPLACE the old labels. (All old labels
- *                            will be purged so you will have to list all labels that should be kept again here).
- * @return {undefined}
+ * @param id The unique id of the record which is to be updated.
+ * @param quote The new quote to set.
+ * @param labels List of the names of labels which should REPLACE the old labels. (All old labels
+ *   will be purged so you will have to list all labels that should be kept again here).
  */
-export async function updateRecording(id, quote, labels, connection) {
+export async function updateRecording(id: number, quote: string, labels: number[], connection): Promise<void> {
     await connection.query("UPDATE Recordings SET quote = ?, changed = ? WHERE id = ?", [quote, new Date(), id]);
     await connection.query("DELETE FROM RecordingLabelRelation WHERE record = ?", [id]);
     await Promise.all(labels.map((label) => addRecordingToLabel(id, label, connection)));
@@ -81,10 +84,10 @@ export async function updateRecording(id, quote, labels, connection) {
 
 /**
  * List all records existing in the database.
- * @param {date} [since] - Optional argument to only list records which have been updated after this date.
- * @return {Recording[]} - List of all records in the database.
+ * @param since Optional argument to only list records which have been updated after this date.
+ * @return List of all records in the database.
  */
-export async function listRecordings(since, connection) {
+export async function listRecordings(since: Date, connection): Promise<Recording[]> {
     const rows = await connection.query(
         "SELECT id " +
         "FROM Recordings " +
@@ -97,10 +100,10 @@ export async function listRecordings(since, connection) {
 
 /**
  * List all records in the database belonging to one specified user.
- * @param {DatabaseUser} user - User for which the records whould be listed.
- * @return {Recording[]} - List of all records in the database belonging to the specified user.
+ * @param user User for which the records whould be listed.
+ * @return List of all records in the database belonging to the specified user.
  */
-export async function listRecordingsForUser(user, connection) {
+export async function listRecordingsForUser(user: DatabaseUser, connection): Promise<Recording[]> {
     const rows = await connection.query("SELECT id FROM Recordings WHERE user = ? ORDER BY used DESC", [user.id]);
     const records = await completeRecordings(rows, connection);
     return records;
@@ -108,18 +111,18 @@ export async function listRecordingsForUser(user, connection) {
 
 /**
  * Indicate that a record was played back (Increase usages by one).
- * @param {number} id - Unique id of the record to update.
- * @return {undefined}
+ * @param id Unique id of the record to update.
+ * @return
  */
-export async function usedRecording(id, connection) {
+export async function usedRecording(id: number, connection): Promise<void> {
     await connection.query("UPDATE Recordings SET used = used +1, changed = ? WHERE id = ?", [new Date(), id]);
 };
 /**
  * Get complet information about one record by its id. This includes resolved user and labels.
- * @param {number} id - The unique id of the record that is to be fetched.
- * @return {Recording} - The record belonging to the specified unique id.
+ * @param id The unique id of the record that is to be fetched.
+ * @return The record belonging to the specified unique id.
  */
-export async function getRecording(id, connection) {
+export async function getRecording(id: number, connection): Promise<Recording> {
     const rows = await connection.query(
         "SELECT id, quote, used, user, submitted, duration, changed, reporter, overwrite, parent " +
         "FROM Recordings " +
@@ -130,10 +133,12 @@ export async function getRecording(id, connection) {
         const user = await getUserById(record.user, connection);
         const labels = await getLabelsOfRecording(record.id, connection);
         const reporter = await getUserById(record.reporter, connection);
-        record.reporter = reporter;
-        record.user = user;
-        record.labels = labels;
-        return record;
+        return {
+            ...record,
+            reporter: reporter,
+            user: user,
+            labels: labels
+        };
     }
     else {
         return;
@@ -142,9 +147,9 @@ export async function getRecording(id, connection) {
 
 /**
  * Get a random record from the database.
- * @return {Recording} - A random record from the database.
+ * @return A random record from the database.
  */
-export async function getRandomRecording(connection) {
+export async function getRandomRecording(connection): Promise<Recording> {
     const rows = await connection.query("SELECT id FROM Recordings ORDER BY RAND() LIMIT 1,1");
     if (rows && rows.length > 0) {
         let record = rows[0];
@@ -158,10 +163,10 @@ export async function getRandomRecording(connection) {
 
 /**
  * Get all labels belonging to one record.
- * @param {number} recordId - The unique id of the record that is to be fetched.
- * @return {Label[]} - List of all labels with which the specified record is tagged.
+ * @param recordId The unique id of the record that is to be fetched.
+ * @return List of all labels with which the specified record is tagged.
  */
-export async function getLabelsOfRecording(recordId, connection) {
+export async function getLabelsOfRecording(recordId: number, connection): Promise<Label[]> {
     const rows = await connection.query(
         "SELECT r.id AS id, r.name AS name " +
         "FROM RecordingLabels r " +
@@ -172,29 +177,29 @@ export async function getLabelsOfRecording(recordId, connection) {
 
 /**
  * Get the amount of records in the database.
- * @return {number} - Amount of all records in the database.
+ * @return Amount of all records in the database.
  */
-export async function getRecordingCount(connection) {
+export async function getRecordingCount(connection): Promise<number> {
     const rows = await connection.query("SELECT COUNT(id) AS amount FROM Recordings");
     return rows[0].amount;
 };
 
 /**
  * Add a new label to the database.
- * @param {string} name - Name of the new label to add.
- * @return {number} - Generated unique id of the new label that was added.
+ * @param name Name of the new label to add.
+ * @return Generated unique id of the new label that was added.
  */
-export async function addRecordingLabel(name, connection) {
+export async function addRecordingLabel(name: string, connection): Promise<number> {
     const result = await connection.query("INSERT INTO RecordingLabels(name) VALUES(?)", [name]);
     return result.insertId;
 };
 
 /**
  * List all labels exiting in the database.
- * @return {Label[]} - A list of all labels in the database with an added numerical property "records"
- *                     that represents the number of records tagged with the label.
+ * @return A list of all labels in the database with an added numerical property "records"
+ *   that represents the number of records tagged with the label.
  */
-export async function listLabels(connection) {
+export async function listLabels(connection): Promise<Label[]> {
     const rows = await connection.query(
         "SELECT name, id, COUNT(record) AS records " +
         "FROM RecordingLabels " +
@@ -206,20 +211,19 @@ export async function listLabels(connection) {
 
 /**
  * Add a label to a record.
- * @param {number} record - Unique id of the record to tag with the label.
- * @param {number} label - Unique id of the label with which the record should be tagged.
- * @return {undefined}
+ * @param record Unique id of the record to tag with the label.
+ * @param label Unique id of the label with which the record should be tagged.
  */
-export async function addRecordingToLabel(record, label, connection) {
+export async function addRecordingToLabel(record: number, label: number, connection): Promise<void> {
     await connection.query("INSERT INTO RecordingLabelRelation(record, label) VALUES(?, ?)", [record, label]);
 };
 
 /**
  * List all records belonging to one label.
- * @param {number} label - Unique id of the label of which to list the records.
- * @return {Recording[]} - List of all records which were tagged with the specified label.
+ * @param label Unique id of the label of which to list the records.
+ * @return List of all records which were tagged with the specified label.
  */
-export async function listRecordingsByLabel(label, connection) {
+export async function listRecordingsByLabel(label: number, connection): Promise<Recording[]> {
     const rows = await connection.query(
         "SELECT id " +
         "FROM Recordings " +
@@ -233,10 +237,10 @@ export async function listRecordingsByLabel(label, connection) {
 
 /**
  * Look up 20 records with their quotes matching a given query string.
- * @param {string} part - Query string which should be looked up in the database.
- * @return {Recording[]} - A list of max. 20 records that match the given query string.
+ * @param part Query string which should be looked up in the database.
+ * @return A list of max. 20 records that match the given query string.
  */
-export async function lookupRecording(part, connection) {
+export async function lookupRecording(part: string, connection): Promise<Recording[]> {
     const rows = await connection.query(
         "SELECT id, quote, user, used, submitted " +
         "FROM Recordings " +
@@ -244,20 +248,14 @@ export async function lookupRecording(part, connection) {
         "ORDER BY used DESC " +
         "LIMIT 20", ["%" + part + "%"]
     );
-    const records = await Promise.all(rows.map((r) => getRecording(r.id, connection)));
-    return records;
+    const promises: Promise<Recording>[] = rows.map((r) => getRecording(r.id, connection));
+    return await Promise.all(promises);
 };
 /**
- * @typedef PlaybackCountByUserStat
- * @property {number} playbacks - How often all records of the user have been played back in total.
- * @property {string} user - Name of the user to which the playbacks belong.
- * @property {number} playbacksRelative - playbacks relative to total amount of records in the database.
- */
-/**
  * Return the amount of playbacks each record of each user has received grouped by the users.
- * @return {PlaybackCountByUserStat[]} - List of all users and how often their records have been played back.
+ * @return List of all users and how often their records have been played back.
  */
-export async function getRecordingPlaybackCountPerUser(connection) {
+export async function getRecordingPlaybackCountPerUser(connection): Promise<PlaybackCountByUserStat[]> {
     const rows = await connection.query(
         "SELECT username AS user, SUM(used) AS playbacks, SUM(used)/COUNT(r.id) AS playbacksRelative " +
         "FROM Recordings r " +
@@ -269,16 +267,24 @@ export async function getRecordingPlaybackCountPerUser(connection) {
 
 /**
  * Forks a record after it was edited.
- * @param {DatabaseUser} user - User who spoke the record.
- * @param {Date} submitted - The date the record was submitted.
- * @param {string} quote - New quote of the record.
- * @param {number} parent - Parent record this record was forked from (id).
- * @param {boolean} overwrite -Whether the original record should be shadowed by this one.
- * @param {DatabaseUser} reporter - The user that forked this record.
- * @param {number} duration - New duration of this record.
- * @return {number} id of the new record.
+ * @param user User who spoke the record.
+ * @param submitted The date the record was submitted.
+ * @param quote New quote of the record.
+ * @param parent Parent record this record was forked from (id).
+ * @param overwrite hether the original record should be shadowed by this one.
+ * @param reporter The user that forked this record.
+ * @param duration New duration of this record.
+ * @return id of the new record.
  */
-export async function forkRecording(user, submitted, quote, parent, overwrite, reporter, duration, connection) {
+export async function forkRecording(
+        user: DatabaseUser,
+        submitted: Date,
+        quote: string,
+        parent: number,
+        overwrite: boolean,
+        reporter: DatabaseUser,
+        duration: number,
+        connection): Promise<number> {
     const result = await connection.query(
         "INSERT INTO Recordings(user, submitted, reporter, duration, quote, changed, overwrite, parent) " +
         "VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
