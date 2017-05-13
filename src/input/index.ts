@@ -57,7 +57,7 @@ export class VoiceInput extends EventEmitter {
     }
 
     /**
-     * <b>Async</b> Called when a user joined the server, or was there before the bot joined.
+     * Called when a user joined the server, or was there before the bot joined.
      * @param {MumbleUser} user - The user who should be registered.
      * @returns {undefined}
      */

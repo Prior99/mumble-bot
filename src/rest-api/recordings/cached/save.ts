@@ -1,7 +1,7 @@
 import * as Winston from "winston";
 import * as FS from "async-file";
 import * as HTTP from "http-status-codes";
-import { addRecord, giveUserMoney } from "../../../database";
+import { addRecording, giveUserMoney } from "../../../database";
 
 const moneyPerSave = 200;
 
@@ -25,7 +25,7 @@ const Save = function(bot) {
                 }
             }
             try {
-                const id = await addRecord(quote, sound.user, sound.date,
+                const id = await addRecording(quote, sound.user, sound.date,
                     labels, sound.duration, req.user, bot.database);
                 try {
                     await giveUserMoney(req.user, moneyPerSave, bot.database);

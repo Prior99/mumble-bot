@@ -1,6 +1,6 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
-import { getRecord } from "../../database";
+import { getRecording } from "../../database";
 
 /**
  * This view returns the details to one specific record.
@@ -11,7 +11,7 @@ export const Get = (bot) => async (req, res) => {
     const id = req.body.id;
     if (id) {
         try {
-            const record = await getRecord(id, bot.database);
+            const record = await getRecording(id, bot.database);
             res.status(HTTP.OK).send({ record })
         }
         catch (err) {

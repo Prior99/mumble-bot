@@ -2,7 +2,7 @@ import * as Winston from "winston";
 import { getUserById, registerUser } from "../../database";
 
 /**
- * <b>Async</b> Grants all permissions to the user with the id 1. (The first registered user is admin).
+ * Grants all permissions to the user with the id 1. (The first registered user is admin).
  * @return {undefined}
  */
 async function grantAll(bot) {

@@ -46,7 +46,7 @@ export class VoiceInputUser extends Stream.Writable {
         this.user = user;
         this.bot = bot;
         this.databaseUser = databaseUser;
-        this.createNewRecordFile();
+        this.createNewRecordingFile();
         this.connectTime = new Date();
         this.user.on("disconnect", this.onDisconnect.bind(this));
     }
@@ -100,7 +100,7 @@ export class VoiceInputUser extends Stream.Writable {
      * Creates a new temporary record file.
      * @returns {undefined}
      */
-    private createNewRecordFile() {
+    private createNewRecordingFile() {
         if (this.databaseUser.settings.record === true) {
             try {
                 FS.mkdirSync("tmp");
@@ -142,7 +142,7 @@ export class VoiceInputUser extends Stream.Writable {
                 this.databaseUser,
                 (Date.now() - this.speakStartTime.getTime()) / msInS
             );
-            this.createNewRecordFile();
+            this.createNewRecordingFile();
         }
         writeUserStatsSpeak(this.databaseUser, this.speakStartTime, new Date(), this.bot.database);
     }

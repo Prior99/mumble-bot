@@ -15,7 +15,7 @@ import { RouteDialogs } from "./dialog";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {Router} - router for the current section.
  */
-export const RouteRecords = function(bot) {
+export const RouteRecordings = function(bot) {
     const router = Express.Router();
 
     router.use("/cached", RouteCached(bot));

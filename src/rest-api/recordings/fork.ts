@@ -3,7 +3,7 @@ import * as HTTP from "http-status-codes";
 import FFMpeg from "fluent-ffmpeg";
 import * as FS from "fs";
 import { PassThrough as PassThroughStream } from "stream";
-import { getRecord, forkRecord } from "../../database";
+import { getRecording, forkRecording } from "../../database";
 
 const audioFreq = 48000;
 
@@ -21,7 +21,7 @@ export const Fork = (bot) => async (req, res) => {
     let newId, record, duration;
     try {
         // Calculate new duration
-        record = await getRecord(id, bot.database);
+        record = await getRecording(id, bot.database);
         duration = record.duration;
         for (const action of actions) {
             if (action.action === "crop") {
@@ -29,7 +29,7 @@ export const Fork = (bot) => async (req, res) => {
             }
         }
         // Fork in the database
-        newId = await forkRecord(
+        newId = await forkRecording(
             record.user,
             new Date(),
             quote,

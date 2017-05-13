@@ -1,7 +1,7 @@
 import * as Winston from "winston";
 import * as FS from "fs";
 import * as HTTP from "http-status-codes";
-import { updateRecord } from "../../database";
+import { updateRecording } from "../../database";
 
 /**
  * This is the view for the api for editing records.
@@ -14,7 +14,7 @@ export const Edit = (bot) => async (req, res) => {
         const quote = req.body.quote;
         const id = req.body.id;
         try {
-            await updateRecord(id, quote, labels, bot.database);
+            await updateRecording(id, quote, labels, bot.database);
             Winston.log("verbose", `${req.user.username} edited record #${id}`);
             res.status(HTTP.OK).send(true);
         }

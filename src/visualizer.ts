@@ -8,7 +8,7 @@ const audioFreq = 44100;
 const maxByte = 255;
 
 /**
- * <b>Async</b> Visualize an audiofile and return the buffer holding a generated png image.
+ * Visualize an audiofile and return the buffer holding a generated png image.
  * @param {string} filename - Name of the audio file to visualize.
  * @param {number} height - Height of the image to generate.
  * @param {number} samplesPerPixel - Number of samples per pixel (determines the width of the image).

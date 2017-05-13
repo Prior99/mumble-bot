@@ -5,7 +5,7 @@
  * @property {number} used - How often the sound was already palyed back.
  */
 /**
- * <b>Async</b> Add a new sound to the database.
+ * Add a new sound to the database.
  * @param {string} name - The name of the sound to add (filename).
  * @return {number} - The unique id of the newly created sound.
  */
@@ -15,7 +15,7 @@ export async function addSound(name, connection) {
 };
 
 /**
- * <b>Async</b> List all sounds in the database.
+ * List all sounds in the database.
  * @return {Sound[]} - List of all sounds in the database.
  */
 export async function listSounds(connection) {
@@ -24,7 +24,7 @@ export async function listSounds(connection) {
 };
 
 /**
- * <b>Async</b> Get details on sepcific sound.
+ * Get details on sepcific sound.
  * @param {number} id - Id of the sound to fetch details of.
  * @return {Sound} - Sound that was requested or null if no such sound was found.
  */
@@ -34,12 +34,12 @@ export async function getSound(id, connection) {
         return rows[0];
     }
     else {
-        return null;
+        return;
     }
 }
 
 /**
- * <b>Async</b> Update a sound to be played back one more times (Increase usages by one).
+ * Update a sound to be played back one more times (Increase usages by one).
  * @param {number} id - Unique id of the sound to update.
  * @return {undefined}
  */

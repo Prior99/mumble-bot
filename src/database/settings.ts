@@ -1,5 +1,5 @@
 /**
- * <b>Async</b> Get get the specified setting from to the given user.
+ * Get get the specified setting from to the given user.
  * @param {DatabaseUser} user - User to fetch the setting from.
  * @param {string} setting - Settings key to fetch the value from.
  * @return {string} - The value in its unchanged string representation as taken from the database.
@@ -12,12 +12,12 @@ export async function getSetting(user, setting, connection) {
         return rows[0].value;
     }
     else {
-        return null;
+        return;
     }
 };
 
 /**
- * <b>Async</b> Get all settings of a specified user as an object.
+ * Get all settings of a specified user as an object.
  * @param {DatabaseUser} user - The user to get the settings from.
  * @return {object} - An object with each settings key as key and the corresponding value
  *                    (parsed from json) as value.
@@ -33,7 +33,7 @@ export async function getSettings(user, connection) {
 };
 
 /**
- * <b>Async</b> Set a specified setting to the specified value.
+ * Set a specified setting to the specified value.
  * @param {DatabaseUser} user - User to change the settings of.
  * @param {string} setting - The setting to change.
  * @param {string} value - The value as already serialized string to store in the database.

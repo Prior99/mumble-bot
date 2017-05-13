@@ -6,7 +6,7 @@ import { colorify } from "../colorbystring";
 import * as HTTP from "http-status-codes";
 import { Server } from "http";
 
-import { RouteRecords } from './record';
+import { RouteRecordings } from './record';
 import { RouteSounds } from './sound';
 import { RouteStats } from './stats';
 import { RouteUsers } from './user';
@@ -81,7 +81,7 @@ class Api {
             });
         });
         this.app.use("/sounds", RouteSounds(bot));
-        this.app.use("/records", RouteRecords(bot));
+        this.app.use("/records", RouteRecordings(bot));
         this.app.use("/stats", RouteStats(bot));
         this.app.use("/users", RouteUsers(bot));
         this.app.get("/channel-tree", ChannelTree(bot));

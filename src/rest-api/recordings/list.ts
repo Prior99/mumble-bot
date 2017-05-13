@@ -1,7 +1,7 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
 import { PassThrough as PassThroughStream } from "stream";
-import { listRecords } from "../../database";
+import { listRecordings } from "../../database";
 
 /**
  * List all records.
@@ -18,7 +18,7 @@ export const List = (bot) => async (req, res) => {
         res.status(HTTP.OK);
         res.set("Content-type", "application/json");
         stream.pipe(res);
-        const records = await listRecords(since, bot.database);
+        const records = await listRecordings(since, bot.database);
         stream.write(JSON.stringify({
             records
         }));

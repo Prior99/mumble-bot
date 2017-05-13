@@ -100,7 +100,7 @@ export class Bot extends EventEmitter {
     }
 
     /**
-     * <b>Async</b> Gently shutdown the whole bot.
+     * Gently shutdown the whole bot.
      * @return {undefined}
      */
     async shutdown() {
@@ -207,7 +207,7 @@ export class Bot extends EventEmitter {
                 }
             }
         }
-        return null;
+        return;
     }
 
     /**

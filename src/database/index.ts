@@ -9,7 +9,7 @@ export * from "./dialogs";
 export * from "./log";
 export * from "./mumbleUsers";
 export * from "./permissions";
-export * from "./records";
+export * from "./recordings";
 export * from "./settings";
 export * from "./sounds";
 export * from "./users";

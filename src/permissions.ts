@@ -17,7 +17,7 @@ class Permissions {
     }
 
     /**
-     * <b>Async</b> Checks whether a user has the given permission.
+     * Checks whether a user has the given permission.
      * @param {User} user - User to check the permission of.
      * @param {string} permission - Permission to check.
      * @returns {boolean} - Whether the permission was granted or whether not.
@@ -55,7 +55,7 @@ class Permissions {
     }
 
     /**
-     * <b>Async</b> Grants the permission to a user. If the issuer is null or undefined, no
+     * Grants the permission to a user. If the issuer is null or undefined, no
      * checks will be performed. If the issuer is defined, a check will be performed
      * whether the issuer can grant the requested permission at all.
      * @param {User} issuer - User that issues this command.
@@ -84,7 +84,7 @@ class Permissions {
     }
 
     /**
-     * <b>Async</b> Revokes a certain permission from a user. If the issuer is null or undefined, no
+     * Revokes a certain permission from a user. If the issuer is null or undefined, no
      * checks will be performed. If the issuer is defined, a check will be performed
      * whether the issuer can revoke the requested permission at all.
      * @param {User} issuer - User that issues this command.
@@ -120,7 +120,7 @@ class Permissions {
      * @property {string} icon - Fontawesome icon class for this permission.
      */
     /**
-     * <b>Async</b> Retrieve information about a given permission.
+     * Retrieve information about a given permission.
      * @param {string} permission - Permission to gather information about.
      * @returns {Permission} - An object holding information about the permission that was requested.
      */
@@ -131,12 +131,12 @@ class Permissions {
         }
         catch (err) {
             Winston.error("Error when getting permission \"" + permission + "\".", err);
-            return null;
+            return;
         }
     }
 
     /**
-     * <b>Async</b> Retrieve an array containing all permissions known to this bot.
+     * Retrieve an array containing all permissions known to this bot.
      * @returns {Permission[]} - An array holding objects holding information about the permissions.
      */
     async listPermissions() {
@@ -151,7 +151,7 @@ class Permissions {
     }
 
     /**
-     * <b>Async</b> Grants all known permissions to one user. If the issuer is null or undefined
+     * Grants all known permissions to one user. If the issuer is null or undefined
      * no checking will be performed. Else it will be checked if the issuer can
      * grant the requested permissions at all and only those he can grant will be
      * granted.
@@ -174,7 +174,7 @@ class Permissions {
     }
 
     /**
-     * <b>Async</b> Lists all permissions from the view of a single user. Information about
+     * Lists all permissions from the view of a single user. Information about
      * whether the user has the permission and whether the issuer can grant it will be added.
      * @param {User} issuer - User that issued the command and of which it should be
      *                 checked whether he can grant the permissions.
@@ -198,7 +198,7 @@ class Permissions {
         return array;
     }
     /**
-     * <b>Async</b> Returns an object with the permissions as keys and a boolean designating whether
+     * Returns an object with the permissions as keys and a boolean designating whether
      * the user has or does not have the permission.
      * (for example: { "permissionA" : true, "permissionB" : false, ... })
      * @param {User} user - The user to fetch the object for.

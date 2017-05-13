@@ -1,6 +1,6 @@
 import * as Winston from "winston";
 import * as HTTP from "http-status-codes";
-import { giveUserMoney, getRecord, usedRecord } from "../../database";
+import { giveUserMoney, getRecording, usedRecording } from "../../database";
 
 const moneyPerPlayReporter = 1;
 const moneyPerPlayUser = 1;
@@ -13,14 +13,14 @@ const moneyPerPlayUser = 1;
 export const Play = (bot) => async ({ params, user }, res) => {
     const { id } = params;
     try {
-        const details = await getRecord(id, bot.database);
+        const details = await getRecording(id, bot.database);
         if (user.id !== details.reporter.id) {
             await giveUserMoney(details.reporter, moneyPerPlayReporter, bot.database);
         }
         if (user.id !== details.user.id) {
             await giveUserMoney(details.user, moneyPerPlayUser, bot.database);
         }
-        await usedRecord(id, bot.database);
+        await usedRecording(id, bot.database);
         Winston.log("verbose", `${user.username} played back record #${id}`);
         bot.playSound("sounds/recorded/" + id, {
             type: "record",

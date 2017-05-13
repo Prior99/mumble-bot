@@ -1,7 +1,7 @@
 import * as Winston from "winston";
 const millisecondsPerSecond = 1000;
 /**
- * <b>Async</b> Write a new set of statistics into the database when a user has spoken.
+ * Write a new set of statistics into the database when a user has spoken.
  * @param {DatabaseUser} user - User that has spoken.
  * @param {date} started - When the speech has started.
  * @param {date} ended - When the speech has ended.
@@ -14,7 +14,7 @@ export async function writeUserStatsSpeak(user, started, ended, connection) {
 };
 
 /**
- * <b>Async</b> Write a new set of statistics into the database when a user is online.
+ * Write a new set of statistics into the database when a user is online.
  * @param {DatabaseUser} user - User that has spoken.
  * @param {date} started - When the user got online.
  * @param {date} ended - When the user got offline.
@@ -32,7 +32,7 @@ export async function writeUserStatsOnline(user, started, ended, connection) {
  * @property {number} amount - Amount of speech in this hour.
  */
 /**
- * <b>Async</b> Get statistics about how much speech per hour was produced.
+ * Get statistics about how much speech per hour was produced.
  * @return {StatObjectSpeechPerHour[]} - List of objects representing the statistics requested.
  */
 export async function getSpokenPerHour(connection) {
@@ -52,7 +52,7 @@ export async function getSpokenPerHour(connection) {
  * @property {number} amount - Amount of speech in this hour.
  */
 /**
- * <b>Async</b> Get statistics about the speech per user.
+ * Get statistics about the speech per user.
  * @return {StatObjectSpeechPerUser[]} - List of objects representing the statistics requested.
  */
 export async function getSpokenPerUser(connection) {
@@ -73,7 +73,7 @@ export async function getSpokenPerUser(connection) {
  * @property {number} amount - Amount of speech in this hour.
  */
 /**
- * <b>Async</b> Get statistics about speech per weekday.
+ * Get statistics about speech per weekday.
  * @return {StatObjectSpeechPerWeekday[]} - List of objects representing the statistics requested.
  */
 export async function getSpokenPerWeekday(connection) {
@@ -93,7 +93,7 @@ export async function getSpokenPerWeekday(connection) {
  * @property {number} amount - Amount of time the user was online in seconds.
  */
 /**
- * <b>Async</b> Get statistics about the online time per user.
+ * Get statistics about the online time per user.
  * @return {StatObjectOnlinePerUser[]} - List of objects representing the statistics requested.
  */
 export async function getOnlinePerUser(connection) {

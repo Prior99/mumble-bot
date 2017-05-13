@@ -1,87 +1,75 @@
 import * as Winston from "winston";
-import { getRecord } from ".";
+import { getRecording } from ".";
+import { Dialog, Recording } from "../types";
 
 /**
- * <b>Async</b> Create a new dialog in the database.
- * @param {number[]} dialog - Array of ids of the records in the dialog.
- * @return {undefined}l
+ * Create a new dialog in the database.
+ * @param dialog - Array of ids of the records in the dialog.
  */
-export async function addDialog(dialog, connection) {
+export async function addDialog(dialog: number[], connection): Promise<void> {
     const result = await connection.query("INSERT INTO Dialogs(submitted) VALUES(?)", [new Date()]);
     const dialogId = result.insertId;
     await Promise.all(dialog.map((id, index) => connection.query(
-        "INSERT INTO DialogParts(dialogId, position, recordId) VALUES(?, ?, ?)",
-        [dialogId, index, id]
-    )
+            "INSERT INTO DialogParts(dialogId, position, recordId) VALUES(?, ?, ?)", [dialogId, index, id]
+        )
     ));
 };
 
 /**
- * <b>Async</b> Get the parts of a dialog (The single records).
- * @param {number} dialogId - Id of the dialog to fetch the parts from.
- * @return {number[]} - List of all ids of the records in the dialog in the correct order.
+ * Get the parts of a dialog (The single records).
+ * @param dialogId - Id of the dialog to fetch the parts from.
+ * @return - List of all ids of the records in the dialog in the correct order.
  */
-export async function getDialogParts(dialogId, connection) {
+export async function getDialogParts(dialogId: number, connection): Promise<number[]> {
     const list = await connection.query(
-        "SELECT recordId FROM DialogParts WHERE dialogId = ? ORDER BY position ASC",
-        [dialogId]
+        "SELECT recordId FROM DialogParts WHERE dialogId = ? ORDER BY position ASC", [dialogId]
     );
     return list.map(p => p.recordId);
 };
 
 /**
- * <b>Async</b> Get the single records from a dialog based on its id.
- * @param {number} dialogId - The id of the dialog to get the records from.
- * @return {Record[]} - List of all records belonging to this dialog.
+ * Get the single records from a dialog based on its id.
+ * @param dialogId - The id of the dialog to get the records from.
+ * @return - List of all records belonging to this dialog.
  */
-export async function getDialogRecords(dialogId, connection) {
+export async function getDialogRecordings(dialogId: number, connection): Promise<Recording[]> {
     const ids = await getDialogParts(dialogId, connection);
-    const records = await Promise.all(ids.map(id => getRecord(id, connection)));
-    return records;
+    return await Promise.all(ids.map(id => getRecording(id, connection)));
 }
+
 /**
- * A dialog as represented in the database including all its records.
- * @typedef Dialog
- * @property {number} id - Unique id of this dialog.
- * @property {date} submitted - The date when this dialog was submitted.
- * @property {number} used - How often this dialog was used.
- * @property {Record[]} records - All records belonging to this dialog.
+ * Grab a whole dialog by id, including all records belonging to this dialog.
+ * @param id - Id of the dialog to fetch.
+ * @return The dialog which was fetched.
  */
-/**
- * <b>Async</b> Grab a whole dialog by id, including all records belonging to this dialog.
- * @param {number} id - Id of the dialog to fetch.
- * @return {Dialog} - The dialog which was fetched.
- */
-export async function getDialog(id, connection) {
-    let dialog;
+export async function getDialog(id: number, connection): Promise<Dialog> {
     const results = await connection.query("SELECT id, submitted, used FROM Dialogs WHERE id = ?", [id]);
     if (!results.length) {
-        return null;
+        return;
     }
     else {
-        dialog = results[0];
-        const parts = await getDialogRecords(dialog.id, connection);
-        dialog.records = parts;
-        return dialog;
+        const dialog = results[0];
+        return {
+            ...dialog,
+            recordings: await getDialogParts(dialog.id, connection)
+        };
     }
 }
+
 /**
  * List all dialogs existing in the database.
- * @return {Dialog[]} - List of all dialogs in the database.
+ * @return List of all dialogs in the database.
  */
-export async function listDialogs(connection) {
-    const dialogs = await connection.query("SELECT id FROM Dialogs ORDER BY used DESC");
-    const completedDialogs = await Promise.all(
-        dialogs.map(dialog => getDialog(dialog.id, connection))
-    );
-    return completedDialogs;
+export async function listDialogs(connection): Promise<Dialog[]> {
+    const results = await connection.query("SELECT id FROM Dialogs ORDER BY used DESC");
+    const dialogs: Promise<Dialog>[] = results.map(result => getDialog(result.id, connection));
+    return await Promise.all(dialogs);
 }
 
 /**
  * Update a dialog to be used. (Increment the usages by one)
- * @param {number} id - Id of the dialog which was used.
- * @return {undefined}
+ * @param id - Id of the dialog which was used.
  */
-export async function usedDialog(id, connection) {
+export async function usedDialog(id: number, connection): Promise<void> {
     await connection.query("UPDATE Dialogs SET used = used +1 WHERE id = ?", [id]);
 }

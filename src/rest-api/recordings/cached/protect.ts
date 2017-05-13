@@ -6,7 +6,7 @@ import * as HTTP from "http-status-codes";
  * @param {Bot} bot - Bot the webpage belongs to.
  * @return {ViewRenderer} - View renderer for this endpoint.
  */
-const ProtectCachedRecord = function(bot) {
+const ProtectCachedRecording = function(bot) {
     return function(req, res) {
         if (req.body.id) {
             if (bot.protectCachedAudio(req.body.id)) {
@@ -26,4 +26,5 @@ const ProtectCachedRecord = function(bot) {
     };
 };
 
-export default ProtectCachedRecord;
+export default ProtectCachedRecording;
+

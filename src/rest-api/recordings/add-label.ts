@@ -1,7 +1,7 @@
 import * as Winston from "winston";
 import { colorify } from "../../colorbystring";
 import * as HTTP from "http-status-codes";
-import { addRecordLabel } from "../../database";
+import { addRecordingLabel } from "../../database";
 
 /**
  * This endpoint handles adding labels to the database..
@@ -17,7 +17,7 @@ export const AddLabel = (bot) => async (req, res) => {
             return;
         }
         try {
-            const id = await addRecordLabel(req.query.name, bot.database);
+            const id = await addRecordingLabel(req.query.name, bot.database);
             Winston.log("verbose", `${req.user.username} added new label for records: "${req.query.name}"`);
             res.status(HTTP.OK).send({
                 color: colorify(req.query.name),

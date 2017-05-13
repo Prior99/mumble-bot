@@ -1,7 +1,7 @@
 import * as Winston from "winston";
 import * as FS from "fs";
 import * as HTTP from "http-status-codes";
-import { getRecord } from "../../database";
+import { getRecording } from "../../database";
 
 /**
  * This view handles the downloading of records.
@@ -26,7 +26,7 @@ export const Download = (bot) => (req, res) => {
             }
         }).on("readable", async () => {
             try {
-                const record = await getRecord(req.body.id, bot.database);
+                const record = await getRecording(req.body.id, bot.database);
                 res.status(HTTP.OK).setHeader(
                     "Content-disposition", `attachment; filename='${record.quote}.mp3'`
                 );

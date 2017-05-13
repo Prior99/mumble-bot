@@ -2,7 +2,7 @@ import * as Express from "express";
 
 import Online from "./online";
 import Spoken from "./spoken";
-import Record from "./record";
+import Recording from "./recordings";
 
 /**
  * Routes all requests related to the stats api commands in the /api/stats/ endpoint.
@@ -14,7 +14,7 @@ export const RouteStats = function(bot) {
 
     router.use("/online", Online(bot));
     router.use("/spoken", Spoken(bot));
-    router.use("/record", Record(bot));
+    router.use("/recordings", Recording(bot));
 
     return router;
 };

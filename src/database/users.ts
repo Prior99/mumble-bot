@@ -1,7 +1,7 @@
 import { getSettings } from "./";
 
 /**
- * <b>Async</b> Register a new user in the database.
+ * Register a new user in the database.
  * @param {object} user - User which should be inserted into the database.
  * @param {string} user.email - E-Mail address of the new user.
  * @param {string} user.username - The new users username.
@@ -19,7 +19,7 @@ export async function registerUser(user, connection) {
 };
 
 /**
- * <b>Async</b> Retrieves details about a user by his username.
+ * Retrieves details about a user by his username.
  * @param {string} username - The username of the user to retrieve.
  * @return {DatabaseUser} - The user related to this username.
  */
@@ -29,12 +29,12 @@ export async function getUserByUsername(username, connection) {
         return await getUserById(rows[0].id, connection);
     }
     else {
-        return null;
+        return;
     }
 };
 
 /**
- * <b>Async</b> A user from the database.
+ * A user from the database.
  * @typedef {object} DatabaseUser
  * @property {string} minecraft - The minecraft username of the user.
  * @property {string} username - The username of this user.
@@ -43,7 +43,7 @@ export async function getUserByUsername(username, connection) {
  */
 
 /**
- * <b>Async</b> Retrieves details about a user by his id.
+ * Retrieves details about a user by his id.
  * @param {number} id - The id of the user to retrieve.
  * @return {DatabaseUser} - The user related to this id.
  */
@@ -66,12 +66,12 @@ export async function getUserById(id, connection) {
         return user;
     }
     else {
-        return null;
+        return;
     }
 };
 
 /**
- * <b>Async</b> Give (Or take with negative number) a user a specified amount of money.
+ * Give (Or take with negative number) a user a specified amount of money.
  * @param {DatabaseUser} user - The user to manipulate the money of.
  * @param {number} amount - The amount of money to change.
  * @return {undefined}
@@ -81,7 +81,7 @@ export async function giveUserMoney(user, amount, connection) {
 };
 
 /**
- * <b>Async</b> Retrieves details about a user by his steam Id.
+ * Retrieves details about a user by his steam Id.
  * @param {string} steamId - The steamid of the user to retrieve.
  * @return {DatabaseUser} - The user related to this steam id.
  */
@@ -91,12 +91,12 @@ export async function getUserBySteamId(steamId, connection) {
         return await getUserById(rows[0].id, connection);
     }
     else {
-        return null;
+        return;
     }
 };
 
 /**
- * <b>Async</b> Retrieves details about a random user.
+ * Retrieves details about a random user.
  * @return {DatabaseUser} - A random user from the database.
  */
 export async function getRandomUser(connection) {
@@ -105,12 +105,12 @@ export async function getRandomUser(connection) {
         return await getUserById(rows[0].id, connection);
     }
     else {
-        return null;
+        return;
     }
 };
 
 /**
- * <b>Async</b> Retrieves details about a user by his steam Id.
+ * Retrieves details about a user by his steam Id.
  * @param {string} minecraft - The minecraft username of the user to retrieve.
  * @return {DatabaseUser} - The user related to this minecraft username.
  */
@@ -120,12 +120,12 @@ export async function getUserByMinecraftUsername(minecraft, connection) {
         return await getUserById(rows[0].id, connection);
     }
     else {
-        return null;
+        return;
     }
 };
 
 /**
- * <b>Async</b> Check the login data of a user.
+ * Check the login data of a user.
  * @param {string} username - Username of the user to check.
  * @param {string} passwordHash - Already hashed password to compare.
  * @return {boolean} - Whether the username and the password matched.
@@ -138,7 +138,7 @@ export async function checkLoginData(username, passwordHash, connection) {
 };
 
 /**
- * <b>Async</b> Retrieves a list of users from the database.
+ * Retrieves a list of users from the database.
  * @return {DatabaseUser[]} - All users in the whole database.
  */
 export async function listUsers(connection) {
@@ -148,7 +148,7 @@ export async function listUsers(connection) {
 };
 
 /**
- * <b>Async</b> Counts all user in the database.
+ * Counts all user in the database.
  * @return {number} - Amount of users in the database.
  */
 export async function countUsers(connection) {
