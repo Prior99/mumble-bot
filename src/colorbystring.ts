@@ -1,5 +1,5 @@
 import RNG from "rng-js";
-import Color from "onecolor";
+import * as Color from "onecolor";
 
 export function colorify(string) {
     const rng = new RNG(string);

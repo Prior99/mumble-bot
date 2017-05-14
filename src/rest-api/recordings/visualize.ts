@@ -7,7 +7,8 @@ import { internalError } from "../utils";
 import { AuthorizedApiEndpoint } from "../types";
 
 const height = 100;
-const samplesPerPixel = 400;
+const width = 1000;
+const samplesPerPixel = 200;
 
 /**
  * This view handles the downloading of visualizations of the records.
@@ -48,7 +49,7 @@ export const Visualize: AuthorizedApiEndpoint = (bot: Bot) => async ({ params },
         }
         Winston.info(`Visualizing audio file "${soundFileName}" to "${fileName}".`);
         try {
-            const buffer = await visualizeAudioFile(soundFileName, height, samplesPerPixel);
+            const buffer = await visualizeAudioFile(soundFileName, width, height, samplesPerPixel);
             await FS.writeFile(fileName, buffer);
             try {
                 const stream = FS.createReadStream(fileName);
