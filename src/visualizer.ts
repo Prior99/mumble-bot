@@ -9,15 +9,14 @@ const maxUnsignedByte = 240;
 export const audioFreq = 44100;
 const maxByte = 255;
 export const chunkSize = 256;
+const width = 1000;
+const height = 100;
 
 /**
  * Visualize an audiofile and return the buffer holding a generated png image.
- * @param {string} filename - Name of the audio file to visualize.
- * @param {number} height - Height of the image to generate.
- * @param {number} samplesPerPixel - Number of samples per pixel (determines the width of the image).
- * @return {Buffer} - Buffer holding the generated png image.
+ * @return Buffer holding the generated png image.
  */
-export const visualizeAudioFile = function(filename, width, height, samplesPerPixel) {
+export const visualizeAudioFile = function(filename) {
     return new Promise((resolve, reject) => {
         try {
             const analyzer = new AudioAnalyzer();

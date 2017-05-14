@@ -13,6 +13,7 @@ import { Users } from './users';
 
 import { ChannelTree } from './channel-tree';
 import { Log } from './log';
+import { Authorized } from './authorized';
 import { WebsocketQueue } from './websocket-queue';
 import { checkLoginData, getUserByUsername } from "../database";
 import { Bot } from "../index";
@@ -47,6 +48,7 @@ export class Api {
         this.app.use("/users", Users(bot));
         this.app.get("/channel-tree", ChannelTree(bot));
         this.app.get("/log", authorized(Log)(bot));
+        this.app.get("/authorized", authorized(Authorized)(bot));
         (this.app as any).ws("/queue", authorizedWebsocket(WebsocketQueue)(bot));
         this.app.use("*", (req, res) => notFound(res));
 

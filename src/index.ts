@@ -5,7 +5,7 @@ import { Api } from "./rest-api";
 import * as FS from "async-file";
 import { EventEmitter } from "events";
 import Permissions from "./permissions";
-import VisualizeAudioFile from "./visualizer";
+import { visualizeAudioFile } from "./visualizer";
 import { connectDatabase } from "./database";
 import { CachedAudio } from "./types";
 
@@ -153,9 +153,7 @@ export class Bot extends EventEmitter {
             duration,
             protected: false
         };
-        const height = 32;
-        const samplesPerPixel = 400;
-        const buffer = await VisualizeAudioFile(filename, height, samplesPerPixel);
+        const buffer = await visualizeAudioFile(filename);
         await FS.writeFile(filename + ".png", buffer);
         this.cachedAudios.push(obj);
         this.emit("cached-audio", obj);
