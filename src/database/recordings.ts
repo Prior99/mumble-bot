@@ -28,7 +28,7 @@ export async function addRecording(
         reporter: number,
         connection): Promise<number> {
     const result = await connection.query(
-        "INSERT INTO Recordings(quote, user, submitted, changed, duration, reporter) VALUES(?, ?, ?, ?, ?, ?)",
+        "INSERT INTO Records(quote, user, submitted, changed, duration, reporter) VALUES(?, ?, ?, ?, ?, ?)",
         [quote, user, date, new Date(), duration, reporter]
     );
     labels.forEach((label) => addRecordingToLabel(result.insertId, label, connection));
@@ -54,7 +54,7 @@ export async function getRecordingCountByUsers(connection): Promise<RecordingCou
     const rows = await connection.query(
         "SELECT COUNT(r.id) AS amount, u.username AS user " +
         "FROM Users u " +
-        "LEFT JOIN Recordings r ON r.user = u.id " +
+        "LEFT JOIN Records r ON r.user = u.id " +
         "GROUP BY u.id HAVING COUNT(r.id) > 0 ORDER BY amount DESC");
     return rows;
 };
@@ -65,7 +65,7 @@ export async function getRecordingCountByUsers(connection): Promise<RecordingCou
 export async function getRecordingCountByDays(connection): Promise<RecordingCountByDateStat[]> {
     const rows = await connection.query(
         "SELECT DATE(submitted) AS submitted, COUNT(id) AS amount " +
-        "FROM Recordings " +
+        "FROM Records " +
         "GROUP BY DATE(submitted) ORDER BY submitted DESC"
     );
     return rows;
@@ -78,8 +78,8 @@ export async function getRecordingCountByDays(connection): Promise<RecordingCoun
  *   will be purged so you will have to list all labels that should be kept again here).
  */
 export async function updateRecording(id: number, quote: string, labels: number[], connection): Promise<void> {
-    await connection.query("UPDATE Recordings SET quote = ?, changed = ? WHERE id = ?", [quote, new Date(), id]);
-    await connection.query("DELETE FROM RecordingLabelRelation WHERE record = ?", [id]);
+    await connection.query("UPDATE Records SET quote = ?, changed = ? WHERE id = ?", [quote, new Date(), id]);
+    await connection.query("DELETE FROM RecordLabelRelation WHERE record = ?", [id]);
     await Promise.all(labels.map((label) => addRecordingToLabel(id, label, connection)));
 };
 
@@ -91,8 +91,8 @@ export async function updateRecording(id: number, quote: string, labels: number[
 export async function listRecordings(since: Date, connection): Promise<Recording[]> {
     const rows = await connection.query(
         "SELECT id " +
-        "FROM Recordings " +
-        "WHERE id NOT IN (SELECT parent FROM Recordings WHERE overwrite = TRUE) " +
+        "FROM Records " +
+        "WHERE id NOT IN (SELECT parent FROM Records WHERE overwrite = TRUE) " +
         (since ? "AND changed >= ? " : "") +
         "ORDER BY used DESC", since);
     const records = await completeRecordings(rows, connection);
@@ -105,7 +105,7 @@ export async function listRecordings(since: Date, connection): Promise<Recording
  * @return List of all records in the database belonging to the specified user.
  */
 export async function listRecordingsForUser(user: DatabaseUser, connection): Promise<Recording[]> {
-    const rows = await connection.query("SELECT id FROM Recordings WHERE user = ? ORDER BY used DESC", [user.id]);
+    const rows = await connection.query("SELECT id FROM Records WHERE user = ? ORDER BY used DESC", [user.id]);
     const records = await completeRecordings(rows, connection);
     return records;
 };
@@ -116,7 +116,7 @@ export async function listRecordingsForUser(user: DatabaseUser, connection): Pro
  * @return
  */
 export async function usedRecording(id: number, connection): Promise<void> {
-    await connection.query("UPDATE Recordings SET used = used +1, changed = ? WHERE id = ?", [new Date(), id]);
+    await connection.query("UPDATE Records SET used = used +1, changed = ? WHERE id = ?", [new Date(), id]);
 };
 /**
  * Get complet information about one record by its id. This includes resolved user and labels.
@@ -126,7 +126,7 @@ export async function usedRecording(id: number, connection): Promise<void> {
 export async function getRecording(id: number, connection): Promise<Recording> {
     const rows = await connection.query(
         "SELECT id, quote, used, user, submitted, duration, changed, reporter, overwrite, parent " +
-        "FROM Recordings " +
+        "FROM Records " +
         "WHERE id = ?", [id]
     );
     if (rows && rows.length > 0) {
@@ -147,7 +147,7 @@ export async function getRecording(id: number, connection): Promise<Recording> {
  * @return A random record from the database.
  */
 export async function getRandomRecording(connection): Promise<Recording> {
-    const rows = await connection.query("SELECT id FROM Recordings ORDER BY RAND() LIMIT 1,1");
+    const rows = await connection.query("SELECT id FROM Records ORDER BY RAND() LIMIT 1,1");
     if (rows && rows.length > 0) {
         let record = rows[0];
         record = getRecording(record.id, connection);
@@ -166,8 +166,8 @@ export async function getRandomRecording(connection): Promise<Recording> {
 export async function getLabelsOfRecording(recordId: number, connection): Promise<Label[]> {
     const rows = await connection.query(
         "SELECT r.id AS id, r.name AS name " +
-        "FROM RecordingLabels r " +
-        "LEFT JOIN RecordingLabelRelation l ON l.label = r.id WHERE l.record = ?", [recordId]
+        "FROM RecordLabels r " +
+        "LEFT JOIN RecordLabelRelation l ON l.label = r.id WHERE l.record = ?", [recordId]
     );
     return rows;
 };
@@ -177,7 +177,7 @@ export async function getLabelsOfRecording(recordId: number, connection): Promis
  * @return Amount of all records in the database.
  */
 export async function getRecordingCount(connection): Promise<number> {
-    const rows = await connection.query("SELECT COUNT(id) AS amount FROM Recordings");
+    const rows = await connection.query("SELECT COUNT(id) AS amount FROM Records");
     return rows[0].amount;
 };
 
@@ -187,7 +187,7 @@ export async function getRecordingCount(connection): Promise<number> {
  * @return Generated unique id of the new label that was added.
  */
 export async function addRecordingLabel(name: string, connection): Promise<number> {
-    const result = await connection.query("INSERT INTO RecordingLabels(name) VALUES(?)", [name]);
+    const result = await connection.query("INSERT INTO RecordLabels(name) VALUES(?)", [name]);
     return result.insertId;
 };
 
@@ -199,8 +199,8 @@ export async function addRecordingLabel(name: string, connection): Promise<numbe
 export async function listLabels(connection): Promise<Label[]> {
     const rows = await connection.query(
         "SELECT name, id, COUNT(record) AS records " +
-        "FROM RecordingLabels " +
-        "LEFT JOIN RecordingLabelRelation ON id = label " +
+        "FROM RecordLabels " +
+        "LEFT JOIN RecordLabelRelation ON id = label " +
         "GROUP BY id"
     );
     return rows;
@@ -212,7 +212,7 @@ export async function listLabels(connection): Promise<Label[]> {
  * @param label Unique id of the label with which the record should be tagged.
  */
 export async function addRecordingToLabel(record: number, label: number, connection): Promise<void> {
-    await connection.query("INSERT INTO RecordingLabelRelation(record, label) VALUES(?, ?)", [record, label]);
+    await connection.query("INSERT INTO RecordLabelRelation(record, label) VALUES(?, ?)", [record, label]);
 };
 
 /**
@@ -223,8 +223,8 @@ export async function addRecordingToLabel(record: number, label: number, connect
 export async function listRecordingsByLabel(label: number, connection): Promise<Recording[]> {
     const rows = await connection.query(
         "SELECT id " +
-        "FROM Recordings " +
-        "LEFT JOIN RecordingLabelRelation ON id = record " +
+        "FROM Records " +
+        "LEFT JOIN RecordLabelRelation ON id = record " +
         "WHERE label = ? " +
         "ORDER BY used DESC", [label]
     );
@@ -240,7 +240,7 @@ export async function listRecordingsByLabel(label: number, connection): Promise<
 export async function lookupRecording(part: string, connection): Promise<Recording[]> {
     const rows = await connection.query(
         "SELECT id, quote, user, used, submitted " +
-        "FROM Recordings " +
+        "FROM Records " +
         "WHERE quote LIKE ? " +
         "ORDER BY used DESC " +
         "LIMIT 20", ["%" + part + "%"]
@@ -255,7 +255,7 @@ export async function lookupRecording(part: string, connection): Promise<Recordi
 export async function getRecordingPlaybackCountPerUser(connection): Promise<PlaybackCountByUserStat[]> {
     const rows = await connection.query(
         "SELECT username AS user, SUM(used) AS playbacks, SUM(used)/COUNT(r.id) AS playbacksRelative " +
-        "FROM Recordings r " +
+        "FROM Records r " +
         "LEFT JOIN Users u ON u.id = user " +
         "GROUP BY user"
     );
@@ -283,7 +283,7 @@ export async function forkRecording(
         duration: number,
         connection): Promise<number> {
     const result = await connection.query(
-        "INSERT INTO Recordings(user, submitted, reporter, duration, quote, changed, overwrite, parent) " +
+        "INSERT INTO Records(user, submitted, reporter, duration, quote, changed, overwrite, parent) " +
         "VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
         [user, submitted, reporter, duration, quote, new Date(), overwrite, parent]);
     return result.insertId;

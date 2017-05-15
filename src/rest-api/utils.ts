@@ -18,14 +18,14 @@ export function okay(response: Response, data?: any) {
     if (data) {
         response.send({
             okay: true,
-            message: "OK"
+            message: "OK",
+            data
         });
         return;
     }
     response.send({
         okay: true,
-        message: "OK",
-        data
+        message: "OK"
     });
 }
 
@@ -65,9 +65,13 @@ export function forbidden(response: Response) {
 }
 
 function parseAuthToken(request: Request): { username: string, password: string } {
-    const { authorization } = request.headers;
+    const { authorization, "sec-websocket-protocol": protocol } = request.headers;
     if (!authorization) {
-        return;
+        if (!protocol) {
+            return;
+        }
+        const [username, password] = protocol.split(/,\s*/);
+        return { username, password };
     }
     if (!authorization.toLowerCase().startsWith("basic")) {
         return;

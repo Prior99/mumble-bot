@@ -38,7 +38,6 @@ class AudioAnalyzer {
     analyze(chunk) {
         const array = Array.prototype.slice.call(chunk);
         if (array.length !== chunkSize) {
-            console.log("Chunk not in expected size");
             return;
         }
         this.samplesTotal += chunk.length;

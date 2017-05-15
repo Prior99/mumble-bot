@@ -11,8 +11,8 @@ import { okay, internalError } from "../utils";
 export const List: AuthorizedApiEndpoint = (bot: Bot) => async ({ query }, res) => {
     try {
         const since = query.since ? new Date(query.since) : undefined;
-        const records = await listRecordings(since, bot.database);
-        return okay(res, { records })
+        const recordings = await listRecordings(since, bot.database);
+        return okay(res, { recordings })
     }
     catch (err) {
         Winston.error("Error listing records", err);
