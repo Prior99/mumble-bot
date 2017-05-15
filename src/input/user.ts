@@ -7,6 +7,7 @@ import * as Stream from "stream";
 import { PassThrough as PassThroughStream } from "stream";
 import { Bot } from "..";
 import { writeUserStatsOnline, writeUserStatsSpeak } from "../database";
+import { DatabaseUser } from "../types";
 
 const TIMEOUT_THRESHOLD = 300;
 const msInS = 1000;
@@ -26,7 +27,7 @@ if (!String.prototype.startsWith) {
 export class VoiceInputUser extends Stream.Writable {
     private bot: Bot;
     private user: any;
-    private databaseUser: any;
+    private databaseUser: DatabaseUser;
     private speaking: boolean = false;
     private connectTime: Date;
     private passthrough: PassThroughStream;
@@ -139,7 +140,7 @@ export class VoiceInputUser extends Stream.Writable {
             this.passthrough.end();
             this.bot.addCachedAudio(
                 this.filename,
-                this.databaseUser,
+                this.databaseUser.id,
                 (Date.now() - this.speakStartTime.getTime()) / msInS
             );
             this.createNewRecordingFile();

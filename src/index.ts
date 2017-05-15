@@ -23,7 +23,7 @@ export class Bot extends EventEmitter {
     public audioCacheAmount: number;
     public output: Output;
     public permissions: Permissions;
-    private audioId: number;
+    private audioId: number = 0;
     private input: VoiceInput;
     private api: Api;
 

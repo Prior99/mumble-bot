@@ -1,6 +1,7 @@
 import * as Winston from "winston";
 import { AuthorizedApiWsEndpoint } from "../../types";
 import { Bot } from "../../..";
+import { omit } from "ramda";
 
 /**
  * Api endpoint for the WEBSOCKET handler for this endpoint.
@@ -9,7 +10,7 @@ export const Websocket: AuthorizedApiWsEndpoint = (bot: Bot) => (ws, req) => {
     const onAdd = audio => {
         ws.send(JSON.stringify({
             type: "add",
-            audio
+            recording: omit(["file"], audio)
         }));
     };
     const onRemoveAudio = audio => {
@@ -27,7 +28,7 @@ export const Websocket: AuthorizedApiWsEndpoint = (bot: Bot) => (ws, req) => {
     ws.send(JSON.stringify({
         type: "init",
         cacheAmount: bot.audioCacheAmount,
-        list: bot.cachedAudios
+        list: bot.cachedAudios.map(recording => omit(["file"], recording))
     }));
     bot.on("cached-audio", onAdd);
     bot.on("removed-cached-audio", onRemoveAudio);
