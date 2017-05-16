@@ -178,7 +178,6 @@ export class Bot extends EventEmitter {
      */
     public protectCachedAudio(id: number): boolean {
         const elem = this.getCachedAudioById(id);
-        console.log("protect", elem)
         if (!elem) {
             return false;
         }

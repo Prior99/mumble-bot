@@ -7,7 +7,7 @@ import { AuthorizedApiEndpoint } from "../../types";
  * This view handles the deleting of cached records.
  */
 export const Delete: AuthorizedApiEndpoint = (bot: Bot) => ({ params }, res) => {
-    if (bot.removeCachedAudioById(params.id)) {
+    if (bot.removeCachedAudioById(parseInt(params.id))) {
         return okay(res)
     }
     return internalError(res);
