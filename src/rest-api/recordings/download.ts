@@ -8,32 +8,39 @@ import { internalError, notFound } from "../utils";
 /**
  * This api endpoint handles the downloading of records.
  */
-export const Download = (bot: Bot) => ({ params }, res) => {
+export const Download = (bot: Bot) => async ({ params }, res) => {
     const id = parseInt(params.id);
-    const stream = FS.createReadStream(`sounds/recorded/${id}`);
-    stream.on("error", (err) => {
-        if (err.code === "ENOENT") {
-            return notFound(res);
-        }
-        else {
+    let record;
+    try {
+        record = await getRecording(id, bot.database);
+    }
+    catch (err) {
+        Winston.error(
+            "Error occured when trying to fetch data about record to download from database",
+            id, err
+        );
+        return internalError(res);
+    }
+    res.setHeader(
+        "Content-disposition", `attachment; filename='${record.quote}.mp3'`
+    );
+    const stream = FS.createReadStream(`sounds/recorded/${id}`)
+        .on("error", (err) => {
+            if (err.code === "ENOENT") {
+                return notFound(res);
+            }
             Winston.error("Error occured when trying to read record with id", id);
-            return internalError(res);
-        }
-    }).on("readable", async () => {
-        try {
-            const record = await getRecording(id, bot.database);
-            res.status(HTTP.OK).setHeader(
-                "Content-disposition", `attachment; filename='${record.quote}.mp3'`
-            );
-            stream.pipe(res);
-            return;
-        }
-        catch (err) {
-            Winston.error(
-                "Error occured when trying to fetch data about record to download from database",
-                id
-            );
-            return internalError(res);
-        }
-    });
+        })
+        .on("readable", async () => {
+            try {
+                stream.pipe(res);
+                return;
+            }
+            catch (err) {
+                Winston.error(
+                    "Error occured when trying to stream file to browser",
+                    id, err
+                );
+            }
+        });
 };
