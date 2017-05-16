@@ -24,7 +24,7 @@ export const Recordings: ApiRoute = (bot: Bot) => {
 
     router.get("/", authorized(List)(bot));
     router.get("/:id", authorized(Get)(bot));
-    router.get("/:id/play", authorized(Play)(bot));
+    router.post("/:id/play", authorized(Play)(bot));
     router.get("/:id/download", authorized(Download)(bot));
     router.post("/:id/addlabel", authorized(AddLabel)(bot));
     router.post("/:id/edit", authorized(Edit)(bot));

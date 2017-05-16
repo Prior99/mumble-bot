@@ -30,7 +30,7 @@ export function okay(response: Response, data?: any) {
 }
 
 export function notFound(response: Response, message: string = "Not found.") {
-    response.status(HTTP.OK).send({
+    response.status(HTTP.NOT_FOUND).send({
         okay: false,
         message
     });

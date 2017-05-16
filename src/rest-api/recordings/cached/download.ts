@@ -11,6 +11,9 @@ import { internalError, notFound } from "../../utils";
 export const Download: AuthorizedApiEndpoint = (bot: Bot) => ({ params }, res) => {
     const id = parseInt(params.id);
     const sound = bot.getCachedAudioById(id);
+    if (!sound) {
+        return notFound(res, "No such cached record.");
+    }
     res.setHeader(
         "Content-disposition", `attachment; filename='cached_${id}.mp3'`
     );
