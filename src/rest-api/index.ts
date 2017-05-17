@@ -39,7 +39,7 @@ export class Api {
         this.connections = new Set();
         this.app = Express();
         ExpressWS(this.app);
-
+        this.app.use(BodyParser.urlencoded());
         this.app.use(BodyParser.json());
         this.app.use(this.handleCORS);
         this.app.use("/sounds", Sounds(bot));

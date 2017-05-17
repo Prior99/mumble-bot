@@ -134,7 +134,7 @@ export async function getRecording(id: number, connection): Promise<Recording> {
         const labels = await getLabelsOfRecording(record.id, connection);
         return {
             ...record,
-            labels: labels
+            labels
         };
     }
     else {
@@ -163,13 +163,13 @@ export async function getRandomRecording(connection): Promise<Recording> {
  * @param recordId The unique id of the record that is to be fetched.
  * @return List of all labels with which the specified record is tagged.
  */
-export async function getLabelsOfRecording(recordId: number, connection): Promise<Label[]> {
+export async function getLabelsOfRecording(recordId: number, connection): Promise<number[]> {
     const rows = await connection.query(
-        "SELECT r.id AS id, r.name AS name " +
+        "SELECT r.id AS id " +
         "FROM RecordLabels r " +
         "LEFT JOIN RecordLabelRelation l ON l.label = r.id WHERE l.record = ?", [recordId]
     );
-    return rows;
+    return rows.map(label => label.id);
 };
 
 /**
@@ -198,7 +198,7 @@ export async function addRecordingLabel(name: string, connection): Promise<numbe
  */
 export async function listLabels(connection): Promise<Label[]> {
     const rows = await connection.query(
-        "SELECT name, id, COUNT(record) AS records " +
+        "SELECT name, id, COUNT(record) AS recordings " +
         "FROM RecordLabels " +
         "LEFT JOIN RecordLabelRelation ON id = label " +
         "GROUP BY id"

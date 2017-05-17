@@ -10,4 +10,8 @@ export interface Label {
      * Name of this label.
      */
     name: string;
+    /**
+     * Amount of recordings tagged with this label;
+     */
+    recordings: number;
 }

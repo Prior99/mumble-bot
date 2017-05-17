@@ -7,7 +7,7 @@ import { Bot } from "../..";
 import { badRequest, okay, internalError } from "../utils";
 
 /**
- * This endpoint handles adding labels to the database..
+ * This endpoint handles adding labels to the database.
  */
 export const AddLabel: AuthorizedApiEndpoint = (bot: Bot) => async ({ body, user }, res) => {
     const { name } = body;
