@@ -1,77 +1,15 @@
 {
-	"url" : "example.org",
-	"name" : "bot",
-	"key" : "./bot.key",
-	"cert" : "./bot.cert",
-	"password" : "this is optional",
-	"channel" : "Root",
-	"afkChannel" : "Bot AFK",
-	"publicChannel" : "Flur (Öffentlich)",
-	"afkWarnTimeout" : 300,
-	"afkTimeout" : 360,
-	"webpageurl" : "http://mumble.example.org/",
-	"audioCacheAmount" : 500,
-	"espeakData" : "/usr/lib/x86_64-linux-gnu",
-	"mpd" : {
-		"fifo" : "path/to/fifo",
-		"port" : 6601,
-		"host" : "localhost",
-		"directory" : "path/to/music"
-	},
-	"responsiveTTS" : false,
-	"rss" : {
-		"rssFetchInterval" : 600
-	},
-	"website" : {
-		"port" : 23278,
-		"tmp" : "tmp/",
-		"sessionSecret" : "some_random_string"
-	},
-	"announce" : {
-		"connect" : true,
-		"move" : false,
-		"disconnect" : false
-	},
-	"database" : {
-		"host" : "localhost",
-		"user" : "bot",
-		"database" : "bot",
-		"password" : "super_secret_password"
-	},
-	"steam" : {
-		"user" : "username",
-		"password" : "password",
-		"steamguard" : "ABCDEF"
-	},
-	"minecraft" : {
-		"host" : "example.org",
-		"port" : 25565
-	},
-	"audioEffects" : [
-		{
-			"effect" : "chorus",
-			"options" : [0.7, 0.9, 55, 0.4, 0.25, 2, "-t"]
-		},
-		{
-			"effect" : "echo",
-			"options" : [0.9, 0.8, 33, 0.9]
-		},
-		{
-			"effect" : "echo",
-			"options" : [0.7, 0.7, 10, 0.2]
-		},
-		{
-			"effect" : "echo",
-			"options" : [0.9, 0.2, 55, 0.5]
-		},
-		{
-			"effect" : "gain",
-			"options" : [20]
-		},
-		{
-			"effect" : "pitch" ,
-			"options" : [150]
-		}
-	],
-	"rssFetchInterval" : 120
+    "url" : "example.org",
+    "name" : "bot",
+    "key" : "./bot.key",
+    "cert" : "./bot.cert",
+    "password" : "this is optional",
+    "channel" : "Root",
+    "audioCacheAmount" : 500,
+    "database" : {
+        "host" : "localhost",
+        "user" : "bot",
+        "database" : "bot",
+        "password" : "super_secret_password"
+    }
 }
