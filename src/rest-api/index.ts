@@ -15,6 +15,7 @@ import { ChannelTree } from './channel-tree';
 import { Log } from './log';
 import { Authorized } from './authorized';
 import { WebsocketQueue } from './websocket-queue';
+import { ShutUp } from './shut-up';
 import { checkLoginData, getUserByUsername } from "../database";
 import { Bot } from "../index";
 import { forbidden, internalError, authorizedWebsocket, authorized, notFound } from "./utils";
@@ -31,7 +32,6 @@ export class Api {
      * Handles the whole website stuff for the bot. Using express and handlebars
      * provides the backend for all data and the interface between the webpage and
      * the bot itself.
-     * @constructor
      * @param bot The bot to use this webpage with.
      */
     constructor(bot: Bot) {
@@ -39,13 +39,14 @@ export class Api {
         this.connections = new Set();
         this.app = Express();
         ExpressWS(this.app);
-        this.app.use(BodyParser.urlencoded());
+        this.app.use(BodyParser.urlencoded({ extended: true }));
         this.app.use(BodyParser.json());
         this.app.use(this.handleCORS);
         this.app.use("/sounds", Sounds(bot));
         this.app.use("/recordings", Recordings(bot));
         this.app.use("/statistics", Stats(bot));
         this.app.use("/users", Users(bot));
+        this.app.post("/shut-up", authorized(ShutUp)(bot));
         this.app.get("/channel-tree", ChannelTree(bot));
         this.app.get("/log", authorized(Log)(bot));
         this.app.get("/authorized", authorized(Authorized)(bot));
