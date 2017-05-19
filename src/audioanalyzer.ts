@@ -70,7 +70,10 @@ class AudioAnalyzer {
             return;
         }
         const overallMax = this.list.reduce((result, value) => result > value.amplitude ? result : value.amplitude, 0);
-        const values = this.list.map(item => ({ ...item, amplitude: item.amplitude / overallMax }));
+        const values = this.list.map(item => ({
+            ...item,
+            amplitude: item.amplitude / overallMax
+        }));
         const width = canvas.width;
         const height = canvas.height;
         const pixelsPerElement = width / values.length;

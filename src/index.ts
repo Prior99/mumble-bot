@@ -1,275 +1,182 @@
-import { VoiceInput } from "./input";
-import { Output } from "./output";
+/*
+ * Imports
+ */
+import * as Mumble from "mumble";
+import Bot from "./bot";
 import * as Winston from "winston";
-import { Api } from "./rest-api";
-import * as FS from "async-file";
-import { EventEmitter } from "events";
-import Permissions from "./permissions";
-import { visualizeAudioFile } from "./visualizer";
+import * as FS from "fs";
 import { connectDatabase } from "./database";
-import { CachedAudio } from "./types";
+/*
+ * Winston
+ */
+import "winston-mysql-transport";
 
-const AUDIO_CACHE_AMOUNT = 4;
+export * from "./bot";
+
+require('source-map-support').install();
 
 /**
- * This is the main class of the bot instanciated from the loader and holding all relevant data,
- * systems and connections.
+ * Pads the given number with zeros in front.
+ * @param {number} number - Number to pad with zeros.
+ * @param {number} len - Amount of digits the final string should have.
+ * @return {string} - The zero padded number.
  */
-export class Bot extends EventEmitter {
-    public options: any;
-    public database: any;
-    public mumble: any;
-    public cachedAudios: CachedAudio[];
-    public audioCacheAmount: number;
-    public output: Output;
-    public permissions: Permissions;
-    private audioId: number = 0;
-    private input: VoiceInput;
-    private api: Api;
-
-    /**
-     * This is the constructor of the bot.
-     * @constructor
-     * @param mumble already set up mumble connection (MumbleClient)
-     * @param options Options read from the config.json
-     * @param database Started connection to database.
-     */
-    constructor(mumble, options, database) {
-        super();
-        this.options = options;
-        this.mumble = mumble;
-        this.cachedAudios = [];
-        this.database = database;
-
-        this.permissions = new Permissions(database);
-
-        this.api = new Api(this);
-
-        this.output = new Output(this);
-        if (options.audioCacheAmount) {
-            this.audioCacheAmount = options.audioCacheAmount;
-        }
-        else {
-            this.audioCacheAmount = AUDIO_CACHE_AMOUNT;
-        }
-
-        this.init();
+const fillZero = function(number, len) {
+    number = "" + number;
+    while(number.length < len) {
+        number = "0" + number;
     }
+    return number;
+}
+
+/**
+ * Returns the timestamp formatted as yyyy-mm-dd hh:mm:ss
+ * @return {String} - the formatted timestamp.
+ */
+const timestampFunction = function() {
+    const d = new Date();
+    const actualYear = d.getFullYear();
+    return actualYear + "-" + fillZero(d.getMonth() + 1, 2) + "-" + fillZero(d.getDate(), 2) + " " +
+        fillZero(d.getHours(), 2) + ":" + fillZero(d.getMinutes(), 2) + ":" + fillZero(d.getSeconds(), 2);
+};
+
+Winston.remove(Winston.transports["Console"]);
+Winston.add(Winston.transports["Console"], {
+    "colorize": true,
+    timestamp: timestampFunction,
+    "level" : "verbose"
+});
+
+Winston.add(Winston.transports["File"], {
+    filename : "bot.log",
+    maxsize : "64000",
+    maxFiles : 7,
+    json: false,
+    level : "verbose",
+    colorize: true,
+    timestamp: timestampFunction
+});
+const options: any = require(`${__dirname}/../config.json`);
+
+const mumbleOptions: any = {};
+
+if(options.key && options.cert) {
+    mumbleOptions.key = FS.readFileSync(options.key);
+    mumbleOptions.cert = FS.readFileSync(options.cert);
+}
+else {
+    Winston.warn("Connecting without certificate. Connection will be unsecured, bot will not be able to register!");
+}
+
+/**
+ * Stops the database connection.
+ * @param {object} database - Connection to the database to close.
+ * @param {VoidCallback} callback - Called once the connection to the database is closed.
+ * @return {undefined}
+ */
+const stopDatabase = async function(database, callback) {
+    Winston.info("Stopping database ... ");
+    await database.stop();
+    Winston.info("Database stopped.");
+    callback();
+}
+
+/**
+ * Stops the mumble connection.
+ * @param {object} connection - Connection to the mumble server.
+ * @param {VoidCallback} callback - Called once the connection is closed.
+ * @return {undefined}
+ */
+const stopMumble = function(connection, callback) {
+    Winston.info("Stopping connection to mumble ... ");
+    connection.on("disconnect", () => {
+        Winston.info("Connection to mumble stopped. ");
+        callback();
+    });
+    connection.disconnect();
+}
+
+/**
+ * Called once the database was started.
+ * @param {object} connection - Connection to the mumble server.
+ * @param {object} database - Initialized instance of database.
+ * @return {undefined}
+ */
+const databaseStarted = function(connection, database) {
+    Winston.add(Winston.transports["Mysql"], {
+        host : options.database.host,
+        user : options.database.user,
+        password : options.database.password,
+        database : options.database.database,
+        table : "Log"
+    });
+    let bot;
+    try {
+        bot = new Bot(connection, options, database);
+    }
+    catch(err) {
+        Winston.error("Error starting the bot:", err);
+        return;
+    }
+    Winston.info("Joining channel: " + options.channel);
+    bot.join(options.channel);
+    bot.on("shutdown", () => {
+        stopDatabase(database, () => {
+            stopMumble(connection, () => {
+                process.exit();
+            });
+        });
+    });
+    let killed = false;
+
     /**
-     * Register commands and listeners and load all addons.
+     * Called when SIGINT is received either through CTRL+C or through the bot.
      * @return {undefined}
      */
-    private async init() {
-        this.input = new VoiceInput(this);
-    }
-
-    /**
-     * Returns only those users which have a unique id and are thous registered on
-     * the mumble server.
-     */
-    public getRegisteredMumbleUsers() {
-        const users = this.mumble.users();
-        const result = [];
-        for (const i in users) {
-            if (users[i].id) {
-                result.push(users[i]);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Instantly shutdown everything which could cause noises.
-     */
-    public beQuiet() {
-        this.output.clear();
-    }
-
-    /**
-     * Gently shutdown the whole bot.
-     */
-    public async shutdown() {
-        try {
-            this.beQuiet();
-            await this.deleteAllCachedAudio(0);
-            await this.api.shutdown();
-            this.output.stop();
-            this.input.stop();
-            this.emit("shutdown");
-        }
-        catch (err) {
-            Winston.error("Error during shutdown:", err);
-        }
-    }
-
-    /**
-     * Will return whether the bot is busy speaking or listening to anyone.
-     * @return If the bot is busy speaking or listening
-     */
-    public busy(): boolean {
-        return this.output.busy;
-    }
-
-    /**
-     * Plays a sound in the mumble server.
-     * @param filename Filename of the soundfile to play. Must be a mono-channel 48,000Hz WAV-File
-     * @param meta Metadata passed to the output module.
-     */
-    async playSound(filename: string, meta: any): Promise<void> {
-        await this.output.playSound(filename, meta);
-    }
-
-    /**
-     * Makes the bot join a specific channel in mumble.
-     * @param cname Name of the channel to join.
-     */
-    public join(cname: string) {
-        try {
-            const channel = this.mumble.channelByName(cname);
-            if (!channel) {
-                Winston.error(`Channel "${cname}" is unknown.`);
-            }
-            else {
-                channel.join();
-            }
-        }
-        catch (err) {
-            Winston.error(`Unable to join channel "${cname}":`, err);
-        }
-    }
-
-    /**
-     * Add an audio file to the list of cached audios.
-     * @param filename Filename of the cached audio file.
-     * @param user User that emitted the audio.
-     * @param duration Duration of the audio.
-     */
-    public async addCachedAudio(filename: string, user: number, duration: number): Promise<void> {
-        const obj = {
-            file: filename,
-            date: new Date(),
-            user,
-            id: this.audioId++,
-            duration,
-            protected: false
-        };
-        const buffer = await visualizeAudioFile(filename);
-        await FS.writeFile(filename + ".png", buffer);
-        this.cachedAudios.push(obj);
-        this.emit("cached-audio", obj);
-        this.clearUpCachedAudio();
-    }
-
-
-    /**
-     * Retrieve the cached audio by its id. Returns the audio when the id was valid
-     * and null otherwise.
-     * @param id Id of the audio to look up.
-     * @return The cached audio or null when the id was invalid.
-     */
-    public getCachedAudioById(id: number): CachedAudio {
-        return this.cachedAudios.find(audio => audio.id === id);
-    }
-
-    /**
-     * Protected the cached audio with the given id.
-     * @param id Id of the audio to protect.
-     * @return False when the id was invalid.
-     */
-    public protectCachedAudio(id: number): boolean {
-        const elem = this.getCachedAudioById(id);
-        if (!elem) {
-            return false;
+    const sigint = function() {
+        if(killed) {
+            Winston.error("CTRL^C detected. Terminating!");
+            process.exit(1);
         }
         else {
-            elem.protected = true;
-            this.emit("protect-cached-audio", elem);
-            return true;
+            killed = true;
+            Winston.warn("CTRL^C detected. Secure shutdown initiated.");
+            Winston.warn("Press CTRL^C again to terminate at your own risk.");
+            bot.shutdown();
         }
     }
+    bot.on("SIGINT", () => sigint());
+    process.on("SIGINT", () => sigint());
+}
 
-    /**
-     * Removes the cached audio with the given id.
-     * @param id Id of the audio to remove.
-     * @return False when the id was invalid.
-     */
-    public removeCachedAudioById(id: number): boolean {
-        const elem = this.getCachedAudioById(id);
-        if (!elem) {
-            return false;
-        }
-        else {
-            this.removeCachedAudio(elem);
-            return true;
-        }
+/**
+ * Starts the bot using the passed already initialized mumble connection.
+ * @param {object} connection - Already initialized mumble connection.
+ * @return {undefined}
+ */
+const startup = async function(connection) {
+    let database;
+    try {
+        database = await connectDatabase(options.database);
+    } catch(err) {
+        Winston.error("Unable to connect to database. Quitting.");
+        database.stop();
+        return;
     }
-
-    /**
-     * Removes the cached audio by audio object.
-     * @param audio audio object to remove.
-     * @return False when the id was invalid.
-     */
-    public removeCachedAudio(audio: CachedAudio): boolean {
-        const index = this.cachedAudios.indexOf(audio);
-        if (index !== -1) {
-            this.cachedAudios.splice(index, 1);
-            this.emit("removed-cached-audio", audio);
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    /**
-     * Clears up the list of cached audios and keeps it to the specified maximum size.
-     */
-    private clearUpCachedAudio() {
-        this.deleteAllCachedAudio(this.audioCacheAmount);
-    }
-
-    /**
-     * Delete the specified amount of audios from the list of cached audios starting with the oldest
-     * and skipping protected audios.
-     * @param amount Amount of audios to remove.
-     */
-    private async deleteAllCachedAudio(amount): Promise<void> {
-        const prot = [];
-        while (this.cachedAudios.length > amount) {
-            const elem = this.cachedAudios.shift();
-            if (elem.protected) {
-                amount--;
-                prot.push(elem);
-            }
-            else {
-                try {
-                    await FS.unlink(elem.file);
-                    this.emit("removed-cached-audio", elem);
-                    Winston.info("Deleted cached audio file " + elem.file + ".");
-                }
-                catch (err) {
-                    Winston.error("Error when cleaning up cached audios!", err);
-                }
-            }
-        }
-        while (prot.length > 0) {
-            this.cachedAudios.unshift(prot.pop());
-        }
-    }
-
-    /**
-     * Find all users in mumble which contain the supplied string in their name.
-     * For example:
-     * ```
-     *     bot.findUsers("merlin");
-     * ```
-     * will find "Merlin | LÖML | Mörrrlin".
-     * This method is used in *certain* methods.
-     * @param namePart Text to search for.
-     */
-    public findUsers(namePart: string): any[] {
-        return this.mumble.users.filter(user => user.name.toLowerCase.includes(namePart.toLowerCase()));
+    try {
+        databaseStarted(connection, database);
+    } catch (err) {
+        console.error(err);
     }
 }
 
-export default Bot;
+Mumble.connect("mumble://" + options.url, mumbleOptions, (err, connection) => {
+    if(err) {
+        throw err;
+    }
+    else {
+        connection.on("error", (data) => Winston.error("An error with the mumble connection has occured:", data));
+        connection.authenticate(options.name, options.password);
+        connection.on("ready", () => startup(connection));
+    }
+});

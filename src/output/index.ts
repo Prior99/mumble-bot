@@ -22,7 +22,7 @@ export class Output extends Stream.Writable {
     private playbackAhead: number = 0;
     private stopped: boolean = false;
     private lastBufferShift: number;
-    private timeout: number;
+    private timeout: NodeJS.Timer;
     /**
      * @constructor
      * @param {Bot} bot - Bot this belongs to.

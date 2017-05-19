@@ -139,7 +139,7 @@ function start {
     echo -e "\033[32mEnvironement is sane.\033[0m"
     echo -e "\033[32mStarting bot now.\033[0m"
     echo
-
+    npm run build
     npm start
 }
 

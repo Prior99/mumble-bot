@@ -23,7 +23,7 @@ export class Sound extends EventEmitter {
     private queue: any[] = [];
     private current: any = null;
     private ffmpeg: any;
-    private timeout: number;
+    private timeout: NodeJS.Timer;
     private playing: boolean;
 
     /**

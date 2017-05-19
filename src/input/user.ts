@@ -31,7 +31,7 @@ export class VoiceInputUser extends Stream.Writable {
     private speaking: boolean = false;
     private connectTime: Date;
     private passthrough: PassThroughStream;
-    private timeout: number;
+    private timeout: NodeJS.Timer;
     private speakStartTime: Date;
     private filename: string;
     private encoder: any;

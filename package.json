@@ -4,7 +4,9 @@
   "description": "A bot for mumble.",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec ./node_modules/.bin/ts-node -- ./index.ts"
+    "dev": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/index.ts",
+    "build": "tsc -p . --outDir dist",
+    "start": "node dist"
   },
   "repository": "https://git.cronosx.de/prior/mumble-bot",
   "author": "Frederick <frederick@gnodtke.net>",
