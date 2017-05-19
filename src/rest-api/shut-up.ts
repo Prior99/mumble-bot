@@ -8,6 +8,9 @@ import { okay, forbidden, internalError } from "./utils";
  */
 export const ShutUp: AuthorizedApiEndpoint = (bot: Bot) => async ({ user }, res) => {
     try {
+        if (!bot.permissions.hasPermission(user.id, "be-quiet")) {
+            return forbidden(res);
+        }
         bot.beQuiet();
         Winston.verbose(`${user.username} made the bot shut up.`)
         return okay(res);
