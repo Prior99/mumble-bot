@@ -13,7 +13,7 @@ export const ListForUser: AuthorizedApiEndpoint = (bot: Bot) => async ({ body, u
         const id = parseInt(body.id);
         const listedUser = await getUserById(id, bot.database);
         if (listedUser) {
-            const permissions = await bot.permissions.listPermissionsForUser(listingUser, listedUser);
+            const permissions = await bot.permissions.listPermissionsForUser(listingUser.id, listedUser.id);
             return okay(res, { permissions });
         }
         else {

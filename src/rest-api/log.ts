@@ -9,7 +9,7 @@ import { okay, forbidden, internalError } from "./utils";
  */
 export const Log: AuthorizedApiEndpoint = (bot: Bot) => async ({ user }, res) => {
     try {
-        if (!await bot.permissions.hasPermission(user, "log")) {
+        if (!await bot.permissions.hasPermission(user.id, "log")) {
             return forbidden(res);
         }
         return okay(res, {

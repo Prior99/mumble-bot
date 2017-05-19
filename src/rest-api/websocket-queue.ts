@@ -9,7 +9,7 @@ export const WebsocketQueue: ApiWsEndpoint = (bot: Bot) => (ws, req) => {
     try {
         ws.send(JSON.stringify({
             action: "initial",
-            data: bot.output.queue
+            queue: bot.output.queue
         }));
     }
     catch (err) {
@@ -18,7 +18,7 @@ export const WebsocketQueue: ApiWsEndpoint = (bot: Bot) => (ws, req) => {
     const onEnqueue = (workitem) => {
         ws.send(JSON.stringify({
             action: "enqueue",
-            data: workitem
+            workitem
         }));
     };
     const onDequeue = () => {

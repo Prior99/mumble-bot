@@ -2,6 +2,7 @@ import * as Winston from "winston";
 import { Sound } from "./sound";
 import * as Stream from "stream";
 import { Bot } from "..";
+import { MetaInformation, WorkItem } from "../types/output";
 
 const PREBUFFER = 0.5;
 const audioFreq = 48000;
@@ -13,32 +14,29 @@ const msInS = 1000;
  */
 export class Output extends Stream.Writable {
     public busy: boolean = false;
-    public queue: Sound[] = [];
+    public queue: WorkItem[] = [];
     private bot: Bot;
     private stream: any;
     private sound: Sound;
     private current: any;
-    private bufferQueue: Sound[] = [];
+    private bufferQueue: Buffer[] = [];
     private playbackAhead: number = 0;
     private stopped: boolean = false;
     private lastBufferShift: number;
     private timeout: NodeJS.Timer;
     /**
-     * @constructor
-     * @param {Bot} bot - Bot this belongs to.
+     * @param bot Bot this belongs to.
      */
     constructor(bot: Bot) {
-        super(); // TODO
+        super();
         this.bot = bot;
         this.stream = bot.mumble.inputStream();
         this.sound = new Sound(this);
         this.current = null;
     }
-    //var PREBUFFER = 0.5; TODO see above
 
     /**
      * Processes the buffer and keeps the stream to mumble filled.
-     * @returns {undefined}
      */
     private shiftBuffer() {
         if (this.stopped) {
@@ -79,12 +77,11 @@ export class Output extends Stream.Writable {
 
     /**
      * Write something into this stream.
-     * @param {buffer} chunk - Chunk to be written to the queue.
-     * @param {string} encoding - Encoding of the cunk if any.
-     * @param {VoidCallback} done - Called when the data is shifted into the queue.
-     * @returns {undefined}
+     * @param chunk Chunk to be written to the queue.
+     * @param encoding Encoding of the cunk if any.
+     * @param done Called when the data is shifted into the queue.
      */
-    public _write(chunk, encoding, done) {
+    public _write(chunk: Buffer, encoding: string, done: () => void) {
         this.bufferQueue.push(chunk);
         if (!this.timeout) {
             this.shiftBuffer(); //Not currently processing queue? Sleeping? Wake up!
@@ -94,9 +91,8 @@ export class Output extends Stream.Writable {
 
     /**
      * Clear the whole queue and stop current playback.
-     * @returns {undefined}
      */
-    clear() {
+    public clear() {
         this.queue = [];
         this.bufferQueue = [];
         this.sound.clear();
@@ -105,7 +101,6 @@ export class Output extends Stream.Writable {
 
     /**
      * Start processing the next item in the queue.
-     * @returns {undefined}
      */
     private next() {
         if (!this.busy && this.queue.length !== 0) {
@@ -118,7 +113,6 @@ export class Output extends Stream.Writable {
 
     /**
      * Process the next item.
-     * @returns {undefined}
      */
     private process() {
         this.processStarted();
@@ -130,7 +124,6 @@ export class Output extends Stream.Writable {
 
     /**
      * When processing the next item started.
-     * @returns {undefined}
      */
     private processStarted() {
         this.busy = true;
@@ -139,7 +132,6 @@ export class Output extends Stream.Writable {
 
     /**
      * When processing stopped.
-     * @returns {undefined}
      */
     private processStopped() {
         const callback = this.current.callback;
@@ -155,44 +147,36 @@ export class Output extends Stream.Writable {
     /**
      * Queue playing back a soundfile. The soundfile needs to be exactly: Raw PCM
      * audio data (*.wav is fine), 44,100Hz and mono-channel.
-     * @param {string} file - Name of the soundfile to play.
-     * @param {Object} meta - Metadata displayed in queue.
-     * @returns {Promise} - Resolved once the sound has finished playing.
+     * @param file Name of the soundfile to play.
+     * @param meta Metadata displayed in queue.
+     * @returns Resolved once the sound has finished playing.
      */
-    playSound(file, meta) {
-        return new Promise((resolve, reject) => {
-            this.enqueue({
-                file,
-                meta,
-                callback() {
-                    resolve();
-                }
-            });
+    public playSound(file: string, meta: MetaInformation): Promise<{}> {
+        return new Promise((callback, reject) => {
+            this.enqueue({ file, meta, callback, time: new Date() });
         });
     }
 
     /**
      * Also enqueues sounds, but many at once (automically?)
-     * @param {string[]} filelist - The files to be played.
-     * @param {Object} meta - Metadata displayed in queue.
-     * @returns {undefined}
+     * @param filelist The files to be played.
+     * @param meta Metadata displayed in queue.
      */
-    playSounds(filelist, meta) { // callback TODO?
+    public playSounds(filelist: string[], meta: MetaInformation) { // callback TODO?
         for (let i = 0; i < filelist.length; i++) {
             this.enqueue({
                 file: filelist[i],
-                meta
+                meta,
+                time: new Date()
             });
         }
     }
 
     /**
      * Enqueues a work item.
-     * @param {object} workitem - The object to be enqueued.
-     * @returns {undefined}
+     * @param workitem The object to be enqueued.
      */
-    private enqueue(workitem) {
-        workitem.time = new Date();
+    private enqueue(workitem: WorkItem) {
         this.queue.push(workitem);
         this.emit("enqueue", workitem);
         this.emit("change", this.queue);
@@ -203,9 +187,8 @@ export class Output extends Stream.Writable {
 
     /**
      * Stop all timeouts and shutdown everything.
-     * @return {undefined}
      */
-    stop() {
+    public stop() {
         this.stopped = true;
         this.clear();
         if (this.timeout) {

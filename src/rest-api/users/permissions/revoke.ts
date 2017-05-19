@@ -14,7 +14,7 @@ export const Revoke: AuthorizedApiEndpoint = (bot: Bot) => async ({ body, user: 
         const id = parseInt(body.id);
         const revokedUser = await getUserById(id, bot.database);
         if (revokedUser) {
-            if (await bot.permissions.revokePermission(revokingUser, revokedUser, permission)) {
+            if (await bot.permissions.revokePermission(revokingUser.id, revokedUser.id, permission)) {
                 return okay(res);
             }
             else {
