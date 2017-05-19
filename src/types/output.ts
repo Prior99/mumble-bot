@@ -3,14 +3,14 @@ import { Recording } from "./recordings";
 import { DatabaseUser } from "./users";
 
 export interface MetaInformationRecording {
-    type: "record";
-    details: Recording;
+    type: "recording";
+    recording: Recording;
     user: DatabaseUser
 }
 
 export interface MetaInformationSound {
     type: "sound";
-    details: DatabaseSound;
+    sound: DatabaseSound;
     user: DatabaseUser
 }
 

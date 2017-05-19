@@ -8,6 +8,7 @@ import Permissions from "./permissions";
 import { visualizeAudioFile } from "./visualizer";
 import { connectDatabase } from "./database";
 import { CachedAudio } from "./types";
+import { MetaInformation } from "./types/output";
 
 const AUDIO_CACHE_AMOUNT = 4;
 
@@ -115,7 +116,7 @@ export class Bot extends EventEmitter {
      * @param filename Filename of the soundfile to play. Must be a mono-channel 48,000Hz WAV-File
      * @param meta Metadata passed to the output module.
      */
-    async playSound(filename: string, meta: any): Promise<void> {
+    async playSound(filename: string, meta: MetaInformation): Promise<void> {
         await this.output.playSound(filename, meta);
     }
 

@@ -1,6 +1,30 @@
 import * as Winston from "winston";
 import { ApiWsEndpoint } from "./types/index";
 import { Bot } from "../index";
+import { WorkItem } from "../types";
+
+function convertWorkItem(item: WorkItem) {
+    const { meta, time } = item;
+    const { user } = meta;
+    if (meta.type === "recording") {
+        const { recording } = meta;
+        return {
+            time,
+            user: user.id,
+            recording: recording.id,
+            type: meta.type
+        };
+    }
+    if (meta.type === "sound") {
+        const { sound } = meta;
+        return {
+            time,
+            user: user.id,
+            sound: sound.id,
+            type: meta.type
+        };
+    }
+}
 
 /**
  * Handler for the WEBSOCKET at this endpoint.
@@ -8,8 +32,8 @@ import { Bot } from "../index";
 export const WebsocketQueue: ApiWsEndpoint = (bot: Bot) => (ws, req) => {
     try {
         ws.send(JSON.stringify({
-            action: "initial",
-            queue: bot.output.queue
+            type: "init",
+            queue: bot.output.queue.map(convertWorkItem)
         }));
     }
     catch (err) {
@@ -17,18 +41,18 @@ export const WebsocketQueue: ApiWsEndpoint = (bot: Bot) => (ws, req) => {
     }
     const onEnqueue = (workitem) => {
         ws.send(JSON.stringify({
-            action: "enqueue",
-            workitem
+            type: "enqueue",
+            workitem: convertWorkItem(workitem)
         }));
     };
     const onDequeue = () => {
         ws.send(JSON.stringify({
-            action: "dequeue"
+            type: "dequeue"
         }));
     };
     const onClear = () => {
         ws.send(JSON.stringify({
-            action: "clear"
+            type: "clear"
         }));
     };
     bot.output.on("clear", onClear);

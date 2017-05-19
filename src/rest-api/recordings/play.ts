@@ -14,18 +14,18 @@ const moneyPerPlayUser = 1;
 export const Play: AuthorizedApiEndpoint = (bot: Bot) => async ({ params, user }, res) => {
     const id = parseInt(params.id);
     try {
-        const details = await getRecording(id, bot.database);
-        if (user.id !== details.reporter) {
-            await giveUserMoney(details.reporter, moneyPerPlayReporter, bot.database);
+        const recording = await getRecording(id, bot.database);
+        if (user.id !== recording.reporter) {
+            await giveUserMoney(recording.reporter, moneyPerPlayReporter, bot.database);
         }
-        if (user.id !== details.user) {
-            await giveUserMoney(details.user, moneyPerPlayUser, bot.database);
+        if (user.id !== recording.user) {
+            await giveUserMoney(recording.user, moneyPerPlayUser, bot.database);
         }
         await usedRecording(id, bot.database);
         Winston.log("verbose", `${user.username} played back record #${id}`);
         bot.playSound("sounds/recorded/" + id, {
-            type: "record",
-            details,
+            type: "recording",
+            recording,
             user: user
         });
         return okay(res);

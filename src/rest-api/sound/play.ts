@@ -12,11 +12,11 @@ export const Play: AuthorizedApiEndpoint = (bot: Bot) => async ({ params, user }
     const id = parseInt(params.id);
     try {
         await usedSound(id, bot.database);
-        const details = await getSound(id, bot.database);
+        const sound = await getSound(id, bot.database);
         Winston.log("verbose", `${user.username} played sound #${id}`);
         bot.playSound(`sounds/uploaded/${id}`, {
             type: "sound",
-            details,
+            sound,
             user
         });
         return okay(res);
