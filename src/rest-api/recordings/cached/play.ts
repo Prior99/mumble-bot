@@ -9,11 +9,11 @@ import { AuthorizedApiEndpoint } from "../../types";
  */
 export const Play: AuthorizedApiEndpoint = (bot: Bot) => ({ params, user }, res) => {
     const id = parseInt(params.id);
-    const sound = bot.getCachedAudioById(id);
-    if (sound) {
-        bot.playSound(sound.file, {
+    const cachedRecording = bot.getCachedAudioById(id);
+    if (cachedRecording) {
+        bot.playSound(cachedRecording.file, {
             type: "cached",
-            details: sound,
+            cachedRecording,
             user
         });
         Winston.log("verbose", `${user.username} played back cached record #${id}`);

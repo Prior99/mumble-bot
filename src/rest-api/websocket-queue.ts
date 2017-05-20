@@ -24,6 +24,22 @@ function convertWorkItem(item: WorkItem) {
             type: meta.type
         };
     }
+    if (meta.type === "cached") {
+        const { cachedRecording } = meta;
+        return {
+            time,
+            user: user.id,
+            cachedRecording: cachedRecording.id,
+            type: meta.type
+        };
+    }
+    if (meta.type === "dialog") {
+        return {
+            time,
+            user: user.id,
+            type: meta.type
+        };
+    }
 }
 
 /**
