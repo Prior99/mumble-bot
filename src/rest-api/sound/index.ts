@@ -19,7 +19,7 @@ export const Sounds: ApiRoute = (bot: Bot) => {
 
     router.put("/", authorized(Add)(bot));
     router.get("/", authorized(List)(bot));
-    router.get("/:id/play", authorized(Play)(bot));
+    router.post("/:id/play", authorized(Play)(bot));
 
     return router;
 };
