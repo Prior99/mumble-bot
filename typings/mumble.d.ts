@@ -8,6 +8,8 @@ declare module "mumble" {
         children: Channel[];
         links: Channel[];
         users: User[];
+        name: string;
+        id: number;
     }
 
     interface User {
@@ -57,6 +59,9 @@ declare module "mumble" {
         disconnect: () => void;
         sendVoice: (chunk: Buffer) => void;
         on: (event: string, callback: (...args: any[]) => any) => void;
+        ready: boolean;
+        rootChannel: Channel;
+        user: User;
     }
 
     function connect(url: string, options: Options, callback: (err: Error, connection: Connection) => void): void;

@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import * as FS from "fs";
+import mkdirp = require("mkdirp-promise");
+import { rename } from "async-file";
 import * as HTTP from "http-status-codes";
 import { addSound } from "../../database";
 import { AuthorizedApiEndpoint } from "../types";
@@ -10,7 +11,7 @@ import { internalError, okay } from "../utils";
  */
 export const Add: AuthorizedApiEndpoint = (bot) => async ({ files }, res) => {
     try {
-        await FS.mkdir("sounds/uploaded");
+        await mkdirp(`${bot.options.paths.uploaded}`);
     }
     catch (e) {
         if (e.code !== "EEXIST") {
@@ -22,7 +23,7 @@ export const Add: AuthorizedApiEndpoint = (bot) => async ({ files }, res) => {
         const promises = upload.map(async (file) => {
             const id = await addSound(file.originalname, bot.database);
             Winston.log("verbose", `added new sound #${id}`);
-            await FS.rename(file.path, `sounds/uploaded/${id}`);
+            await rename(file.path, `${bot.options.paths.uploaded}/${id}`);
             return id;
         });
         const ids: number[] = await Promise.all(promises);

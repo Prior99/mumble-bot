@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import * as FS from "async-file";
+import mkdirp = require("mkdirp-promise");
+import { rename } from "async-file";
 import * as HTTP from "http-status-codes";
 import { addRecording, giveUserMoney } from "../../../database";
 import { AuthorizedApiEndpoint } from "../../types";
@@ -27,7 +28,7 @@ export const Save: AuthorizedApiEndpoint = (bot: Bot) => async ({ params, body, 
     }
 
     try {
-        FS.mkdir("sounds/recorded");
+        await mkdirp(bot.options.paths.recordings);
     }
     catch (e) {
         if (e.code !== "EEXIST") {
@@ -40,8 +41,8 @@ export const Save: AuthorizedApiEndpoint = (bot: Bot) => async ({ params, body, 
         );
         try {
             await giveUserMoney(user, moneyPerSave, bot.database);
-            await FS.rename(sound.file, `sounds/recorded/${id}`);
-            await FS.rename(sound.file + ".png", `sounds/visualized/${id}.png`);
+            await rename(sound.file, `${bot.options.paths.recordings}/${id}`);
+            await rename(sound.file + ".png", `${bot.options.paths.visualizations}/${id}.png`);
             if (bot.removeCachedAudio(sound)) {
                 Winston.log("verbose", `${user.username} added new record #${id}`);
                 return okay(res);

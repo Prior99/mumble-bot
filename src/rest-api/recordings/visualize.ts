@@ -1,5 +1,6 @@
 import * as Winston from "winston";
-import * as FS from "async-file";
+import mkdirp = require("mkdirp-promise");
+import { stat, createReadStream, writeFile } from "async-file";
 import * as HTTP from "http-status-codes";
 import { Bot } from "../..";
 import { internalError } from "../utils";
@@ -17,12 +18,12 @@ export const Visualize: AuthorizedApiEndpoint = (bot: Bot) => async ({ params },
         return;
     };
 
-    const dirName = "sounds/visualized";
-    const soundFileName = `sounds/recorded/${id}`;
+    const dirName = bot.options.paths.visualizations;
+    const soundFileName = `${bot.options.paths.recordings}/${id}`;
     const fileName = `${dirName}/${id}.png`;
 
     try {
-        await FS.mkdir(dirName);
+        await mkdirp(dirName);
     }
     catch (e) {
         if (e.code !== "EEXIST") {
@@ -34,8 +35,8 @@ export const Visualize: AuthorizedApiEndpoint = (bot: Bot) => async ({ params },
     }
     let stream;
     try {
-        await FS.stat(fileName);
-        stream = FS.createReadStream(fileName);
+        await stat(fileName);
+        stream = createReadStream(fileName);
         sendFile(stream);
     }
     catch (err) {
@@ -46,9 +47,9 @@ export const Visualize: AuthorizedApiEndpoint = (bot: Bot) => async ({ params },
         Winston.info(`Visualizing audio file "${soundFileName}" to "${fileName}".`);
         try {
             const buffer = await visualizeAudioFile(soundFileName);
-            await FS.writeFile(fileName, buffer);
+            await writeFile(fileName, buffer);
             try {
-                const stream = FS.createReadStream(fileName);
+                const stream = createReadStream(fileName);
                 return sendFile(stream);
             }
             catch (err) {

@@ -14,7 +14,7 @@ export const Play: AuthorizedApiEndpoint = (bot: Bot) => async ({ params, user }
         await usedDialog(id, bot.database);
         const parts = await getDialogParts(id, bot.database);
         // TODO: Hardcoded path.
-        const files = parts.map(part => `sounds/recorded/${part}`);
+        const files = parts.map(part => `${bot.options.paths.recordings}/${part}`);
         bot.output.playSounds(files, {
             type: "dialog",
             user

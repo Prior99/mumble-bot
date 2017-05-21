@@ -4,7 +4,7 @@
 
 import Samplerate from "node-samplerate";
 import * as Winston from "winston";
-import * as FS from "fs";
+import { stat } from "async-file";
 import { EventEmitter } from "events";
 import * as FFMpeg from "fluent-ffmpeg";
 
@@ -28,43 +28,56 @@ export class Sound extends EventEmitter {
 
     /**
      * @constructor
-     * @param {WritableStream} stream - Stream to write the audio data to.
+     * @param stream Stream to write the audio data to.
       */
-    constructor(stream) {
+    constructor(stream: NodeJS.WritableStream) {
         super();
         this.stream = stream;
     }
 
     /**
      * Plays the file.
-     * @param {string} filename - The filename of the file to be played.
-     * @returns {undefined}
+     * @param filename The filename of the file to be played.
      */
-    _play(filename) {
+    private async play(filename: string) {
         let samplesTotal = 0;
         const startTime = Date.now();
-        this._playbackStarted();
-        this.ffmpeg = FFMpeg(filename)
-            .format("s16le")
-            .audioChannels(1)
-            .audioFrequency(audioFreq);
-        this.ffmpeg.stream().on("data", chunk => {
-            samplesTotal += chunk.length / 2;
-            this.stream.write(chunk);
-        })
+        this.playbackStarted();
+        try {
+            const result = await stat(filename);
+            if (!result.isFile()) {
+                Winston.error(`File ${filename} is not a regular file`);
+                this.playbackStopped();
+                return;
+            }
+            this.ffmpeg = FFMpeg(filename)
+                .format("s16le")
+                .audioChannels(1)
+                .audioFrequency(audioFreq);
+            this.ffmpeg.on("error", (err) => {
+                Winston.error(`Error decoding file ${filename}`, err);
+                this.playbackStopped();
+            });
+            this.ffmpeg.stream().on("data", chunk => {
+                samplesTotal += chunk.length / 2;
+                this.stream.write(chunk);
+            })
             .on("end", () => {
                 const timeAlreadyTaken = Date.now() - startTime;
                 const totalTime = (samplesTotal / audioFreq) * msInS;
                 const waitTime = totalTime - timeAlreadyTaken;
-                this.timeout = setTimeout(this._playbackStopped.bind(this), waitTime);
+                this.timeout = setTimeout(this.playbackStopped.bind(this), waitTime);
             });
+        } catch(err) {
+            Winston.error(`Error reading file ${filename}`, err);
+            this.playbackStopped();
+        }
     }
 
     /**
      * Clear the whole queue and stop current playback.
-     * @returns {undefined}
      */
-    clear() {
+    public clear() {
         this.queue = [];
         if (this.timeout) {
             clearTimeout(this.timeout);
@@ -73,29 +86,27 @@ export class Sound extends EventEmitter {
         if (this.ffmpeg) {
             this.ffmpeg.kill();
         }
-        this._playbackStopped();
+        this.playbackStopped();
     }
 
     /**
      * When the playback started.
-     * @returns {undefined}
      */
-    _playbackStarted() {
+    private playbackStarted() {
         this.playing = true;
         this.emit("start");
     }
 
     /**
      * When the playback stopped.
-     * @returns {undefined}
      */
-    _playbackStopped() {
+    private playbackStopped() {
         this.playing = false;
         if (this.current) {
             this.emit("stop");
             const callback = this.current.callback;
             this.current = null;
-            this._next();
+            this.next();
             if (callback) {
                 callback();
             }
@@ -106,10 +117,10 @@ export class Sound extends EventEmitter {
      * Plays the next sound in the queue.
      * @returns {undefined}
      */
-    _next() {
+    private next() {
         if (!this.playing && this.queue.length !== 0) {
             this.current = this.queue.shift();
-            this._play(this.current.file);
+            this.play(this.current.file);
         }
     }
 
@@ -119,18 +130,17 @@ export class Sound extends EventEmitter {
      *                     soundfile.
      * @returns {undefined}
      */
-    enqueue(workitem) {
+    public enqueue(workitem) {
         this.queue.push(workitem);
         if (!this.playing) {
-            this._next();
+            this.next();
         }
     }
 
     /**
      * Stop the sound submodule.
-     * @return {undefined}
      */
-    stop() {
+    public stop() {
         if (this.timeout) {
             clearTimeout(this.timeout);
         }

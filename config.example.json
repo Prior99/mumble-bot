@@ -11,5 +11,11 @@
         "user" : "bot",
         "database" : "bot",
         "password" : "super_secret_password"
+    },
+    "paths": {
+        "tmp": "data/tmp",
+        "recordings": "data/recordings",
+        "visualizations": "data/visualizations",
+        "uploaded": "data/uploaded"
     }
 }

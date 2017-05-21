@@ -23,7 +23,7 @@ export const Play: AuthorizedApiEndpoint = (bot: Bot) => async ({ params, user }
         }
         await usedRecording(id, bot.database);
         Winston.log("verbose", `${user.username} played back record #${id}`);
-        bot.playSound("sounds/recorded/" + id, {
+        bot.playSound(`${bot.options.paths.recordings}/${id}`, {
             type: "recording",
             recording,
             user: user

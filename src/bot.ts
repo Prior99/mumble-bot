@@ -3,7 +3,7 @@ import { Output } from "./output";
 import * as Winston from "winston";
 import { Connection } from "mumble";
 import { Api } from "./rest-api";
-import * as FS from "async-file";
+import { writeFile, unlink, readFile } from "async-file";
 import { EventEmitter } from "events";
 import Permissions from "./permissions";
 import { visualizeAudioFile } from "./visualizer";
@@ -63,6 +63,12 @@ export class Bot extends EventEmitter {
      */
     private async init() {
         this.input = new VoiceInput(this);
+        try {
+            this.cachedAudios = JSON.parse(await readFile(this.cachedAudioIndexFilePath));
+        } catch(err) {
+            Winston.error("Failed to load cached audios from index file.", err);
+            this.cachedAudios = [];
+        }
     }
 
     /**
@@ -70,14 +76,7 @@ export class Bot extends EventEmitter {
      * the mumble server.
      */
     public getRegisteredMumbleUsers() {
-        const users = this.mumble.users();
-        const result = [];
-        for (const i in users) {
-            if (users[i].id) {
-                result.push(users[i]);
-            }
-        }
-        return result;
+        return this.mumble.users().filter(user => typeof user.id !== "undefined");
     }
 
     /**
@@ -93,7 +92,6 @@ export class Bot extends EventEmitter {
     public async shutdown() {
         try {
             this.beQuiet();
-            await this.deleteAllCachedAudio(0);
             await this.api.shutdown();
             this.output.stop();
             this.input.stop();
@@ -156,10 +154,11 @@ export class Bot extends EventEmitter {
             protected: false
         };
         const buffer = await visualizeAudioFile(filename);
-        await FS.writeFile(filename + ".png", buffer);
+        await writeFile(filename + ".png", buffer);
         this.cachedAudios.push(obj);
         this.emit("cached-audio", obj);
         this.clearUpCachedAudio();
+        this.persistCachedAudios();
     }
 
 
@@ -186,6 +185,7 @@ export class Bot extends EventEmitter {
         else {
             elem.protected = true;
             this.emit("protect-cached-audio", elem);
+            this.persistCachedAudios();
             return true;
         }
     }
@@ -202,8 +202,17 @@ export class Bot extends EventEmitter {
         }
         else {
             this.removeCachedAudio(elem);
+            this.persistCachedAudios();
             return true;
         }
+    }
+
+    private get cachedAudioIndexFilePath() {
+        return `${this.options.paths.tmp}/useraudio.json`;
+    }
+
+    private async persistCachedAudios() {
+        await writeFile(this.cachedAudioIndexFilePath, JSON.stringify(this.cachedAudios));
     }
 
     /**
@@ -245,7 +254,7 @@ export class Bot extends EventEmitter {
             }
             else {
                 try {
-                    await FS.unlink(elem.file);
+                    await unlink(elem.file);
                     this.emit("removed-cached-audio", elem);
                     Winston.info("Deleted cached audio file " + elem.file + ".");
                 }

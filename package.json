@@ -24,6 +24,7 @@
     "fft-js": "^0.0.11",
     "fluent-ffmpeg": "^2.1.2",
     "http-status-codes": "^1.1.6",
+    "mkdirp-promise": "^5.0.1",
     "multer": "^1.3.0",
     "mumble": "^0.3.11",
     "mysql": "^2.11.1",

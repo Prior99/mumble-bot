@@ -24,7 +24,7 @@ export const Download = (bot: Bot) => async ({ params }, res) => {
     res.setHeader(
         "Content-disposition", `attachment; filename='${record.quote}.mp3'`
     );
-    const stream = FS.createReadStream(`sounds/recorded/${id}`)
+    const stream = FS.createReadStream(`${bot.options.paths.recordings}/${id}`)
         .on("error", (err) => {
             if (err.code === "ENOENT") {
                 return notFound(res);

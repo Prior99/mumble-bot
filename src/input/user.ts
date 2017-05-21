@@ -1,7 +1,7 @@
 import Samplerate from "node-samplerate";
 import * as Winston from "winston";
 import { EventEmitter } from "events";
-import * as FS from "fs";
+import mkdirp = require("mkdirp-promise");
 import * as FFMpeg from "fluent-ffmpeg";
 import * as Stream from "stream";
 import { PassThrough as PassThroughStream } from "stream";
@@ -83,7 +83,6 @@ export class VoiceInputUser extends Stream.Writable {
 
     /**
      * When user started speaking.
-     * @returns {undefined}
      */
     private speechStarted() {
         this.speaking = true;
@@ -92,34 +91,21 @@ export class VoiceInputUser extends Stream.Writable {
 
     /**
      * Creates a new temporary record file.
-     * @returns {undefined}
      */
-    private createNewRecordingFile() {
-        if (this.databaseUser.settings.record === true) {
-            try {
-                FS.mkdirSync("tmp");
-            }
-            catch (err) { /* Ignored */ }
-            try {
-                FS.mkdirSync("tmp/useraudio");
-            }
-            catch (err) { /* Ignored */ }
-            try {
-                FS.mkdirSync("tmp/useraudio/" + this.user.id);
-            }
-            catch (err) { /* Ignored */ }
-            this.filename = "tmp/useraudio/" + this.user.id + "/" + Date.now() + ".mp3";
-            this.passthrough = new PassThroughStream();
-            this.encoder = FFMpeg(this.passthrough)
-                .inputOptions(
+    private async createNewRecordingFile() {
+        const path = `${this.bot.options.paths.tmp}/useraudio/${this.user.id}`;
+        await mkdirp(path);
+        this.filename = `${path}/${Date.now()}.mp3`;
+        this.passthrough = new PassThroughStream();
+        this.encoder = FFMpeg(this.passthrough)
+            .inputOptions(
                 "-f", "s16le",
                 "-ar", audioFreq,
                 "-ac", "1"
-                )
-                .on("error", (err) => Winston.error(`Encoder for user ${this.user.name} crashed.`))
-                .audioCodec("libmp3lame")
-                .save(this.filename);
-        }
+            )
+            .on("error", (err) => Winston.error(`Encoder for user ${this.user.name} crashed.`))
+            .audioCodec("libmp3lame")
+            .save(this.filename);
     }
 
     /**

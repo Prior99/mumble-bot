@@ -11,9 +11,14 @@ async function getMumbleUsersLinkingPossible(bot: Bot) {
         const arr = [];
         const mumbleIds = await getLinkedMumbleUsers(bot.database);
         return mumbleUsers.reduce((result, user) => {
-            const linked = mumbleIds.reduce((linkedId, id) => id.id === user.id || linkedId, false);
+            const linked = mumbleIds.some(id => id === user.id);
             if (!linked && user.id !== bot.mumble.user.id) {
-                return [...result, user];
+                return [
+                    ...result, {
+                        name: user.name,
+                        id: user.id
+                    }
+                ];
             }
             return result;
         }, []);

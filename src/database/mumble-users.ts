@@ -6,13 +6,13 @@ import { getUserById } from ".";
  * are linked to users in this bot and their counterparts usernames.
  * @return The mumble users in the database.
  */
-export async function getLinkedMumbleUsers(connection): Promise<MumbleDatabaseUser[]> {
+export async function getLinkedMumbleUsers(connection): Promise<number[]> {
     const rows = await connection.query(
-        "SELECT m.mumbleId AS id, u.username AS username " +
+        "SELECT m.mumbleId AS id " +
         "FROM MumbleUsers m " +
         "LEFT JOIN Users u ON u.id = m.user"
     );
-    return rows;
+    return rows.map(row => row.id);
 };
 
 /**

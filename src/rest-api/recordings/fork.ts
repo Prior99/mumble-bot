@@ -48,13 +48,13 @@ export const Fork: AuthorizedApiEndpoint = (bot: Bot) => async ({ params, body, 
     }
 
     const crop = (begin, end) => new Promise((resolve, reject) => {
-        FFMpeg(`sounds/recorded/${id}`)
+        FFMpeg(`${bot.options.paths.recordings}/${id}`)
             .seekInput(begin)
             .duration(end - begin)
             .format("mp3")
             .audioCodec("libmp3lame")
             .on("error", (err) => reject(err))
-            .save(`sounds/recorded/${newId}`)
+            .save(`${bot.options.paths.recordings}/${newId}`)
             .on("end", () => resolve());
     });
 
