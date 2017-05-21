@@ -3,6 +3,8 @@ import * as Winston from "winston";
 import { EventEmitter } from "events";
 import { Bot } from "..";
 import { getLinkedUser } from "../database";
+import { User as MumbleUser } from "mumble";
+import { DatabaseUser } from "../types";
 
 interface UserMap {
     [id: string]: VoiceInputUser;
@@ -16,39 +18,29 @@ export class VoiceInput extends EventEmitter {
     private bot: Bot;
     private users: UserMap = {};
 
-    /**
-     * @constructor
-     * @param {Bot} bot - Instance of the bot this belongs to.
-     */
     constructor(bot: Bot) {
         super();
         this.bot = bot;
-        this._initConnectedUsers(bot.mumble.users());
-        bot.mumble.on("user-connect", this._addUser.bind(this));
-        bot.mumble.on("user-disconnect", this._removeUser.bind(this));
+        this.initConnectedUsers(bot.mumble.users());
+        bot.mumble.on("user-connect", this.addUser.bind(this));
+        bot.mumble.on("user-disconnect", this.removeUser.bind(this));
         Winston.info("Module started: Voice input");
     }
 
     /**
      * Registers all connected users as VoiceInputs
-     * @param {MumbleUser[]} users - The corrently connected users . TODO fix type
-     * @returns {undefined}
+     * @param users The corrently connected users . TODO fix type
      */
-    _initConnectedUsers(users) {
-        for (const i in users) {
-            if (users.hasOwnProperty(i)) {
-                this._addUser(users[i]);
-            }
-        }
+    private initConnectedUsers(users: MumbleUser[]) {
+        users.forEach(user => this.addUser(user));
     }
 
     /**
      * Creates a local user object handling the data received from the mumble user of a registered user.
-     * @param {MumbleUser} user - The mumble user object.
-     * @param {DatabaseUser} databaseUser - The user object from the database.
-     * @returns {undefined}
+     * @param user The mumble user object.
+     * @param databaseUser The user object from the database.
      */
-    _addRegisteredUser(user, databaseUser) {
+    private addRegisteredUser(user: MumbleUser, databaseUser: DatabaseUser) {
         Winston.info("Input registered for user " + user.name);
         const localUser = new VoiceInputUser(user, databaseUser, this.bot);
         this.users[user.id] = localUser;
@@ -58,23 +50,24 @@ export class VoiceInput extends EventEmitter {
 
     /**
      * Called when a user joined the server, or was there before the bot joined.
-     * @param {MumbleUser} user - The user who should be registered.
-     * @returns {undefined}
+     * @param user The user who should be registered.
      */
-    async _addUser(user) {
+    private async addUser(user: MumbleUser) {
         try {
             const databaseUser = await getLinkedUser(user.id, this.bot.database);
             if (!databaseUser) {
-                Winston.info("Did not register input for user " + user.name
-                    + " as this user is not linked to any database user.");
+                Winston.info(
+                    `Did not register input for user ${user.name} as this user is not linked to any database user.`
+                );
                 return;
             }
             if (databaseUser.settings.record !== true) {
-                Winston.info("Did not register input for user " + user.name
-                    + " as this user does not want to be recorded.");
+                Winston.info(
+                    `Did not register input for user ${user.name} as this user does not want to be recorded.`
+                );
                 return;
             }
-            this._addRegisteredUser(user, databaseUser);
+            this.addRegisteredUser(user, databaseUser);
         }
         catch (err) {
             Winston.error("Error occured when trying to fetch user by mumble id", err);
@@ -83,10 +76,9 @@ export class VoiceInput extends EventEmitter {
 
     /**
      * Called when user disconnects. Unregisters the user.
-     * @param {VoiceInputUser} user - The user which disconnected.
-     * @returns {undefined}
+     * @param user The user which disconnected.
      */
-    _removeUser(user) {
+    private removeUser(user: MumbleUser) {
         const localUser = this.users[user.id];
         if (localUser) {
             this.users[user.id].stop();
@@ -96,15 +88,9 @@ export class VoiceInput extends EventEmitter {
 
     /**
      * Stop all timeouts and shutdown everything.
-     * @return {undefined}
      */
-    stop() {
-        for (const u in this.users) {
-            if (this.users.hasOwnProperty(u)) {
-                const user = this.users[u];
-                user.stop();
-            }
-        }
+    public stop() {
+        Object.keys(this.users).map(key => this.users[key]).forEach(user => user.stop());
         Winston.info("Input stopped.");
     }
 }

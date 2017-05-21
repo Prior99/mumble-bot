@@ -1,7 +1,7 @@
 /*
  * Imports
  */
-import * as Mumble from "mumble";
+import { connect } from "mumble";
 import Bot from "./bot";
 import * as Winston from "winston";
 import * as FS from "fs";
@@ -76,7 +76,7 @@ else {
  */
 const stopDatabase = async (database, callback) => {
     Winston.info("Stopping database ... ");
-    await database.stop();
+    await database.end();
     Winston.info("Database stopped.");
     callback();
 }
@@ -170,7 +170,7 @@ const startup = async function(connection) {
     }
 }
 
-Mumble.connect("mumble://" + options.url, mumbleOptions, (err, connection) => {
+connect("mumble://" + options.url, mumbleOptions, (err, connection) => {
     if(err) {
         throw err;
     }

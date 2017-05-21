@@ -1,6 +1,7 @@
 import { VoiceInput } from "./input";
 import { Output } from "./output";
 import * as Winston from "winston";
+import { Connection } from "mumble";
 import { Api } from "./rest-api";
 import * as FS from "async-file";
 import { EventEmitter } from "events";
@@ -19,7 +20,7 @@ const AUDIO_CACHE_AMOUNT = 4;
 export class Bot extends EventEmitter {
     public options: any;
     public database: any;
-    public mumble: any;
+    public mumble: Connection;
     public cachedAudios: CachedAudio[];
     public audioCacheAmount: number;
     public output: Output;
@@ -256,20 +257,6 @@ export class Bot extends EventEmitter {
         while (prot.length > 0) {
             this.cachedAudios.unshift(prot.pop());
         }
-    }
-
-    /**
-     * Find all users in mumble which contain the supplied string in their name.
-     * For example:
-     * ```
-     *     bot.findUsers("merlin");
-     * ```
-     * will find "Merlin | LÖML | Mörrrlin".
-     * This method is used in *certain* methods.
-     * @param namePart Text to search for.
-     */
-    public findUsers(namePart: string): any[] {
-        return this.mumble.users.filter(user => user.name.toLowerCase.includes(namePart.toLowerCase()));
     }
 }
 

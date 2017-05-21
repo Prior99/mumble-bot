@@ -8,17 +8,11 @@ import { PassThrough as PassThroughStream } from "stream";
 import { Bot } from "..";
 import { writeUserStatsOnline, writeUserStatsSpeak } from "../database";
 import { DatabaseUser } from "../types";
+import { User as MumbleUser } from "mumble";
 
 const TIMEOUT_THRESHOLD = 300;
 const msInS = 1000;
 const audioFreq = 48000;
-
-if (!String.prototype.startsWith) {
-    String.prototype.startsWith = function(searchString, position) {
-        position = position || 0;
-        return this.lastIndexOf(searchString, position) === position;
-    };
-}
 
 /**
  * This class belongs to the VoiceInput and handles the speech recognition for a
@@ -26,7 +20,7 @@ if (!String.prototype.startsWith) {
  */
 export class VoiceInputUser extends Stream.Writable {
     private bot: Bot;
-    private user: any;
+    private user: MumbleUser;
     private databaseUser: DatabaseUser;
     private speaking: boolean = false;
     private connectTime: Date;
@@ -38,9 +32,9 @@ export class VoiceInputUser extends Stream.Writable {
     private started: boolean;
     /**
      * @constructor
-     * @param {MumbleUser} user - Mumble user to recognize the speech of.
-     * @param {DatabaseUser} databaseUser - The user from the database.
-     * @param {Bot} bot - The bot instance this user belongs to.
+     * @param user Mumble user to recognize the speech of.
+     * @param databaseUser The user from the database.
+     * @param bot The bot instance this user belongs to.
      */
     constructor(user, databaseUser, bot) {
         super();
@@ -54,12 +48,11 @@ export class VoiceInputUser extends Stream.Writable {
 
     /**
      * Feed raw PCM audio data captured from mumble to this user.
-     * @param {array} chunk - Buffer of raw PCM audio data.
-     * @param {string} encoding - unused.
-     * @param {function} done - callback.
-     * @returns {undefined}
+     * @param chunk Buffer of raw PCM audio data.
+     * @param encoding unused.
+     * @param done callback.
      */
-    public _write(chunk: any, encoding?: string, done?: Function): boolean {
+    public _write(chunk: Buffer, encoding?: string, done?: Function): boolean {
         if (!this.speaking) {
             this.speechStarted();
         }
@@ -123,7 +116,7 @@ export class VoiceInputUser extends Stream.Writable {
                 "-ar", audioFreq,
                 "-ac", "1"
                 )
-                .on("error", (err) => Winston.error("Encoder for user " + this.user.username + " crashed."))
+                .on("error", (err) => Winston.error(`Encoder for user ${this.user.name} crashed.`))
                 .audioCodec("libmp3lame")
                 .save(this.filename);
         }
@@ -131,7 +124,6 @@ export class VoiceInputUser extends Stream.Writable {
 
     /**
      * When user stopped speaking.
-     * @returns {undefined}
      */
     private speechStopped() {
         this.speaking = false;
@@ -151,10 +143,9 @@ export class VoiceInputUser extends Stream.Writable {
     /**
      * When user continues speaking this method will be called,
      * the audio will be encoded and the timeout will be refreshed.
-     * @param {Buffer} chunk - The user's speech buffer.
-     * @returns {undefined}
+     * @param chunk - The user's speech buffer.
      */
-    private speechContinued(chunk) {
+    private speechContinued(chunk: Buffer) {
         if (this.databaseUser.settings.record === true) {
             this.passthrough.write(chunk);
         }
@@ -163,14 +154,13 @@ export class VoiceInputUser extends Stream.Writable {
 
     /**
      * Stop all timeouts and shutdown everything.
-     * @return {undefined}
      */
-    stop() {
+    public stop() {
         this.encoder.kill();
         this.end();
         if (this.timeout) {
             clearTimeout(this.timeout);
         }
-        Winston.info("Input stopped for user " + this.user.name);
+        Winston.info(`Input stopped for user ${this.user.name}`);
     }
 }
