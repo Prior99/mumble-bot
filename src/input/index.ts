@@ -40,9 +40,10 @@ export class VoiceInput extends EventEmitter {
      * @param user The mumble user object.
      * @param databaseUser The user object from the database.
      */
-    private addRegisteredUser(user: MumbleUser, databaseUser: DatabaseUser) {
+    private async addRegisteredUser(user: MumbleUser, databaseUser: DatabaseUser) {
         Winston.info("Input registered for user " + user.name);
         const localUser = new VoiceInputUser(user, databaseUser, this.bot);
+        await localUser.init();
         this.users[user.id] = localUser;
         const stream = user.outputStream(true);
         stream.pipe(localUser);
@@ -58,12 +59,6 @@ export class VoiceInput extends EventEmitter {
             if (!databaseUser) {
                 Winston.info(
                     `Did not register input for user ${user.name} as this user is not linked to any database user.`
-                );
-                return;
-            }
-            if (databaseUser.settings.record !== true) {
-                Winston.info(
-                    `Did not register input for user ${user.name} as this user does not want to be recorded.`
                 );
                 return;
             }

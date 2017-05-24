@@ -30,6 +30,8 @@ export class VoiceInputUser extends Stream.Writable {
     private filename: string;
     private encoder: any;
     private started: boolean;
+    private path: string;
+
     /**
      * @constructor
      * @param user Mumble user to recognize the speech of.
@@ -41,9 +43,17 @@ export class VoiceInputUser extends Stream.Writable {
         this.user = user;
         this.bot = bot;
         this.databaseUser = databaseUser;
+        this.path = `${this.bot.options.paths.tmp}/useraudio/${this.user.id}`;
         this.createNewRecordingFile();
         this.connectTime = new Date();
         this.user.on("disconnect", this.onDisconnect.bind(this));
+    }
+
+    /**
+     * Has to be called from outside, before the stream is connected.
+     */
+    public async init() {
+        await mkdirp(this.path);
     }
 
     /**
@@ -92,20 +102,18 @@ export class VoiceInputUser extends Stream.Writable {
     /**
      * Creates a new temporary record file.
      */
-    private async createNewRecordingFile() {
-        const path = `${this.bot.options.paths.tmp}/useraudio/${this.user.id}`;
-        await mkdirp(path);
-        this.filename = `${path}/${Date.now()}.mp3`;
+    private createNewRecordingFile = () => {
+        this.filename = `${this.path}/${Date.now()}.mp3`;
         this.passthrough = new PassThroughStream();
         this.encoder = FFMpeg(this.passthrough)
-            .inputOptions(
-                "-f", "s16le",
-                "-ar", audioFreq,
-                "-ac", "1"
-            )
-            .on("error", (err) => Winston.error(`Encoder for user ${this.user.name} crashed.`, err))
-            .audioCodec("libmp3lame")
-            .save(this.filename);
+        .inputOptions(
+            "-f", "s16le",
+            "-ar", audioFreq,
+            "-ac", "1"
+        )
+        .on("error", (err) => Winston.error(`Encoder for user ${this.user.name} crashed.`, err))
+        .audioCodec("libmp3lame")
+        .save(this.filename);
     }
 
     /**
@@ -114,15 +122,13 @@ export class VoiceInputUser extends Stream.Writable {
     private speechStopped() {
         this.speaking = false;
         this.started = false;
-        if (this.databaseUser.settings.record === true) {
-            this.passthrough.end();
-            this.bot.addCachedAudio(
-                this.filename,
-                this.databaseUser.id,
-                (Date.now() - this.speakStartTime.getTime()) / msInS
-            );
-            this.createNewRecordingFile();
-        }
+        this.passthrough.end();
+        this.bot.addCachedAudio(
+            this.filename,
+            this.databaseUser.id,
+            (Date.now() - this.speakStartTime.getTime()) / msInS
+        );
+        this.createNewRecordingFile();
         writeUserStatsSpeak(this.databaseUser, this.speakStartTime, new Date(), this.bot.database);
     }
 
@@ -132,9 +138,7 @@ export class VoiceInputUser extends Stream.Writable {
      * @param chunk - The user's speech buffer.
      */
     private speechContinued(chunk: Buffer) {
-        if (this.databaseUser.settings.record === true) {
-            this.passthrough.write(chunk);
-        }
+        this.passthrough.write(chunk);
         this.refreshTimeout();
     }
 
