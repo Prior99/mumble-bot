@@ -5,7 +5,7 @@ import { Connection } from "mumble";
 import { Api } from "./rest-api";
 import { writeFile, unlink, readFile } from "async-file";
 import { EventEmitter } from "events";
-import Permissions from "./permissions";
+import { Permissions } from "./permissions";
 import { visualizeAudioFile } from "./visualizer";
 import { connectDatabase } from "./database";
 import { CachedAudio } from "./types";
@@ -25,7 +25,7 @@ export class Bot extends EventEmitter {
     public audioCacheAmount: number;
     public output: Output;
     public permissions: Permissions;
-    private audioId: number = 0;
+    private audioId = 0;
     private input: VoiceInput;
     private api: Api;
 
@@ -63,7 +63,7 @@ export class Bot extends EventEmitter {
         try {
             this.cachedAudios = JSON.parse(await readFile(this.cachedAudioIndexFilePath));
             this.audioId = this.cachedAudios.reduce((result, cached) => cached.id > result ? cached.id : result, 0) + 1;
-        } catch(err) {
+        } catch (err) {
             Winston.error("Failed to load cached audios from index file.", err);
             this.cachedAudios = [];
         }
@@ -113,7 +113,7 @@ export class Bot extends EventEmitter {
      * @param filename Filename of the soundfile to play. Must be a mono-channel 48,000Hz WAV-File
      * @param meta Metadata passed to the output module.
      */
-    async playSound(filename: string, meta: MetaInformation): Promise<void> {
+    public async playSound(filename: string, meta: MetaInformation): Promise<void> {
         await this.output.playSound(filename, meta);
     }
 
@@ -158,7 +158,6 @@ export class Bot extends EventEmitter {
         this.clearUpCachedAudio();
         this.persistCachedAudios();
     }
-
 
     /**
      * Retrieve the cached audio by its id. Returns the audio when the id was valid
@@ -266,5 +265,3 @@ export class Bot extends EventEmitter {
         }
     }
 }
-
-export default Bot;

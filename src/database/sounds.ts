@@ -8,7 +8,7 @@ import { DatabaseSound } from "../types/sounds";
 export async function addSound(name: string, connection): Promise<number> {
     const result = await connection.query("INSERT INTO Sounds(name) VALUES(?)", [name]);
     return result.insertId;
-};
+}
 
 /**
  * List all sounds in the database.
@@ -17,7 +17,7 @@ export async function addSound(name: string, connection): Promise<number> {
 export async function listSounds(connection): Promise<DatabaseSound[]> {
     const rows = await connection.query("SELECT id, name, used FROM Sounds ORDER BY name, used DESC");
     return rows;
-};
+}
 
 /**
  * Get details on sepcific sound.
@@ -40,5 +40,4 @@ export async function getSound(id: number, connection): Promise<DatabaseSound> {
  */
 export async function usedSound(id: number, connection): Promise<void> {
     await connection.query("UPDATE Sounds SET used = used +1 WHERE id = ?", [id]);
-};
-
+}

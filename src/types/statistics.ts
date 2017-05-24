@@ -35,7 +35,6 @@ export interface RecordingCountByUserStat {
     user: string;
 }
 
-
 export interface RecordingCountByDateStat {
     /**
      * Amount of records this user has.

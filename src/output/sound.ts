@@ -18,10 +18,10 @@ const audioFreq = 48000;
  */
 export class Sound extends EventEmitter {
     public length: number;
-    private plaing: boolean = false;
+    private plaing = false;
     private stream: any;
     private queue: any[] = [];
-    private current: any = null;
+    private current: any;
     private ffmpeg: any;
     private timeout: NodeJS.Timer;
     private playing: boolean;
@@ -29,7 +29,7 @@ export class Sound extends EventEmitter {
     /**
      * @constructor
      * @param stream Stream to write the audio data to.
-      */
+     */
     constructor(stream: NodeJS.WritableStream) {
         super();
         this.stream = stream;
@@ -68,7 +68,7 @@ export class Sound extends EventEmitter {
                 const waitTime = totalTime - timeAlreadyTaken;
                 this.timeout = setTimeout(this.playbackStopped.bind(this), waitTime);
             });
-        } catch(err) {
+        } catch (err) {
             Winston.error(`Error reading file ${filename}`, err);
             this.playbackStopped();
         }
@@ -81,7 +81,7 @@ export class Sound extends EventEmitter {
         this.queue = [];
         if (this.timeout) {
             clearTimeout(this.timeout);
-            this.timeout = null;
+            this.timeout = undefined;
         }
         if (this.ffmpeg) {
             this.ffmpeg.kill();
@@ -105,7 +105,7 @@ export class Sound extends EventEmitter {
         if (this.current) {
             this.emit("stop");
             const callback = this.current.callback;
-            this.current = null;
+            this.current = undefined;
             this.next();
             if (callback) {
                 callback();

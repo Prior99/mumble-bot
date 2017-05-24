@@ -13,7 +13,7 @@ export async function addDialog(dialog: number[], connection): Promise<void> {
             "INSERT INTO DialogParts(dialogId, position, recordId) VALUES(?, ?, ?)", [dialogId, index, id]
         )
     ));
-};
+}
 
 /**
  * Get the parts of a dialog (The single records).
@@ -25,7 +25,7 @@ export async function getDialogParts(dialogId: number, connection): Promise<numb
         "SELECT recordId FROM DialogParts WHERE dialogId = ? ORDER BY position ASC", [dialogId]
     );
     return list.map(p => p.recordId);
-};
+}
 
 /**
  * Get the single records from a dialog based on its id.

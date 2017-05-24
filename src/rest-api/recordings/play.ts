@@ -26,7 +26,7 @@ export const Play: AuthorizedApiEndpoint = (bot: Bot) => async ({ params, user }
         bot.playSound(`${bot.options.paths.recordings}/${id}`, {
             type: "recording",
             recording,
-            user: user
+            user
         });
         return okay(res);
     }

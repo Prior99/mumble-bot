@@ -1,7 +1,7 @@
 import Samplerate from "node-samplerate";
 import * as Winston from "winston";
 import { EventEmitter } from "events";
-import mkdirp = require("mkdirp-promise");
+import mkdirp = require("mkdirp-promise"); // tslint:disable-line
 import * as FFMpeg from "fluent-ffmpeg";
 import * as Stream from "stream";
 import { PassThrough as PassThroughStream } from "stream";
@@ -22,7 +22,7 @@ export class VoiceInputUser extends Stream.Writable {
     private bot: Bot;
     private user: MumbleUser;
     private databaseUser: DatabaseUser;
-    private speaking: boolean = false;
+    private speaking = false;
     private connectTime: Date;
     private passthrough: PassThroughStream;
     private timeout: NodeJS.Timer;

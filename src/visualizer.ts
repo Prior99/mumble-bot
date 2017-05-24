@@ -2,7 +2,7 @@ import * as Winston from "winston";
 import * as Canvas from "canvas";
 import * as FFMpeg from "fluent-ffmpeg";
 import * as FS from "fs";
-import AudioAnalyzer from "./audioanalyzer";
+import { AudioAnalyzer } from "./audioanalyzer";
 import * as ChunkingStreams from "chunking-streams";
 
 const maxUnsignedByte = 240;
@@ -31,7 +31,7 @@ export const visualizeAudioFile = function(filename) {
                 for (let i = 0; i < data.length; i++) {
                     arr[i] = (data[i] / maxByte) * 2 - 1;
                 }
-                analyzer.analyze(arr)
+                analyzer.analyze(arr);
             });
             chunker.on("end", () => {
                 const canvas = new Canvas(width, height);

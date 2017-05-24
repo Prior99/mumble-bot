@@ -1,5 +1,11 @@
 import * as Winston from "winston";
-import { DatabaseUser, StatObjectSpeechPerHour, StatObjectSpeechPerUser, StatObjectSpeechPerWeekday, StatObjectOnlinePerUser } from "../types";
+import {
+    DatabaseUser,
+    StatObjectSpeechPerHour,
+    StatObjectSpeechPerUser,
+    StatObjectSpeechPerWeekday,
+    StatObjectOnlinePerUser
+} from "../types";
 
 const millisecondsPerSecond = 1000;
 
@@ -13,7 +19,7 @@ export async function writeUserStatsSpeak(user: DatabaseUser, started: Date, end
     await connection.query(
         "INSERT INTO UserStatsSpeaking(user, started, ended) VALUES(?, ?, ?)", [user.id, started, ended]
     );
-};
+}
 
 /**
  * Write a new set of statistics into the database when a user is online.
@@ -25,7 +31,7 @@ export async function writeUserStatsOnline(user: DatabaseUser, started: Date, en
     await connection.query(
         "INSERT INTO UserStatsOnline(user, started, ended) VALUES(?, ?, ?)", [user.id, started, ended]
     );
-};
+}
 
 /**
  * Get statistics about how much speech per hour was produced.
@@ -40,7 +46,7 @@ export async function getSpokenPerHour(connection): Promise<StatObjectSpeechPerH
         hour: elem.hour,
         amount: new Date(elem.amount * millisecondsPerSecond)
     }));
-};
+}
 
 /**
  * Get statistics about the speech per user.
@@ -56,7 +62,7 @@ export async function getSpokenPerUser(connection): Promise<StatObjectSpeechPerU
         user: elem.user,
         amount: new Date(elem.amount * millisecondsPerSecond)
     }));
-};
+}
 
 /**
  * Get statistics about speech per weekday.
@@ -72,7 +78,8 @@ export async function getSpokenPerWeekday(connection): Promise<StatObjectSpeechP
         day: elem.day,
         amount: new Date(elem.amount * millisecondsPerSecond)
     }));
-};
+}
+
 /**
  * Get statistics about the online time per user.
  * @return List of objects representing the statistics requested.
@@ -88,4 +95,4 @@ export async function getOnlinePerUser(connection): Promise<StatObjectOnlinePerU
         user: elem.user,
         amount: new Date(elem.amount * millisecondsPerSecond)
     }));
-};
+}

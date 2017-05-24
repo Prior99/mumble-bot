@@ -11,10 +11,10 @@ import { internalError, okay } from "../../utils";
 export const PerHour: AuthorizedApiEndpoint = (bot: Bot) => async (req, res) => {
     try {
         const arr = await getSpokenPerHour(bot.database);
-        return okay(res, arr)
+        return okay(res, arr);
     }
     catch (err) {
         Winston.error("Could not get amount of speech by hour of the day.", err);
         return internalError(res);
     }
-};;
+};

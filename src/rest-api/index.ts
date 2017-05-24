@@ -1,21 +1,21 @@
 import * as Express from "express";
 import * as Winston from "winston";
-import ExpressWS = require("express-ws");
+import ExpressWS = require("express-ws"); // tslint:disable-line
 import * as BodyParser from "body-parser";
 import { colorify } from "../colorbystring";
 import * as HTTP from "http-status-codes";
 import { Server } from "http";
 
-import { Recordings } from './recordings';
-import { Sounds } from './sound';
-import { Stats } from './stats';
-import { Users } from './users';
+import { Recordings } from "./recordings";
+import { Sounds } from "./sound";
+import { Stats } from "./stats";
+import { Users } from "./users";
 
-import { ChannelTree } from './channel-tree';
-import { Log } from './log';
-import { Authorized } from './authorized';
-import { WebsocketQueue } from './websocket-queue';
-import { ShutUp } from './shut-up';
+import { ChannelTree } from "./channel-tree";
+import { Log } from "./log";
+import { Authorized } from "./authorized";
+import { WebsocketQueue } from "./websocket-queue";
+import { ShutUp } from "./shut-up";
 import { checkLoginData, getUserByUsername } from "../database";
 import { Bot } from "../index";
 import { forbidden, internalError, authorizedWebsocket, authorized, notFound } from "./utils";
@@ -57,10 +57,10 @@ export class Api {
         this.server = this.app.listen(port);
 
         const timeoutValue = 30000; // 30 seconds timeout
-        this.server.setTimeout(timeoutValue, () => {});
+        this.server.setTimeout(timeoutValue, () => { return; });
         this.server.on("connection", (conn) => this.onConnection(conn));
 
-        Winston.info("Api started, listening on port " + port);
+        Winston.info(`Api started, listening on port ${port}`);
     }
 
     private handleCORS: Express.Handler = (req, res, next) => {
@@ -93,7 +93,7 @@ export class Api {
         return new Promise((resolve, reject) => {
             Winston.info("Stopping website ...");
             this.server.close(() => {
-                Winston.info("Terminating " + this.connections.size + " connections.");
+                Winston.info(`Terminating ${this.connections.size} connections.`);
                 for (const socket of this.connections) {
                     socket.destroy();
                     this.connections.delete(socket);

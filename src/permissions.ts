@@ -13,13 +13,11 @@ type PermissionName =
     "be-quiet" |
     "log";
 
-
-
 /**
  * Handles permissions in the bot.
  * This is basically just a nicer-to-use interface to the database.
  */
-class Permissions {
+export class Permissions {
     private database: any;
     /**
      * @param database - The database of the bot to use.
@@ -60,7 +58,7 @@ class Permissions {
      */
     public requirePermission(user, permission, callback) {
         if (!user) {
-            Winston.warn("Unknown user tried to execute something which required permission \"" + permission + "\"");
+            Winston.warn(`Unknown user tried to execute something which required permission "${permission}"`);
             return;
         }
         else {
@@ -83,12 +81,11 @@ class Permissions {
         if (!issuer || (grant && perm)) {
             try {
                 await grantPermission(user.id, permission, this.database);
-                Winston.info("Permission \"" + permission + "\" was granted to user " + user.username);
+                Winston.info(`Permission "${permission}" was granted to user ${user.username}`);
                 return true;
             }
             catch (err) {
-                Winston.error("Error when granting permission \"" + permission + "\" to user "
-                    + user.username + ".", err);
+                Winston.error(`Error when granting permission "${permission}" to user ${user.username}.`, err);
                 return false;
             }
         }
@@ -137,7 +134,7 @@ class Permissions {
             return databasePermission;
         }
         catch (err) {
-            Winston.error("Error when getting permission \"" + permission + "\".", err);
+            Winston.error(`Error when getting permission "${permission}".`, err);
             return;
         }
     }
@@ -167,7 +164,7 @@ class Permissions {
      * @param callback Called once all permissions were processed.
      * @returns If everything has gone right.
      */
-    async grantAllPermissions(issuer: number, user: number): Promise<boolean> {
+    public async grantAllPermissions(issuer: number, user: number): Promise<boolean> {
         const permissions = await this.listPermissions();
         let okay = true;
         while (permissions.length) {
@@ -222,5 +219,3 @@ class Permissions {
         return obj;
     }
 }
-
-export default Permissions;

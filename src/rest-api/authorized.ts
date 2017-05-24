@@ -11,4 +11,3 @@ import { okay } from "./utils";
 export const Authorized: AuthorizedApiEndpoint = (bot: Bot) => async (req, res) => {
     okay(res);
 };
-

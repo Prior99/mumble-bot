@@ -1,4 +1,4 @@
-import { VoiceInputUser } from "./user"
+import { VoiceInputUser } from "./user";
 import * as Winston from "winston";
 import { EventEmitter } from "events";
 import { Bot } from "..";

@@ -13,7 +13,7 @@ export async function getLinkedMumbleUsers(connection): Promise<number[]> {
         "LEFT JOIN Users u ON u.id = m.user"
     );
     return rows.map(row => row.id);
-};
+}
 
 /**
  * Returns all mumble user ids of mumble users which are linked to the specified user.
@@ -28,7 +28,7 @@ export async function getLinkedMumbleUsersOfUser(id: number, connection): Promis
         [id]
     );
     return rows;
-};
+}
 
 /**
  * Links a mumble user to a user in this bot.
@@ -57,4 +57,3 @@ export async function getLinkedUser(id: number, connection) {
         return;
     }
 }
-

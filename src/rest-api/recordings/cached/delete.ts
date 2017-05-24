@@ -8,7 +8,7 @@ import { AuthorizedApiEndpoint } from "../../types";
  */
 export const Delete: AuthorizedApiEndpoint = (bot: Bot) => ({ params }, res) => {
     if (bot.removeCachedAudioById(parseInt(params.id))) {
-        return okay(res)
+        return okay(res);
     }
     return internalError(res);
-}
+};

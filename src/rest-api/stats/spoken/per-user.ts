@@ -17,4 +17,4 @@ export const PerUser: AuthorizedApiEndpoint = (bot: Bot) => async (req, res) => 
         Winston.error("Could not get amount of speech by user.", err);
         return internalError(res);
     }
-};;
+};

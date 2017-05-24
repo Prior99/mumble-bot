@@ -12,4 +12,3 @@ export interface DatabaseSound {
      */
     used: number;
 }
-

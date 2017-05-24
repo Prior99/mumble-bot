@@ -11,7 +11,7 @@ export async function hasPermission(userid: number, permission, connection) {
         [userid, permission]
     );
     return rows && rows.length > 0;
-};
+}
 
 /**
  * Grants a permission to a user without checking.
@@ -22,7 +22,7 @@ export async function grantPermission(userid: number, permission, connection) {
     await connection.query("INSERT IGNORE INTO UserPermissions (user, permission) VALUES (?, ?)",
         [userid, permission]
     );
-};
+}
 
 /**
  * Revokes a permission from a user without performing any checks.
@@ -33,7 +33,8 @@ export async function revokePermission(userid: number, permission, connection) {
     await connection.query("DELETE FROM UserPermissions WHERE user = ? AND permission = ?",
         [userid, permission]
     );
-};
+}
+
 /**
  * Get details about a certain permission.
  * @param permission Permission to look up (Id).
@@ -48,7 +49,8 @@ export async function getPermission(permission: number, connection): Promise<Per
     else {
         return;
     }
-};
+}
+
 /**
  * Get a list of all permissions.
  * @return The permission to get the details of.
@@ -56,5 +58,4 @@ export async function getPermission(permission: number, connection): Promise<Per
 export async function listPermissions(connection): Promise<Permission[]> {
     const rows = await connection.query("SELECT id, name, description, icon FROM Permissions");
     return rows;
-};
-
+}

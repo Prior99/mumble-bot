@@ -10,7 +10,7 @@ import { internalError, conflict, okay } from "../utils";
 async function grantAll(bot: Bot) {
     try {
         const user = await getUserById(1, bot.database);
-        bot.permissions.grantAllPermissions(null, user.id);
+        bot.permissions.grantAllPermissions(undefined, user.id);
     }
     catch (err) {
         Winston.error("Error when granting all permissions to user with id 0.", err);
