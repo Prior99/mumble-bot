@@ -40,6 +40,7 @@ export async function connectDatabase(options) {
             user: options.user,
             password: options.password,
             database: options.database,
+            socketPath: options.socketPath,
             multipleStatements: true,
             connectTimeout: options.connectTimeout ? options.connectTimeout : timeout
         });

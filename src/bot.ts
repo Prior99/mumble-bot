@@ -57,14 +57,12 @@ export class Bot extends EventEmitter {
 
         this.init();
     }
-    /**
-     * Register commands and listeners and load all addons.
-     * @return {undefined}
-     */
+
     private async init() {
         this.input = new VoiceInput(this);
         try {
             this.cachedAudios = JSON.parse(await readFile(this.cachedAudioIndexFilePath));
+            this.audioId = this.cachedAudios.reduce((result, cached) => cached.id > result ? cached.id : result, 0) + 1;
         } catch(err) {
             Winston.error("Failed to load cached audios from index file.", err);
             this.cachedAudios = [];

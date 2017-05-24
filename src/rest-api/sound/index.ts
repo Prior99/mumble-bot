@@ -14,7 +14,7 @@ import { List } from "./list";
 export const Sounds: ApiRoute = (bot: Bot) => {
     const router = Express.Router();
     router.use(Multer({
-        dest: bot.options.website.tmp
+        dest: bot.options.paths.tmp
     }).array());
 
     router.put("/", authorized(Add)(bot));

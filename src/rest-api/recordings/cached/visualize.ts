@@ -14,7 +14,7 @@ export const Visualize: AuthorizedApiEndpoint = (bot: Bot) => ({ params }, res) 
     if (sound) {
         res.status(HTTP.OK);
         FS.createReadStream(`${sound.file}.png`).on("error", (err) => {
-            Winston.error(`Error sending visualization of ${sound.file} to client.`);
+            Winston.error(`Error sending visualization of ${sound.file} to client.`, err);
             return internalError(res);
         }).pipe(res);
         return;

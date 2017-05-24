@@ -17,5 +17,9 @@
         "recordings": "data/recordings",
         "visualizations": "data/visualizations",
         "uploaded": "data/uploaded"
+    },
+    "website": {
+        "port": "23278",
+        "sessionSecret": "dfghjfdghtdrgyh"
     }
 }
