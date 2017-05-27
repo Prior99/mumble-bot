@@ -47,7 +47,7 @@ deploy:
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
   script:
     - cd deploy
-    - ansible-playbook mumble-bot.yml --extra-vars "database_password=$DATABASE_PASSWORD bot_key=$BOT_KEY"
+    - ansible-playbook mumble-bot.yml --extra-vars "database_password='$DATABASE_PASSWORD' bot_key='$BOT_KEY'"
   stage: deploy
   when: manual
   only:
