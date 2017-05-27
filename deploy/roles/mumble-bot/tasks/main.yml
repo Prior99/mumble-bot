@@ -5,7 +5,7 @@
 
 - name: fetch latest artifact
   unarchive:
-    src: https://git.92k.de/prior/mumble-bot/builds/artifacts/master/download?job=build
+    src: 'https://git.92k.de/prior/mumble-bot/builds/artifacts/master/download?job=build'
     dest: /home/prior/applications/mumble-bot
     remote_src: yes
 
