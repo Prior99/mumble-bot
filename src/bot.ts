@@ -6,7 +6,6 @@ import { Api } from "./rest-api";
 import { writeFile, unlink, readFile } from "async-file";
 import { EventEmitter } from "events";
 import { Permissions } from "./permissions";
-import { visualizeAudioFile } from "./visualizer";
 import { connectDatabase } from "./database";
 import { CachedAudio } from "./types";
 import { MetaInformation } from "./types/output";
@@ -142,7 +141,7 @@ export class Bot extends EventEmitter {
      * @param user User that emitted the audio.
      * @param duration Duration of the audio.
      */
-    public async addCachedAudio(filename: string, user: number, duration: number): Promise<void> {
+    public addCachedAudio(filename: string, user: number, duration: number) {
         const obj = {
             file: filename,
             date: new Date(),
@@ -151,8 +150,6 @@ export class Bot extends EventEmitter {
             duration,
             protected: false
         };
-        const buffer = await visualizeAudioFile(filename);
-        await writeFile(filename + ".png", buffer);
         this.cachedAudios.push(obj);
         this.emit("cached-audio", obj);
         this.clearUpCachedAudio();

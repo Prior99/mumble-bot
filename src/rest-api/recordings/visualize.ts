@@ -1,69 +1,38 @@
 import * as Winston from "winston";
-import mkdirp = require("mkdirp-promise"); // tslint:disable-line
-import { stat, createReadStream, writeFile } from "async-file";
+import { createReadStream, writeFile, exists } from "async-file";
 import * as HTTP from "http-status-codes";
 import { Bot } from "../..";
-import { internalError } from "../utils";
+import { internalError, notFound } from "../utils";
 import { AuthorizedApiEndpoint } from "../types";
-import { visualizeAudioFile } from "../../visualizer";
+
+const maxRetries = 5;
 
 /**
  * This view handles the downloading of visualizations of the records.
  */
 export const Visualize: AuthorizedApiEndpoint = (bot: Bot) => async ({ params }, res) => {
     const id = parseInt(params.id);
-    const sendFile = stream => {
-        res.status(HTTP.OK);
-        stream.pipe(res);
-        return;
-    };
 
     const dirName = bot.options.paths.visualizations;
-    const soundFileName = `${bot.options.paths.recordings}/${id}`;
     const fileName = `${dirName}/${id}.png`;
 
-    try {
-        await mkdirp(dirName);
-    }
-    catch (e) {
-        if (e.code !== "EEXIST") {
-            res.status(HTTP.INTERNAL_SERVER_ERROR).send({
-                reason: "internal_error"
-            });
-            throw e;
+    const trySend = async (retries: number) => {
+        if (!await exists(fileName)) {
+            if (retries === maxRetries) {
+                return notFound(res);
+            }
+            setTimeout(() => trySend(retries + 1), 500);
+            return;
         }
-    }
-    let stream;
-    try {
-        await stat(fileName);
-        stream = createReadStream(fileName);
-        sendFile(stream);
-    }
-    catch (err) {
-        if (err.code !== "ENOENT") {
+        try {
+            res.status(HTTP.OK);
+            createReadStream(fileName).pipe(res);
+        }
+        catch (err) {
             Winston.error("Error occured during request of sound visualization.", err);
             return internalError(res);
         }
-        Winston.info(`Visualizing audio file "${soundFileName}" to "${fileName}".`);
-        try {
-            const buffer = await visualizeAudioFile(soundFileName);
-            await writeFile(fileName, buffer);
-            try {
-                const readStream = createReadStream(fileName);
-                return sendFile(readStream);
-            }
-            catch (err) {
-                if (err.code === "ENOENT") {
-                    Winston.error("Visualizer did not create a file.");
-                } else {
-                    Winston.error("Unknown error when accessing file from visualizer.", err);
-                }
-                return internalError(res);
-            }
-        }
-        catch (err) {
-            Winston.error("Error occured when viusalizing file.", err);
-            return internalError(res);
-        }
-    }
+    };
+
+    await trySend(0);
 };

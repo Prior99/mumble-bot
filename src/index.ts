@@ -1,12 +1,9 @@
-/*
- * Imports
- */
 import { connect } from "mumble";
 import { Bot } from "./bot";
-import * as moment from "moment";
 import * as Winston from "winston";
 import * as FS from "fs";
 import { connectDatabase } from "./database";
+import { setupWinston } from "./utils/winston";
 /*
  * Winston
  */
@@ -14,32 +11,7 @@ import "winston-mysql-transport";
 
 export * from "./bot";
 
-/**
- * Returns the timestamp formatted as yyyy-mm-dd hh:mm:ss
- * @return {String} - the formatted timestamp.
- */
-function timestampFunction () {
-    const d = new Date();
-    const actualYear = d.getFullYear();
-    return moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
-}
-
-Winston.remove(Winston.transports.Console);
-Winston.add(Winston.transports.Console, {
-    colorize: true,
-    timestamp: timestampFunction,
-    level: "verbose"
-});
-
-Winston.add(Winston.transports.File, {
-    filename: "bot.log",
-    maxsize: "64000",
-    maxFiles: 7,
-    json: false,
-    level: "verbose",
-    colorize: true,
-    timestamp: timestampFunction
-});
+setupWinston("bot.log");
 
 const options: any = require(`${__dirname}/../config.json`); // tslint:disable-line
 
