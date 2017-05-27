@@ -1,0 +1,17 @@
+image: "node:7"
+
+before_script:
+  - yarn install
+
+cache:
+  key: "$CI_PROJECT_ID"
+  paths:
+    - node_modules/
+
+build:
+  script:
+    - npm run build
+
+lint:
+  script:
+    - npm run lint
