@@ -22,7 +22,7 @@ async function generateMissingVisualization(file: string, transform: PathTranfor
         const buffer = await visualizeAudioFile(file);
         await writeFile(destination, buffer);
         Winston.info(`Generated visualization for ${file} to ${destination}.`);
-    } catch(err) {
+    } catch (err) {
         Winston.error(`Failed to generate visualization for file ${file}:`, err);
     }
 }

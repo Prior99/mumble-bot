@@ -29,4 +29,3 @@ export function setupWinston(filename: string) {
         timestamp: timestampFunction
     });
 }
-
