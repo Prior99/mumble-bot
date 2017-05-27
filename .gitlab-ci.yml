@@ -1,10 +1,9 @@
-image: "node:7"
-
 stages:
   - test
   - deploy
 
 build:
+  image: "node:7"
   before_script:
     - yarn install
   script:
@@ -17,9 +16,17 @@ build:
   artifacts:
     paths:
       - dist/
-      - node_modules/
+      - src/
+      - package.json
+      - yarn.lock
+      - scripts/
+      - schema.sql
+      - CHANGELOG.md
+      - typings/
+      - README.md
 
 lint:
+  image: "node:7"
   before_script:
     - yarn install
   script:
@@ -29,7 +36,6 @@ lint:
     key: "$CI_PROJECT_ID"
     paths:
       - node_modules/
-  when: manual
 
 deploy:
   image: "alpine:3.5"
@@ -40,5 +46,9 @@ deploy:
     - chmod 600 ~/.ssh/id_rsa
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
   script:
+    - cd deploy
     - ansible-playbook mumble-bot.yml --extra-vars "database_password=$DATABASE_PASSWORD bot_key=$BOT_KEY"
   stage: deploy
+  when: manual
+  only:
+    - master
