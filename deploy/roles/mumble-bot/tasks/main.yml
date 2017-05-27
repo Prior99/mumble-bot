@@ -1,0 +1,44 @@
+---
+
+- name: fetch latest artifact
+  unarchive:
+    src: https://92k.de/prior/mumble-bot/builds/artifacts/master/download?job=build
+    dest: /home/prior/applications/mumble-bot
+    remote_src: yes
+
+- name: configure
+  template:
+    src: config.json.j2
+    dest: '/home/prior/applications/mumble-bot/config.json'
+
+- name: add private key
+  copy: content="{{ bot_key }}" dest=/home/prior/applcations/mumble-bot/bot.key
+
+- name: add cert
+  template:
+    src: bot.cert.j2
+    dest: '/home/prior/applications/mumble-bot/bot.cert'
+
+- name: install node
+  unarchive:
+    src: https://nodejs.org/dist/v7.10.0/node-v7.10.0-linux-x64.tar.xz
+    dest: /home/prior/applications/mumble-bot/node
+    remote_src: yes
+
+- name: add systemd unit files
+  template:
+    src: {{ item }}.j2
+    dest: '/home/prior/.config/systemd/user/{{ item }}'
+  with_items:
+    - mumble-bot.service
+    - mumble-bot-worker.service
+
+- name: enable and start the services
+  service:
+    name: '{{ item }}'
+    state: restarted
+    enabled: yes
+    daemon-reload: yes
+  with_items:
+    - mumble-bot
+    - mumble-bot-worker

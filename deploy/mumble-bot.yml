@@ -1,0 +1,7 @@
+---
+
+- name: Mumble Bot
+  hosts: 92k.de
+  remote_user: prior
+  roles:
+    - mumble-bot

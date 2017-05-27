@@ -1,17 +1,44 @@
 image: "node:7"
 
-before_script:
-  - yarn install
-
-cache:
-  key: "$CI_PROJECT_ID"
-  paths:
-    - node_modules/
+stages:
+  - test
+  - deploy
 
 build:
+  before_script:
+    - yarn install
   script:
     - npm run build
+  stage: test
+  cache:
+    key: "$CI_PROJECT_ID"
+    paths:
+      - node_modules/
+  artifacts:
+    paths:
+      - dist/
+      - node_modules/
 
 lint:
+  before_script:
+    - yarn install
   script:
     - npm run lint
+  stage: test
+  cache:
+    key: "$CI_PROJECT_ID"
+    paths:
+      - node_modules/
+  when: manual
+
+deploy:
+  image: "alpine:3.5"
+  before_script:
+    - apk --update add ansible git openssh python py2-pip
+    - mkdir ~/.ssh
+    - echo "$SSH_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+  script:
+    - ansible-playbook mumble-bot.yml --extra-vars "database_password=$DATABASE_PASSWORD bot_key=$BOT_KEY"
+  stage: deploy
