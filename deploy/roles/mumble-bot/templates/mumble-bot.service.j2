@@ -1,0 +1,15 @@
+[Unit]
+Description=Mumble Bot
+After=network.target
+
+[Service]
+TimeoutStartSec=5
+#User=prior
+WorkingDirectory=/home/prior/applications/mumble-bot/
+ExecStart=/home/prior/applications/mumble-bot/node-v7.10.0-linux-x64/bin/node dist/
+TimeoutStopSec=10
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi.target

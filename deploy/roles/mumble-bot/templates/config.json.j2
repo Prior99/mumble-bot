@@ -1,0 +1,23 @@
+{
+    "url" : "138.201.13.130",
+    "name" : "Jenny",
+    "key" : "./bot.key",
+    "cert" : "./bot.cert",
+    "channel" : "Myrtes Badezimmer",
+    "audioCacheAmount" : 500,
+    "database" : {
+        "socketPath" : "/var/run/mysqld/mysqld.sock",
+        "user" : "jenny",
+        "database" : "jenny",
+        "password" : "{{ database_password }}"
+    },
+    "paths": {
+        "tmp": "data/tmp",
+        "recordings": "data/recordings",
+        "visualizations": "data/visualizations",
+        "uploaded": "data/uploaded"
+    },
+    "website": {
+        "port": "23278"
+    }
+}
