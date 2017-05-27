@@ -249,8 +249,9 @@ export class Bot extends EventEmitter {
             else {
                 try {
                     await unlink(elem.file);
+                    await unlink(`${elem.file}.png`);
                     this.emit("removed-cached-audio", elem);
-                    Winston.info("Deleted cached audio file " + elem.file + ".");
+                    Winston.info(`Deleted cached audio file "${elem.file}" and "${elem.file}.png".`);
                 }
                 catch (err) {
                     Winston.error("Error when cleaning up cached audios!", err);
