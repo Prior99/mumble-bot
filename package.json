@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/index.ts",
+    "prebuild": "rm -rf dist/",
     "build": "tsc -p . --outDir dist",
     "start:bot": "node dist",
     "start:worker": "node dist/worker",
