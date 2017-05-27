@@ -27,4 +27,4 @@ export const Link: AuthorizedApiEndpoint = (bot: Bot) => async ({ body, user }, 
     else {
         return forbidden(res);
     }
-};;
+};

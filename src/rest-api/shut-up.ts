@@ -12,7 +12,7 @@ export const ShutUp: AuthorizedApiEndpoint = (bot: Bot) => async ({ user }, res)
             return forbidden(res);
         }
         bot.beQuiet();
-        Winston.verbose(`${user.username} made the bot shut up.`)
+        Winston.verbose(`${user.username} made the bot shut up.`);
         return okay(res);
     }
     catch (err) {
@@ -20,4 +20,3 @@ export const ShutUp: AuthorizedApiEndpoint = (bot: Bot) => async ({ user }, res)
         return internalError(res);
     }
 };
-

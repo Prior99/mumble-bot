@@ -6,24 +6,24 @@ import { CachedAudio } from "./cached-audio";
 export interface MetaInformationRecording {
     type: "recording";
     recording: Recording;
-    user: DatabaseUser
+    user: DatabaseUser;
 }
 
 export interface MetaInformationSound {
     type: "sound";
     sound: DatabaseSound;
-    user: DatabaseUser
+    user: DatabaseUser;
 }
 
 export interface MetaInformationCached {
     type: "cached";
     cachedRecording: CachedAudio;
-    user: DatabaseUser
+    user: DatabaseUser;
 }
 
 export interface MetaInformationDialog {
     type: "dialog";
-    user: DatabaseUser
+    user: DatabaseUser;
 }
 
 export type MetaInformation = MetaInformationRecording|

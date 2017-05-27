@@ -33,4 +33,4 @@ export const Download: AuthorizedApiEndpoint = (bot: Bot) => ({ params }, res) =
                 Winston.error("Error occured when trying to stream file to browser", id, err);
             }
         });
-}
+};

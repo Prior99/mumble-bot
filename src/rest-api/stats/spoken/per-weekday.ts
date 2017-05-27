@@ -22,4 +22,4 @@ export const PerWeekday: AuthorizedApiEndpoint = (bot: Bot) => async (req, res) 
         Winston.error("Could not get speech amount per weekday.", err);
         return internalError(res);
     }
-};;
+};

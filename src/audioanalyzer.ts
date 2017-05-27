@@ -14,10 +14,10 @@ interface Values {
  * Analyzes a stream of audio which can be fed chunk by chunk to this class.
  * When done, can draw a nice image onto a canvas.
  */
-class AudioAnalyzer {
+export class AudioAnalyzer {
     public list: Values[];
 
-    private samplesTotal: number = 0;
+    private samplesTotal = 0;
     /**
      * @constructor
      * @param {number} samplesPerPixel - Number of samples represented by one pixel.
@@ -32,10 +32,9 @@ class AudioAnalyzer {
 
     /**
      * Analyze one chunk of audio data.
-     * @param {Buffer} chunk - Audio data which should be analyzed.
-     * @return {undefined}
+     * @param chunk Audio data which should be analyzed.
      */
-    analyze(chunk) {
+    public analyze(chunk: Float32Array) {
         const array = Array.prototype.slice.call(chunk);
         if (array.length !== chunkSize) {
             return;
@@ -50,9 +49,7 @@ class AudioAnalyzer {
         const frequencies = FFT.util.fftFreq(phasors, 44100);
         const magnitudes = FFT.util.fftMag(phasors);
         const maxValue = Math.max.apply(magnitudes);
-        const maxIndex = magnitudes.reduce((maxIndex, value, index) =>
-            value > magnitudes[maxIndex] ? index : maxIndex, 0
-        );
+        const maxIndex = magnitudes.reduce((result, value, index) => value > magnitudes[result] ? index : result, 0);
         this.list.push({
             amplitude: max,
             freq: frequencies[maxIndex]
@@ -62,10 +59,9 @@ class AudioAnalyzer {
     /**
      * This method can be called when all data was processed.
      * A nice image will be drawn onto the canvas representing all audio that was analyzed.
-     * @param {Canvas} canvas - A HTML5 canvas region to draw on.
-     * @return {undefined}
+     * @param canvas A HTML5 canvas region to draw on.
      */
-    draw(canvas) {
+    public draw(canvas) {
         if (this.list.length < 2) {
             return;
         }
@@ -98,5 +94,3 @@ class AudioAnalyzer {
         ctx.fill();
     }
 }
-
-export default AudioAnalyzer;

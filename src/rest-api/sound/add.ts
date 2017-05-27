@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import mkdirp = require("mkdirp-promise");
+import mkdirp = require("mkdirp-promise"); // tslint:disable-line
 import { rename } from "async-file";
 import * as HTTP from "http-status-codes";
 import { addSound } from "../../database";

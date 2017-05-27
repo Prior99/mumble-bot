@@ -30,19 +30,17 @@ async function setupDatabase(connection) {
 }
 
 export async function connectDatabase(options) {
+    const { host, user, password, database, socketPath, connectTimeout } = options;
     try {
-        Winston.info(
-            "Connecting to database " +
-            "mysql://" + options.user + "@" + options.host + "/" + options.database + " ... "
-        );
+        Winston.info(`Connecting to database mysql://${user}@${host}/${database} ... `);
         const conn = await MySQL.createConnection({
-            host: options.host,
-            user: options.user,
-            password: options.password,
-            database: options.database,
-            socketPath: options.socketPath,
+            host,
+            user,
+            password,
+            database,
+            socketPath,
             multipleStatements: true,
-            connectTimeout: options.connectTimeout ? options.connectTimeout : timeout
+            connectTimeout: connectTimeout ? connectTimeout : timeout
         });
         Winston.info("Successfully connected to database!");
         await setupDatabase(conn);

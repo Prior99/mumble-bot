@@ -16,7 +16,7 @@ export async function getSetting(user, setting, connection): Promise<string> {
     else {
         return;
     }
-};
+}
 
 /**
  * Get all settings of a specified user as an object.
@@ -31,7 +31,7 @@ export async function getSettings(user: DatabaseUser, connection): Promise<Setti
             [row.setting]: JSON.parse(row.value)
         };
     }, {});
-};
+}
 
 /**
  * Set a specified setting to the specified value.
@@ -45,4 +45,4 @@ export async function setSetting(user: DatabaseUser, setting: string, value: str
         "VALUES(?, ?, ?) " +
         "ON DUPLICATE KEY UPDATE value = VALUES(value)", [user.id, setting, value]
     );
-};
+}

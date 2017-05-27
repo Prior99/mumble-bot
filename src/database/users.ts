@@ -17,7 +17,7 @@ export async function registerUser(user: RegisterData, connection) {
         [user.email, user.username, user.password]
     );
     return result.insertId;
-};
+}
 
 /**
  * Retrieves details about a user by his username.
@@ -32,8 +32,7 @@ export async function getUserByUsername(username: string, connection): Promise<D
     else {
         return;
     }
-};
-
+}
 
 /**
  * Retrieves details about a user by his id.
@@ -61,7 +60,7 @@ export async function getUserById(id, connection): Promise<DatabaseUser> {
     else {
         return;
     }
-};
+}
 
 /**
  * Give (Or take with negative number) a user a specified amount of money.
@@ -70,7 +69,7 @@ export async function getUserById(id, connection): Promise<DatabaseUser> {
  */
 export async function giveUserMoney(user, amount, connection): Promise<void> {
     await connection.query("UPDATE Users SET money = money + ? WHERE id = ?", [amount, user.id]);
-};
+}
 
 /**
  * Retrieves details about a user by his steam Id.
@@ -85,7 +84,7 @@ export async function getUserBySteamId(steamId, connection): Promise<DatabaseUse
     else {
         return;
     }
-};
+}
 
 /**
  * Retrieves details about a random user.
@@ -99,7 +98,7 @@ export async function getRandomUser(connection): Promise<DatabaseUser> {
     else {
         return;
     }
-};
+}
 
 /**
  * Retrieves details about a user by his steam Id.
@@ -114,7 +113,7 @@ export async function getUserByMinecraftUsername(minecraft, connection): Promise
     else {
         return;
     }
-};
+}
 
 /**
  * Check the login data of a user.
@@ -127,7 +126,7 @@ export async function checkLoginData(username, passwordHash, connection): Promis
         "SELECT id FROM Users " +
         "WHERE username = ? AND password = ?", [username, passwordHash]);
     return rows && rows.length > 0;
-};
+}
 
 /**
  * Retrieves a list of users from the database.
@@ -137,7 +136,7 @@ export async function listUsers(connection): Promise<DatabaseUser[]> {
     const rows = await connection.query("SELECT id FROM Users");
     const promises: Promise<DatabaseUser>[] = rows.map((u) => getUserById(u.id, connection));
     return await Promise.all(promises);
-};
+}
 
 /**
  * Counts all user in the database.
@@ -146,5 +145,4 @@ export async function listUsers(connection): Promise<DatabaseUser[]> {
 export async function countUsers(connection): Promise<number> {
     const rows = await connection.query("SELECT COUNT(id) AS count FROM Users");
     return rows[0].count;
-};
-
+}

@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import mkdirp = require("mkdirp-promise");
+import mkdirp = require("mkdirp-promise"); // tslint:disable-line
 import { stat, createReadStream, writeFile } from "async-file";
 import * as HTTP from "http-status-codes";
 import { Bot } from "../..";
@@ -49,8 +49,8 @@ export const Visualize: AuthorizedApiEndpoint = (bot: Bot) => async ({ params },
             const buffer = await visualizeAudioFile(soundFileName);
             await writeFile(fileName, buffer);
             try {
-                const stream = createReadStream(fileName);
-                return sendFile(stream);
+                const readStream = createReadStream(fileName);
+                return sendFile(readStream);
             }
             catch (err) {
                 if (err.code === "ENOENT") {

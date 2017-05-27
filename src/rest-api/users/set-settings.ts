@@ -23,4 +23,4 @@ export const SetSettings: AuthorizedApiEndpoint = (bot: Bot) => async ({ body, u
         Winston.error("An error occured while saving settings for user " + user.username, err);
         return internalError(res);
     }
-};;
+};

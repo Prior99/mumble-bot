@@ -20,4 +20,3 @@ export interface DatabaseUser {
      */
     settings: any;
 }
-

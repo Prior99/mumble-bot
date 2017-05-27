@@ -1,5 +1,5 @@
 import * as Winston from "winston";
-import mkdirp = require("mkdirp-promise");
+import mkdirp = require("mkdirp-promise"); // tslint:disable-line
 import { rename } from "async-file";
 import * as HTTP from "http-status-codes";
 import { addRecording, giveUserMoney } from "../../../database";
@@ -36,15 +36,15 @@ export const Save: AuthorizedApiEndpoint = (bot: Bot) => async ({ params, body, 
         }
     }
     try {
-        const id = await addRecording(
+        const newId = await addRecording(
             quote, sound.user, sound.date, labels, sound.duration, user.id, bot.database
         );
         try {
             await giveUserMoney(user, moneyPerSave, bot.database);
-            await rename(sound.file, `${bot.options.paths.recordings}/${id}`);
-            await rename(sound.file + ".png", `${bot.options.paths.visualizations}/${id}.png`);
+            await rename(sound.file, `${bot.options.paths.recordings}/${newId}`);
+            await rename(sound.file + ".png", `${bot.options.paths.visualizations}/${newId}.png`);
             if (bot.removeCachedAudio(sound)) {
-                Winston.log("verbose", `${user.username} added new record #${id}`);
+                Winston.log("verbose", `${user.username} added new record #${newId}`);
                 return okay(res);
             }
             Winston.error("Could not remove element from array of cached audios.");

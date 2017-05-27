@@ -33,7 +33,7 @@ export async function addRecording(
     );
     labels.forEach((label) => addRecordingToLabel(result.insertId, label, connection));
     return result.insertId;
-};
+}
 
 /**
  * Complete a list of records by adding all possible information to it by resolving ids of
@@ -44,7 +44,7 @@ export async function addRecording(
 async function completeRecordings(records: Recording[], connection): Promise<Recording[]> {
     const promises: Promise<Recording>[] = records.map((r) => getRecording(r.id, connection));
     return await Promise.all(promises);
-};
+}
 
 /**
  * Get the amount of records by one single user.
@@ -57,7 +57,8 @@ export async function getRecordingCountByUsers(connection): Promise<RecordingCou
         "LEFT JOIN Records r ON r.user = u.id " +
         "GROUP BY u.id HAVING COUNT(r.id) > 0 ORDER BY amount DESC");
     return rows;
-};
+}
+
 /**
  * Get the amount of records mapped to days of the week.
  * @return List of days and the amount of records recorded on that day.
@@ -69,7 +70,8 @@ export async function getRecordingCountByDays(connection): Promise<RecordingCoun
         "GROUP BY DATE(submitted) ORDER BY submitted DESC"
     );
     return rows;
-};
+}
+
 /**
  * Update a record with a new quote and a new list of labels.
  * @param id The unique id of the record which is to be updated.
@@ -81,7 +83,7 @@ export async function updateRecording(id: number, quote: string, labels: number[
     await connection.query("UPDATE Records SET quote = ?, changed = ? WHERE id = ?", [quote, new Date(), id]);
     await connection.query("DELETE FROM RecordLabelRelation WHERE record = ?", [id]);
     await Promise.all(labels.map((label) => addRecordingToLabel(id, label, connection)));
-};
+}
 
 /**
  * List all records existing in the database.
@@ -97,7 +99,7 @@ export async function listRecordings(since: Date, connection): Promise<Recording
         "ORDER BY used DESC", since);
     const records = await completeRecordings(rows, connection);
     return records;
-};
+}
 
 /**
  * List all records in the database belonging to one specified user.
@@ -108,7 +110,7 @@ export async function listRecordingsForUser(user: DatabaseUser, connection): Pro
     const rows = await connection.query("SELECT id FROM Records WHERE user = ? ORDER BY used DESC", [user.id]);
     const records = await completeRecordings(rows, connection);
     return records;
-};
+}
 
 /**
  * Indicate that a record was played back (Increase usages by one).
@@ -117,7 +119,8 @@ export async function listRecordingsForUser(user: DatabaseUser, connection): Pro
  */
 export async function usedRecording(id: number, connection): Promise<void> {
     await connection.query("UPDATE Records SET used = used +1, changed = ? WHERE id = ?", [new Date(), id]);
-};
+}
+
 /**
  * Get complet information about one record by its id. This includes resolved user and labels.
  * @param id The unique id of the record that is to be fetched.
@@ -140,7 +143,7 @@ export async function getRecording(id: number, connection): Promise<Recording> {
     else {
         return;
     }
-};
+}
 
 /**
  * Get a random record from the database.
@@ -156,7 +159,7 @@ export async function getRandomRecording(connection): Promise<Recording> {
     else {
         return;
     }
-};
+}
 
 /**
  * Get all labels belonging to one record.
@@ -170,7 +173,7 @@ export async function getLabelsOfRecording(recordId: number, connection): Promis
         "LEFT JOIN RecordLabelRelation l ON l.label = r.id WHERE l.record = ?", [recordId]
     );
     return rows.map(label => label.id);
-};
+}
 
 /**
  * Get the amount of records in the database.
@@ -179,7 +182,7 @@ export async function getLabelsOfRecording(recordId: number, connection): Promis
 export async function getRecordingCount(connection): Promise<number> {
     const rows = await connection.query("SELECT COUNT(id) AS amount FROM Records");
     return rows[0].amount;
-};
+}
 
 /**
  * Add a new label to the database.
@@ -189,7 +192,7 @@ export async function getRecordingCount(connection): Promise<number> {
 export async function addRecordingLabel(name: string, connection): Promise<number> {
     const result = await connection.query("INSERT INTO RecordLabels(name) VALUES(?)", [name]);
     return result.insertId;
-};
+}
 
 /**
  * List all labels exiting in the database.
@@ -204,7 +207,7 @@ export async function listLabels(connection): Promise<Label[]> {
         "GROUP BY id"
     );
     return rows;
-};
+}
 
 /**
  * Add a label to a record.
@@ -213,7 +216,7 @@ export async function listLabels(connection): Promise<Label[]> {
  */
 export async function addRecordingToLabel(record: number, label: number, connection): Promise<void> {
     await connection.query("INSERT INTO RecordLabelRelation(record, label) VALUES(?, ?)", [record, label]);
-};
+}
 
 /**
  * List all records belonging to one label.
@@ -228,9 +231,9 @@ export async function listRecordingsByLabel(label: number, connection): Promise<
         "WHERE label = ? " +
         "ORDER BY used DESC", [label]
     );
-    const records = await completeRecordings(rows, connection)
+    const records = await completeRecordings(rows, connection);
     return records;
-};
+}
 
 /**
  * Look up 20 records with their quotes matching a given query string.
@@ -247,7 +250,8 @@ export async function lookupRecording(part: string, connection): Promise<Recordi
     );
     const promises: Promise<Recording>[] = rows.map((r) => getRecording(r.id, connection));
     return await Promise.all(promises);
-};
+}
+
 /**
  * Return the amount of playbacks each record of each user has received grouped by the users.
  * @return List of all users and how often their records have been played back.
@@ -260,7 +264,7 @@ export async function getRecordingPlaybackCountPerUser(connection): Promise<Play
         "GROUP BY user"
     );
     return rows;
-};
+}
 
 /**
  * Forks a record after it was edited.
@@ -287,4 +291,4 @@ export async function forkRecording(
         "VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
         [user, submitted, reporter, duration, quote, new Date(), overwrite, parent]);
     return result.insertId;
-};
+}

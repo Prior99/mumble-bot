@@ -19,7 +19,7 @@ const buildChannelTree = function(root: Channel) {
         }))],
         children: root.children.map(buildChannelTree)
     };
-}
+};
 
 /**
  * Generates a tree with all channels and users in the mumble.

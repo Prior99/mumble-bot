@@ -29,21 +29,21 @@ export function okay(response: Response, data?: any) {
     });
 }
 
-export function notFound(response: Response, message: string = "Not found.") {
+export function notFound(response: Response, message = "Not found.") {
     response.status(HTTP.NOT_FOUND).send({
         okay: false,
         message
     });
 }
 
-export function badRequest(response: Response, message: string = "Bad Request.") {
+export function badRequest(response: Response, message = "Bad Request.") {
     response.status(HTTP.BAD_REQUEST).send({
         okay: false,
         message
     });
 }
 
-export function missingArguments(response: Response, message: string = "Missing arguments.") {
+export function missingArguments(response: Response, message = "Missing arguments.") {
     response.status(HTTP.BAD_REQUEST).send({
         okay: false,
         message
@@ -76,8 +76,8 @@ function parseAuthToken(request: Request): { username: string, password: string 
     if (!authorization.toLowerCase().startsWith("basic")) {
         return;
     }
-    const token = new Buffer(authorization.substr(6), 'base64').toString('utf8');
-    const [username, password] = token.split(':');
+    const token = new Buffer(authorization.substr(6), "base64").toString("utf8");
+    const [username, password] = token.split(":");
     return { username, password };
 }
 
@@ -102,7 +102,7 @@ export function authorized(endpoint: AuthorizedApiEndpoint): AuthorizedApiEndpoi
             return endpoint(bot)(authorizedRequest, response, next);
         } catch (err) {
             Winston.error(`Error when loading data for user ${username}`, err);
-            return internalError(response)
+            return internalError(response);
         }
     };
 }

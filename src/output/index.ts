@@ -13,15 +13,15 @@ const msInS = 1000;
  * including both TTS and sounds.
  */
 export class Output extends Stream.Writable {
-    public busy: boolean = false;
+    public busy = false;
     public queue: WorkItem[] = [];
     private bot: Bot;
     private stream: any;
     private sound: Sound;
     private current: any;
     private bufferQueue: Buffer[] = [];
-    private playbackAhead: number = 0;
-    private stopped: boolean = false;
+    private playbackAhead = 0;
+    private stopped = false;
     private lastBufferShift: number;
     private timeout: NodeJS.Timer;
     /**
@@ -32,7 +32,6 @@ export class Output extends Stream.Writable {
         this.bot = bot;
         this.stream = bot.mumble.inputStream();
         this.sound = new Sound(this);
-        this.current = null;
     }
 
     /**
@@ -70,8 +69,8 @@ export class Output extends Stream.Writable {
         }
         else {
             this.playbackAhead = 0;
-            this.lastBufferShift = null;
-            this.timeout = null;
+            this.lastBufferShift = undefined;
+            this.timeout = undefined;
         }
     }
 
@@ -84,7 +83,7 @@ export class Output extends Stream.Writable {
     public _write(chunk: Buffer, encoding: string, done: () => void) {
         this.bufferQueue.push(chunk);
         if (!this.timeout) {
-            this.shiftBuffer(); //Not currently processing queue? Sleeping? Wake up!
+            this.shiftBuffer(); // Not currently processing queue? Sleeping? Wake up!
         }
         done();
     }
@@ -135,7 +134,7 @@ export class Output extends Stream.Writable {
      */
     private processStopped() {
         const callback = this.current.callback;
-        this.current = null;
+        this.current = undefined;
         this.busy = false;
         this.emit("stop");
         if (callback) {
