@@ -48,6 +48,8 @@ deploy:
   script:
     - cd deploy
     - ansible-playbook mumble-bot.yml --extra-vars "database_password='$DATABASE_PASSWORD' bot_key='$BOT_KEY'"
+  dependencies:
+    - build
   stage: deploy
   when: manual
   only:
