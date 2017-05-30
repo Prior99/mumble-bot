@@ -38,9 +38,9 @@ export class Api {
         this.bot = bot;
         this.connections = new Set();
         this.app = Express();
+        this.app.use(BodyParser.json({ limit: "100mb" }));
+        this.app.use(BodyParser.urlencoded({ limit: "100mb", extended: true }));
         ExpressWS(this.app);
-        this.app.use(BodyParser.urlencoded({ extended: true }));
-        this.app.use(BodyParser.json());
         this.app.use(this.handleCORS);
         this.app.use("/sounds", Sounds(bot));
         this.app.use("/recordings", Recordings(bot));

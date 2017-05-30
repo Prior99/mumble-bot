@@ -1,5 +1,4 @@
 import * as Express from "express";
-import * as Multer from "multer";
 import { Bot } from "../..";
 import { ApiRoute } from "../types";
 import { authorized } from "../utils";
@@ -13,9 +12,6 @@ import { List } from "./list";
  */
 export const Sounds: ApiRoute = (bot: Bot) => {
     const router = Express.Router();
-    router.use(Multer({
-        dest: bot.options.paths.tmp
-    }).array());
 
     router.put("/", authorized(Add)(bot));
     router.get("/", authorized(List)(bot));
