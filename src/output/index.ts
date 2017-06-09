@@ -117,7 +117,8 @@ export class Output extends Stream.Writable {
         this.processStarted();
         this.sound.enqueue({
             file: this.current.file,
-            callback: this.processStopped.bind(this)
+            callback: this.processStopped.bind(this),
+            pitch: this.current.pitch
         });
     }
 
@@ -148,25 +149,28 @@ export class Output extends Stream.Writable {
      * audio data (*.wav is fine), 44,100Hz and mono-channel.
      * @param file Name of the soundfile to play.
      * @param meta Metadata displayed in queue.
+     * @param pitch The pitch to which the audio should be transformed.
      * @returns Resolved once the sound has finished playing.
      */
-    public playSound(file: string, meta: MetaInformation): Promise<{}> {
+    public playSound(file: string, meta: MetaInformation, pitch = 0): Promise<{}> {
         return new Promise((callback, reject) => {
-            this.enqueue({ file, meta, callback, time: new Date() });
+            this.enqueue({ file, meta, callback, time: new Date(), pitch });
         });
     }
 
     /**
      * Also enqueues sounds, but many at once (automically?)
      * @param filelist The files to be played.
+     * @param pitch The pitch to which the audio should be transformed.
      * @param meta Metadata displayed in queue.
      */
-    public playSounds(filelist: string[], meta: MetaInformation) { // callback TODO?
+    public playSounds(filelist: string[], meta: MetaInformation, pitch = 0) { // callback TODO?
         for (let i = 0; i < filelist.length; i++) {
             this.enqueue({
                 file: filelist[i],
                 meta,
-                time: new Date()
+                time: new Date(),
+                pitch
             });
         }
     }

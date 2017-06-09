@@ -7,6 +7,8 @@ import * as Winston from "winston";
 import { stat } from "async-file";
 import { EventEmitter } from "events";
 import * as FFMpeg from "fluent-ffmpeg";
+import * as Sox from "sox-audio";
+import { PassThrough as PassThroughStream } from "stream";
 
 const msInS = 1000;
 const audioFreq = 48000;
@@ -38,8 +40,9 @@ export class Sound extends EventEmitter {
     /**
      * Plays the file.
      * @param filename The filename of the file to be played.
+     * @param pitch The pitch to which the audio should be transformed.
      */
-    private async play(filename: string) {
+    private async play(filename: string, pitch = 0) {
         let samplesTotal = 0;
         const startTime = Date.now();
         this.playbackStarted();
@@ -58,7 +61,27 @@ export class Sound extends EventEmitter {
                 Winston.error(`Error decoding file ${filename}`, err);
                 this.playbackStopped();
             });
-            this.ffmpeg.stream().on("data", chunk => {
+            const transform = new Sox()
+                .input(this.ffmpeg.stream())
+                .inputSampleRate('48k')
+                .inputBits(16)
+                .inputChannels(1)
+                .inputFileType('raw')
+                .inputEncoding('signed');
+            const ptStream = new PassThroughStream();
+            const output = transform.output(ptStream)
+                .outputSampleRate('48k')
+                .outputEncoding('signed')
+                .outputBits(16)
+                .outputChannels(1)
+                .outputFileType('raw');
+            output.addEffect("pitch", [pitch]);
+            transform.on("error", (err) => {
+                Winston.error(`Error transforming file ${filename}`, err);
+                this.playbackStopped();
+            });
+            transform.run();
+            ptStream.on("data", chunk => {
                 samplesTotal += chunk.length / 2;
                 this.stream.write(chunk);
             })
@@ -120,7 +143,7 @@ export class Sound extends EventEmitter {
     private next() {
         if (!this.playing && this.queue.length !== 0) {
             this.current = this.queue.shift();
-            this.play(this.current.file);
+            this.play(this.current.file, this.current.pitch);
         }
     }
 

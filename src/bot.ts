@@ -111,9 +111,10 @@ export class Bot extends EventEmitter {
      * Plays a sound in the mumble server.
      * @param filename Filename of the soundfile to play. Must be a mono-channel 48,000Hz WAV-File
      * @param meta Metadata passed to the output module.
+     * @param pitch The pitch to which the audio should be transformed.
      */
-    public async playSound(filename: string, meta: MetaInformation): Promise<void> {
-        await this.output.playSound(filename, meta);
+    public async playSound(filename: string, meta: MetaInformation, pitch = 0): Promise<void> {
+        await this.output.playSound(filename, meta, pitch);
     }
 
     /**

@@ -11,8 +11,9 @@ const moneyPerPlayUser = 1;
 /**
  * This api endpoint is responsible for playing back a stored record.
  */
-export const Play: AuthorizedApiEndpoint = (bot: Bot) => async ({ params, user }, res) => {
+export const Play: AuthorizedApiEndpoint = (bot: Bot) => async ({ params, user, body }, res) => {
     const id = parseInt(params.id);
+    const pitch = body.pitch ? parseInt(body.pitch) : 0;
     try {
         const recording = await getRecording(id, bot.database);
         if (user.id !== recording.reporter) {
@@ -27,7 +28,7 @@ export const Play: AuthorizedApiEndpoint = (bot: Bot) => async ({ params, user }
             type: "recording",
             recording,
             user
-        });
+        }, pitch);
         return okay(res);
     }
     catch (err) {

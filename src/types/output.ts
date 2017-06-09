@@ -36,4 +36,5 @@ export interface WorkItem {
     meta: MetaInformation;
     callback?: () => void;
     time: Date;
+    pitch: number;
 }
