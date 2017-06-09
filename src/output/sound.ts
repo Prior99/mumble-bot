@@ -63,18 +63,18 @@ export class Sound extends EventEmitter {
             });
             const transform = new Sox()
                 .input(this.ffmpeg.stream())
-                .inputSampleRate('48k')
+                .inputSampleRate("48k")
                 .inputBits(16)
                 .inputChannels(1)
-                .inputFileType('raw')
-                .inputEncoding('signed');
+                .inputFileType("raw")
+                .inputEncoding("signed");
             const ptStream = new PassThroughStream();
             const output = transform.output(ptStream)
-                .outputSampleRate('48k')
-                .outputEncoding('signed')
+                .outputSampleRate("48k")
+                .outputEncoding("signed")
                 .outputBits(16)
                 .outputChannels(1)
-                .outputFileType('raw');
+                .outputFileType("raw");
             output.addEffect("pitch", [pitch]);
             transform.on("error", (err) => {
                 Winston.error(`Error transforming file ${filename}`, err);
