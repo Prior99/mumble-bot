@@ -8,16 +8,11 @@ It has a webinterface via which it can be controlled.
 
  - Speechdispatching using eSpeak or other TTS libraries (Bing, Google, ResponsiveVoice)
  - Webinterface to control everything from within a browser
- - Playback music using mpd, control mpd using the bot
- - Fetch music from youtube
- - Upload music to mpd library
  - Record users in the server and store and playback the records
  - Upload and playback sounds
  - Generate and see neat statistics about your server
 
 ## Install
-
-**Important:** For the time being only nodejs v0.12.x is supported. No versions higher than this will work.
 
 This is currently under heavy development and in no means ready for using in production.
 If you still want to install this, you will need some of my (forks of) some node modules:
@@ -27,11 +22,6 @@ If you still want to install this, you will need some of my (forks of) some node
  - [node-samplerate](https://github.com/Prior99/node-samplerate)
 
 Some of which are not available on npm. If ```npm install``` fails, just clone the respective repositories into th ```node_modules/``` subdirectory.
-
-### Addons
-
-If you want to use addons, you will have to create a directory ```addons/``` and put them in there. Each addon needs to be defined as an own directory containing an ```index.js``` file.
-There is a repository with default addons which can be found [here](https://git.cronosx.de/prior/mumble-bot-addons). Please note that those are **not safe for work**.
 
 ### Installing on Arch Linux
 
