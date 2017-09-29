@@ -24,8 +24,6 @@ If you still want to install this, you will need some of my (forks of) some node
 
 Some of which are not available on npm. If ```npm install``` fails, just clone the respective repositories into th ```node_modules/``` subdirectory.
 
-### About the structure
-
 ### Installing on Arch Linux
 
 You will need to install some packets in order to get everything working.
