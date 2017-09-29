@@ -140,17 +140,46 @@ function start {
     echo -e "\033[32mStarting bot now.\033[0m"
     echo
     npm run build
-    npm start
+    npm run start:bot
+}
+
+function worker {
+    check_env
+    #
+    # Check if the user created a configfile.
+    #
+    echo -n "  Checking for config ... "
+    if [ -f "config.json" ]; then
+        echo -ne "\033[32mokay.\033[0m"
+        echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+    else
+        echo -ne "\033[31mnot found!\033[0m"
+        echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+        editconfig
+    fi
+
+    #
+    # Everything went right, we may now start the server.
+    #
+    echo
+    echo -e "\033[32mEnvironement is sane.\033[0m"
+    echo -e "\033[32mStarting bot now.\033[0m"
+    echo
+    npm run build
+    npm run start:worker
 }
 
 case $1 in
     start)
         start
     ;;
+    worker)
+        worker
+    ;;
     setup)
         setup
     ;;
     *)
-        echo "Usage: $0 {setup|start}"
+        echo "Usage: $0 {setup|start|worker}"
     ;;
 esac
