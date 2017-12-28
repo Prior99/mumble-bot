@@ -12,12 +12,13 @@ import { Channel, User } from "mumble";
 const buildChannelTree = function(root: Channel) {
     return {
         name: root.name,
+        position: root.position,
         users: [...root.users.map(user => ({
             name: user.name,
             id: user.id,
             session: user.session
         }))],
-        children: root.children.map(buildChannelTree)
+        children: root.children.sort((a, b) => a.position - b.position).map(buildChannelTree)
     };
 };
 

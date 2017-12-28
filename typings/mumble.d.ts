@@ -10,6 +10,7 @@ declare module "mumble" {
         users: User[];
         name: string;
         id: number;
+        position: number;
     }
 
     interface User {

@@ -70,15 +70,16 @@ function parseAuthToken(request: Request): { username: string, password: string 
         if (!protocol) {
             return;
         }
-        const [username, password] = protocol.split(/,\s*/);
+        const [username, password] = (protocol as string).split(/,\s*/);
         return { username, password };
     }
-    if (!authorization.toLowerCase().startsWith("basic")) {
+    else if (!(authorization as string).toLowerCase().startsWith("basic")) {
         return;
+    } else {
+        const token = new Buffer((authorization as string).substr(6), "base64").toString("utf8");
+        const [username, password] = token.split(":");
+        return { username, password };
     }
-    const token = new Buffer(authorization.substr(6), "base64").toString("utf8");
-    const [username, password] = token.split(":");
-    return { username, password };
 }
 
 async function validateRequestLoginData(request: Request, bot: Bot): Promise<boolean> {
