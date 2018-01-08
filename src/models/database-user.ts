@@ -1,0 +1,56 @@
+import {
+    Column,
+    PrimaryGeneratedColumn,
+    Entity,
+    ManyToOne,
+    OneToMany,
+    CreateDateColumn,
+    UpdateDateColumn
+} from "typeorm";
+import { is, scope, DataType, oneOf, specify, required, length, uuid, transform } from "hyrest";
+import { world, login } from "../scopes";
+import { hash } from "../utils";
+import { Recording } from "./recording";
+import { PermissionAssociation } from "./";
+
+/**
+ * A user from the database.
+ */
+@Entity()
+export class DatabaseUser {
+    @PrimaryGeneratedColumn("uuid")
+    @scope(world) @is().validate(uuid)
+    public id?: string;
+
+    /**
+     * The username of this user.
+     */
+    @Column("varchar", { length: 100 })
+    @is() @scope(world)
+    public username?: string;
+
+    /**
+     * The password of the user.
+     */
+    @Column("varchar", { length: 200 })
+    @is().validate(length(8, 255)) @scope(login)
+    @transform(hash)
+    public password?: string;
+
+    /**
+     * The custom settings of the user are stored key-value-wise in this object.
+     */
+    public settings?: any;
+
+    @OneToMany(() => Recording, recording => recording.user)
+    @is() @scope(world) @specify(() => Recording)
+    public recordings: Recording[];
+
+    @OneToMany(() => Recording, recording => recording.reporter)
+    @is() @scope(world) @specify(() => Recording)
+    public reported: Recording[];
+
+    @OneToMany(() => PermissionAssociation, permissionAssociation => permissionAssociation.user)
+    @is() @scope(world) @specify(() => PermissionAssociation)
+    public permissionAssociations: PermissionAssociation[];
+}

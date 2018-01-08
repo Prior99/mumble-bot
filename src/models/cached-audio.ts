@@ -1,0 +1,44 @@
+import { is, scope, DataType, oneOf, specify, required, length, uuid, transform } from "hyrest";
+import { world } from "../scopes";
+import { DatabaseUser } from "./database-user";
+
+/**
+ * A cached audio.
+ */
+export class CachedAudio {
+    /**
+     * The filename of the audio.
+     */
+    @is() @scope(world)
+    public file?: string;
+
+    /**
+     * The date the audio was recorded.
+     */
+    @is() @scope(world) @specify(() => Date)
+    public date?: Date;
+
+    /**
+     * The user from which the audio was recorded.
+     */
+    @is() @scope(world)
+    public user?: DatabaseUser;
+
+    /**
+     * The id of the cached audio.
+     */
+    @scope(world) @is().validate(uuid)
+    public id?: string;
+
+    /**
+     * The duration of the audio in seconds.
+     */
+    @is(DataType.float) @scope(world)
+    public duration?: number;
+
+    /**
+     * Whether the audio was protected by someone or not.
+     */
+    @is(DataType.bool) @scope(world)
+    public protected?: boolean;
+}

@@ -1,7 +1,4 @@
-import { DatabaseSound } from "./sounds";
-import { Recording } from "./recordings";
-import { DatabaseUser } from "./users";
-import { CachedAudio } from "./cached-audio";
+import { CachedAudio, DatabaseUser, Recording, DatabaseSound } from "../models";
 
 export interface MetaInformationRecording {
     type: "recording";
