@@ -2,7 +2,7 @@ import { createScope } from "hyrest";
 
 export const world = createScope();
 export const login = createScope();
-export const createRecording = createScope();
+export const updateRecording = createScope();
 export const createLabel = createScope();
 export const createDialog = createScope();
 export const createUser = createScope();

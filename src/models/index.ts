@@ -13,3 +13,5 @@ export { PermissionAssociation } from "./permission-association";
 export { Token } from "./token";
 export { MumbleUser } from "./mumble-user";
 export { Channel } from "./channel";
+export { PlaybackOptions } from "./playback-options";
+export { ForkOptions } from "./fork-options";
