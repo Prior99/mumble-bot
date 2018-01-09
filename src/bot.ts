@@ -7,7 +7,7 @@ import { writeFile, unlink, readFile } from "async-file";
 import { EventEmitter } from "events";
 import { Permissions } from "./permissions";
 import { connectDatabase } from "./database";
-import { CachedAudio } from "./types";
+import { CachedAudio } from "./models";
 import { MetaInformation } from "./types/output";
 
 const AUDIO_CACHE_AMOUNT = 4;
@@ -163,7 +163,7 @@ export class Bot extends EventEmitter {
      * @param id Id of the audio to look up.
      * @return The cached audio or null when the id was invalid.
      */
-    public getCachedAudioById(id: number): CachedAudio {
+    public getCachedAudioById(id: string): CachedAudio {
         return this.cachedAudios.find(audio => audio.id === id);
     }
 
@@ -172,7 +172,7 @@ export class Bot extends EventEmitter {
      * @param id Id of the audio to protect.
      * @return False when the id was invalid.
      */
-    public protectCachedAudio(id: number): boolean {
+    public protectCachedAudio(id: string): boolean {
         const elem = this.getCachedAudioById(id);
         if (!elem) {
             return false;
@@ -190,7 +190,7 @@ export class Bot extends EventEmitter {
      * @param id Id of the audio to remove.
      * @return False when the id was invalid.
      */
-    public removeCachedAudioById(id: number): boolean {
+    public removeCachedAudioById(id: string): boolean {
         const elem = this.getCachedAudioById(id);
         if (!elem) {
             return false;
