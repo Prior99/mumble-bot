@@ -6,7 +6,7 @@ import { Connection } from "typeorm";
 import { verbose, error } from "winston";
 
 import { CachedAudio, Recording } from "../models";
-import { createDialog } from "../scopes";
+import { createRecording, world } from "../scopes";
 import { Bot } from "..";
 import { Context } from "../context";
 import { compareCachedAudio } from "../utils";
@@ -30,10 +30,10 @@ export class Cached {
         }
     }
 
-    @route("POST", "/cached/:id/save")
+    @route("POST", "/cached/:id/save").dump(Recording, world)
     public async saveCached(
         @param("id") @is().validate(uuid) id: string,
-        @body() recording: Recording,
+        @body(createRecording) recording: Recording,
         @context ctx?: Context
     ): Promise<Recording> {
         const cached = this.bot.getCachedAudioById(id);
@@ -56,7 +56,7 @@ export class Cached {
         return ok();
     }
 
-    @route("POST", "/cached/:id/protect")
+    @route("POST", "/cached/:id/protect").dump(CachedAudio, world)
     public async protectCached(@param("id") @is().validate(uuid) id: string): Promise<CachedAudio> {
         if (this.bot.protectCachedAudio(id)) {
             return ok();

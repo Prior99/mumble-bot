@@ -4,7 +4,7 @@ import { Connection } from "typeorm";
 import { verbose } from "winston";
 
 import { Dialog } from "../models";
-import { createDialog } from "../scopes";
+import { createDialog, world } from "../scopes";
 import { Bot } from "..";
 import { Context } from "../context";
 
@@ -13,7 +13,7 @@ export class Dialogs {
     @inject private db: Connection;
     @inject private bot: Bot;
 
-    @route("GET", "/dialogs")
+    @route("GET", "/dialogs").dump(Dialog, world)
     public async listDialogs(@param("id") @is().validate(uuid) id: string): Promise<Dialog[]> {
         const dialogs = await this.db.getRepository(Dialog).find();
         return ok(dialogs);
@@ -40,7 +40,7 @@ export class Dialogs {
         return ok();
     }
 
-    @route("POST", "/dialog")
+    @route("POST", "/dialog").dump(Dialog, world)
     public async createDialog(@body(createDialog) dialog: Dialog, @context ctx?: Context): Promise<Dialog> {
         await this.db.getRepository(Dialog).save(dialog);
 
