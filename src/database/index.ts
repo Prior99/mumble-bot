@@ -5,13 +5,10 @@ import * as Winston from "winston";
 import * as MySQL from "promise-mysql";
 import * as FS from "async-file";
 
-export * from "./dialogs";
 export * from "./log";
 export * from "./mumble-users";
 export * from "./permissions";
-export * from "./recordings";
 export * from "./settings";
-export * from "./sounds";
 export * from "./users";
 export * from "./user-stats";
 
