@@ -18,8 +18,6 @@ export const Users = (bot: Bot) => {
     router.use("/permission", authorized(Permissions)(bot));
     router.use("/mumble", authorized(Mumble)(bot));
     router.get("/username-available", authorized(UsernameAvailable)(bot));
-    router.post("/", authorized(Register)(bot));
-    router.get("/", authorized(List)(bot));
     router.post("/set-settings", authorized(SetSettings)(bot));
 
     return router;

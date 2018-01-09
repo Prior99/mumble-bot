@@ -1,16 +1,9 @@
-import {
-    PrimaryGeneratedColumn,
-    Entity,
-    ManyToOne,
-    OneToMany,
-    CreateDateColumn,
-    UpdateDateColumn
-} from "typeorm";
-import { is, scope, DataType, oneOf, specify, required, length, uuid, transform } from "hyrest";
+import { PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
+import { is, scope, uuid } from "hyrest";
+
 import { world } from "../scopes";
-import { Label } from "./label";
-import { Recording } from "./recording";
-import { Dialog } from "./dialog";
+
+import { Dialog, Label, Recording  } from ".";
 
 @Entity()
 export class DialogPart {

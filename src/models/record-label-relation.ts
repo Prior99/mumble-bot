@@ -1,16 +1,9 @@
-import {
-    Column,
-    PrimaryGeneratedColumn,
-    Entity,
-    ManyToOne,
-    OneToMany,
-    CreateDateColumn,
-    UpdateDateColumn
-} from "typeorm";
-import { is, scope, DataType, oneOf, specify, required, length, uuid, transform } from "hyrest";
+import { PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
+import { is, scope, uuid } from "hyrest";
+
 import { world } from "../scopes";
-import { Label } from "./label";
-import { Recording } from "./recording";
+
+import { Recording, Label } from ".";
 
 @Entity()
 export class RecordLabeLRelation {

@@ -1,6 +1,8 @@
-import { is, scope, DataType, oneOf, specify, required, length, uuid, transform } from "hyrest";
+import { is, scope, DataType, specify, uuid } from "hyrest";
+
 import { world } from "../scopes";
-import { DatabaseUser } from "./database-user";
+
+import { DatabaseUser } from ".";
 
 /**
  * A cached audio.

@@ -1,17 +1,10 @@
-import {
-    Column,
-    PrimaryGeneratedColumn,
-    Entity,
-    ManyToOne,
-    OneToMany,
-    CreateDateColumn,
-    UpdateDateColumn
-} from "typeorm";
-import { is, scope, DataType, oneOf, specify, required, length, uuid, transform } from "hyrest";
-import { world, login } from "../scopes";
+import { Column, PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
+import { is, scope, specify, length, uuid, transform } from "hyrest";
+
+import { world, login, owner } from "../scopes";
 import { hash } from "../utils";
-import { Recording } from "./recording";
-import { PermissionAssociation } from "./";
+
+import { Recording, PermissionAssociation, Token } from ".";
 
 /**
  * A user from the database.
@@ -44,13 +37,18 @@ export class DatabaseUser {
 
     @OneToMany(() => Recording, recording => recording.user)
     @is() @scope(world) @specify(() => Recording)
-    public recordings: Recording[];
+    public recordings?: Recording[];
 
     @OneToMany(() => Recording, recording => recording.reporter)
     @is() @scope(world) @specify(() => Recording)
-    public reported: Recording[];
+    public reported?: Recording[];
 
     @OneToMany(() => PermissionAssociation, permissionAssociation => permissionAssociation.user)
     @is() @scope(world) @specify(() => PermissionAssociation)
-    public permissionAssociations: PermissionAssociation[];
+    public permissionAssociations?: PermissionAssociation[];
+
+    @OneToMany(() => Token, token => token.user)
+    @is() @specify(() => Token)
+    @scope(owner)
+    public tokens?: Token[];
 }

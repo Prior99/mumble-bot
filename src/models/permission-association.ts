@@ -7,7 +7,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn
 } from "typeorm";
-import { is, scope, DataType, oneOf, specify, required, length, uuid } from "hyrest";
+import { is, scope, uuid } from "hyrest";
 import { world } from "../scopes";
 import { Permission } from "./permission";
 import { DatabaseUser } from "./database-user";

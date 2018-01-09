@@ -14,8 +14,6 @@ export const Sounds: ApiRoute = (bot: Bot) => {
     const router = Express.Router();
 
     router.put("/", authorized(Add)(bot));
-    router.get("/", authorized(List)(bot));
-    router.post("/:id/play", authorized(Play)(bot));
 
     return router;
 };

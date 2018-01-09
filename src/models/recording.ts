@@ -1,17 +1,9 @@
-import {
-    Column,
-    PrimaryGeneratedColumn,
-    Entity,
-    ManyToOne,
-    OneToMany,
-    CreateDateColumn,
-    UpdateDateColumn
-} from "typeorm";
-import { is, scope, DataType, oneOf, specify, required, length, uuid } from "hyrest";
+import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, OneToMany, CreateDateColumn } from "typeorm";
+import { is, scope, DataType, specify, uuid } from "hyrest";
+
 import { world } from "../scopes";
-import { RecordLabeLRelation } from "./record-label-relation";
-import { DialogPart } from "./dialog-part";
-import { DatabaseUser } from "./database-user";
+
+import { DatabaseUser, DialogPart, RecordLabeLRelation } from ".";
 
 /**
  * A single record as represented in the database.

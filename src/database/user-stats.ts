@@ -1,11 +1,6 @@
 import * as Winston from "winston";
-import {
-    DatabaseUser,
-    StatObjectSpeechPerHour,
-    StatObjectSpeechPerUser,
-    StatObjectSpeechPerWeekday,
-    StatObjectOnlinePerUser
-} from "../types";
+import { StatObjectSpeechPerHour, StatObjectSpeechPerUser, StatObjectSpeechPerWeekday, StatObjectOnlinePerUser } from "../types";
+import { DatabaseUser } from "../models";
 
 const millisecondsPerSecond = 1000;
 

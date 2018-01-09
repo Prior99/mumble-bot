@@ -1,13 +1,5 @@
-import {
-    Column,
-    PrimaryGeneratedColumn,
-    Entity,
-    ManyToOne,
-    OneToMany,
-    CreateDateColumn,
-    UpdateDateColumn
-} from "typeorm";
-import { is, scope, DataType, oneOf, specify, required, length, uuid, transform } from "hyrest";
+import { Column, PrimaryGeneratedColumn, Entity } from "typeorm";
+import { is, scope, DataType, uuid } from "hyrest";
 import { world, login } from "../scopes";
 
 /**

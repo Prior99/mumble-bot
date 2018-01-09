@@ -10,3 +10,6 @@ export { LogEntry } from "./log-entry";
 export { MumbleDatabaseUser } from "./mumble-database-user";
 export { Permission } from "./permission";
 export { PermissionAssociation } from "./permission-association";
+export { Token } from "./token";
+export { MumbleUser } from "./mumble-user";
+export { Channel } from "./channel";

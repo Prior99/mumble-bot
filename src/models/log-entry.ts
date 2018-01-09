@@ -1,13 +1,6 @@
-import {
-    Column,
-    PrimaryGeneratedColumn,
-    Entity,
-    ManyToOne,
-    OneToMany,
-    CreateDateColumn,
-    UpdateDateColumn
-} from "typeorm";
-import { is, scope, DataType, oneOf, specify, required, length, uuid, transform } from "hyrest";
+import { Column, PrimaryGeneratedColumn, Entity, CreateDateColumn } from "typeorm";
+import { is, scope, specify, uuid } from "hyrest";
+
 import { world } from "../scopes";
 
 export type LogLevel = "error" | "warning" | "verbose" | "info" | "debug";

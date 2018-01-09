@@ -56,6 +56,7 @@ export interface StatObjectSpeechPerHour {
      */
     amount: number;
 }
+
 export interface StatObjectSpeechPerUser {
     /**
      * Name of the user this object is representing.
@@ -66,6 +67,7 @@ export interface StatObjectSpeechPerUser {
      */
     amount: number;
 }
+
 export interface StatObjectSpeechPerWeekday {
     /**
      * Name of the weekday this object is representing.
@@ -76,6 +78,7 @@ export interface StatObjectSpeechPerWeekday {
      */
     amount: number;
 }
+
 export interface StatObjectOnlinePerUser {
     /**
      * Name of the user this object is representing.

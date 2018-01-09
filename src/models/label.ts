@@ -1,15 +1,9 @@
-import {
-    Column,
-    PrimaryGeneratedColumn,
-    Entity,
-    ManyToOne,
-    OneToMany,
-    CreateDateColumn,
-    UpdateDateColumn
-} from "typeorm";
-import { is, scope, DataType, oneOf, specify, required, length, uuid, transform } from "hyrest";
+import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, CreateDateColumn } from "typeorm";
+import { is, scope, DataType, specify, uuid } from "hyrest";
+
 import { world } from "../scopes";
-import { RecordLabeLRelation } from "./record-label-relation";
+
+import { RecordLabeLRelation } from ".";
 
 /**
  * A label with which the records can be tagged.
