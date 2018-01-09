@@ -1,5 +1,5 @@
 import { ForkOptions } from "../models";
-import { context, body, controller, route, param, is, uuid, ok, query, specify } from "hyrest";
+import { context, body, controller, route, param, is, uuid, ok, query, specify, created } from "hyrest";
 import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { verbose } from "winston";
@@ -117,6 +117,6 @@ export class Recordings {
             await this.crop(action.begin, action.end, original.id, newRecording.id);
         }));
 
-        return ok(newRecording);
+        return created(newRecording);
     }
 }
