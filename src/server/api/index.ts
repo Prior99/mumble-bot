@@ -12,13 +12,12 @@ import { bind } from "bind-decorator";
 import { createReadStream, writeFile, exists } from "async-file";
 import { omit } from "ramda";
 
-import { Bot } from "..";
-import { convertWorkItem } from "../utils";
-import { Recording } from "../models";
+import { Bot } from "../bot";
+import { Recording, convertWorkItem } from "../../common";
 
 import { cors, catchError } from "./middlewares";
 
-@component
+@component({ eager: true })
 export class RestApi {
     @inject private bot: Bot;
     @inject private db: Connection;

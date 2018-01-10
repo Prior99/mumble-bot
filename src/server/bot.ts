@@ -63,7 +63,7 @@ export class Bot extends EventEmitter {
     private async init() {
         this.input = new VoiceInput(this);
         try {
-            this.cachedAudios = JSON.parse(await readFile(this.cachedAudioIndexFilePath));
+            this.cachedAudios = ;
             this.audioId = this.cachedAudios.reduce((result, cached) => cached.id > result ? cached.id : result, 0) + 1;
         } catch (err) {
             Winston.error("Failed to load cached audios from index file.", err);
@@ -137,27 +137,6 @@ export class Bot extends EventEmitter {
         catch (err) {
             Winston.error(`Unable to join channel "${cname}":`, err);
         }
-    }
-
-    /**
-     * Add an audio file to the list of cached audios.
-     * @param filename Filename of the cached audio file.
-     * @param user User that emitted the audio.
-     * @param duration Duration of the audio.
-     */
-    public addCachedAudio(filename: string, user: number, duration: number) {
-        const obj = {
-            file: filename,
-            date: new Date(),
-            user,
-            id: this.audioId++,
-            duration,
-            protected: false
-        };
-        this.cachedAudios.push(obj);
-        this.emit("cached-audio", obj);
-        this.clearUpCachedAudio();
-        this.persistCachedAudios();
     }
 
     /**

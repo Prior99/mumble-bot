@@ -17,6 +17,7 @@
   "dependencies": {
     "@types/http-status-codes": "^1.0.29",
     "@types/multer": "^0.0.33",
+    "@types/uuid": "^3.4.3",
     "async-file": "^2.0.2",
     "bind-decorator": "^1.0.11",
     "body-parser": "1.17",
@@ -43,6 +44,7 @@
     "sox-audio": "^0.3.0",
     "tsdi": "^0.18.2",
     "typeorm": "^0.1.10",
+    "uuid": "^3.1.0",
     "winston": "^2.3.1",
     "winston-mysql-transport": "0.1.2",
     "ws": "^2.3.1"
