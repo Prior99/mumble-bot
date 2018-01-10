@@ -1,66 +1,56 @@
 import * as Express from "express";
-import * as Winston from "winston";
+import * as FS from "fs";
+import { Request, Response } from "express";
 import ExpressWS = require("express-ws"); // tslint:disable-line
+import mkdirp = require("mkdirp-promise"); // tslint:disable-line
 import * as BodyParser from "body-parser";
-import { colorify } from "../colorbystring";
-import * as HTTP from "http-status-codes";
 import { Server } from "http";
+import { Connection } from "typeorm";
+import { component, inject, initialize } from "tsdi";
+import { info, error } from "winston";
+import { bind } from "bind-decorator";
+import { createReadStream, writeFile, exists } from "async-file";
+import { omit } from "ramda";
 
-import { Recordings } from "./recordings";
-import { Sounds } from "./sound";
-import { Stats } from "./stats";
-import { Users } from "./users";
+import { Bot } from "..";
+import { convertWorkItem } from "../utils";
+import { Recording } from "../models";
 
-import { ChannelTree } from "./channel-tree";
-import { Log } from "./log";
-import { Authorized } from "./authorized";
-import { WebsocketQueue } from "./websocket-queue";
-import { ShutUp } from "./shut-up";
-import { checkLoginData, getUserByUsername } from "../database";
-import { Bot } from "../index";
-import { forbidden, internalError, authorizedWebsocket, authorized, notFound } from "./utils";
+import { cors, catchError } from "./middlewares";
 
-const maxPercent = 100;
+@component
+export class RestApi {
+    @inject private bot: Bot;
+    @inject private db: Connection;
 
-export class Api {
-    private connections: Set<any>;
+    private connections = new Set<any>();
     private app: Express.Application;
     private server: Server;
-    private bot: Bot;
 
-    /**
-     * Handles the whole website stuff for the bot. Using express and handlebars
-     * provides the backend for all data and the interface between the webpage and
-     * the bot itself.
-     * @param bot The bot to use this webpage with.
-     */
-    constructor(bot: Bot) {
-        this.bot = bot;
-        this.connections = new Set();
+    @initialize
+    private start() {
         this.app = Express();
         this.app.use(BodyParser.json({ limit: "100mb" }));
         this.app.use(BodyParser.urlencoded({ limit: "100mb", extended: true }));
+        this.app.use(cors);
+        this.app.use(catchError);
         ExpressWS(this.app);
-        this.app.use(this.handleCORS);
-        this.app.use("/sounds", Sounds(bot));
-        this.app.use("/recordings", Recordings(bot));
-        this.app.use("/statistics", Stats(bot));
-        this.app.use("/users", Users(bot));
-        this.app.post("/shut-up", authorized(ShutUp)(bot));
-        this.app.get("/channel-tree", ChannelTree(bot));
-        this.app.get("/log", authorized(Log)(bot));
-        this.app.get("/authorized", authorized(Authorized)(bot));
-        (this.app as any).ws("/queue", authorizedWebsocket(WebsocketQueue)(bot));
-        this.app.use("*", (req, res) => notFound(res));
 
-        const port = bot.options.website.port;
+        this.app.use(this.handleCORS);
+        (this.app as any).ws("/queue", this.websocketQueue);
+        (this.app as any).ws("/cached/live", this.websocketQueue);
+        this.app.get("/cached/:id/download", this.downloadCached);
+        this.app.get("/cached/:id/visualized", this.downloadVisualizedCached);
+        this.app.get("/recording/:id/download", this.downloadRecording);
+        this.app.get("/recording/:id/visualized", this.downloadVisualizedRecording);
+
+        const port = this.bot.options.website.port;
         this.server = this.app.listen(port);
 
-        const timeoutValue = 30000; // 30 seconds timeout
-        this.server.setTimeout(timeoutValue, () => { return; });
+        this.server.setTimeout(10000, () => { return; });
         this.server.on("connection", (conn) => this.onConnection(conn));
 
-        Winston.info(`Api started, listening on port ${port}`);
+        info(`Api started, listening on port ${port}`);
     }
 
     private handleCORS: Express.Handler = (req, res, next) => {
@@ -86,21 +76,172 @@ export class Api {
     }
 
     /**
-     * Stop the webpage immediatly.
+     * Stop the api immediatly.
      * @return Promise which will be resolved when the website has been shut down.
      */
     public shutdown() {
         return new Promise((resolve, reject) => {
-            Winston.info("Stopping website ...");
+            info("Stopping api ...");
             this.server.close(() => {
-                Winston.info(`Terminating ${this.connections.size} connections.`);
+                info(`Terminating ${this.connections.size} connections.`);
                 for (const socket of this.connections) {
                     socket.destroy();
                     this.connections.delete(socket);
                 }
-                Winston.info("Website stopped.");
+                info("Api stopped.");
                 resolve();
             });
         });
+    }
+
+    @bind public websocketCached(ws, req: Request) {
+        ws.send(JSON.stringify({
+            type: "init",
+            cacheAmount: this.bot.audioCacheAmount,
+            list: this.bot.cachedAudios.map(recording => omit(["file"], recording))
+        }));
+
+        const onAdd = audio => ws.send(JSON.stringify({ type: "add", recording: omit(["file"], audio) }));
+        this.bot.on("cached-audio", onAdd);
+
+        const onRemoveAudio = ({ id }) => ws.send(JSON.stringify({ type: "remove", id }));
+        this.bot.on("removed-cached-audio", onRemoveAudio);
+
+        const onProtect = ({ id }) => ws.send(JSON.stringify({ type: "protect", id }));
+        this.bot.on("protect-cached-audio", onProtect);
+
+        ws.on("close", () => {
+            this.bot.removeListener("cached-audio", onAdd);
+            this.bot.removeListener("removed-cached-audio", onRemoveAudio);
+            this.bot.removeListener("protect-cached-audio", onProtect);
+        });
+    }
+
+    @bind public websocketQueue(ws, req: Request) {
+        try {
+            ws.send(JSON.stringify({
+                type: "init",
+                queue: this.bot.output.queue.map(convertWorkItem)
+            }));
+        }
+        catch (err) {
+            error("Error sending initial packet to live queue websocket:", err);
+        }
+        const onEnqueue = (workitem) => {
+            ws.send(JSON.stringify({
+                type: "enqueue",
+                workitem: convertWorkItem(workitem)
+            }));
+        };
+        const onDequeue = () => {
+            ws.send(JSON.stringify({
+                type: "dequeue"
+            }));
+        };
+        const onClear = () => {
+            ws.send(JSON.stringify({
+                type: "clear"
+            }));
+        };
+        this.bot.output.on("clear", onClear);
+        this.bot.output.on("enqueue", onEnqueue);
+        this.bot.output.on("dequeue", onDequeue);
+        ws.on("close", () => {
+            this.bot.output.removeListener("clear", onClear);
+            this.bot.output.removeListener("enqueue", onEnqueue);
+            this.bot.output.removeListener("dequeue", onDequeue);
+        });
+    }
+
+    @bind public downloadCached({ params }: Request, res: Response) {
+        const { id } = params;
+        const sound = this.bot.getCachedAudioById(id);
+        if (!sound) { return res.status(404).send(); }
+
+        res.setHeader("Content-disposition", `attachment; filename='cached_${id}.mp3'`);
+        const stream = FS.createReadStream(sound.file)
+            .on("error", (err) => {
+                error(`Error occured when trying to read cached record with id ${id}`);
+                if (err.code === "ENOENT") { return res.status(404).send(); }
+            })
+            .on("readable", () => {
+                try { stream.pipe(res); }
+                catch (err) { error("Error occured when trying to stream file to browser", id, err); }
+            });
+    }
+
+    @bind public async downloadVisualizedCached({ params }: Request, res: Response) {
+        const { id } = params;
+        const sound = this.bot.getCachedAudioById(id);
+        if (!sound) { return res.status(404).send(); }
+
+        const fileName = `${sound.file}.png`;
+        const trySend = async (retries = 0) => {
+            if (!await exists(fileName)) {
+                if (retries === 5) { return res.status(404).send(); }
+                setTimeout(() => trySend(retries + 1), 500);
+                return;
+            }
+            try {
+                res.status(200);
+                createReadStream(fileName).on("error", (err) => {
+                    error(`Error sending visualization of ${sound.file} to client.`, err);
+                    res.status(500).send();
+                }).pipe(res);
+            }
+            catch (err) {
+                error("Error occured during request of sound visualization.", err);
+                return res.status(500).send();
+            }
+        };
+
+        await trySend();
+    }
+
+    @bind public async downloadRecording({ params }: Request, res: Response) {
+        const { id } = params;
+        const recording = await this.db.getRepository(Recording).findOneById(id);
+        if (!recording) { return res.status(404).send(); }
+
+        res.setHeader("Content-disposition", `attachment; filename='${recording.quote}.mp3'`);
+        const stream = FS.createReadStream(`${this.bot.options.paths.recordings}/${recording.id}`)
+            .on("error", (err) => {
+                if (err.code === "ENOENT") { return res.status(404).send(); }
+                error(`Error occured when trying to read record with id ${recording.id}`);
+            })
+            .on("readable", async () => {
+                try { stream.pipe(res); }
+                catch (err) {
+                    error(`Error occured when trying to stream file to browser for recording ${id}`, err);
+                }
+            });
+    }
+
+    @bind public async downloadVisualizedRecording({ params }: Request, res: Response) {
+        const { id } = params;
+        const recording = await this.db.getRepository(Recording).findOneById(id);
+        if (!recording) { return res.status(404).send(); }
+
+        const fileName = `${this.bot.options.paths.visualizations}/${recording.id}.png`;
+        const trySend = async (retries = 0) => {
+            if (!await exists(fileName)) {
+                if (retries === 5) { return res.status(404).send(); }
+                setTimeout(() => trySend(retries + 1), 500);
+                return;
+            }
+            try {
+                res.status(200);
+                createReadStream(fileName).on("error", (err) => {
+                    error(`Error sending visualization of ${fileName} to client.`, err);
+                    res.status(500).send();
+                }).pipe(res);
+            }
+            catch (err) {
+                error("Error occured during request of sound visualization.", err);
+                return res.status(500).send();
+            }
+        };
+
+        await trySend();
     }
 }

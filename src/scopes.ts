@@ -10,3 +10,4 @@ export const signup = createScope().include(login);
 export const owner = createScope();
 export const createRecording = createScope();
 export const createMumbleLink = createScope();
+export const createSound = createScope();
