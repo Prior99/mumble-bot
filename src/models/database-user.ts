@@ -4,7 +4,7 @@ import { is, scope, specify, length, uuid, transform } from "hyrest";
 import { world, login, owner } from "../scopes";
 import { hash } from "../utils";
 
-import { Recording, PermissionAssociation, Token, Setting } from ".";
+import { Recording, PermissionAssociation, Token, Setting, MumbleLink } from ".";
 
 /**
  * A user from the database.
@@ -54,4 +54,8 @@ export class DatabaseUser {
     @is() @specify(() => Setting)
     @scope(owner)
     public settings?: Setting[];
+
+    @OneToMany(() => MumbleLink, mumbleLink => mumbleLink.user)
+    @is() @specify(() => MumbleLink)
+    public mumbleLinks?: MumbleLink;
 }

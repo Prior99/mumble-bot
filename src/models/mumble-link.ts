@@ -1,12 +1,14 @@
-import { Column, PrimaryGeneratedColumn, Entity } from "typeorm";
+import { Column, PrimaryGeneratedColumn, Entity, ManyToOne } from "typeorm";
 import { is, scope, DataType, uuid } from "hyrest";
 import { world, login } from "../scopes";
+
+import { DatabaseUser } from ".";
 
 /**
  * A Mumble user representation in the database used for storing linkage from mumble user to database users.
  */
 @Entity()
-export class MumbleDatabaseUser {
+export class MumbleLink {
     @PrimaryGeneratedColumn("uuid")
     @scope(world) @is().validate(uuid)
     private id?: string;
@@ -16,12 +18,16 @@ export class MumbleDatabaseUser {
      */
     @Column("int")
     @scope(world) @is(DataType.int)
-    public mumbleId: number;
+    public mumbleId?: number;
+
+    @Column("varchar", { length: 128 })
+    @scope(world) @is()
+    public name?: string;
 
     /**
-     * The username of the user in the mumble server.
+     * The in the database.
      */
-    @Column("varchar", { length: 100 })
+    @ManyToOne(() => DatabaseUser, user => user.mumbleLinks)
     @is() @scope(world)
-    public username: string;
+    public user?: DatabaseUser;
 }

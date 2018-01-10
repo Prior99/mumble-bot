@@ -20,7 +20,7 @@ export class PermissionAssociation {
 
     @Column("varchar", { length: 32 })
     @is() @scope(world)
-    public permission: string;
+    public permission?: string;
 
     @OneToMany(() => DatabaseUser, user => user.permissionAssociations)
     @is() @scope(world)
