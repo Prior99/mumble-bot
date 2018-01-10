@@ -1,7 +1,3 @@
-/*
- * Imports
- */
-
 import Samplerate from "node-samplerate";
 import * as Winston from "winston";
 import { stat } from "async-file";

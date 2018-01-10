@@ -1,3 +1,5 @@
+import { component } from "tsdi";
+
 import { VoiceInput } from "./input";
 import { Output } from "./output";
 import * as Winston from "winston";
@@ -16,6 +18,7 @@ const AUDIO_CACHE_AMOUNT = 4;
  * This is the main class of the bot instanciated from the loader and holding all relevant data,
  * systems and connections.
  */
+@component({ eager: true })
 export class Bot extends EventEmitter {
     public options: any;
     public database: any;

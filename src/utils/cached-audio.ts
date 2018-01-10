@@ -1,4 +1,4 @@
-import { CachedAudio } from "../models";
+import { CachedAudio } from "../common";
 
 export function compareCachedAudio(a: CachedAudio, b: CachedAudio): number {
     if (a.protected === b.protected) {

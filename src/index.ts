@@ -2,12 +2,7 @@ import { connect } from "mumble";
 import { Bot } from "./bot";
 import * as Winston from "winston";
 import * as FS from "fs";
-import { connectDatabase } from "./database";
-import { setupWinston } from "./utils/winston";
-/*
- * Winston
- */
-import "winston-mysql-transport";
+import { setupWinston } from "./utils";
 
 export * from "./bot";
 
