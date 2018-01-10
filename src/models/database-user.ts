@@ -4,7 +4,7 @@ import { is, scope, specify, length, uuid, transform } from "hyrest";
 import { world, login, owner } from "../scopes";
 import { hash } from "../utils";
 
-import { Recording, PermissionAssociation, Token } from ".";
+import { Recording, PermissionAssociation, Token, Setting } from ".";
 
 /**
  * A user from the database.
@@ -30,11 +30,6 @@ export class DatabaseUser {
     @transform(hash)
     public password?: string;
 
-    /**
-     * The custom settings of the user are stored key-value-wise in this object.
-     */
-    public settings?: any;
-
     @OneToMany(() => Recording, recording => recording.user)
     @is() @scope(world) @specify(() => Recording)
     public recordings?: Recording[];
@@ -51,4 +46,12 @@ export class DatabaseUser {
     @is() @specify(() => Token)
     @scope(owner)
     public tokens?: Token[];
+
+    /**
+     * The custom settings of the user are stored key-value-wise in this object.
+     */
+    @OneToMany(() => Setting, setting => setting.user)
+    @is() @specify(() => Setting)
+    @scope(owner)
+    public settings?: Setting[];
 }

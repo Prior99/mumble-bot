@@ -18,17 +18,9 @@ export class PermissionAssociation {
     @scope(world) @is().validate(uuid)
     public id?: string;
 
-    @Column("bool", { default: false })
+    @Column("varchar", { length: 32 })
     @is() @scope(world)
-    public granted?: boolean;
-
-    @Column("bool", { default: false })
-    @is() @scope(world)
-    public canGrant?: boolean;
-
-    @OneToMany(() => Permission, permission => permission.associations)
-    @is() @scope(world)
-    public permission?: Permission;
+    public permission: string;
 
     @OneToMany(() => DatabaseUser, user => user.permissionAssociations)
     @is() @scope(world)
