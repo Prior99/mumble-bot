@@ -6,16 +6,16 @@ import { world } from "../scopes";
 import { Recording, Label } from ".";
 
 @Entity()
-export class RecordLabeLRelation {
+export class RecordingLabelRelation {
     @PrimaryGeneratedColumn("uuid")
     @scope(world) @is().validate(uuid)
     public id?: string;
 
-    @OneToMany(() => Recording, recording => recording.recordLabelRelations)
+    @OneToMany(() => Recording, recording => recording.recordingLabelRelations)
     @is() @scope(world)
     public recording?: Recording;
 
-    @OneToMany(() => Label, label => label.recordLabelRelations)
+    @OneToMany(() => Label, label => label.recordingLabelRelations)
     @is() @scope(world)
     public label?: Label;
 }

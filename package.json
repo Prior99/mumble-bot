@@ -24,6 +24,7 @@
     "canvas": "^1.6.5",
     "chokidar": "^1.7.0",
     "chunking-streams": "^0.0.8",
+    "clime": "^0.5.9",
     "crypto-js": "^3.1.9-1",
     "express": "^4.15.2",
     "express-ws": "^3.0.0",

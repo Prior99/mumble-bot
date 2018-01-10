@@ -27,7 +27,8 @@ export class Label {
     /**
      * A list of all labels with which this record was tagged.
      */
-    @ManyToOne(() => RecordLabeLRelation, recordLabelRelation => recordLabelRelation.label)
+    @ManyToOne(() => RecordLabeLRelation, recordingLabelRelation => recordingLabelRelation.label)
     @scope(world) @specify(() => RecordLabeLRelation) @is()
-    public recordLabelRelations?: RecordLabeLRelation[];
+    public recordingLabelRelations?: RecordLabeLRelation[];
 }
+

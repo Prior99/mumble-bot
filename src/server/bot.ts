@@ -1,74 +1,30 @@
-import { component } from "tsdi";
+import { component, initialize, inject } from "tsdi";
+import { Connection as MumbleConnection} from "mumble";
+import { Connection as DbConnection } from "typeorm";
+import { error } from "winston";
+import { writeFile, unlink, readFile } from "async-file";
+import { EventEmitter } from "events";
 
 import { VoiceInput } from "./input";
 import { Output } from "./output";
-import * as Winston from "winston";
-import { Connection } from "mumble";
-import { Api } from "./rest-api";
-import { writeFile, unlink, readFile } from "async-file";
-import { EventEmitter } from "events";
-import { Permissions } from "./permissions";
-import { connectDatabase } from "./database";
-import { CachedAudio } from "./models";
-import { MetaInformation } from "./types/output";
+import { MetaInformation, CachedAudio } from "../common";
 
-const AUDIO_CACHE_AMOUNT = 4;
-
-/**
- * This is the main class of the bot instanciated from the loader and holding all relevant data,
- * systems and connections.
- */
 @component({ eager: true })
 export class Bot extends EventEmitter {
+    @inject private mumble: MumbleConnection;
+    @inject private db: DbConnection;
+
     public options: any;
-    public database: any;
-    public mumble: Connection;
-    public cachedAudios: CachedAudio[];
-    public audioCacheAmount: number;
+
     public output: Output;
-    public permissions: Permissions;
-    private audioId = 0;
     private input: VoiceInput;
-    private api: Api;
 
-    /**
-     * This is the constructor of the bot.
-     * @constructor
-     * @param mumble already set up mumble connection (MumbleClient)
-     * @param options Options read from the config.json
-     * @param database Started connection to database.
-     */
-    constructor(mumble, options, database) {
-        super();
+    @initialize
+    private initialize(mumble, options, database) {
         this.options = options;
-        this.mumble = mumble;
-        this.cachedAudios = [];
-        this.database = database;
-
-        this.permissions = new Permissions(database);
-
-        this.api = new Api(this);
 
         this.output = new Output(this);
-        if (options.audioCacheAmount) {
-            this.audioCacheAmount = options.audioCacheAmount;
-        }
-        else {
-            this.audioCacheAmount = AUDIO_CACHE_AMOUNT;
-        }
-
-        this.init();
-    }
-
-    private async init() {
         this.input = new VoiceInput(this);
-        try {
-            this.cachedAudios = ;
-            this.audioId = this.cachedAudios.reduce((result, cached) => cached.id > result ? cached.id : result, 0) + 1;
-        } catch (err) {
-            Winston.error("Failed to load cached audios from index file.", err);
-            this.cachedAudios = [];
-        }
     }
 
     /**
@@ -92,13 +48,12 @@ export class Bot extends EventEmitter {
     public async shutdown() {
         try {
             this.beQuiet();
-            await this.api.shutdown();
             this.output.stop();
             this.input.stop();
             this.emit("shutdown");
         }
         catch (err) {
-            Winston.error("Error during shutdown:", err);
+            error("Error during shutdown:", err);
         }
     }
 
@@ -128,121 +83,13 @@ export class Bot extends EventEmitter {
         try {
             const channel = this.mumble.channelByName(cname);
             if (!channel) {
-                Winston.error(`Channel "${cname}" is unknown.`);
+                error(`Channel "${cname}" is unknown.`);
+                return;
             }
-            else {
-                channel.join();
-            }
+            channel.join();
         }
         catch (err) {
-            Winston.error(`Unable to join channel "${cname}":`, err);
-        }
-    }
-
-    /**
-     * Retrieve the cached audio by its id. Returns the audio when the id was valid
-     * and null otherwise.
-     * @param id Id of the audio to look up.
-     * @return The cached audio or null when the id was invalid.
-     */
-    public getCachedAudioById(id: string): CachedAudio {
-        return this.cachedAudios.find(audio => audio.id === id);
-    }
-
-    /**
-     * Protected the cached audio with the given id.
-     * @param id Id of the audio to protect.
-     * @return False when the id was invalid.
-     */
-    public protectCachedAudio(id: string): boolean {
-        const elem = this.getCachedAudioById(id);
-        if (!elem) {
-            return false;
-        }
-        else {
-            elem.protected = true;
-            this.emit("protect-cached-audio", elem);
-            this.persistCachedAudios();
-            return true;
-        }
-    }
-
-    /**
-     * Removes the cached audio with the given id.
-     * @param id Id of the audio to remove.
-     * @return False when the id was invalid.
-     */
-    public removeCachedAudioById(id: string): boolean {
-        const elem = this.getCachedAudioById(id);
-        if (!elem) {
-            return false;
-        }
-        else {
-            this.removeCachedAudio(elem);
-            this.persistCachedAudios();
-            return true;
-        }
-    }
-
-    private get cachedAudioIndexFilePath() {
-        return `${this.options.paths.tmp}/useraudio.json`;
-    }
-
-    private async persistCachedAudios() {
-        await writeFile(this.cachedAudioIndexFilePath, JSON.stringify(this.cachedAudios));
-    }
-
-    /**
-     * Removes the cached audio by audio object.
-     * @param audio audio object to remove.
-     * @return False when the id was invalid.
-     */
-    public removeCachedAudio(audio: CachedAudio): boolean {
-        const index = this.cachedAudios.indexOf(audio);
-        if (index !== -1) {
-            this.cachedAudios.splice(index, 1);
-            this.emit("removed-cached-audio", audio);
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    /**
-     * Clears up the list of cached audios and keeps it to the specified maximum size.
-     */
-    private clearUpCachedAudio() {
-        this.deleteAllCachedAudio(this.audioCacheAmount);
-    }
-
-    /**
-     * Delete the specified amount of audios from the list of cached audios starting with the oldest
-     * and skipping protected audios.
-     * @param amount Amount of audios to remove.
-     */
-    private async deleteAllCachedAudio(amount): Promise<void> {
-        const prot = [];
-        while (this.cachedAudios.length > amount) {
-            const elem = this.cachedAudios.shift();
-            if (elem.protected) {
-                amount--;
-                prot.push(elem);
-            }
-            else {
-                try {
-                    await unlink(elem.file);
-                    await unlink(`${elem.file}.png`);
-                    this.emit("removed-cached-audio", elem);
-                    Winston.info(`Deleted cached audio file "${elem.file}" and "${elem.file}.png".`);
-                }
-                catch (err) {
-                    Winston.error("Error when cleaning up cached audios!", err);
-                }
-            }
-        }
-        while (prot.length > 0) {
-            this.cachedAudios.unshift(prot.pop());
+            error(`Unable to join channel "${cname}":`, err);
         }
     }
 }

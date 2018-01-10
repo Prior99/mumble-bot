@@ -21,18 +21,6 @@ else {
 }
 
 /**
- * Stops the database connection.
- * @param database Connection to the database to close.
- * @param callback Called once the connection to the database is closed.
- */
-const stopDatabase = async (database, callback: Function) => {
-    Winston.info("Stopping database ... ");
-    await database.end();
-    Winston.info("Database stopped.");
-    callback();
-};
-
-/**
  * Stops the mumble connection.
  * @param connection Connection to the mumble server.
  * @param callback Called once the connection is closed.

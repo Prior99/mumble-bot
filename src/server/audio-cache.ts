@@ -43,7 +43,7 @@ export class AudioCache extends EventEmitter {
      * @param user User that emitted the audio.
      * @param duration Duration of the audio.
      */
-    public async addCachedAudio(filename: string, userId: string, duration: number) {
+    public async add(filename: string, userId: string, duration: number) {
         const id = Uuid.v4();
         const user = await this.db.getRepository(DatabaseUser).findOneById(userId);
         const cachedAudio: CachedAudio = new CachedAudio(filename, user, duration);
@@ -70,16 +70,35 @@ export class AudioCache extends EventEmitter {
             }
         }));
     }
-
     /**
      * Removes the cached audio with the given id.
      * @param id Id of the audio to remove.
      * @return False when the id was invalid.
      */
-    public removeCachedAudioById(id: string): boolean {
+    public remove(id: string): boolean {
         if (!this.cachedAudios.has(id)) { return false; }
         this.cachedAudios.delete(id);
         this.exportCache();
         return true;
+    }
+
+    public byId(id: string) {
+        return this.cachedAudios.get(id);
+    }
+
+    /**
+     * Protected the cached audio with the given id.
+     * @param id Id of the audio to protect.
+     * @return False when the id was invalid.
+     */
+    public protect(id: string): boolean {
+        const cachedAudio = this.byId(id);
+        if (!cachedAudio) { return false; }
+        else {
+            cachedAudio.protected = true;
+            this.emit("protect-cached-audio", cachedAudio);
+            this.exportCache();
+            return true;
+        }
     }
 }

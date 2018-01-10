@@ -1,6 +1,7 @@
 import { is, scope, DataType, specify, uuid } from "hyrest";
+import * as Uuid from "uuid";
 
-import { world } from "../scopes";
+import { world } from "../../scopes";
 
 import { DatabaseUser } from ".";
 
@@ -8,6 +9,17 @@ import { DatabaseUser } from ".";
  * A cached audio.
  */
 export class CachedAudio {
+    constructor(filename?: string, user?: DatabaseUser, duration?: number) {
+        if (filename && user && duration) {
+            this.file = filename;
+            this.user = user;
+            this.duration = duration;
+            this.id = Uuid.v4();
+            this.protected = false;
+            this.date = new Date();
+        }
+    }
+
     /**
      * The filename of the audio.
      */

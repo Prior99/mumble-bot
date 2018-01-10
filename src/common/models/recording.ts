@@ -73,9 +73,9 @@ export class Recording {
     /**
      * A list of all labels with which this record was tagged.
      */
-    @ManyToOne(() => RecordLabeLRelation, recordLabelRelation => recordLabelRelation.recording)
+    @ManyToOne(() => RecordLabeLRelation, recordingLabelRelation => recordingLabelRelation.recording)
     @scope(world) @specify(() => RecordLabeLRelation) @is()
-    public recordLabelRelations?: RecordLabeLRelation[];
+    public recordingLabelRelations?: RecordLabeLRelation[];
 
     /**
      * Duration in seconds of this recording.
