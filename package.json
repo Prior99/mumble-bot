@@ -18,6 +18,7 @@
     "@types/http-status-codes": "^1.0.29",
     "@types/multer": "^0.0.33",
     "async-file": "^2.0.2",
+    "bind-decorator": "^1.0.11",
     "body-parser": "1.17",
     "canvas": "^1.6.5",
     "chokidar": "^1.7.0",
