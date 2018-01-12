@@ -1,38 +1,26 @@
+import { component, inject, initialize } from "tsdi";
 import { VoiceInputUser } from "./user";
-import * as Winston from "winston";
+import { info } from "winston";
 import { EventEmitter } from "events";
-import { Bot } from "..";
-import { getLinkedUser } from "../database";
-import { User as MumbleUser } from "mumble";
-import { DatabaseUser } from "../types";
+import { User as MumbleUser, Connection as MumbleConnection } from "mumble";
+import { Connection as DatabaseConnection } from "typeorm";
 
-interface UserMap {
-    [id: string]: VoiceInputUser;
-}
+import { DatabaseUser, MumbleLink } from "../../common";
 
 /**
  * This class handles voice input for all users. It uses instances of user.js
  * and handles them.
  */
 export class VoiceInput extends EventEmitter {
-    private bot: Bot;
-    private users: UserMap = {};
+    @inject private mumble: MumbleConnection;
+    @inject private db: DatabaseConnection;
+    private users = new Map<number, VoiceInputUser>();
 
-    constructor(bot: Bot) {
-        super();
-        this.bot = bot;
-        this.initConnectedUsers(bot.mumble.users());
-        bot.mumble.on("user-connect", this.addUser.bind(this));
-        bot.mumble.on("user-disconnect", this.removeUser.bind(this));
-        Winston.info("Module started: Voice input");
-    }
-
-    /**
-     * Registers all connected users as VoiceInputs
-     * @param users The corrently connected users . TODO fix type
-     */
-    private initConnectedUsers(users: MumbleUser[]) {
-        users.forEach(user => this.addUser(user));
+    @initialize
+    private initConnectedUsers() {
+        this.mumble.on("user-connect", this.addUser);
+        this.mumble.on("user-disconnect", this.removeUser);
+        this.mumble.users().forEach(user => this.addUser(user));
     }
 
     /**
@@ -41,12 +29,11 @@ export class VoiceInput extends EventEmitter {
      * @param databaseUser The user object from the database.
      */
     private async addRegisteredUser(user: MumbleUser, databaseUser: DatabaseUser) {
-        Winston.info("Input registered for user " + user.name);
-        const localUser = new VoiceInputUser(user, databaseUser, this.bot);
+        info(`Input registered for user ${user.name}`);
+        const localUser = new VoiceInputUser(user, databaseUser);
         await localUser.init();
-        this.users[user.id] = localUser;
-        const stream = user.outputStream(true);
-        stream.pipe(localUser);
+        this.users.set(user.id, localUser);
+        user.outputStream(true).pipe(localUser);
     }
 
     /**
@@ -54,19 +41,15 @@ export class VoiceInput extends EventEmitter {
      * @param user The user who should be registered.
      */
     private async addUser(user: MumbleUser) {
-        try {
-            const databaseUser = await getLinkedUser(user.id, this.bot.database);
-            if (!databaseUser) {
-                Winston.info(
-                    `Did not register input for user ${user.name} as this user is not linked to any database user.`
-                );
-                return;
-            }
-            this.addRegisteredUser(user, databaseUser);
+        const link = await this.db.getRepository(MumbleLink).findOne({
+            where: { mumbleId: user.id },
+            relations: ["user"]
+        });
+        if (!link) {
+            info(`Did not register input for user ${user.name} as this user is not linked to any database user.`);
+            return;
         }
-        catch (err) {
-            Winston.error("Error occured when trying to fetch user by mumble id", err);
-        }
+        this.addRegisteredUser(user, link.user);
     }
 
     /**
@@ -86,6 +69,6 @@ export class VoiceInput extends EventEmitter {
      */
     public stop() {
         Object.keys(this.users).map(key => this.users[key]).forEach(user => user.stop());
-        Winston.info("Input stopped.");
+        info("Input stopped.");
     }
 }

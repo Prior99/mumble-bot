@@ -1,8 +1,10 @@
-import * as Winston from "winston";
-import { Sound } from "./sound";
+import { warn, info } from "winston";
+import { Connection as MumbleConnection } from "mumble";
 import * as Stream from "stream";
-import { Bot } from "..";
-import { MetaInformation, WorkItem } from "../types/output";
+import { inject, component, initialize } from "tsdi";
+
+import { Sound } from "./sound";
+import { MetaInformation, WorkItem } from "../../common";
 
 const PREBUFFER = 0.5;
 const audioFreq = 48000;
@@ -12,10 +14,12 @@ const msInS = 1000;
  * Audio output for the bot. This class handles the whole audio output,
  * including both TTS and sounds.
  */
+@component
 export class Output extends Stream.Writable {
+    @inject private mumble: MumbleConnection;
+
     public busy = false;
     public queue: WorkItem[] = [];
-    private bot: Bot;
     private stream: any;
     private sound: Sound;
     private current: any;
@@ -23,15 +27,11 @@ export class Output extends Stream.Writable {
     private playbackAhead = 0;
     private stopped = false;
     private lastBufferShift: number;
-    private timeout: NodeJS.Timer;
-    /**
-     * @param bot Bot this belongs to.
-     */
-    constructor(bot: Bot) {
-        super();
-        this.bot = bot;
-        this.stream = bot.mumble.inputStream();
-        this.sound = new Sound(this);
+    private timeout: any;
+
+    @initialize
+    private initialize() {
+        this.stream = this.mumble.inputStream();
     }
 
     /**
@@ -48,7 +48,7 @@ export class Output extends Stream.Writable {
         if (this.bufferQueue.length > 0) {
             const start = Date.now();
             if (this.playbackAhead < 0 && this.lastBufferShift) {
-                Winston.warn("Buffer underflow.");
+                warn("Buffer underflow.");
             }
             while (this.playbackAhead < PREBUFFER && this.bufferQueue.length > 0) {
                 const b = this.bufferQueue.shift();
@@ -200,6 +200,6 @@ export class Output extends Stream.Writable {
         this.sound.stop();
         this.stream.close();
         this.stream.end();
-        Winston.info("Output stopped.");
+        info("Output stopped.");
     }
 }

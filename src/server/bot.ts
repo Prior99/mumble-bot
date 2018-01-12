@@ -5,7 +5,6 @@ import { error } from "winston";
 import { writeFile, unlink, readFile } from "async-file";
 import { EventEmitter } from "events";
 
-import { VoiceInput } from "./input";
 import { Output } from "./output";
 import { MetaInformation, CachedAudio } from "../common";
 
@@ -15,12 +14,10 @@ export class Bot extends EventEmitter {
     @inject private db: DbConnection;
 
     public output: Output;
-    private input: VoiceInput;
 
     @initialize
     private initialize() {
         this.output = new Output(this);
-        this.input = new VoiceInput(this);
     }
 
     /**
@@ -46,7 +43,6 @@ export class Bot extends EventEmitter {
         try {
             this.beQuiet();
             this.output.stop();
-            this.input.stop();
             this.emit("shutdown");
         }
         catch (err) {

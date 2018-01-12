@@ -3,7 +3,7 @@ import { is, scope, DataType, specify, uuid } from "hyrest";
 
 import { world } from "../scopes";
 
-import { DatabaseUser, DialogPart, RecordLabeLRelation } from ".";
+import { DatabaseUser, DialogPart, RecordLabelRelation } from ".";
 
 /**
  * A single record as represented in the database.
@@ -73,9 +73,9 @@ export class Recording {
     /**
      * A list of all labels with which this record was tagged.
      */
-    @ManyToOne(() => RecordLabeLRelation, recordingLabelRelation => recordingLabelRelation.recording)
-    @scope(world) @is() @specify(() => RecordLabeLRelation)
-    public recordingLabelRelations?: RecordLabeLRelation[];
+    @ManyToOne(() => RecordLabelRelation, recordingLabelRelation => recordingLabelRelation.recording)
+    @scope(world) @is() @specify(() => RecordLabelRelation)
+    public recordingLabelRelations?: RecordLabelRelation[];
 
     /**
      * Duration in seconds of this recording.

@@ -3,7 +3,7 @@ import { is, scope, DataType, specify, uuid } from "hyrest";
 
 import { world } from "../scopes";
 
-import { RecordLabeLRelation } from ".";
+import { RecordingLabelRelation } from ".";
 
 /**
  * A label with which the records can be tagged.
@@ -27,7 +27,7 @@ export class Label {
     /**
      * A list of all labels with which this record was tagged.
      */
-    @ManyToOne(() => RecordLabeLRelation, recordingLabelRelation => recordingLabelRelation.label)
-    @scope(world) @is() @specify(() => RecordLabeLRelation)
-    public recordingLabelRelations?: RecordLabeLRelation[];
+    @ManyToOne(() => RecordingLabelRelation, recordingLabelRelation => recordingLabelRelation.label)
+    @scope(world) @is() @specify(() => RecordingLabelRelation)
+    public recordingLabelRelations?: RecordingLabelRelation[];
 }
