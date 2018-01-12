@@ -2,7 +2,7 @@ export { Recording } from "./recording";
 export { DatabaseUser } from "./database-user";
 export { Label } from "./label";
 export { CachedAudio } from "./cached-audio";
-export { RecordingLabeLRelation } from "./recording-label-relation";
+export { RecordingLabelRelation } from "./recording-label-relation";
 export { DatabaseSound } from "./database-sound";
 export { Dialog } from "./dialog";
 export { DialogPart } from "./dialog-part";

@@ -2,6 +2,7 @@ import { body, controller, route, param, is, uuid, ok } from "hyrest";
 import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { bind } from "bind-decorator";
+import { Connection as MumbleConnection} from "mumble";
 
 import { Channel, LogEntry, MumbleUser } from "../models";
 import { world } from "../scopes";
@@ -10,6 +11,7 @@ import { Bot } from "../../server";
 @controller @component
 export class Utilities {
     @inject private db: Connection;
+    @inject private mumble: MumbleConnection;
     @inject private bot: Bot;
 
     @bind private buildChannelTree(channel: Channel) {
@@ -27,7 +29,7 @@ export class Utilities {
 
     @route("GET", "/channel-tree")
     public async channelTree(): Promise<Channel> {
-        return ok(this.buildChannelTree(this.bot.mumble.rootChannel));
+        return ok(this.buildChannelTree(this.mumble.rootChannel));
     }
 
     @route("POST", "/shut-up")

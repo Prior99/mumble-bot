@@ -7,7 +7,7 @@ import { MumbleLink, MumbleUser } from "../models";
 import { createMumbleLink, world } from "../scopes";
 import { Context } from "../context";
 import { Setting } from "../models/setting";
-import { Bot } from "..";
+import { Bot } from "../../server";
 
 export interface Settings {
     [key: string]: string;

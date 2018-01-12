@@ -27,6 +27,7 @@ export class Bot extends EventEmitter {
      * Returns only those users which have a unique id and are thous registered on
      * the mumble server.
      */
+    // TODO: Move into utility.
     public getRegisteredMumbleUsers() {
         return this.mumble.users().filter(user => typeof user.id !== "undefined");
     }
