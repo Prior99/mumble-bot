@@ -12,15 +12,18 @@ import { bind } from "bind-decorator";
 import { createReadStream, writeFile, exists } from "async-file";
 import { omit } from "ramda";
 
-import { Bot } from "../bot";
+import { ServerConfig } from "../../config";
 import { Recording, convertWorkItem } from "../../common";
+import { Bot, AudioCache } from "..";
 
 import { cors, catchError } from "./middlewares";
 
-@component({ eager: true })
+@component
 export class RestApi {
     @inject private bot: Bot;
     @inject private db: Connection;
+    @inject private config: ServerConfig;
+    @inject private cache: AudioCache;
 
     private connections = new Set<any>();
     private app: Express.Application;
@@ -43,7 +46,7 @@ export class RestApi {
         this.app.get("/recording/:id/download", this.downloadRecording);
         this.app.get("/recording/:id/visualized", this.downloadVisualizedRecording);
 
-        const port = this.bot.options.website.port;
+        const port = this.config.port;
         this.server = this.app.listen(port);
 
         this.server.setTimeout(10000, () => { return; });
@@ -96,23 +99,23 @@ export class RestApi {
     @bind public websocketCached(ws, req: Request) {
         ws.send(JSON.stringify({
             type: "init",
-            cacheAmount: this.bot.audioCacheAmount,
-            list: this.bot.cachedAudios.map(recording => omit(["file"], recording))
+            cacheAmount: this.cache.cacheAmount,
+            list: this.cache.all.map(recording => omit(["file"], recording))
         }));
 
         const onAdd = audio => ws.send(JSON.stringify({ type: "add", recording: omit(["file"], audio) }));
-        this.bot.on("cached-audio", onAdd);
+        this.cache.on("cached-audio", onAdd);
 
         const onRemoveAudio = ({ id }) => ws.send(JSON.stringify({ type: "remove", id }));
-        this.bot.on("removed-cached-audio", onRemoveAudio);
+        this.cache.on("removed-cached-audio", onRemoveAudio);
 
         const onProtect = ({ id }) => ws.send(JSON.stringify({ type: "protect", id }));
-        this.bot.on("protect-cached-audio", onProtect);
+        this.cache.on("protect-cached-audio", onProtect);
 
         ws.on("close", () => {
-            this.bot.removeListener("cached-audio", onAdd);
-            this.bot.removeListener("removed-cached-audio", onRemoveAudio);
-            this.bot.removeListener("protect-cached-audio", onProtect);
+            this.cache.removeListener("cached-audio", onAdd);
+            this.cache.removeListener("removed-cached-audio", onRemoveAudio);
+            this.cache.removeListener("protect-cached-audio", onProtect);
         });
     }
 
@@ -154,7 +157,7 @@ export class RestApi {
 
     @bind public downloadCached({ params }: Request, res: Response) {
         const { id } = params;
-        const sound = this.bot.getCachedAudioById(id);
+        const sound = this.cache.byId(id);
         if (!sound) { return res.status(404).send(); }
 
         res.setHeader("Content-disposition", `attachment; filename='cached_${id}.mp3'`);
@@ -171,7 +174,7 @@ export class RestApi {
 
     @bind public async downloadVisualizedCached({ params }: Request, res: Response) {
         const { id } = params;
-        const sound = this.bot.getCachedAudioById(id);
+        const sound = this.cache.byId(id);
         if (!sound) { return res.status(404).send(); }
 
         const fileName = `${sound.file}.png`;
@@ -203,7 +206,7 @@ export class RestApi {
         if (!recording) { return res.status(404).send(); }
 
         res.setHeader("Content-disposition", `attachment; filename='${recording.quote}.mp3'`);
-        const stream = FS.createReadStream(`${this.bot.options.paths.recordings}/${recording.id}`)
+        const stream = FS.createReadStream(`${this.config.recordingsDir}/${recording.id}`)
             .on("error", (err) => {
                 if (err.code === "ENOENT") { return res.status(404).send(); }
                 error(`Error occured when trying to read record with id ${recording.id}`);
@@ -221,7 +224,7 @@ export class RestApi {
         const recording = await this.db.getRepository(Recording).findOneById(id);
         if (!recording) { return res.status(404).send(); }
 
-        const fileName = `${this.bot.options.paths.visualizations}/${recording.id}.png`;
+        const fileName = `${this.config.visualizationsDir}/${recording.id}.png`;
         const trySend = async (retries = 0) => {
             if (!await exists(fileName)) {
                 if (retries === 5) { return res.status(404).send(); }

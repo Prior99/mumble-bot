@@ -5,10 +5,10 @@ import { bind } from "bind-decorator";
 
 import { Channel, LogEntry, MumbleUser } from "../models";
 import { world } from "../scopes";
-import { Bot } from "..";
+import { Bot } from "../../server";
 
 @controller @component
-export class Users {
+export class Utilities {
     @inject private db: Connection;
     @inject private bot: Bot;
 

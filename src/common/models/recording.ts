@@ -67,14 +67,14 @@ export class Recording {
      * When the record was originally recorded.
      */
     @CreateDateColumn()
-    @scope(world) @specify(() => Date) @is()
+    @scope(world) @is() @specify(() => Date)
     public submitted?: Date;
 
     /**
      * A list of all labels with which this record was tagged.
      */
     @ManyToOne(() => RecordLabeLRelation, recordingLabelRelation => recordingLabelRelation.recording)
-    @scope(world) @specify(() => RecordLabeLRelation) @is()
+    @scope(world) @is() @specify(() => RecordLabeLRelation)
     public recordingLabelRelations?: RecordLabeLRelation[];
 
     /**
@@ -85,6 +85,7 @@ export class Recording {
     public duration?: number;
 
     @ManyToOne(() => DialogPart, dialogPart => dialogPart.recording)
-    @scope(world) @specify(() => DialogPart) @is()
+    @scope(world) @is() @specify(() => DialogPart)
     public dialogParts?: DialogPart[];
 }
+

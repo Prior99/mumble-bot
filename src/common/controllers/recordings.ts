@@ -5,15 +5,17 @@ import { Connection } from "typeorm";
 import { verbose } from "winston";
 import FFMpeg from "fluent-ffmpeg";
 
+import { Bot } from "../../server";
+import { ServerConfig } from "../../config";
 import { Recording, PlaybackOptions } from "../models";
 import { updateRecording, world } from "../scopes";
 import { Context } from "../context";
-import { Bot } from "..";
 
 @controller @component
 export class Recordings {
     @inject private db: Connection;
     @inject private bot: Bot;
+    @inject private config: ServerConfig;
 
     @route("GET", "/recording/:id").dump(Recording, world)
     public async getRecording(@param("id") @is().validate(uuid) id: string): Promise<Recording> {
@@ -63,7 +65,7 @@ export class Recordings {
         const currentUser = await ctx.currentUser();
         const { username } = currentUser;
 
-        this.bot.playSound(`${this.bot.options.paths.recordings}/${id}`, {
+        this.bot.playSound(`${this.config.recordingsDir}/${id}`, {
             type: "recording",
             recording,
             user: currentUser
@@ -76,13 +78,13 @@ export class Recordings {
 
     private crop(begin: number, end: number, oldId: string, newId: string): Promise<undefined> {
         return new Promise((resolve, reject) => {
-            FFMpeg(`${this.bot.options.paths.recordings}/${oldId}`)
+            FFMpeg(`${this.config.recordingsDir}/${oldId}`)
                 .seekInput(begin)
                 .duration(end - begin)
                 .format("mp3")
                 .audioCodec("libmp3lame")
                 .on("error", (err) => reject(err))
-                .save(`${this.bot.options.paths.recordings}/${newId}`)
+                .save(`${this.config.recordingsDir}/${newId}`)
                 .on("end", () => resolve());
         });
     }

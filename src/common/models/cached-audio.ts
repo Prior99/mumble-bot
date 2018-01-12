@@ -1,7 +1,7 @@
 import { is, scope, DataType, specify, uuid } from "hyrest";
 import * as Uuid from "uuid";
 
-import { world } from "../../scopes";
+import { world } from "../scopes";
 
 import { DatabaseUser } from ".";
 

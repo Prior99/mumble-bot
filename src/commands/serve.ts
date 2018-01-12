@@ -1,19 +1,18 @@
-import { metadata, command, Command } from "clime";
+import { metadata, command, Command, Options } from "clime";
 import { external, factory, TSDI } from "tsdi";
 
-import { WorkerConfig } from "../config";
+import { ServerConfig } from "../config";
 import { Bot, AudioCache, RestApi } from "../server";
 
 @command({ description: "Start the API and the bot." }) @external
 export default class ServeCommand extends Command { // tslint:disable-line
-    private config: WorkerConfig;
+    private config: ServerConfig;
 
     @metadata
     public execute(
-        workerConfig: WorkerConfig,
+        config: ServerConfig
     ) {
-        this.config = workerConfig;
-
+        this.config = config;
         const tsdi = new TSDI();
         tsdi.enableComponentScanner();
         tsdi.get(Bot);
@@ -21,5 +20,5 @@ export default class ServeCommand extends Command { // tslint:disable-line
         tsdi.get(RestApi);
     }
 
-    @factory public getConfig(): WorkerConfig { return this.config; }
+    @factory public getConfig(): ServerConfig { return this.config; }
 }

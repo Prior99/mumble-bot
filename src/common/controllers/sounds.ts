@@ -5,10 +5,11 @@ import { Connection } from "typeorm";
 import { verbose } from "winston";
 import { writeFile } from "async-file";
 
+import { Bot } from "../../server";
+import { ServerConfig } from "../../config";
 import { DatabaseSound } from "../models";
 import { Context } from "../context";
 import { createSound, world } from "../scopes";
-import { Bot } from "..";
 
 export class UploadSound extends DatabaseSound {
     @is()
@@ -19,10 +20,11 @@ export class UploadSound extends DatabaseSound {
 export class Sounds {
     @inject private db: Connection;
     @inject private bot: Bot;
+    @inject private config: ServerConfig;
 
     private async createSoundDirectory() {
         try {
-            await mkdirp(`${this.bot.options.paths.uploaded}`);
+            await mkdirp(`${this.config.uploadDir}`);
         }
         catch (e) {
             if (e.code !== "EEXIST") { throw e; }
@@ -38,7 +40,7 @@ export class Sounds {
         await this.db.getRepository(DatabaseSound).save(sound);
 
         const { data } = sound;
-        await writeFile(`${this.bot.options.paths.uploaded}/${sound.id}`, Buffer.from(data, "base64"));
+        await writeFile(`${this.config.uploadDir}/${sound.id}`, Buffer.from(data, "base64"));
 
         verbose(`Added new sound #${sound.id}`);
         delete sound.data;
@@ -59,7 +61,7 @@ export class Sounds {
         await this.db.getRepository(DatabaseSound).save(sound);
 
         const currentUser = await ctx.currentUser();
-        this.bot.playSound(`${this.bot.options.paths.uploaded}/${id}`, {
+        this.bot.playSound(`${this.config.uploadDir}/${id}`, {
             type: "sound",
             sound,
             user: currentUser

@@ -9,20 +9,16 @@ import { VoiceInput } from "./input";
 import { Output } from "./output";
 import { MetaInformation, CachedAudio } from "../common";
 
-@component({ eager: true })
+@component
 export class Bot extends EventEmitter {
     @inject private mumble: MumbleConnection;
     @inject private db: DbConnection;
-
-    public options: any;
 
     public output: Output;
     private input: VoiceInput;
 
     @initialize
-    private initialize(mumble, options, database) {
-        this.options = options;
-
+    private initialize() {
         this.output = new Output(this);
         this.input = new VoiceInput(this);
     }

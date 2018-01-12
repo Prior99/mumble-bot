@@ -5,10 +5,12 @@ import mkdirp = require("mkdirp-promise"); // tslint:disable-line
 import * as FFMpeg from "fluent-ffmpeg";
 import * as Stream from "stream";
 import { PassThrough as PassThroughStream } from "stream";
-import { Bot } from "..";
-import { writeUserStatsOnline, writeUserStatsSpeak } from "../database";
-import { DatabaseUser } from "../types";
+import { external, inject } from "tsdi";
 import { User as MumbleUser } from "mumble";
+
+import { ServerConfig } from "../../config";
+import { DatabaseUser } from "../../common";
+import { Bot, AudioCache } from "..";
 
 const TIMEOUT_THRESHOLD = 300;
 const msInS = 1000;
@@ -18,19 +20,22 @@ const audioFreq = 48000;
  * This class belongs to the VoiceInput and handles the speech recognition for a
  * single user.
  */
+@external
 export class VoiceInputUser extends Stream.Writable {
-    private bot: Bot;
+    @inject private bot: Bot;
+    @inject private config: ServerConfig;
+    @inject private cache: AudioCache;
+
     private user: MumbleUser;
     private databaseUser: DatabaseUser;
     private speaking = false;
     private connectTime: Date;
     private passthrough: PassThroughStream;
-    private timeout: NodeJS.Timer;
+    private timeout: any;
     private speakStartTime: Date;
     private filename: string;
     private encoder: any;
     private started: boolean;
-    private path: string;
 
     /**
      * @constructor
@@ -38,15 +43,16 @@ export class VoiceInputUser extends Stream.Writable {
      * @param databaseUser The user from the database.
      * @param bot The bot instance this user belongs to.
      */
-    constructor(user, databaseUser, bot) {
+    constructor(user, databaseUser) {
         super();
         this.user = user;
-        this.bot = bot;
         this.databaseUser = databaseUser;
-        this.path = `${this.bot.options.paths.tmp}/useraudio/${this.user.id}`;
         this.createNewRecordingFile();
         this.connectTime = new Date();
-        this.user.on("disconnect", this.onDisconnect.bind(this));
+    }
+
+    private get path() {
+        return `${this.config.tmpDir}/useraudio/${this.user.id}`;
     }
 
     /**
@@ -69,15 +75,6 @@ export class VoiceInputUser extends Stream.Writable {
         this.speechContinued(chunk);
         done();
         return true;
-    }
-
-    /**
-     * Called when user disconnects.
-     * Updates the stats.
-     * @returns {undefined}
-     */
-    private onDisconnect() {
-        writeUserStatsOnline(this.databaseUser, this.connectTime, new Date(), this.bot.database);
     }
 
     /**
@@ -123,13 +120,12 @@ export class VoiceInputUser extends Stream.Writable {
         this.speaking = false;
         this.started = false;
         this.passthrough.end();
-        this.bot.addCachedAudio(
+        this.cache.add(
             this.filename,
             this.databaseUser.id,
             (Date.now() - this.speakStartTime.getTime()) / msInS
         );
         this.createNewRecordingFile();
-        writeUserStatsSpeak(this.databaseUser, this.speakStartTime, new Date(), this.bot.database);
     }
 
     /**

@@ -7,5 +7,4 @@ export { Users } from "./users";
 export { Utilities } from "./utilities";
 export { Validation } from "./validation";
 export { Tokens } from "./tokens";
-export { Permissions } from "./permissions";
 export { MumbleLinks } from "./mumble-links";

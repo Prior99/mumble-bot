@@ -3,15 +3,17 @@ import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { verbose } from "winston";
 
+import { Bot } from "../../server";
+import { ServerConfig } from "../../config";
 import { Dialog } from "../models";
 import { createDialog, world } from "../scopes";
-import { Bot } from "..";
 import { Context } from "../context";
 
 @controller @component
 export class Dialogs {
     @inject private db: Connection;
     @inject private bot: Bot;
+    @inject private config: ServerConfig;
 
     @route("GET", "/dialogs").dump(Dialog, world)
     public async listDialogs(@param("id") @is().validate(uuid) id: string): Promise<Dialog[]> {
@@ -29,7 +31,7 @@ export class Dialogs {
 
         const currentUser = await ctx.currentUser();
 
-        const files = dialog.parts.map(part => `${this.bot.options.paths.recordings}/${part.recording.id}`);
+        const files = dialog.parts.map(part => `${this.config.recordingsDir}/${part.recording.id}`);
         this.bot.output.playSounds(files, {
             type: "dialog",
             user: currentUser

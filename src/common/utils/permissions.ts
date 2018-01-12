@@ -1,7 +1,7 @@
 import * as Winston from "winston";
 import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
-import { Permission, DatabaseUser } from "./common";
+import { Permission } from "../models/permission";
 
 export const permissions = new Map<string, Permission>();
 

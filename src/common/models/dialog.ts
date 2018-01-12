@@ -23,7 +23,7 @@ export class Dialog {
      * The date when this dialog was submitted.
      */
     @CreateDateColumn()
-    @scope(world) @specify(() => Date) @is()
+    @scope(world) @is() @specify(() => Date)
     public submitted?: Date;
 
     /**
@@ -40,3 +40,4 @@ export class Dialog {
     @is() @scope(world) @specify(() => DialogPart)
     public parts?: DialogPart[];
 }
+

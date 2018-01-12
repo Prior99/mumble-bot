@@ -5,25 +5,27 @@ import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { verbose, error } from "winston";
 
+import { ServerConfig } from "../../config";
+import { Bot, AudioCache } from "../../server";
 import { CachedAudio, Recording } from "../models";
 import { createRecording, world } from "../scopes";
-import { Bot } from "..";
 import { Context } from "../context";
-import { compareCachedAudio } from "../utils";
 
 @controller @component
 export class Cached {
     @inject private db: Connection;
     @inject private bot: Bot;
+    @inject private config: ServerConfig;
+    @inject private cache: AudioCache;
 
     @route("GET", "/cached")
     public async listCached(): Promise<CachedAudio[]> {
-        return ok(this.bot.cachedAudios.slice().sort(compareCachedAudio));
+        return ok(this.cache.sorted);
     }
 
     private async createRecordingDirectory() {
         try {
-            await mkdirp(this.bot.options.paths.recordings);
+            await mkdirp(this.config.recordingsDir);
         }
         catch (e) {
             if (e.code !== "EEXIST") { throw e; }
@@ -36,7 +38,7 @@ export class Cached {
         @body(createRecording) recording: Recording,
         @context ctx?: Context
     ): Promise<Recording> {
-        const cached = this.bot.getCachedAudioById(id);
+        const cached = this.cache.byId(id);
         if (!cached) {
             return notFound<undefined>(`No cached recording with id "${id}" found.`);
         }
@@ -45,12 +47,12 @@ export class Cached {
 
         await this.db.getRepository(Recording).save(recording);
 
-        await rename(cached.file, `${this.bot.options.paths.recordings}/${recording.id}`);
-        await rename(cached.file + ".png", `${this.bot.options.paths.visualizations}/${recording.id}.png`);
+        await rename(cached.file, `${this.config.recordingsDir}/${recording.id}`);
+        await rename(cached.file + ".png", `${this.config.visualizationsDir}/${recording.id}.png`);
 
         const currentUser = await ctx.currentUser();
 
-        this.bot.removeCachedAudio(cached);
+        this.cache.remove(cached.id);
         verbose(`${currentUser.username} added new record #${recording.id}`);
 
         return ok();
@@ -58,7 +60,7 @@ export class Cached {
 
     @route("POST", "/cached/:id/protect").dump(CachedAudio, world)
     public async protectCached(@param("id") @is().validate(uuid) id: string): Promise<CachedAudio> {
-        if (this.bot.protectCachedAudio(id)) {
+        if (this.cache.protect(id)) {
             return ok();
         }
         return notFound<undefined>(`No cached recording with id "${id}" found.`);
@@ -66,7 +68,7 @@ export class Cached {
 
     @route("POST", "/cached/:id/play")
     public async playCached(@param("id") @is().validate(uuid) id: string, @context ctx?: Context): Promise<{}> {
-        const cached = this.bot.getCachedAudioById(id);
+        const cached = this.cache.byId(id);
         if (!cached) { return notFound<undefined>(`No cached recording with id "${id}" found.`); }
 
         const currentUser = await ctx.currentUser();
@@ -82,7 +84,7 @@ export class Cached {
 
     @route("DELETE", "/cached/:id")
     public async deleteCached(@param("id") @is().validate(uuid) id: string): Promise<{}> {
-        if (this.bot.removeCachedAudioById(id)) {
+        if (this.cache.remove(id)) {
             return ok();
         }
         return notFound<undefined>(`No cached recording with id "${id}" found.`);

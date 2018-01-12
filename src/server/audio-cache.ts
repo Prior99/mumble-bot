@@ -5,19 +5,21 @@ import { writeFile, unlink, readFile } from "async-file";
 import { error, info } from "winston";
 import { EventEmitter } from "events";
 
+import { ServerConfig } from "../config";
 import { CachedAudio, DatabaseUser, compareCachedAudio } from "../common";
 
 import { Bot } from "./bot";
 
-@component({ eager: true })
+@component
 export class AudioCache extends EventEmitter {
     @inject private bot: Bot;
     @inject private db: Connection;
+    @inject private config: ServerConfig;
 
     public cachedAudios: Map<string, CachedAudio>;
-    private cacheAmount = 4;
+    public cacheAmount = 4;
 
-    private get cachedAudioIndexFilePath() { return `${this.bot.options.paths.tmp}/useraudio.json`; }
+    private get cachedAudioIndexFilePath() { return `${this.config.tmpDir}/useraudio.json`; }
 
     private async importCache() {
         const obj = JSON.parse(await readFile(this.cachedAudioIndexFilePath));
@@ -32,8 +34,7 @@ export class AudioCache extends EventEmitter {
 
     @initialize
     private initialize() {
-        const { options } = this.bot;
-        if (options.audioCacheAmount) { this.cacheAmount = options.audioCacheAmount; }
+        if (this.config.audioCacheAmount) { this.cacheAmount = this.config.audioCacheAmount; }
         this.importCache();
     }
 
@@ -53,9 +54,12 @@ export class AudioCache extends EventEmitter {
         this.exportCache();
     }
 
+    public get all() { return Array.from(this.cachedAudios.values()); }
+    public get sorted() { return this.all.sort(compareCachedAudio); }
+
     private async cleanUp() {
         const prot = [];
-        const list = Array.from(this.cachedAudios.values()).sort(compareCachedAudio);
+        const list = this.sorted;
         await Promise.all(list.map(async cachedAudio => {
             if (cachedAudio.protected) { return; }
             if (this.cachedAudios.size <= this.cacheAmount) { return; }

@@ -32,6 +32,7 @@ export class LogEntry {
      * The date and time this was logged.
      */
     @CreateDateColumn()
-    @scope(world) @specify(() => Date) @is()
+    @scope(world) @is() @specify(() => Date)
     public timestamp: Date;
 }
+
