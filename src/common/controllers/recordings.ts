@@ -5,7 +5,7 @@ import { Connection } from "typeorm";
 import { verbose } from "winston";
 import FFMpeg from "fluent-ffmpeg";
 
-import { Bot } from "../../server";
+import { AudioOutput } from "../../server";
 import { ServerConfig } from "../../config";
 import { Recording, PlaybackOptions } from "../models";
 import { updateRecording, world } from "../scopes";
@@ -14,7 +14,7 @@ import { Context } from "../context";
 @controller @component
 export class Recordings {
     @inject private db: Connection;
-    @inject private bot: Bot;
+    @inject private audioOutput: AudioOutput;
     @inject private config: ServerConfig;
 
     @route("GET", "/recording/:id").dump(Recording, world)
@@ -65,7 +65,7 @@ export class Recordings {
         const currentUser = await ctx.currentUser();
         const { username } = currentUser;
 
-        this.bot.playSound(`${this.config.recordingsDir}/${id}`, {
+        this.audioOutput.playSound(`${this.config.recordingsDir}/${id}`, {
             type: "recording",
             recording,
             user: currentUser

@@ -14,13 +14,13 @@ import { omit } from "ramda";
 
 import { ServerConfig } from "../../config";
 import { Recording, convertWorkItem } from "../../common";
-import { Bot, AudioCache } from "..";
+import { AudioCache, AudioOutput } from "..";
 
 import { cors, catchError } from "./middlewares";
 
 @component
 export class RestApi {
-    @inject private bot: Bot;
+    @inject private audioOutput: AudioOutput;
     @inject private db: Connection;
     @inject private config: ServerConfig;
     @inject private cache: AudioCache;
@@ -81,7 +81,7 @@ export class RestApi {
      * Stop the api immediatly.
      * @return Promise which will be resolved when the website has been shut down.
      */
-    public shutdown() {
+    public stop() {
         return new Promise((resolve, reject) => {
             info("Stopping api ...");
             this.server.close(() => {
@@ -123,7 +123,7 @@ export class RestApi {
         try {
             ws.send(JSON.stringify({
                 type: "init",
-                queue: this.bot.output.workItemQueue.map(convertWorkItem)
+                queue: this.audioOutput.workItemQueue.map(convertWorkItem)
             }));
         }
         catch (err) {
@@ -145,13 +145,13 @@ export class RestApi {
                 type: "clear"
             }));
         };
-        this.bot.output.on("clear", onClear);
-        this.bot.output.on("enqueue", onEnqueue);
-        this.bot.output.on("dequeue", onDequeue);
+        this.audioOutput.on("clear", onClear);
+        this.audioOutput.on("enqueue", onEnqueue);
+        this.audioOutput.on("dequeue", onDequeue);
         ws.on("close", () => {
-            this.bot.output.removeListener("clear", onClear);
-            this.bot.output.removeListener("enqueue", onEnqueue);
-            this.bot.output.removeListener("dequeue", onDequeue);
+            this.audioOutput.removeListener("clear", onClear);
+            this.audioOutput.removeListener("enqueue", onEnqueue);
+            this.audioOutput.removeListener("dequeue", onDequeue);
         });
     }
 

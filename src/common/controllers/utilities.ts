@@ -6,13 +6,13 @@ import { Connection as MumbleConnection} from "mumble";
 
 import { Channel, LogEntry, MumbleUser } from "../models";
 import { world } from "../scopes";
-import { Bot } from "../../server";
+import { AudioOutput } from "../../server";
 
 @controller @component
 export class Utilities {
     @inject private db: Connection;
     @inject private mumble: MumbleConnection;
-    @inject private bot: Bot;
+    @inject private audioOutput: AudioOutput;
 
     @bind private buildChannelTree(channel: Channel) {
         const { name, position } = channel;
@@ -34,7 +34,7 @@ export class Utilities {
 
     @route("POST", "/shut-up")
     public async shutUp(): Promise<{}> {
-        this.bot.beQuiet();
+        this.audioOutput.clear();
         return ok();
     }
 
@@ -49,7 +49,7 @@ export class Utilities {
 
     @route("GET", "/mumble-users").dump(MumbleUser, world)
     public async getMumbleUsers(): Promise<MumbleUser[]> {
-        const mumbleUsers = await this.bot.getRegisteredMumbleUsers();
+        const mumbleUsers = this.mumble.users().filter(user => typeof user.id !== "undefined");
         return ok(mumbleUsers.map(user => {
             const { name, id, session } = user;
             return { name, id, session };

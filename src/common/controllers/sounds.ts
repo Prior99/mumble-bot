@@ -5,7 +5,7 @@ import { Connection } from "typeorm";
 import { verbose } from "winston";
 import { writeFile } from "async-file";
 
-import { Bot } from "../../server";
+import { AudioOutput } from "../../server";
 import { ServerConfig } from "../../config";
 import { DatabaseSound } from "../models";
 import { Context } from "../context";
@@ -19,7 +19,7 @@ export class UploadSound extends DatabaseSound {
 @controller @component
 export class Sounds {
     @inject private db: Connection;
-    @inject private bot: Bot;
+    @inject private audioOutput: AudioOutput;
     @inject private config: ServerConfig;
 
     private async createSoundDirectory() {
@@ -61,7 +61,7 @@ export class Sounds {
         await this.db.getRepository(DatabaseSound).save(sound);
 
         const currentUser = await ctx.currentUser();
-        this.bot.playSound(`${this.config.uploadDir}/${id}`, {
+        this.audioOutput.playSound(`${this.config.uploadDir}/${id}`, {
             type: "sound",
             sound,
             user: currentUser

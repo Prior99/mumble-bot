@@ -1,11 +1,14 @@
 import { option, Options } from "clime";
+import { readFileSync } from "fs";
+import { error } from "winston";
+
 import { loadConfigFile } from "./load-config-file";
 
 export class ServerConfig extends Options {
     @option({ flag: "p", description: "Port to host the API on." })
     public port: number;
 
-    @option({ flag: "u", description: "Public Url on which the API will be reachable" })
+    @option({ flag: "u", description: "Url of the mumble server to connect to." })
     public url: string;
 
     @option({ flag: "c", description: "Path to the configuration file.", required: true })
@@ -80,5 +83,23 @@ export class ServerConfig extends Options {
         if (this.recordingsDir === undefined) { this.recordingsDir = file.recordingsDir; }
         if (this.visualizationsDir === undefined) { this.visualizationsDir = file.visualizationsDir; }
         if (this.uploadDir === undefined) { this.uploadDir = file.uploadDir; }
+    }
+
+    public get keyContent() {
+        if (!this.key) { return; }
+        try {
+            return readFileSync(this.key, "utf8");
+        } catch (err) {
+            error(`Could not open SSL key file "${this.key}"`);
+        }
+    }
+
+    public get certContent() {
+        if (!this.cert) { return; }
+        try {
+            return readFileSync(this.cert, "utf8");
+        } catch (err) {
+            error(`Could not open SSL cert file "${this.cert}"`);
+        }
     }
 }

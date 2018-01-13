@@ -8,11 +8,8 @@ import { EventEmitter } from "events";
 import { ServerConfig } from "../config";
 import { CachedAudio, DatabaseUser, compareCachedAudio } from "../common";
 
-import { Bot } from "./bot";
-
 @component
 export class AudioCache extends EventEmitter {
-    @inject private bot: Bot;
     @inject private db: Connection;
     @inject private config: ServerConfig;
 

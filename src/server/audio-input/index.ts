@@ -11,7 +11,7 @@ import { DatabaseUser, MumbleLink } from "../../common";
  * This class handles voice input for all users. It uses instances of user.js
  * and handles them.
  */
-export class VoiceInput extends EventEmitter {
+export class AudioInput extends EventEmitter {
     @inject private mumble: MumbleConnection;
     @inject private db: DatabaseConnection;
     private users = new Map<number, VoiceInputUser>();

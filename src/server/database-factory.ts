@@ -23,7 +23,7 @@ import {
 import { ServerConfig } from "../config";
 
 @component
-export class Database {
+export class DatabaseFactory {
     @inject private config: ServerConfig;
 
     public conn: Connection;

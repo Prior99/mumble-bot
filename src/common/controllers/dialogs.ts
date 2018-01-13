@@ -3,7 +3,7 @@ import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { verbose } from "winston";
 
-import { Bot } from "../../server";
+import { AudioOutput } from "../../server";
 import { ServerConfig } from "../../config";
 import { Dialog } from "../models";
 import { createDialog, world } from "../scopes";
@@ -12,7 +12,7 @@ import { Context } from "../context";
 @controller @component
 export class Dialogs {
     @inject private db: Connection;
-    @inject private bot: Bot;
+    @inject private audioOutput: AudioOutput;
     @inject private config: ServerConfig;
 
     @route("GET", "/dialogs").dump(Dialog, world)
@@ -32,7 +32,7 @@ export class Dialogs {
         const currentUser = await ctx.currentUser();
 
         const files = dialog.parts.map(part => `${this.config.recordingsDir}/${part.recording.id}`);
-        this.bot.output.playSounds(files, {
+        this.audioOutput.playSounds(files, {
             type: "dialog",
             user: currentUser
         });

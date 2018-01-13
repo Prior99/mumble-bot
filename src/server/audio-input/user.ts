@@ -10,7 +10,7 @@ import { User as MumbleUser } from "mumble";
 
 import { ServerConfig } from "../../config";
 import { DatabaseUser } from "../../common";
-import { Bot, AudioCache } from "..";
+import { AudioCache } from "..";
 
 const TIMEOUT_THRESHOLD = 300;
 const msInS = 1000;
@@ -22,7 +22,6 @@ const audioFreq = 48000;
  */
 @external
 export class VoiceInputUser extends Stream.Writable {
-    @inject private bot: Bot;
     @inject private config: ServerConfig;
     @inject private cache: AudioCache;
 
@@ -41,7 +40,6 @@ export class VoiceInputUser extends Stream.Writable {
      * @constructor
      * @param user Mumble user to recognize the speech of.
      * @param databaseUser The user from the database.
-     * @param bot The bot instance this user belongs to.
      */
     constructor(user, databaseUser) {
         super();

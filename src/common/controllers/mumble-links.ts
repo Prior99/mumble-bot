@@ -7,7 +7,6 @@ import { MumbleLink, MumbleUser } from "../models";
 import { createMumbleLink, world } from "../scopes";
 import { Context } from "../context";
 import { Setting } from "../models/setting";
-import { Bot } from "../../server";
 
 export interface Settings {
     [key: string]: string;
@@ -16,7 +15,6 @@ export interface Settings {
 @controller @component
 export class MumbleLinks {
     @inject private db: Connection;
-    @inject private bot: Bot;
 
     @route("POST", "/mumble-link").dump(MumbleLink, world)
     public async createMumbleLink(

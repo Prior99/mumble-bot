@@ -3,7 +3,7 @@ import { basename } from "path";
 import { watch } from "chokidar";
 import * as Winston from "winston";
 import mkdirp = require("mkdirp-promise"); // tslint:disable-line
-import { setupWinston } from "../utils/winston";
+import { setupWinston } from "../common";
 import { visualizeAudioFile } from "./visualizer";
 
 setupWinston("worker.log");

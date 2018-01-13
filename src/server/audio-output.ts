@@ -7,7 +7,7 @@ import { inject, component, initialize } from "tsdi";
 import { stat } from "async-file";
 import { EventEmitter } from "events";
 
-import { MetaInformation, WorkItem } from "../../common";
+import { MetaInformation, WorkItem } from "../common";
 
 const PREBUFFER = 0.5;
 const audioFreq = 48000;

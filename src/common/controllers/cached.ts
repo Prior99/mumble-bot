@@ -6,7 +6,7 @@ import { Connection } from "typeorm";
 import { verbose, error } from "winston";
 
 import { ServerConfig } from "../../config";
-import { Bot, AudioCache } from "../../server";
+import { AudioOutput, AudioCache } from "../../server";
 import { CachedAudio, Recording } from "../models";
 import { createRecording, world } from "../scopes";
 import { Context } from "../context";
@@ -14,7 +14,7 @@ import { Context } from "../context";
 @controller @component
 export class Cached {
     @inject private db: Connection;
-    @inject private bot: Bot;
+    @inject private audioOutput: AudioOutput;
     @inject private config: ServerConfig;
     @inject private cache: AudioCache;
 
@@ -73,7 +73,7 @@ export class Cached {
 
         const currentUser = await ctx.currentUser();
 
-        this.bot.playSound(cached.file, {
+        this.audioOutput.playSound(cached.file, {
             type: "cached",
             cachedRecording: cached,
             user: currentUser
