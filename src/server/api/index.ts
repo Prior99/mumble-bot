@@ -83,9 +83,8 @@ export class RestApi {
      */
     public stop() {
         return new Promise((resolve, reject) => {
-            info("Stopping api ...");
             this.server.close(() => {
-                info(`Terminating ${this.connections.size} connections.`);
+                info(`Terminating ${this.connections.size} open websocket connections.`);
                 for (const socket of this.connections) {
                     socket.destroy();
                     this.connections.delete(socket);

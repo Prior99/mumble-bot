@@ -11,6 +11,7 @@ import { DatabaseUser, MumbleLink } from "../../common";
  * This class handles voice input for all users. It uses instances of user.js
  * and handles them.
  */
+@component
 export class AudioInput extends EventEmitter {
     @inject private mumble: MumbleConnection;
     @inject private db: DatabaseConnection;
@@ -68,7 +69,7 @@ export class AudioInput extends EventEmitter {
      * Stop all timeouts and shutdown everything.
      */
     public stop() {
-        Object.keys(this.users).map(key => this.users[key]).forEach(user => user.stop());
+        this.users.forEach(user => user.stop());
         info("Input stopped.");
     }
 }

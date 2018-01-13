@@ -1,4 +1,5 @@
 import { component, inject, initialize } from "tsdi";
+import mkdirp = require("mkdirp-promise"); // tslint:disable-line
 import { Connection } from "typeorm";
 import * as Uuid from "uuid";
 import { writeFile, unlink, readFile } from "async-file";
@@ -18,9 +19,23 @@ export class AudioCache extends EventEmitter {
 
     private get cachedAudioIndexFilePath() { return `${this.config.tmpDir}/useraudio.json`; }
 
+    private async createTmpDirectory() {
+        try {
+            await mkdirp(this.config.tmpDir);
+        }
+        catch (e) {
+            if (e.code !== "EEXIST") { throw e; }
+        }
+    }
+
     private async importCache() {
-        const obj = JSON.parse(await readFile(this.cachedAudioIndexFilePath));
-        Object.keys(obj).forEach(key => this.cachedAudios.set(key, obj[key]));
+        try {
+            const obj = JSON.parse(await readFile(this.cachedAudioIndexFilePath));
+            Object.keys(obj).forEach(key => this.cachedAudios.set(key, obj[key]));
+        } catch (err) {
+            if (err.code !== "ENOENT") { throw err; }
+            info("No previous index of cached audios found.");
+        }
     }
 
     private async exportCache() {
@@ -30,7 +45,8 @@ export class AudioCache extends EventEmitter {
     }
 
     @initialize
-    private initialize() {
+    private async initialize() {
+        await this.createTmpDirectory();
         if (this.config.audioCacheAmount) { this.cacheAmount = this.config.audioCacheAmount; }
         this.importCache();
     }

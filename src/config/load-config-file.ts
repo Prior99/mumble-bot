@@ -4,6 +4,7 @@ import { error, warn } from "winston";
 export function loadConfigFile(filename: string): any {
     if (!filename) {
         warn("No config file set.");
+        return {};
     }
     try {
         const file = Yaml.load(filename);

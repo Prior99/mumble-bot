@@ -217,6 +217,7 @@ export class AudioOutput extends EventEmitter {
         this.stopped = true;
         this.mumbleStream.close();
         this.mumbleStream.end();
+        this.clear();
         info("Output stopped.");
     }
 }

@@ -39,6 +39,7 @@
     "mysql": "^2.11.1",
     "node-samplerate": "^0.2.0",
     "onecolor": "3.0.4",
+    "pg": "^7.4.1",
     "promise-mysql": "^3.0.1",
     "prompt": "1.0.0",
     "ramda": "^0.23.0",

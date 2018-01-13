@@ -80,7 +80,7 @@ export class Recording {
     /**
      * Duration in seconds of this recording.
      */
-    @Column("float")
+    @Column("double precision")
     @scope(world) @is(DataType.float)
     public duration?: number;
 

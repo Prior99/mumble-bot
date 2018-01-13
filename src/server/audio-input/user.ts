@@ -30,7 +30,7 @@ export class VoiceInputUser extends Stream.Writable {
     private speaking = false;
     private connectTime: Date;
     private passthrough: PassThroughStream;
-    private timeout: any;
+    private timeout: NodeJS.Timer;
     private speakStartTime: Date;
     private filename: string;
     private encoder: any;
@@ -83,7 +83,7 @@ export class VoiceInputUser extends Stream.Writable {
         if (this.timeout) {
             clearTimeout(this.timeout);
         }
-        this.timeout = setTimeout(this.speechStopped.bind(this), TIMEOUT_THRESHOLD);
+        this.timeout = global.setTimeout(this.speechStopped.bind(this), TIMEOUT_THRESHOLD);
     }
 
     /**

@@ -11,21 +11,11 @@ function timestampFunction () {
     return moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
 }
 
-export function setupWinston(filename: string) {
+export function setupWinston() {
     Winston.remove(Winston.transports.Console);
     Winston.add(Winston.transports.Console, {
         colorize: true,
         timestamp: timestampFunction,
         level: "verbose"
-    });
-
-    Winston.add(Winston.transports.File, {
-        filename,
-        maxsize: "64000",
-        maxFiles: 7,
-        json: false,
-        level: "verbose",
-        colorize: true,
-        timestamp: timestampFunction
     });
 }

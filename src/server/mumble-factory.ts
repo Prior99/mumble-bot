@@ -11,10 +11,9 @@ export class MumbleFactory {
     public conn: Connection;
 
     public async connect() {
-        info("Connecting to mumble...");
         const { keyContent, certContent, url, name, mumblePassword} = this.config;
         if (!keyContent || !certContent) {
-            warn("Connecting without certificate. Connection will be unsecured, bot will not be able to register!");
+            warn("Connecting to mumble without SSL. Connection will be unsecured, bot will not be able to register!");
         }
         this.conn = await new Promise<Connection>((resolve, reject) => {
             connect(`mumble://${url}`, { key: keyContent, cert: certContent }, (err, connection) => {
@@ -29,4 +28,14 @@ export class MumbleFactory {
 
     @factory
     public getConnection(): Connection { return this.conn; }
+
+    public stop(): Promise<undefined> {
+        return new Promise(resolve => {
+            this.conn.on("disconnect", () => {
+                info("Disconnected from mumble.");
+                resolve();
+            });
+            this.conn.disconnect();
+        });
+    }
 }

@@ -1,8 +1,6 @@
 import { component, factory, initialize, inject } from "tsdi";
 import { createConnection, Connection, ConnectionOptions } from "typeorm";
 import { info } from "winston";
-import * as Yaml from "yamljs";
-import { existsSync } from "fs";
 
 import {
     CachedAudio,
@@ -29,7 +27,6 @@ export class DatabaseFactory {
     public conn: Connection;
 
     public async connect() {
-        info("Connecting to database...");
         this.conn = await createConnection({
             synchronize: true,
             entities: [
@@ -61,4 +58,9 @@ export class DatabaseFactory {
 
     @factory
     public getConnection(): Connection { return this.conn; }
+
+    public async stop() {
+        await this.conn.close();
+        info("Disconnected from database.");
+    }
 }
