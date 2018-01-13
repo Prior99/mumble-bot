@@ -2,7 +2,7 @@ import { metadata, command, Command, Options } from "clime";
 import { external, factory, TSDI } from "tsdi";
 
 import { ServerConfig } from "../config";
-import { Bot, AudioCache, RestApi } from "../server";
+import { Bot, AudioCache, RestApi, AudioOutput, AudioInput } from "../server";
 
 @command({ description: "Start the API and the bot." }) @external
 export default class ServeCommand extends Command { // tslint:disable-line

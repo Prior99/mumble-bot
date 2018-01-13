@@ -1,4 +1,37 @@
 declare module "mumble" {
+    interface InputStream extends NodeJS.WritableStream {
+        close: () => void;
+        setGain: (gain: number) => void;
+        connection: Connection;
+        channels: number;
+        whisperId: number;
+        sampleRate: number;
+        gain: number;
+        bitDepth: number;
+        signed: boolean;
+        endianness: "BE" | "LE";
+        processInterval: NodeJS.Timer;
+        processObserver: EventEmitter;
+        frameQueue: Buffer[];
+        lastFrame: Buffer;
+        lastFrameWritten: number;
+        queuedForPlay: number;
+        lastWrite: number;
+        sent: number;
+    }
+
+    interface OutputStream extends NodeJS.ReadableStream {
+        close: () => void;
+        connection: Connection;
+        sessionId: number;
+        eventEmitter: EventEmitter;
+        frames: Buffer[];
+        writtenUntil: number;
+        noEmptyFrames: boolean;
+        emptyFrame: Buffer;
+        voiceListener: (data: Buffer) => void;
+    }
+
     interface Channel {
         addSubChannel: (name: string, options: any) => void;
         getPermissions: (callback: () => any) => void;
@@ -29,11 +62,11 @@ declare module "mumble" {
         ban: (reason?: string) => void;
         canHear: () => boolean;
         canTalk: () => boolean;
-        inputStream: () => any;
+        inputStream: () => InputStream;
         isRegistered: () => boolean;
         kick: (reason?: string) => void;
         moveToChannel: (channel: Channel) => void;
-        outputStream: (noEmptyFrames?: boolean) => any;
+        outputStream: (noEmptyFrames?: boolean) => OutputStream;
         sendMessage: (message: string) => void;
         setComment: (comment: string) => void;
         setSelfDeaf: (isSelfDeaf: boolean) => void;
@@ -55,8 +88,8 @@ declare module "mumble" {
         channelByName: (name: string) => Channel;
         userByName: (name: string) => User;
         sendMessage: (name: string, data: string) => void;
-        outputStream: (userId?: number) => any;
-        inputStream: () => any;
+        outputStream: (userId?: number) => OutputStream;
+        inputStream: () => InputStream;
         disconnect: () => void;
         sendVoice: (chunk: Buffer) => void;
         on: (event: string, callback: (...args: any[]) => any) => void;

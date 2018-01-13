@@ -123,7 +123,7 @@ export class RestApi {
         try {
             ws.send(JSON.stringify({
                 type: "init",
-                queue: this.bot.output.queue.map(convertWorkItem)
+                queue: this.bot.output.workItemQueue.map(convertWorkItem)
             }));
         }
         catch (err) {
