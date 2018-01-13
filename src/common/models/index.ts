@@ -6,7 +6,6 @@ export { RecordingLabelRelation } from "./recording-label-relation";
 export { DatabaseSound } from "./database-sound";
 export { Dialog } from "./dialog";
 export { DialogPart } from "./dialog-part";
-export { LogEntry } from "./log-entry";
 export { MumbleLink } from "./mumble-link";
 export { Permission } from "./permission";
 export { PermissionAssociation } from "./permission-association";

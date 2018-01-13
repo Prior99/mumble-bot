@@ -4,7 +4,7 @@ import { Connection } from "typeorm";
 import { bind } from "bind-decorator";
 import { Connection as MumbleConnection} from "mumble";
 
-import { Channel, LogEntry, MumbleUser } from "../models";
+import { Channel, MumbleUser } from "../models";
 import { world } from "../scopes";
 import { AudioOutput } from "../../server";
 
@@ -36,15 +36,6 @@ export class Utilities {
     public async shutUp(): Promise<{}> {
         this.audioOutput.clear();
         return ok();
-    }
-
-    @route("GET", "/log").dump(LogEntry, world)
-    public async getLog(): Promise<LogEntry[]> {
-        const entries = await this.db.getRepository(LogEntry).createQueryBuilder("entry")
-            .limit(300)
-            .orderBy("entry.timestamp", "DESC")
-            .getMany();
-        return ok(entries);
     }
 
     @route("GET", "/mumble-users").dump(MumbleUser, world)
