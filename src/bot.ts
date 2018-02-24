@@ -9,6 +9,7 @@ import { Permissions } from "./permissions";
 import { connectDatabase } from "./database";
 import { CachedAudio } from "./models";
 import { MetaInformation } from "./types/output";
+import * as uuid from "uuid";
 
 const AUDIO_CACHE_AMOUNT = 4;
 
@@ -24,7 +25,6 @@ export class Bot extends EventEmitter {
     public audioCacheAmount: number;
     public output: Output;
     public permissions: Permissions;
-    private audioId = 0;
     private input: VoiceInput;
     private api: Api;
 
@@ -61,7 +61,6 @@ export class Bot extends EventEmitter {
         this.input = new VoiceInput(this);
         try {
             this.cachedAudios = JSON.parse(await readFile(this.cachedAudioIndexFilePath));
-            this.audioId = this.cachedAudios.reduce((result, cached) => cached.id > result ? cached.id : result, 0) + 1;
         } catch (err) {
             Winston.error("Failed to load cached audios from index file.", err);
             this.cachedAudios = [];
@@ -142,12 +141,12 @@ export class Bot extends EventEmitter {
      * @param user User that emitted the audio.
      * @param duration Duration of the audio.
      */
-    public addCachedAudio(filename: string, user: number, duration: number) {
+    public addCachedAudio(filename: string, user: string, duration: number) {
         const obj = {
             file: filename,
             date: new Date(),
             user,
-            id: this.audioId++,
+            id: uuid.v4(),
             duration,
             protected: false
         };

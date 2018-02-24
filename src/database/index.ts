@@ -5,7 +5,6 @@ import * as Winston from "winston";
 import * as MySQL from "promise-mysql";
 import * as FS from "async-file";
 
-export * from "./log";
 export * from "./mumble-users";
 export * from "./permissions";
 export * from "./settings";

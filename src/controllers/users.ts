@@ -3,7 +3,7 @@ import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { verbose } from "winston";
 
-import { DatabaseUser } from "../models";
+import { DatabaseUser, MumbleDatabaseUser } from "../models";
 import { createUser, world } from "../scopes";
 
 @controller @component
@@ -26,6 +26,12 @@ export class Users {
     public async createUser(@body(createUser) user: DatabaseUser): Promise<DatabaseUser> {
         await this.db.getRepository(DatabaseUser).save(user);
         verbose(`New user ${user.username} with id ${user.id} just signed up`);
+        return created(user);
+    }
+
+    @route("GET", "/user/:id/linked")
+    public async getLinkedMumbleUsers(@param("id") @is().validate(uuid) id: string): Promise<MumbleDatabaseUser[]> {
+        await this.db.getRepository(MumbleDatabaseUser).;
         return created(user);
     }
 }

@@ -4,7 +4,7 @@ import { EventEmitter } from "events";
 import { Bot } from "..";
 import { getLinkedUser } from "../database";
 import { User as MumbleUser } from "mumble";
-import { DatabaseUser } from "../types";
+import { DatabaseUser } from "../models";
 
 interface UserMap {
     [id: string]: VoiceInputUser;

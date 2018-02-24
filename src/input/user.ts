@@ -7,7 +7,7 @@ import * as Stream from "stream";
 import { PassThrough as PassThroughStream } from "stream";
 import { Bot } from "..";
 import { writeUserStatsOnline, writeUserStatsSpeak } from "../database";
-import { DatabaseUser } from "../types";
+import { DatabaseUser } from "../models";
 import { User as MumbleUser } from "mumble";
 
 const TIMEOUT_THRESHOLD = 300;
@@ -25,7 +25,7 @@ export class VoiceInputUser extends Stream.Writable {
     private speaking = false;
     private connectTime: Date;
     private passthrough: PassThroughStream;
-    private timeout: NodeJS.Timer;
+    private timeout: number;
     private speakStartTime: Date;
     private filename: string;
     private encoder: any;
