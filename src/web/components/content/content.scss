@@ -1,0 +1,12 @@
+@import "../../breakpoints.scss";
+
+.content {
+    padding: 8px;
+    margin: 0 20px;
+}
+
+@media(min-width: $breakpoint-l) {
+    .content {
+        margin: 20px 40px;
+    }
+}

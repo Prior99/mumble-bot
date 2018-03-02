@@ -1,0 +1,9 @@
+/**
+ * Breakpoints for responsive design.
+ * All values are the **minimum** value.
+ * Taken and extended from the Bootstrap breakpoints.
+ */
+$breakpoint-xl: 1600px; // Extreme large displays, nearing Full HD and more.
+$breakpoint-l: 1200px; // Normal laptop screens, no normal phone portraits.
+$breakpoint-m: 992px; // Landscape mode of phone, small tablet or big phone.
+$breakpoint-s: 768px; // Small phones.

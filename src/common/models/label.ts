@@ -1,7 +1,7 @@
 import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, CreateDateColumn } from "typeorm";
 import { is, scope, DataType, specify, uuid } from "hyrest";
 
-import { world } from "../scopes";
+import { world, createRecording } from "../scopes";
 
 import { RecordingLabelRelation } from ".";
 
@@ -14,7 +14,7 @@ export class Label {
      * Unique id of this record which is used as the mapping to the audio file.
      */
     @PrimaryGeneratedColumn("uuid")
-    @scope(world) @is().validate(uuid)
+    @scope(world, createRecording) @is().validate(uuid)
     public id?: string;
 
     /**

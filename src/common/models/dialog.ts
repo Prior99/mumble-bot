@@ -1,7 +1,7 @@
 import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, CreateDateColumn } from "typeorm";
 import { is, scope, specify, uuid, DataType } from "hyrest";
 
-import { world, login } from "../scopes";
+import { world, login, createDialog } from "../scopes";
 import { hash } from "../utils";
 
 import { Recording, DialogPart } from ".";
@@ -37,7 +37,7 @@ export class Dialog {
      * All records belonging to this dialog.
      */
     @ManyToOne(() => DialogPart, dialogPart => dialogPart.dialog)
-    @is() @scope(world) @specify(() => DialogPart)
+    @is() @scope(world, createDialog) @specify(() => DialogPart)
     public parts?: DialogPart[];
 }
 

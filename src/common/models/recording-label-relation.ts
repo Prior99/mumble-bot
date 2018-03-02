@@ -1,7 +1,7 @@
 import { PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
 import { is, scope, uuid } from "hyrest";
 
-import { world } from "../scopes";
+import { world, createRecording } from "../scopes";
 
 import { Recording, Label } from ".";
 
@@ -16,6 +16,6 @@ export class RecordingLabelRelation {
     public recording?: Recording;
 
     @OneToMany(() => Label, label => label.recordingLabelRelations)
-    @is() @scope(world)
+    @is() @scope(world, createRecording)
     public label?: Label;
 }

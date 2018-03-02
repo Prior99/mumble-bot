@@ -1,7 +1,7 @@
 import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, OneToMany, CreateDateColumn } from "typeorm";
 import { is, scope, DataType, specify, uuid } from "hyrest";
 
-import { world } from "../scopes";
+import { world, createRecording } from "../scopes";
 
 import { DatabaseUser, DialogPart, RecordingLabelRelation } from ".";
 
@@ -21,7 +21,7 @@ export class Recording {
      * The quote for this record (textual description).
      */
     @Column("text")
-    @is() @scope(world)
+    @is() @scope(world, createRecording)
     public quote?: string;
 
     /**
@@ -74,7 +74,7 @@ export class Recording {
      * A list of all labels with which this record was tagged.
      */
     @ManyToOne(() => RecordingLabelRelation, recordingLabelRelation => recordingLabelRelation.recording)
-    @scope(world) @is() @specify(() => RecordingLabelRelation)
+    @scope(world, createRecording) @is() @specify(() => RecordingLabelRelation)
     public recordingLabelRelations?: RecordingLabelRelation[];
 
     /**

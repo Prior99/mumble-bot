@@ -18,7 +18,7 @@ export class Cached {
     @inject private config: ServerConfig;
     @inject private cache: AudioCache;
 
-    @route("GET", "/cached")
+    @route("GET", "/cached").dump(CachedAudio, world)
     public async listCached(): Promise<CachedAudio[]> {
         return ok(this.cache.sorted);
     }
@@ -43,14 +43,16 @@ export class Cached {
             return notFound<undefined>(`No cached recording with id "${id}" found.`);
         }
 
+        const currentUser = await ctx.currentUser();
+        recording.reporter = currentUser;
+        recording.user = cached.user;
+
         await this.createRecordingDirectory();
 
         await this.db.getRepository(Recording).save(recording);
 
         await rename(cached.file, `${this.config.recordingsDir}/${recording.id}`);
         await rename(cached.file + ".png", `${this.config.visualizationsDir}/${recording.id}.png`);
-
-        const currentUser = await ctx.currentUser();
 
         this.cache.remove(cached.id);
         verbose(`${currentUser.username} added new record #${recording.id}`);

@@ -1,7 +1,7 @@
 import { PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
 import { is, scope, uuid } from "hyrest";
 
-import { world } from "../scopes";
+import { world, createDialog } from "../scopes";
 
 import { Dialog, Label, Recording  } from ".";
 
@@ -12,7 +12,7 @@ export class DialogPart {
     public id?: string;
 
     @OneToMany(() => Recording, recording => recording.dialogParts)
-    @is() @scope(world)
+    @is() @scope(world, createDialog)
     public recording?: Recording;
 
     @OneToMany(() => Dialog, dialog => dialog.parts)
