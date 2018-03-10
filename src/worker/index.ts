@@ -6,7 +6,7 @@ import mkdirp = require("mkdirp-promise"); // tslint:disable-line
 import { setupWinston } from "../common";
 import { visualizeAudioFile } from "./visualizer";
 
-setupWinston("worker.log");
+setupWinston();
 
 const config = require("../../config.json"); // tslint:disable-line
 
