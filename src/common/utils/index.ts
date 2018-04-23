@@ -5,3 +5,4 @@ export * from "./work-item";
 export * from "./colorify";
 export * from "./permissions";
 export * from "./winston";
+export * from "./environment";

@@ -7,15 +7,11 @@ import { Route, Switch, Redirect } from "react-router-dom";
 import { Router } from "react-router";
 import { configureController, ControllerOptions } from "hyrest";
 
-import { isProductionEnvironment, Users, Tokens, Games, Followerships, Feed } from "../common";
+import { isProductionEnvironment, Users, Tokens } from "../common";
 import {
     PageLogin,
     PageDashboard,
     PageSignup,
-    PageCreateGame,
-    PageGame,
-    PageGames,
-    PageFollow,
     PageUser,
 } from "./pages";
 import { AppContainer } from "./components";
@@ -37,22 +33,6 @@ export const pages = [
     {
         route: routes.routeDashboard,
         component: PageDashboard,
-    },
-    {
-        route: routes.routeGames,
-        component: PageGames,
-    },
-    {
-        route: routes.routeCreateGame,
-        component: PageCreateGame,
-    },
-    {
-        route: routes.routeGame,
-        component: PageGame,
-    },
-    {
-        route: routes.routeFollow,
-        component: PageFollow,
     },
     {
         route: routes.routeUser,
@@ -108,9 +88,6 @@ const controllerOptions: ControllerOptions = {
 configureController([
     Users,
     Tokens,
-    Games,
-    Followerships,
-    Feed,
 ], controllerOptions);
 
 ReactDOM.render(

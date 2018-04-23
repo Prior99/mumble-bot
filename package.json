@@ -14,6 +14,7 @@
   "author": "Frederick <frederick@gnodtke.net>",
   "license": "GPL-3.0",
   "dependencies": {
+    "@types/classnames": "^2.2.3",
     "@types/http-status-codes": "^1.0.29",
     "@types/multer": "^0.0.33",
     "@types/uuid": "^3.4.3",
@@ -24,6 +25,7 @@
     "canvas": "^1.6.5",
     "chokidar": "^1.7.0",
     "chunking-streams": "^0.0.8",
+    "classnames": "^2.2.5",
     "clime": "^0.5.9",
     "crypto-js": "^3.1.9-1",
     "decko": "^1.2.0",
@@ -50,6 +52,7 @@
     "react-dom": "^16.2.0",
     "react-router-dom": "^4.2.2",
     "rng-js": "1.0.1",
+    "semantic-ui-react": "^0.79.1",
     "sox-audio": "^0.3.0",
     "tsdi": "^0.18.2",
     "typeorm": "^0.1.10",

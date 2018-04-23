@@ -1,7 +1,7 @@
 import * as React from "react";
 import { observer } from "mobx-react";
 import { Sidebar, Segment, Menu, Icon } from "semantic-ui-react";
-import * as classNames from "classnames";
+import * as classNames from "classnames/bind";
 import { inject, external } from "tsdi";
 
 import { SidebarStore, LoginStore } from "../../../common-ui";
@@ -10,15 +10,18 @@ import * as css from "./app-container.scss";
 
 declare var SOFTWARE_VERSION: string;
 
+const cx = classNames.bind(css);
+
 @observer @external
 export class AppContainer extends React.Component<{}, undefined> {
     @inject private sidebar: SidebarStore;
     @inject private login: LoginStore;
 
     public render() {
-        const pageClasses = classNames({
-            [css.pageSidebarActive]: this.sidebar.alwaysOpen && this.login.loggedIn,
+        const pageClasses = cx({
+            pageSidebarActive: this.sidebar.alwaysOpen && this.login.loggedIn,
         });
+
         return (
             <div>
                 <Errors />
