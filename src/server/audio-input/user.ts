@@ -104,7 +104,7 @@ export class VoiceInputUser extends Stream.Writable {
         .inputOptions(
             "-f", "s16le",
             "-ar", audioFreq,
-            "-ac", "1"
+            "-ac", "1",
         )
         .on("error", (err) => Winston.error(`Encoder for user ${this.user.name} crashed.`, err))
         .audioCodec("libmp3lame")
@@ -121,7 +121,7 @@ export class VoiceInputUser extends Stream.Writable {
         this.cache.add(
             this.filename,
             this.databaseUser.id,
-            (Date.now() - this.speakStartTime.getTime()) / msInS
+            (Date.now() - this.speakStartTime.getTime()) / msInS,
         );
         this.createNewRecordingFile();
     }

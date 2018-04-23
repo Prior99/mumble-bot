@@ -16,6 +16,6 @@ export function setupWinston() {
     Winston.add(Winston.transports.Console, {
         colorize: true,
         timestamp: timestampFunction,
-        level: "verbose"
+        level: "verbose",
     });
 }

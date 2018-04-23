@@ -99,7 +99,7 @@ export class RestApi {
         ws.send(JSON.stringify({
             type: "init",
             cacheAmount: this.cache.cacheAmount,
-            list: this.cache.all.map(recording => omit(["file"], recording))
+            list: this.cache.all.map(recording => omit(["file"], recording)),
         }));
 
         const onAdd = audio => ws.send(JSON.stringify({ type: "add", recording: omit(["file"], audio) }));
@@ -122,7 +122,7 @@ export class RestApi {
         try {
             ws.send(JSON.stringify({
                 type: "init",
-                queue: this.audioOutput.workItemQueue.map(convertWorkItem)
+                queue: this.audioOutput.workItemQueue.map(convertWorkItem),
             }));
         }
         catch (err) {
@@ -131,17 +131,17 @@ export class RestApi {
         const onEnqueue = (workitem) => {
             ws.send(JSON.stringify({
                 type: "enqueue",
-                workitem: convertWorkItem(workitem)
+                workitem: convertWorkItem(workitem),
             }));
         };
         const onDequeue = () => {
             ws.send(JSON.stringify({
-                type: "dequeue"
+                type: "dequeue",
             }));
         };
         const onClear = () => {
             ws.send(JSON.stringify({
-                type: "clear"
+                type: "clear",
             }));
         };
         this.audioOutput.on("clear", onClear);

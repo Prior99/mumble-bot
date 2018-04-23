@@ -11,7 +11,7 @@ import {
     uuid,
     is,
     notFound,
-    forbidden
+    forbidden,
 } from "hyrest";
 import { inject, component } from "tsdi";
 import { Connection } from "typeorm";

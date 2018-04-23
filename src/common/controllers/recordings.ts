@@ -27,7 +27,7 @@ export class Recordings {
     public async postRecording(
         @param("id") @is().validate(uuid) id: string,
         @body(updateRecording) recording: Recording,
-        @context ctx?: Context
+        @context ctx?: Context,
     ): Promise<Recording>{
         await this.db.getRepository(Recording).updateById(id, recording);
 
@@ -40,7 +40,7 @@ export class Recordings {
 
     @route("GET", "/recordings").dump(Recording, world)
     public async listRecordings(
-        @query("since") @is() @specify(() => Date) since?: Date
+        @query("since") @is() @specify(() => Date) since?: Date,
     ): Promise<Recording[]> {
         const queryBuilder = this.db.getRepository(Recording).createQueryBuilder("recording");
         if (since) {
@@ -55,7 +55,7 @@ export class Recordings {
     public async playRecording(
         @param("id") @is().validate(uuid) id: string,
         @body() playbackOptions: PlaybackOptions,
-        @context ctx?: Context
+        @context ctx?: Context,
     ): Promise<{}> {
         const { pitch } = playbackOptions;
         const recording = await this.getRecording(id);
@@ -68,7 +68,7 @@ export class Recordings {
         this.audioOutput.playSound(`${this.config.recordingsDir}/${id}`, {
             type: "recording",
             recording,
-            user: currentUser
+            user: currentUser,
         });
 
         verbose(`${username} played back record #${id}`);
@@ -93,7 +93,7 @@ export class Recordings {
     public async forkRecording(
         @param("id") @is().validate(uuid) id: string,
         @body() options: ForkOptions,
-        @context ctx?: Context
+        @context ctx?: Context,
     ): Promise<{}> {
         const { actions, quote, overwrite } = options;
         const original = await this.getRecording(id);
@@ -103,7 +103,7 @@ export class Recordings {
         const oldDuration = original.duration;
         const newDuration = actions.reduce((result, action) =>
             action.action === "crop" ? action.begin - action.end + result : result,
-            0
+            0,
         );
 
         const newRecording = await this.db.getRepository(Recording).save({
@@ -111,7 +111,7 @@ export class Recordings {
             quote,
             overwrite,
             duration: newDuration,
-            reporter: currentUser
+            reporter: currentUser,
         });
 
         verbose(`${username} is forking record #${id}`);

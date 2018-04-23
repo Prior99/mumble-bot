@@ -33,7 +33,7 @@ export class Sounds {
 
     @route("POST", "/sound").dump(DatabaseSound, world)
     public async createSound(
-        @body(createSound) sound: UploadSound
+        @body(createSound) sound: UploadSound,
     ): Promise<DatabaseSound> {
         await this.createSoundDirectory();
 
@@ -64,7 +64,7 @@ export class Sounds {
         this.audioOutput.playSound(`${this.config.uploadDir}/${id}`, {
             type: "sound",
             sound,
-            user: currentUser
+            user: currentUser,
         });
 
         verbose(`${currentUser.username} played sound #${id}`);

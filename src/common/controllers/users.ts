@@ -48,12 +48,13 @@ export class Users {
     public async revokePermission(
         @param("id") @is().validate(uuid) id: string,
         @param("permission") @is() permission: string,
-        @context ctx?: Context
+        @context ctx?: Context,
     ): Promise<{}> {
         const associations = await this.db.getRepository(PermissionAssociation).createQueryBuilder("association")
             .leftJoin("user", "user")
             .where("user.id = :id AND association.permission = :permission", { id, permission })
-            .delete();
+            .delete()
+            .execute();
 
         const user = await this.db.getRepository(DatabaseUser).findOneById(id);
         const currentUser = await ctx.currentUser();
@@ -66,7 +67,7 @@ export class Users {
     public async grantPermission(
         @param("id") @is().validate(uuid) id: string,
         @param("permission") @is() permission: string,
-        @context ctx?: Context
+        @context ctx?: Context,
     ): Promise<DatabaseUser> {
         const association = { permission, user: { id }};
         await this.db.getRepository(PermissionAssociation).save(association);
@@ -95,7 +96,7 @@ export class Users {
     public async updateSettings(
         @param("id") @is().validate(uuid) id: string,
         @body() @is(DataType.obj) settings: Settings,
-        @TransactionManager() transaction?: EntityManager
+        @TransactionManager() transaction?: EntityManager,
     ): Promise<Settings> {
         const old = await transaction.getRepository(Setting).createQueryBuilder("setting")
             .leftJoin("user", "user")

@@ -18,7 +18,7 @@ export class MumbleLinks {
 
     @route("POST", "/mumble-link").dump(MumbleLink, world)
     public async createMumbleLink(
-        @body(createMumbleLink) @is() mumbleLink: MumbleLink
+        @body(createMumbleLink) @is() mumbleLink: MumbleLink,
     ): Promise<MumbleLink> {
         await this.db.getRepository(MumbleLink).save(mumbleLink);
         return created(mumbleLink);

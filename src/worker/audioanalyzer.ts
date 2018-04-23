@@ -26,7 +26,7 @@ export class AudioAnalyzer {
         this.samplesTotal = 0;
         this.list = [{
             amplitude: 0.5,
-            freq: 0
+            freq: 0,
         }];
     }
 
@@ -52,7 +52,7 @@ export class AudioAnalyzer {
         const maxIndex = magnitudes.reduce((result, value, index) => value > magnitudes[result] ? index : result, 0);
         this.list.push({
             amplitude: max,
-            freq: frequencies[maxIndex]
+            freq: frequencies[maxIndex],
         });
     }
 
@@ -68,7 +68,7 @@ export class AudioAnalyzer {
         const overallMax = this.list.reduce((result, value) => result > value.amplitude ? result : value.amplitude, 0);
         const values = this.list.map(item => ({
             ...item,
-            amplitude: item.amplitude / overallMax
+            amplitude: item.amplitude / overallMax,
         }));
         const width = canvas.width;
         const height = canvas.height;

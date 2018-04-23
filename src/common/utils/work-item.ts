@@ -45,7 +45,7 @@ export function convertWorkItem(item: WorkItem) {
             time,
             user: user.id,
             recording: recording.id,
-            type
+            type,
         };
     }
     if (meta.type === "sound") {
@@ -54,7 +54,7 @@ export function convertWorkItem(item: WorkItem) {
             time,
             user: user.id,
             sound: sound.id,
-            type
+            type,
         };
     }
     if (meta.type === "cached") {
@@ -63,14 +63,14 @@ export function convertWorkItem(item: WorkItem) {
             time,
             user: user.id,
             cachedRecording: cachedRecording.id,
-            type
+            type,
         };
     }
     if (meta.type === "dialog") {
         return {
             time,
             user: user.id,
-            type
+            type,
         };
     }
 }

@@ -16,7 +16,7 @@ import {
     RecordingLabelRelation,
     Recording,
     Setting,
-    Token
+    Token,
 } from "../common";
 
 @component
@@ -41,7 +41,7 @@ export class Database {
                 RecordingLabelRelation,
                 Recording,
                 Setting,
-                Token
+                Token,
             ],
             database: dbName,
             username: dbUsername,

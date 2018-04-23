@@ -91,7 +91,7 @@ export class ServerConfig extends Options {
         check(this.tmpDir, "Temp dir not configured. Add 'tmpDir' to config file or specify --tmp-dir");
         check(
             this.name,
-            "Recordings dir not configured. Add 'recordingsDir' to config file or specify --recordings-dir"
+            "Recordings dir not configured. Add 'recordingsDir' to config file or specify --recordings-dir",
         );
         check(
             this.visualizationsDir,

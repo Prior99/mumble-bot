@@ -36,7 +36,7 @@ export class Cached {
     public async saveCached(
         @param("id") @is().validate(uuid) id: string,
         @body(createRecording) recording: Recording,
-        @context ctx?: Context
+        @context ctx?: Context,
     ): Promise<Recording> {
         const cached = this.cache.byId(id);
         if (!cached) {
@@ -78,7 +78,7 @@ export class Cached {
         this.audioOutput.playSound(cached.file, {
             type: "cached",
             cachedRecording: cached,
-            user: currentUser
+            user: currentUser,
         });
         verbose(`${currentUser.username} played back cached audio with id ${id}`);
         return ok();

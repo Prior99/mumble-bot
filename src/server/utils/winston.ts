@@ -16,7 +16,7 @@ export function setupWinston(filename: string) {
     Winston.add(Winston.transports.Console, {
         colorize: true,
         timestamp: timestampFunction,
-        level: "verbose"
+        level: "verbose",
     });
 
     Winston.add(Winston.transports.File, {
@@ -26,6 +26,6 @@ export function setupWinston(filename: string) {
         json: false,
         level: "verbose",
         colorize: true,
-        timestamp: timestampFunction
+        timestamp: timestampFunction,
     });
 }

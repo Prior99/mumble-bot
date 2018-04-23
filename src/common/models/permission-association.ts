@@ -5,7 +5,7 @@ import {
     ManyToOne,
     OneToMany,
     CreateDateColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
 } from "typeorm";
 import { is, scope, uuid } from "hyrest";
 import { world } from "../scopes";

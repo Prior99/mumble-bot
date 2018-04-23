@@ -28,13 +28,13 @@ export type Route = AuthorizedRoute | AuthorizedNavbarRoute | UnauthorizedRoute;
 export const routeLogin: Route = {
     path: () => "/login",
     pattern: "/login",
-    unauthorized: true
+    unauthorized: true,
 };
 
 export const routeSignup: Route = {
     path: () => "/signup",
     pattern: "/signup",
-    unauthorized: true
+    unauthorized: true,
 };
 
 export const routeDashboard: Route = {
@@ -42,18 +42,18 @@ export const routeDashboard: Route = {
     pattern: "/dashboard",
     navbar: true,
     title: "Dashboard",
-    icon: "dashboard"
+    icon: "dashboard",
 };
 export const routeUser: Route = {
     path: (id: string) => `/user/${id}`,
-    pattern: "/user/:id"
+    pattern: "/user/:id",
 };
 
 export const routes: Route[] = [
     routeLogin,
     routeSignup,
     routeDashboard,
-    routeUser
+    routeUser,
 ];
 
 export function getRoute(url: string) {

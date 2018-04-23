@@ -15,7 +15,7 @@ import {
     RecordingLabelRelation,
     Recording,
     Setting,
-    Token
+    Token,
 } from "../common";
 import { ServerConfig } from "../config";
 
@@ -41,7 +41,7 @@ export class DatabaseFactory {
                 RecordingLabelRelation,
                 Recording,
                 Setting,
-                Token
+                Token,
             ],
             database: this.config.dbName,
             type: this.config.dbDriver as any,
@@ -49,7 +49,7 @@ export class DatabaseFactory {
             password: this.config.dbPassword,
             port: this.config.dbPort,
             username: this.config.dbUsername,
-            host: this.config.dbHost
+            host: this.config.dbHost,
         });
         info("Connected to database.");
     }

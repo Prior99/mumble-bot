@@ -19,7 +19,7 @@ export class Utilities {
         const users = channel.users.map(user => ({
             name: user.name,
             id: user.id,
-            session: user.session
+            session: user.session,
         }));
         const children = channel.children
             .sort((a, b) => a.position - b.position)

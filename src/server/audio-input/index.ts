@@ -44,7 +44,7 @@ export class AudioInput extends EventEmitter {
     private async addUser(user: MumbleUser) {
         const link = await this.db.getRepository(MumbleLink).findOne({
             where: { mumbleId: user.id },
-            relations: ["user"]
+            relations: ["user"],
         });
         if (!link) {
             info(`Did not register input for user ${user.name} as this user is not linked to any database user.`);

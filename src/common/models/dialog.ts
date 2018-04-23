@@ -40,4 +40,3 @@ export class Dialog {
     @is() @scope(world, createDialog) @specify(() => DialogPart)
     public parts?: DialogPart[];
 }
-
