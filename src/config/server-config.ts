@@ -27,7 +27,7 @@ export class ServerConfig extends Options {
     public dbPassword: string;
 
     @option({ description: "Port the database runs on." })
-    public dbPort: string;
+    public dbPort: number;
 
     @option({ description: "Hostname of the server hosting the database." })
     public dbHost: string;

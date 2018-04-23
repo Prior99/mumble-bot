@@ -7,8 +7,7 @@
     "dev": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/index.ts",
     "prebuild": "rm -rf dist/",
     "build": "tsc -p . --outDir dist",
-    "start:bot": "node dist",
-    "start:worker": "node dist/worker",
+    "start": "node dist",
     "lint": "tslint --format stylish --type-check --project tsconfig.json"
   },
   "repository": "https://git.cronosx.de/prior/mumble-bot",

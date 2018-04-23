@@ -10,7 +10,7 @@ type ReactComponent<P> = React.StatelessComponent<P> | React.ComponentClass<P>;
 
 export function requireLogin<P, R extends React.ComponentClass<P | void>>(component: R): R {
     @observer @external
-    class RequireLogin extends React.Component<P, undefined> {
+    class RequireLogin extends React.Component<P> {
         @inject private login: LoginStore;
         public render() {
             if (!this.login.loggedIn) {

@@ -1,52 +1,31 @@
-import { component, factory, initialize } from "tsdi";
-import { createConnection, Connection, ConnectionOptions } from "typeorm";
+import { inject, component, factory, initialize } from "tsdi";
+import { Driver, createConnection, Connection, ConnectionOptions } from "typeorm";
 import { info } from "winston";
 import * as Yaml from "yamljs";
 import { existsSync } from "fs";
-
+import { ServerConfig } from "../config";
 import {
     DatabaseSound,
     DatabaseUser,
     DialogPart,
     Dialog,
     Label,
-    LogEntry,
     MumbleLink,
     MumbleUser,
     PermissionAssociation,
-    RecordLabelRelation,
+    RecordingLabelRelation,
     Recording,
     Setting,
     Token
 } from "../common";
 
-function envConfig() {
-    const result: any = {};
-    if (!process || !process.env) { return result; }
-    const {
-        MUMBLE_BOT_DB_DATABASE,
-        MUMBLE_BOT_DB_USER,
-        MUMBLE_BOT_DB_PASSWORD,
-        MUMBLE_BOT_DB_PORT,
-        MUMBLE_BOT_DB_HOST,
-        MUMBLE_BOT_DB_LOGGING,
-        MUMBLE_BOT_DB_DRIVER
-    } = process.env;
-    if (MUMBLE_BOT_DB_DATABASE) { result.database = MUMBLE_BOT_DB_DATABASE; }
-    if (MUMBLE_BOT_DB_USER) { result.username = MUMBLE_BOT_DB_USER; }
-    if (MUMBLE_BOT_DB_PASSWORD) { result.password = MUMBLE_BOT_DB_PASSWORD; }
-    if (MUMBLE_BOT_DB_PORT) { result.port = MUMBLE_BOT_DB_PORT; }
-    if (MUMBLE_BOT_DB_HOST) { result.host = MUMBLE_BOT_DB_HOST; }
-    if (MUMBLE_BOT_DB_DRIVER) { result.type = MUMBLE_BOT_DB_DRIVER; }
-    if (MUMBLE_BOT_DB_LOGGING) { result.logging = MUMBLE_BOT_DB_LOGGING === "true"; }
-    return result;
-}
-
 @component
 export class Database {
+    @inject private serverConfig: ServerConfig;
     public conn: Connection;
 
     public async connect() {
+        const { dbUsername, dbName, dbPassword, dbPort, dbHost, dbDriver, dbLogging } = this.serverConfig;
         info("Connecting to database...");
         this.conn = await createConnection({
             synchronize: true,
@@ -56,17 +35,21 @@ export class Database {
                 DialogPart,
                 Dialog,
                 Label,
-                LogEntry,
                 MumbleLink,
                 MumbleUser,
                 PermissionAssociation,
-                RecordLabelRelation,
+                RecordingLabelRelation,
                 Recording,
                 Setting,
                 Token
             ],
-            ...(existsSync("./database.yml") ? Yaml.load("./database.yml") : {}),
-            ...envConfig()
+            database: dbName,
+            username: dbUsername,
+            password: dbPassword,
+            port: dbPort,
+            host: dbHost,
+            type: "postgres",
+            logging: dbLogging,
         });
         info("Connected to database.");
     }

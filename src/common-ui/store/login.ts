@@ -4,10 +4,9 @@ import * as isomorphicFetch from "isomorphic-fetch";
 import { History } from "history";
 import { component, inject, initialize } from "tsdi";
 
-import { Users, Tokens, User } from "../../common";
+import { Users, Tokens, DatabaseUser } from "../../common";
 import { routeDashboard } from "../../common-ui";
-import { GamesStore, OwnUserStore  } from ".";
-import { ServiceWorkerManager } from "..";
+import { OwnUserStore  } from ".";
 
 const softwareVersion = 2;
 const localStorageIdentifier = "software-login";
@@ -28,9 +27,7 @@ export class LoginStore {
     @inject private users: Users;
     @inject private tokens: Tokens;
     @inject("OwnUserStore") private ownUser: OwnUserStore;
-    @inject("GamesStore") private games: GamesStore;
     @inject private browserHistory: History;
-    @inject("ServiceWorkerManager") private serviceWorkerManager: ServiceWorkerManager;
 
     @observable public authToken: string;
     @observable public userId: string;
@@ -48,16 +45,14 @@ export class LoginStore {
     @bind @action
     public async login(email: string, password: string) {
         const body = { email, password };
-        const response = await this.tokens.createToken({ email, password } as User);
+        const response = await this.tokens.createToken({ email, password } as DatabaseUser);
         if (response) {
             const { id, user } = response;
             this.authToken = id;
             this.userId = user.id;
             this.save();
             await this.ownUser.loadUser();
-            await this.games.loadGames();
             this.browserHistory.replace(routeDashboard.path());
-            await this.serviceWorkerManager.updateSubscription();
         }
         return response;
     }

@@ -1,58 +1,29 @@
-import { component, factory, initialize } from "tsdi";
-import { connect } from "mumble";
+import { inject, component, factory, initialize } from "tsdi";
+import { connect, Connection } from "mumble";
 import { info } from "winston";
 import * as Yaml from "yamljs";
 import { existsSync } from "fs";
-
-function envConfig() {
-    const result: any = {};
-    if (!process || !process.env) { return result; }
-    const {
-        MUMBLE_BOT_KEY_FILE,
-        MUMBLE_BOT_CERT_FILE,
-        MUMBLE_BOT_DB_PASSWORD,
-        MUMBLE_BOT_DB_PORT,
-        MUMBLE_BOT_DB_HOST,
-        MUMBLE_BOT_DB_LOGGING,
-        MUMBLE_BOT_DB_DRIVER
-    } = process.env;
-    if (MUMBLE_BOT_DB_DATABASE) { result.database = MUMBLE_BOT_DB_DATABASE; }
-    if (MUMBLE_BOT_DB_USER) { result.username = MUMBLE_BOT_DB_USER; }
-    if (MUMBLE_BOT_DB_PASSWORD) { result.password = MUMBLE_BOT_DB_PASSWORD; }
-    if (MUMBLE_BOT_DB_PORT) { result.port = MUMBLE_BOT_DB_PORT; }
-    if (MUMBLE_BOT_DB_HOST) { result.host = MUMBLE_BOT_DB_HOST; }
-    if (MUMBLE_BOT_DB_DRIVER) { result.type = MUMBLE_BOT_DB_DRIVER; }
-    if (MUMBLE_BOT_DB_LOGGING) { result.logging = MUMBLE_BOT_DB_LOGGING === "true"; }
-    return result;
-}
+import { ServerConfig } from "../config";
 
 @component
 export class Database {
+    @inject private serverConfig: ServerConfig;
+
     public conn: Connection;
 
     public async connect() {
-        info("Connecting to database...");
-        this.conn = await createConnection({
-            synchronize: true,
-            entities: [
-                DatabaseSound,
-                DatabaseUser,
-                DialogPart,
-                Dialog,
-                Label,
-                LogEntry,
-                MumbleLink,
-                MumbleUser,
-                PermissionAssociation,
-                RecordLabelRelation,
-                Recording,
-                Setting,
-                Token
-            ],
-            ...(existsSync("./database.yml") ? Yaml.load("./database.yml") : {}),
-            ...envConfig()
+        info("Connecting to mumble...");
+        const { url, keyContent: key, certContent: cert } = this.serverConfig;
+        this.conn = await new Promise<Connection>((resolve, reject) => {
+            connect(url, { key, cert }, (error: Error, connection: Connection) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(connection);
+            });
         });
-        info("Connected to database.");
+        info("Connected to mumble.");
     }
 
     @factory
@@ -60,4 +31,3 @@ export class Database {
         return this.conn;
     }
 }
-
