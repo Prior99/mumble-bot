@@ -201,7 +201,7 @@ export class RestApi {
 
     @bind public async downloadRecording({ params }: Request, res: Response) {
         const { id } = params;
-        const recording = await this.db.getRepository(Recording).findOneById(id);
+        const recording = await this.db.getRepository(Recording).findOne(id);
         if (!recording) { return res.status(404).send(); }
 
         res.setHeader("Content-disposition", `attachment; filename='${recording.quote}.mp3'`);
@@ -220,7 +220,7 @@ export class RestApi {
 
     @bind public async downloadVisualizedRecording({ params }: Request, res: Response) {
         const { id } = params;
-        const recording = await this.db.getRepository(Recording).findOneById(id);
+        const recording = await this.db.getRepository(Recording).findOne(id);
         if (!recording) { return res.status(404).send(); }
 
         const fileName = `${this.config.visualizationsDir}/${recording.id}.png`;

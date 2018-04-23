@@ -3,11 +3,12 @@ stages:
   - deploy
 
 build:
-  image: "node:7"
+  image: "node:8"
   before_script:
     - yarn install
   script:
-    - npm run build
+    - yarn build:web:release
+    - yarn build:server
   stage: test
   cache:
     key: "$CI_PROJECT_ID"
@@ -16,6 +17,7 @@ build:
   artifacts:
     paths:
       - dist/
+      - server/
       - src/
       - package.json
       - yarn.lock
@@ -26,11 +28,12 @@ build:
       - README.md
 
 lint:
-  image: "node:7"
+  image: "node:8"
   before_script:
     - yarn install
   script:
-    - npm run lint
+    - yarn lint:src
+    - yarn lint:style
   stage: test
   cache:
     key: "$CI_PROJECT_ID"

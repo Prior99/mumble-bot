@@ -59,7 +59,7 @@ export class AudioCache extends EventEmitter {
      */
     public async add(filename: string, userId: string, duration: number) {
         const id = Uuid.v4();
-        const user = await this.db.getRepository(DatabaseUser).findOneById(userId);
+        const user = await this.db.getRepository(DatabaseUser).findOne(userId);
         const cachedAudio: CachedAudio = new CachedAudio(filename, user, duration);
         this.cachedAudios.set(cachedAudio.id, cachedAudio);
         this.emit("cached-audio", cachedAudio);

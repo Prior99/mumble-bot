@@ -33,7 +33,7 @@ export class PageLogin extends React.Component {
     public render() {
         return (
             <Content>
-                <h1>Go 3</h1>
+                <h1>Mumble Bot</h1>
                 <Form size="large" onSubmit={this.handleSubmit}>
                     <Form.Field error={!this.emailValid}>
                         <Input

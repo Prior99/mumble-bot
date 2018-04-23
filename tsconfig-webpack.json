@@ -2,14 +2,13 @@
     "compilerOptions": {
         "target": "es6",
         "module": "commonjs",
-        "moduleResolution": "node",
         "declaration": false,
         "noImplicitAny": false,
         "removeComments": true,
         "experimentalDecorators": true,
         "noLib": false,
         "jsx": "react",
-        "outDir": "bot",
+        "outDir": "dist",
         "lib": ["es2016", "webworker", "dom"],
         "emitDecoratorMetadata": true,
         "allowSyntheticDefaultImports": true,
@@ -20,5 +19,9 @@
         "typings/*",
         "src/**/*.ts?",
         "src/**/*.ts"
+    ],
+    "exclude": [
+        "src/index.ts",
+        "src/commands"
     ]
 }

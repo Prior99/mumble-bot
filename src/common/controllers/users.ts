@@ -23,7 +23,7 @@ export class Users {
 
     @route("GET", "/user/:id").dump(DatabaseUser, world)
     public async getUser(@param("id") @is().validate(uuid) id: string): Promise<DatabaseUser> {
-        const user = await this.db.getRepository(DatabaseUser).findOneById(id);
+        const user = await this.db.getRepository(DatabaseUser).findOne(id);
         if (!user) { return notFound<DatabaseUser>(`No user with id "${id}"`); }
         return ok(user);
     }
@@ -56,7 +56,7 @@ export class Users {
             .delete()
             .execute();
 
-        const user = await this.db.getRepository(DatabaseUser).findOneById(id);
+        const user = await this.db.getRepository(DatabaseUser).findOne(id);
         const currentUser = await ctx.currentUser();
         verbose(`Permission "${permission}" revoked from ${user.username} by ${currentUser.username}`);
 
@@ -72,7 +72,7 @@ export class Users {
         const association = { permission, user: { id }};
         await this.db.getRepository(PermissionAssociation).save(association);
 
-        const user = await this.db.getRepository(DatabaseUser).findOneById(id);
+        const user = await this.db.getRepository(DatabaseUser).findOne(id);
         const currentUser = await ctx.currentUser();
         verbose(`Permission "${permission}" granted to ${user.username} by ${currentUser.username}`);
 

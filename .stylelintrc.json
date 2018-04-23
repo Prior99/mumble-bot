@@ -1,0 +1,18 @@
+{
+  "rules": {
+    "block-no-empty": true,
+    "color-no-hex": true,
+    "color-named": "never",
+    "value-no-vendor-prefix": true,
+    "unit-case": "lower",
+    "declaration-colon-space-after": "always",
+    "indentation": 4,
+    "max-empty-lines": 1,
+    "rule-empty-line-before": [
+        "always", {
+            "except": ["first-nested"],
+            "ignore": ["after-comment"]
+        }
+    ]
+  }
+}

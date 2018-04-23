@@ -2,7 +2,7 @@ import { body, controller, route, param, is, uuid, ok } from "hyrest";
 import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { bind } from "bind-decorator";
-import { Connection as MumbleConnection} from "mumble";
+import { Connection as MumbleConnection } from "mumble";
 
 import { Channel, MumbleUser } from "../models";
 import { world } from "../scopes";

@@ -56,7 +56,7 @@ export class Sounds {
 
     @route("POST", "/sound/:id/play")
     public async playSound(@param("id") @is().validate(uuid) id: string, @context ctx?: Context): Promise<{}> {
-        const sound = await this.db.getRepository(DatabaseSound).findOneById(id);
+        const sound = await this.db.getRepository(DatabaseSound).findOne(id);
         sound.used++;
         await this.db.getRepository(DatabaseSound).save(sound);
 

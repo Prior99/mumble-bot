@@ -23,7 +23,7 @@ export class Dialogs {
 
     @route("POST", "/dialog/:id/play")
     public async playDialog(@param("id") @is().validate(uuid) id: string, @context ctx?: Context): Promise<{}> {
-        const dialog = await this.db.getRepository(Dialog).findOneById(id, {
+        const dialog = await this.db.getRepository(Dialog).findOne(id, {
             relations: ["parts", "parts.recording"],
         });
         dialog.used++;

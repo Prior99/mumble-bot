@@ -8,18 +8,21 @@ const extractCSS = new ExtractTextPlugin('[name].css');
 const gitRevision = new GitRevisionPlugin({ lightweightTags: true });
 
 module.exports = {
+    mode: "development",
     entry: {
-        bundle: path.resolve(__dirname, "src/web"),
-        "service-worker": path.resolve(__dirname, "src/service-worker"),
+        "bundle": path.join(__dirname, "src", "web"),
     },
-    context: __dirname + "/dist/",
+    context: path.join(__dirname, "dist"),
     output: {
-        path: __dirname + "/dist/",
+        path: path.join(__dirname, "dist"),
         filename: "[name].js",
         publicPath: "/"
     },
     resolve: {
-        extensions: [".js", ".jsx", ".ts", ".tsx", ".json"]
+        extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
+        alias: {
+            "clime": path.join(__dirname, "src", "clime-shim.ts"),
+        },
     },
     module: {
         rules: [
@@ -38,11 +41,13 @@ module.exports = {
             },
             {
                 test: /\.tsx?/,
-                loader: "awesome-typescript-loader",
+                loader: "ts-loader",
                 exclude: [
                     /__tests__/,
-                    // path.resolve(__dirname, "src/server")
-                ]
+                ],
+                options: {
+                    configFile: "tsconfig-webpack.json",
+                },
             },
             {
                 test: /\.css$/,
@@ -85,11 +90,23 @@ module.exports = {
             }
         ]
     },
+    externals: {
+        "child_process": "{}",
+        "express": "{}",
+        "express-ws": "{}",
+        "fluent-ffmpeg": "{}",
+        "fs": "{}",
+        "mumble": "{}",
+        "net": "{}",
+        "readline": "{}",
+        "winston": "{}",
+        "react-native-sqlite-storage": "{}"
+    },
     devtool: "source-map",
     devServer: {
-        port: 3000,
+        port: 3020,
         historyApiFallback: true,
-        contentBase: __dirname + "/dist/"
+        contentBase: path.join(__dirname, "dist")
     },
     plugins: [
         new Webpack.NormalModuleReplacementPlugin(/typeorm$/, result => {
@@ -103,10 +120,4 @@ module.exports = {
         }),
         new ProgressBarPlugin()
     ],
-    node: {
-        child_process: "empty",
-        fs: "empty",
-        net: "empty",
-        readline: "empty",
-    },
 };

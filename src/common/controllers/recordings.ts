@@ -19,7 +19,7 @@ export class Recordings {
 
     @route("GET", "/recording/:id").dump(Recording, world)
     public async getRecording(@param("id") @is().validate(uuid) id: string): Promise<Recording> {
-        const recording = await this.db.getRepository(Recording).findOneById(id);
+        const recording = await this.db.getRepository(Recording).findOne(id);
         return ok(recording);
     }
 
@@ -29,7 +29,7 @@ export class Recordings {
         @body(updateRecording) recording: Recording,
         @context ctx?: Context,
     ): Promise<Recording>{
-        await this.db.getRepository(Recording).updateById(id, recording);
+        await this.db.getRepository(Recording).update(id, recording);
 
         const { username } = await ctx.currentUser();
         verbose(`${username} edited record #${id}`);

@@ -7,7 +7,6 @@ import { AudioCache, RestApi, AudioOutput, AudioInput, DatabaseFactory, MumbleFa
 
 @command({ description: "Start the API and the bot." })
 export default class ServeCommand extends Command { // tslint:disable-line
-
     @metadata
     public async execute(config: ServerConfig) {
         const configConsistent = config.load();
