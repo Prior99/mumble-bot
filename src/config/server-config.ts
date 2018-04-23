@@ -1,6 +1,7 @@
 import { option, Options } from "clime";
 import { readFileSync } from "fs";
 import { error } from "winston";
+import { pickBy } from "ramda";
 
 import { loadConfigFile } from "./load-config-file";
 
@@ -63,68 +64,40 @@ export class ServerConfig extends Options {
     public uploadDir: string;
 
     public load() {
-        const file = loadConfigFile(this.configFile);
-        let okay = true;
+        Object.assign(
+            this,
+            {
+                port: 23278,
+                audioCacheAmount: 100,
+                dbPort: 5432,
+                dbHost: "localhost",
+                dbDriver: "postgres",
+                dbLogging: false,
+            },
+            pickBy(val => val !== undefined, loadConfigFile(this.configFile)),
+            pickBy(val => val !== undefined, this),
+        );
 
+        let okay = true;
         const check = (value: string | number | boolean, message: string) => {
             if (value === undefined) {
                 error(message);
                 okay = false;
             }
         };
-
-        if (this.port === undefined)  { this.port = file.port || 23278; }
-        if (this.url === undefined)  {
-            this.url = file.url;
-            check(this.url, "Mumble url not configured. Add 'url' to config file or specify --url.");
-        }
-        if (this.configFile === undefined) { this.configFile = file.configFile; }
-        if (this.audioCacheAmount === undefined) { this.audioCacheAmount = file.audioCacheAmount || 100; }
-        if (this.dbName === undefined) {
-            this.dbName = file.dbName;
-            check(this.dbName, "Database name not configured. Add 'dbName' to config file or specify --db-name.");
-        }
-        if (this.dbUsername === undefined) {
-            this.dbUsername = file.dbUsername;
-            check(
-                this.dbUsername,
-                "Database user not configured. Add 'dbUsername' to config file or specify --db-username."
-            );
-        }
-        if (this.dbPassword === undefined) { this.dbPassword = file.dbPassword; }
-        if (this.dbPort === undefined) { this.dbPort = file.dbPort || 5432; }
-        if (this.dbHost === undefined) { this.dbHost = file.dbHost || "localhost"; }
-        if (this.dbDriver === undefined) { this.dbDriver = file.dbDriver || "postgres"; }
-        if (this.dbLogging === undefined) { this.dbLogging = file.dbLogging || false; }
-        if (this.key === undefined) { this.key = file.key; }
-        if (this.cert === undefined) { this.cert = file.cert; }
-        if (this.name === undefined) {
-            this.name = file.name;
-            check(this.name, "Name not configured. Add 'name' to config file or specify --name");
-        }
-        if (this.mumblePassword === undefined) { this.mumblePassword = file.mumblePassword; }
-        if (this.tmpDir === undefined) {
-            this.tmpDir = file.tmpDir;
-            check(this.tmpDir, "Temp dir not configured. Add 'tmpDir' to config file or specify --tmp-dir");
-        }
-        if (this.recordingsDir === undefined) {
-            this.recordingsDir = file.recordingsDir;
-            check(
-                this.name,
-                "Recordings dir not configured. Add 'recordingsDir' to config file or specify --recordings-dir"
-            );
-        }
-        if (this.visualizationsDir === undefined) {
-            this.visualizationsDir = file.visualizationsDir;
-            check(
-                this.visualizationsDir,
-                "Visualizations dir not configured. Add 'visualizationsDir' to config file or specify --visualizations-dir" // tslint:disable-line
-            );
-        }
-        if (this.uploadDir === undefined) {
-            this.uploadDir = file.uploadDir;
-            check(this.uploadDir, "Upload dir not configured. Add 'uploadDir' to config file or specify --upload-dir");
-        }
+        check(this.url, "Mumble url not configured. Add 'url' to config file or specify --url.");
+        check(this.dbName, "Database name not configured. Add 'dbName' to config file or specify --db-name.");
+        check(this.name, "Name not configured. Add 'name' to config file or specify --name");
+        check(this.tmpDir, "Temp dir not configured. Add 'tmpDir' to config file or specify --tmp-dir");
+        check(
+            this.name,
+            "Recordings dir not configured. Add 'recordingsDir' to config file or specify --recordings-dir"
+        );
+        check(
+            this.visualizationsDir,
+            "Visualizations dir not configured. Add 'visualizationsDir' to config file or specify --visualizations-dir",
+        );
+        check(this.uploadDir, "Upload dir not configured. Add 'uploadDir' to config file or specify --upload-dir");
         return okay;
     }
 

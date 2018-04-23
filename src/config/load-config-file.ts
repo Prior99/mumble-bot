@@ -8,10 +8,8 @@ export function loadConfigFile(filename: string): any {
     }
     try {
         const file = Yaml.load(filename);
-        console.log(file);
         return file;
     } catch (err) {
-        console.log(err)
-        error(`Unable to load config file "${filename}".`);
+        error(`Unable to load config file "${filename}".: ${err}`);
     }
 }

@@ -1,0 +1,16 @@
+url: example.com
+name: bot
+key: "./bot.key"
+cert: "./bot.cert"
+password: "this is optionsal"
+channel: Root
+audioCacheAmount: 500
+port: 23278
+dbPassword: "Database password"
+dbHost: localhost
+dbUsername: bot
+dbName: bot
+tmpDir: data/tmp
+recordingsDir: data/recordings
+visualizationsDir: data/visualizations
+uploadDir: data/uploaded

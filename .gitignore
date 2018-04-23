@@ -1,5 +1,5 @@
 node_modules/
-config.json
+config.yml
 build/
 *.key
 *.cert
