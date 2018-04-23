@@ -1,0 +1,23 @@
+@import "../../breakpoints.scss";
+
+.container {
+    display: flex;
+    flex-direction: row;
+}
+
+.feed {
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin: 0 20px 0 0;
+}
+
+.side {
+    flex-basis: 290px;
+    width: 290px;
+}
+
+@media(max-width: $breakpoint-m) {
+    .side {
+        display: none;
+    }
+}

@@ -1,0 +1,24 @@
+@import "../../colors.scss";
+@import "../app-bar/style.scss";
+
+.version {
+    color: rgb(200, 200, 200);
+    font-size: 8pt;
+    font-style: italic;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+}
+
+.container {
+    background: $white;
+    height: calc(100% - #{$appBarHeight});
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.pageSidebarActive {
+    transform: none !important;
+    left: 260px;
+    width: calc(100% - 260px);
+}

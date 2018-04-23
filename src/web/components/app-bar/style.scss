@@ -1,0 +1,19 @@
+@import "../../breakpoints.scss";
+
+$appBarHeight: 32pt;
+
+.appBar {
+    height: $appBarHeight;
+}
+
+@media(max-width: $breakpoint-m) {
+    .veryweak {
+        display: none !important;
+    }
+}
+
+@media(max-width: $breakpoint-s) {
+    .weak {
+        display: none !important;
+    }
+}
