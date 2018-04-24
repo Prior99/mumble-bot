@@ -37,7 +37,7 @@ export class DatabaseUser {
     @is()
         .validate(length(8, 200), required)
         .validateCtx(ctx => only(signup, value => ctx.validation.emailAvailable(value)))
-    @scope(login)
+    @scope(owner, login)
     public email?: string;
 
     @OneToMany(() => Recording, recording => recording.user)
@@ -67,5 +67,5 @@ export class DatabaseUser {
 
     @OneToMany(() => MumbleLink, mumbleLink => mumbleLink.user)
     @is() @specify(() => MumbleLink)
-    public mumbleLinks?: MumbleLink;
+    public mumbleLinks?: MumbleLink[];
 }
