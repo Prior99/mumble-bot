@@ -1,19 +1,38 @@
 import * as Express from "express";
 import * as FS from "fs";
 import { Request, Response } from "express";
-import ExpressWS = require("express-ws"); // tslint:disable-line
-import mkdirp = require("mkdirp-promise"); // tslint:disable-line
+import ExpressWS = require("express-ws");
+import mkdirp = require("mkdirp-promise");
 import * as BodyParser from "body-parser";
 import { Server } from "http";
 import { Connection } from "typeorm";
-import { component, inject, initialize } from "tsdi";
+import { component, inject, initialize, TSDI } from "tsdi";
 import { info, error } from "winston";
 import { bind } from "bind-decorator";
 import { createReadStream, writeFile, exists } from "async-file";
 import { omit } from "ramda";
+import { hyrest } from "hyrest/middleware";
+import { AuthorizationMode } from "hyrest";
+import * as morgan from "morgan";
 
 import { ServerConfig } from "../../config";
-import { Recording, convertWorkItem } from "../../common";
+import {
+    Cached,
+    Dialogs,
+    Labels,
+    MumbleLinks,
+    Recordings,
+    Sounds,
+    Tokens,
+    Users,
+    Utilities,
+    Validation,
+    Recording,
+    Token,
+    convertWorkItem,
+    Context,
+    getAuthTokenId,
+} from "../../common";
 import { AudioCache, AudioOutput } from "..";
 
 import { cors, catchError } from "./middlewares";
@@ -25,6 +44,8 @@ export class RestApi {
     @inject private config: ServerConfig;
     @inject private cache: AudioCache;
 
+    @inject private tsdi: TSDI;
+
     private connections = new Set<any>();
     private app: Express.Application;
     private server: Server;
@@ -34,6 +55,7 @@ export class RestApi {
         this.app = Express();
         this.app.use(BodyParser.json({ limit: "100mb" }));
         this.app.use(BodyParser.urlencoded({ limit: "100mb", extended: true }));
+        this.app.use(morgan("tiny", { stream: { write: msg => info(msg.trim()) } }));
         this.app.use(cors);
         this.app.use(catchError);
         ExpressWS(this.app);
@@ -45,6 +67,30 @@ export class RestApi {
         this.app.get("/cached/:id/visualized", this.downloadVisualizedCached);
         this.app.get("/recording/:id/download", this.downloadRecording);
         this.app.get("/recording/:id/visualized", this.downloadVisualizedRecording);
+        this.app.use(
+            hyrest(
+                this.tsdi.get(Cached),
+                this.tsdi.get(Dialogs),
+                this.tsdi.get(Labels),
+                this.tsdi.get(MumbleLinks),
+                this.tsdi.get(Recordings),
+                this.tsdi.get(Sounds),
+                this.tsdi.get(Tokens),
+                this.tsdi.get(Users),
+                this.tsdi.get(Utilities),
+                this.tsdi.get(Validation),
+            )
+            .context(req => new Context(req))
+            .defaultAuthorizationMode(AuthorizationMode.AUTH)
+            .authorization(async req => {
+                const id = getAuthTokenId(req);
+                if (!id) { return false; }
+                const token = await this.tsdi.get(Connection).getRepository(Token).findOne(id);
+                if (!token) { return false; }
+                if (token.deleted) { return false; }
+                return true;
+            }),
+        );
 
         const port = this.config.port;
         this.server = this.app.listen(port);

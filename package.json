@@ -14,9 +14,15 @@
     "test": "TZ=UTC jest"
   },
   "nodemonConfig": {
-    "ignore": ["data/**/*", "dist/**/*", "server/**/*"],
+    "ignore": [
+      "data/**/*",
+      "dist/**/*",
+      "server/**/*"
+    ],
     "ext": "ts",
-    "watch": ["src"],
+    "watch": [
+      "src"
+    ],
     "exec": "yarn build:server && node server serve --config-file config.yml"
   },
   "repository": "https://git.cronosx.de/prior/mumble-bot",
@@ -36,12 +42,12 @@
     "express-ws": "^3.0.0",
     "fft-js": "^0.0.11",
     "fluent-ffmpeg": "^2.1.2",
-    "hyrest": "^0.7.12",
+    "hyrest": "0.7.11",
     "mkdirp-promise": "^5.0.1",
     "mobx": "^4.2.0",
     "mobx-react": "^5.0.0",
     "mobx-react-devtools": "^5.0.1",
-    "moment": "^2.22.1",
+    "morgan": "^1.9.0",
     "mumble": "^0.3.13",
     "node-samplerate": "^0.2.0",
     "nodemon": "^1.17.3",
@@ -67,7 +73,7 @@
     "@types/body-parser": "^1.16.8",
     "@types/chokidar": "^1.7.5",
     "@types/classnames": "^2.2.3",
-    "@types/moment": "^2.13.0",
+    "@types/morgan": "^1.7.35",
     "@types/multer": "^1.3.6",
     "@types/node": "^9.6.6",
     "@types/ramda": "^0.25.24",

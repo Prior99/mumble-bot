@@ -33,7 +33,6 @@
         "indent": [true, "spaces"],
         "linebreak-style": [true, "LF"],
         "max-line-length": [true, 120],
-        "no-require-imports": true,
         "no-trailing-whitespace": true,
         "trailing-comma": [true, {
             "multiline": "always",

@@ -67,7 +67,7 @@ export class Sounds {
             user: currentUser,
         });
 
-        verbose(`${currentUser.username} played sound #${id}`);
+        verbose(`${currentUser.name} played sound #${id}`);
 
         return ok();
     }

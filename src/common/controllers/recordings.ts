@@ -31,8 +31,8 @@ export class Recordings {
     ): Promise<Recording>{
         await this.db.getRepository(Recording).update(id, recording);
 
-        const { username } = await ctx.currentUser();
-        verbose(`${username} edited record #${id}`);
+        const { name } = await ctx.currentUser();
+        verbose(`${name} edited record #${id}`);
 
         const updated = await this.getRecording(id);
         return ok(updated);
@@ -63,7 +63,7 @@ export class Recordings {
         await this.db.getRepository(Recording).save(recording);
 
         const currentUser = await ctx.currentUser();
-        const { username } = currentUser;
+        const { name } = currentUser;
 
         this.audioOutput.playSound(`${this.config.recordingsDir}/${id}`, {
             type: "recording",
@@ -71,7 +71,7 @@ export class Recordings {
             user: currentUser,
         });
 
-        verbose(`${username} played back record #${id}`);
+        verbose(`${name} played back record #${id}`);
 
         return ok(recording);
     }
@@ -99,7 +99,7 @@ export class Recordings {
         const original = await this.getRecording(id);
 
         const currentUser = await ctx.currentUser();
-        const { username } = currentUser;
+        const { name } = currentUser;
         const oldDuration = original.duration;
         const newDuration = actions.reduce((result, action) =>
             action.action === "crop" ? action.begin - action.end + result : result,
@@ -114,7 +114,7 @@ export class Recordings {
             reporter: currentUser,
         });
 
-        verbose(`${username} is forking record #${id}`);
+        verbose(`${name} is forking record #${id}`);
         await Promise.all(actions.map(async action => {
             await this.crop(action.begin, action.end, original.id, newRecording.id);
         }));

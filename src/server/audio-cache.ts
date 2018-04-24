@@ -14,7 +14,7 @@ export class AudioCache extends EventEmitter {
     @inject private db: Connection;
     @inject private config: ServerConfig;
 
-    public cachedAudios: Map<string, CachedAudio>;
+    public cachedAudios = new Map<string, CachedAudio>();
     public cacheAmount = 4;
 
     private get cachedAudioIndexFilePath() { return `${this.config.tmpDir}/useraudio.json`; }

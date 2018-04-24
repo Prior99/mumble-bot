@@ -32,11 +32,11 @@ export class PageUser extends React.Component<PageUserProps> {
         if (!user) {
             return null;
         }
-        const { username, id } = user;
+        const { name, id } = user;
         return (
             <Content>
                 <h1>
-                    {username}
+                    {name}
                 </h1>
             </Content>
         );

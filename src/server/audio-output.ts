@@ -107,6 +107,7 @@ export class AudioOutput extends EventEmitter {
      * Processes the buffer and keeps the stream to mumble filled.
      */
     private shiftBuffer() {
+        // Here be dragons.
         if (this.stopped) { return; }
         if (this.lastBufferShift) {
             const timePassed = (Date.now() - this.lastBufferShift) / msInS;

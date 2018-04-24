@@ -1,7 +1,7 @@
 import { Column, PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
-import { is, scope, specify, length, uuid, transform } from "hyrest";
+import { is, scope, specify, length, uuid, transform, only, required } from "hyrest";
 
-import { world, login, owner } from "../scopes";
+import { world, login, owner, signup } from "../scopes";
 import { hash } from "../utils";
 
 import { Recording, PermissionAssociation, Token, Setting, MumbleLink } from ".";
@@ -19,16 +19,26 @@ export class DatabaseUser {
      * The username of this user.
      */
     @Column("varchar", { length: 100 })
-    @is() @scope(world)
-    public username?: string;
+    @is()
+        .validate(length(3, 100), only(signup, required))
+        .validateCtx(ctx => only(signup, value => ctx.validation.nameAvailable(value)))
+    @scope(world, signup)
+    public name?: string;
 
     /**
      * The password of the user.
      */
     @Column("varchar", { length: 200 })
-    @is().validate(length(8, 255)) @scope(login)
     @transform(hash)
+    @is().validate(length(8, 255)) @scope(login)
     public password?: string;
+
+    @Column("varchar", { length: 200 })
+    @is()
+        .validate(length(8, 200), required)
+        .validateCtx(ctx => only(signup, value => ctx.validation.emailAvailable(value)))
+    @scope(login)
+    public email?: string;
 
     @OneToMany(() => Recording, recording => recording.user)
     @is() @scope(world) @specify(() => Recording)

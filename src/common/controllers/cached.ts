@@ -55,7 +55,7 @@ export class Cached {
         await rename(cached.file + ".png", `${this.config.visualizationsDir}/${recording.id}.png`);
 
         this.cache.remove(cached.id);
-        verbose(`${currentUser.username} added new record #${recording.id}`);
+        verbose(`${currentUser.name} added new record #${recording.id}`);
 
         return ok();
     }
@@ -80,7 +80,7 @@ export class Cached {
             cachedRecording: cached,
             user: currentUser,
         });
-        verbose(`${currentUser.username} played back cached audio with id ${id}`);
+        verbose(`${currentUser.name} played back cached audio with id ${id}`);
         return ok();
     }
 

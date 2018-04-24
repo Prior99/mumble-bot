@@ -7,11 +7,20 @@ import { DatabaseUser } from "../models";
 @controller @component("validation")
 export class Validation {
     @inject public db: Connection;
-    @route("POST", "/validate/user/username") @noauth
-    public async usernameAvailable(@body() @is(DataType.str) username: string) {
-        const user = await this.db.getRepository(DatabaseUser).findOne({ username });
+    @route("POST", "/validate/user/name") @noauth
+    public async nameAvailable(@body() @is(DataType.str) name: string) {
+        const user = await this.db.getRepository(DatabaseUser).findOne({ name });
         if (user) {
             return ok({ error: "Name already taken." });
+        }
+        return ok({});
+    }
+
+    @route("POST", "/validate/user/email") @noauth
+    public async emailAvailable(@body() @is(DataType.str) email: string) {
+        const user = await this.db.getRepository(DatabaseUser).findOne({ email });
+        if (user) {
+            return ok({ error: "Email already taken." });
         }
         return ok({});
     }

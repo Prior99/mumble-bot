@@ -9,6 +9,14 @@ import { AudioCache, RestApi, AudioOutput, AudioInput, DatabaseFactory, MumbleFa
 export default class ServeCommand extends Command { // tslint:disable-line
     @metadata
     public async execute(config: ServerConfig) {
+        process.on("unhandledRejection", err => {
+            error(`Unhandled Promise rejection: ${err.message}`);
+            console.error(err);
+        });
+        process.on("uncaughtException", err => {
+            error(`Unhandled Promise rejection: ${err.message}`);
+            console.error(err);
+        });
         const configConsistent = config.load();
         if (!configConsistent) {
             return;

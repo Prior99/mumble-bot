@@ -20,7 +20,7 @@ export class Labels {
     public async createLabel(@body(createLabel) label: Label, @context ctx?: Context): Promise<Label> {
         await this.db.getRepository(Label).save(label);
         const currentUser = await ctx.currentUser();
-        verbose(`${currentUser.username} added new label for records: "${label.name}"`);
+        verbose(`${currentUser.name} added new label for records: "${label.name}"`);
         return created(label);
     }
 }

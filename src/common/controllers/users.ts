@@ -1,10 +1,10 @@
-import { context, body, controller, route, param, is, uuid, ok, notFound, created, DataType } from "hyrest";
+import { context, body, controller, route, param, is, uuid, ok, notFound, created, DataType, noauth } from "hyrest";
 import { component, inject } from "tsdi";
 import { Connection, Transaction, EntityManager, TransactionManager } from "typeorm";
 import { verbose } from "winston";
 
 import { DatabaseUser, PermissionAssociation } from "../models";
-import { createUser, world } from "../scopes";
+import { signup, world, owner } from "../scopes";
 import { Context } from "../context";
 import { Setting } from "../models/setting";
 
@@ -28,10 +28,10 @@ export class Users {
         return ok(user);
     }
 
-    @route("POST", "/user")
-    public async createUser(@body(createUser) user: DatabaseUser): Promise<DatabaseUser> {
+    @route("POST", "/user").dump(DatabaseUser, owner) @noauth
+    public async createUser(@body(signup) user: DatabaseUser): Promise<DatabaseUser> {
         await this.db.getRepository(DatabaseUser).save(user);
-        verbose(`New user ${user.username} with id ${user.id} just signed up`);
+        verbose(`New user ${user.name} with id ${user.id} just signed up`);
         return created(user);
     }
 
@@ -58,7 +58,7 @@ export class Users {
 
         const user = await this.db.getRepository(DatabaseUser).findOne(id);
         const currentUser = await ctx.currentUser();
-        verbose(`Permission "${permission}" revoked from ${user.username} by ${currentUser.username}`);
+        verbose(`Permission "${permission}" revoked from ${user.name} by ${currentUser.name}`);
 
         return ok();
     }
@@ -74,7 +74,7 @@ export class Users {
 
         const user = await this.db.getRepository(DatabaseUser).findOne(id);
         const currentUser = await ctx.currentUser();
-        verbose(`Permission "${permission}" granted to ${user.username} by ${currentUser.username}`);
+        verbose(`Permission "${permission}" granted to ${user.name} by ${currentUser.name}`);
 
         return created(user);
     }

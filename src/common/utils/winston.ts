@@ -1,5 +1,4 @@
 import * as Winston from "winston";
-import * as moment from "moment";
 
 /**
  * Returns the timestamp formatted as yyyy-mm-dd hh:mm:ss
@@ -8,7 +7,7 @@ import * as moment from "moment";
 function timestampFunction () {
     const d = new Date();
     const actualYear = d.getFullYear();
-    return moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+    return new Date().toISOString();
 }
 
 export function setupWinston() {

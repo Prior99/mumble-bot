@@ -160,11 +160,11 @@
   version "0.0.29"
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-0.0.29.tgz#fbcfd330573b912ef59eeee14602bface630754b"
 
-"@types/moment@^2.13.0":
-  version "2.13.0"
-  resolved "https://registry.yarnpkg.com/@types/moment/-/moment-2.13.0.tgz#604ebd189bc3bc34a1548689404e61a2a4aac896"
+"@types/morgan@^1.7.35":
+  version "1.7.35"
+  resolved "https://registry.yarnpkg.com/@types/morgan/-/morgan-1.7.35.tgz#6358f502931cc2583d7a94248c41518baa688494"
   dependencies:
-    moment "*"
+    "@types/express" "*"
 
 "@types/multer@^1.3.6":
   version "1.3.6"
@@ -1204,6 +1204,12 @@ base@^0.11.1:
     isobject "^3.0.1"
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
+
+basic-auth@~2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/basic-auth/-/basic-auth-2.0.0.tgz#015db3f353e02e56377755f962742e8981e7bbba"
+  dependencies:
+    safe-buffer "5.1.1"
 
 batch@0.6.1:
   version "0.6.1"
@@ -3812,9 +3818,9 @@ hyphenate@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/hyphenate/-/hyphenate-0.2.1.tgz#531f403332dc128c3c616ea93fc0f54353a87e85"
 
-hyrest@^0.7.12:
-  version "0.7.12"
-  resolved "https://registry.yarnpkg.com/hyrest/-/hyrest-0.7.12.tgz#a7a5cff3e45334ef1c223ff7e2d392d496977651"
+hyrest@0.7.11:
+  version "0.7.11"
+  resolved "https://registry.yarnpkg.com/hyrest/-/hyrest-0.7.11.tgz#f746fa33d255461df4498b34b9cb513ac6c952fd"
   dependencies:
     express "^4.16.2"
     http-status-codes "^1.3.0"
@@ -5178,13 +5184,15 @@ mobx@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/mobx/-/mobx-4.2.0.tgz#ee0b0a4f3da2f4776225046ab208ac329a4841d4"
 
-moment@*:
-  version "2.18.1"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.18.1.tgz#c36193dd3ce1c2eed2adb7c802dbbc77a81b1c0f"
-
-moment@^2.22.1:
-  version "2.22.1"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.1.tgz#529a2e9bf973f259c9643d237fda84de3a26e8ad"
+morgan@^1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/morgan/-/morgan-1.9.0.tgz#d01fa6c65859b76fcf31b3cb53a3821a311d8051"
+  dependencies:
+    basic-auth "~2.0.0"
+    debug "2.6.9"
+    depd "~1.1.1"
+    on-finished "~2.3.0"
+    on-headers "~1.0.1"
 
 move-concurrently@^1.0.1:
   version "1.0.1"

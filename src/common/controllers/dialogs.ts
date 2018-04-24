@@ -37,7 +37,7 @@ export class Dialogs {
             user: currentUser,
         });
 
-        verbose(`${currentUser.username} played dialog ${id}`);
+        verbose(`${currentUser.name} played dialog ${id}`);
 
         return ok();
     }
@@ -46,8 +46,8 @@ export class Dialogs {
     public async createDialog(@body(createDialog) dialog: Dialog, @context ctx?: Context): Promise<Dialog> {
         await this.db.getRepository(Dialog).save(dialog);
 
-        const { username } = await ctx.currentUser();
-        verbose(`${username} created a new dialog ${dialog.id}`);
+        const { name } = await ctx.currentUser();
+        verbose(`${name} created a new dialog ${dialog.id}`);
 
         return created(dialog);
     }

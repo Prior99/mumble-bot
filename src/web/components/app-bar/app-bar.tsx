@@ -46,7 +46,7 @@ export class AppBar extends React.Component {
                                 key="user"
                             >
                                 <Dropdown.Menu>
-                                    <Dropdown.Header>Logged in in as {this.ownUser.user.username}</Dropdown.Header>
+                                    <Dropdown.Header>Logged in in as {this.ownUser.user.name}</Dropdown.Header>
                                     <Dropdown.Item
                                         content="Dashboard"
                                         onClick={() => this.browserHistory.push(routeDashboard.path())}
