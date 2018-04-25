@@ -2,6 +2,27 @@ stages:
   - test
   - deploy
 
+services:
+  - postgres:latest
+
+variables:
+  POSTGRES_DB: bot-test
+  POSTGRES_USER: runner
+  POSTGRES_PASSWORD: ""
+  POSTGRES_HOST: "postgres"
+
+test:
+  image: "node:8"
+  before_script:
+    - yarn install
+  script:
+    - yarn test
+  stage: test
+  cache:
+    key: "NODE_8_$CI_PROJECT_ID"
+    paths:
+      - node_modules/
+
 build:
   image: "node:8"
   before_script:
@@ -11,7 +32,7 @@ build:
     - yarn build:server
   stage: test
   cache:
-    key: "$CI_PROJECT_ID"
+    key: "NODE_8_$CI_PROJECT_ID"
     paths:
       - node_modules/
   artifacts:
@@ -36,7 +57,7 @@ lint:
     - yarn lint:style
   stage: test
   cache:
-    key: "$CI_PROJECT_ID"
+    key: "NODE_8_$CI_PROJECT_ID"
     paths:
       - node_modules/
 
