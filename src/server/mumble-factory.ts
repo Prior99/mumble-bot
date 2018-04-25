@@ -32,11 +32,9 @@ export class MumbleFactory {
     @destroy
     public stop(): Promise<undefined> {
         return new Promise(resolve => {
+            if (!this.conn) { return; }
             this.conn.on("disconnect", () => {
                 info("Disconnected from mumble.");
-                // TODO: Remove this line once https://github.com/Rantanen/node-mumble/pull/103
-                // is merged.
-                clearInterval((this.conn as any).connection.processInterval);
                 resolve();
             });
             this.conn.disconnect();
