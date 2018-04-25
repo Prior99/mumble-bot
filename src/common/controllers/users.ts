@@ -16,11 +16,23 @@ export interface Settings {
 export class Users {
     @inject private db: Connection;
 
+    /**
+     * List all users from the database with their public data.
+     *
+     * @return A list of all users.
+     */
     @route("GET", "/users").dump(DatabaseUser, world)
     public async listUsers(): Promise<DatabaseUser[]> {
         return ok(await this.db.getRepository(DatabaseUser).find());
     }
 
+    /**
+     * Fetch one specific user by id.
+     *
+     * @param id The id of the user to fetch.
+     *
+     * @return The specified user.
+     */
     @route("GET", "/user/:id").dump(DatabaseUser, world)
     public async getUser(@param("id") @is().validate(uuid) id: string): Promise<DatabaseUser> {
         const user = await this.db.getRepository(DatabaseUser).findOne(id);
@@ -28,6 +40,13 @@ export class Users {
         return ok(user);
     }
 
+    /**
+     * Signup a new user.
+     *
+     * @param user `name`, `email` and `password` of the new user to create.
+     *
+     * @return The created user.
+     */
     @route("POST", "/user").dump(DatabaseUser, owner) @noauth
     public async createUser(@body(signup) user: DatabaseUser): Promise<DatabaseUser> {
         await this.db.getRepository(DatabaseUser).save(user);
