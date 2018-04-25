@@ -1,12 +1,13 @@
-import { is, DataType, specify } from "hyrest";
+import { is, DataType, specify, scope } from "hyrest";
+import { world } from "../scopes";
 
 export class MumbleUser {
-    @is()
+    @is() @scope(world)
     public name?: string;
 
-    @is(DataType.int)
+    @is(DataType.int) @scope(world)
     public id?: number;
 
-    @is(DataType.int)
+    @is(DataType.int) @scope(world)
     public session?: number;
 }

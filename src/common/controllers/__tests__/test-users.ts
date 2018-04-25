@@ -84,12 +84,5 @@ describe("users controller", () => {
             expect(response.body).toEqual({ message: "Unauthorized." });
             expect(response.status).toBe(401);
         });
-
-        it("fetches the permissions of the specified user", async () => {
-            const user = await createUser();
-            const response = await api().get(`/user/${user.id}/permissions`);
-            expect(response.body).toEqual({ message: "Unauthorized." });
-            expect(response.status).toBe(401);
-        });
     });
 });

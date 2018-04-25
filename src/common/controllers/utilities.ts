@@ -1,4 +1,4 @@
-import { body, controller, route, param, is, uuid, ok } from "hyrest";
+import { body, controller, route, param, is, uuid, ok, populate } from "hyrest";
 import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { bind } from "bind-decorator";
@@ -41,9 +41,6 @@ export class Utilities {
     @route("GET", "/mumble-users").dump(MumbleUser, world)
     public async getMumbleUsers(): Promise<MumbleUser[]> {
         const mumbleUsers = this.mumble.users().filter(user => typeof user.id !== "undefined");
-        return ok(mumbleUsers.map(user => {
-            const { name, id, session } = user;
-            return { name, id, session };
-        }));
+        return ok(mumbleUsers.map(user =>  populate(world, MumbleUser, user)));
     }
 }
