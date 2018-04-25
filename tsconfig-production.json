@@ -18,5 +18,9 @@
         "typings/*",
         "src/**/*.ts?",
         "src/**/*.ts"
+    ],
+    "exclude": [
+        "**/__tests__/**",
+        "**/__mocks__/**"
     ]
 }
