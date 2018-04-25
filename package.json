@@ -11,7 +11,7 @@
     "start:server": "TZ=UTC nodemon",
     "lint:src": "tslint --format stylish --type-check --project tsconfig.json",
     "lint:style": "stylelint --allow-empty-input src/**/*.scss",
-    "test": "TZ=UTC jest"
+    "test": "TZ=UTC jest --runInBand"
   },
   "jest": {
     "collectCoverage": true,
