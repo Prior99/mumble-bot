@@ -1,7 +1,7 @@
 url: example.com
 name: bot
-key: "./bot.key"
-cert: "./bot.cert"
+keyFile: "./bot.key"
+certFile: "./bot.cert"
 password: "this is optionsal"
 channel: Root
 audioCacheAmount: 500

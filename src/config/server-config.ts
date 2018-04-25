@@ -40,9 +40,15 @@ export class ServerConfig extends Options {
     public dbLogging: boolean;
 
     @option({ name: "mumbleKeyFile", description: "Path to the SSL key file used to connect to mumble." })
-    public key: string;
+    public keyFile: string;
 
     @option({ name: "mumbleCertFile", description: "Path to the SSL certificate file used to connect to mumble." })
+    public certFile: string;
+
+    @option({ name: "mumbleKey", description: "SSL key used to connect to mumble." })
+    public key: string;
+
+    @option({ name: "mumbleCert", description: "SSL certificate used to connect to mumble." })
     public cert: string;
 
     @option({ flag: "n", description: "Name of the bot in Mumble." })
@@ -102,20 +108,26 @@ export class ServerConfig extends Options {
     }
 
     public get keyContent() {
-        if (!this.key) { return; }
+        if (!this.keyFile) {
+            if (this.key) { return this.key; }
+            return;
+        }
         try {
-            return readFileSync(this.key, "utf8");
+            return readFileSync(this.keyFile, "utf8");
         } catch (err) {
-            error(`Could not open SSL key file "${this.key}"`);
+            error(`Could not open SSL key file "${this.keyFile}"`);
         }
     }
 
     public get certContent() {
-        if (!this.cert) { return; }
+        if (!this.certFile) {
+            if (this.cert) { return this.cert; }
+            return;
+        }
         try {
-            return readFileSync(this.cert, "utf8");
+            return readFileSync(this.certFile, "utf8");
         } catch (err) {
-            error(`Could not open SSL cert file "${this.cert}"`);
+            error(`Could not open SSL cert file "${this.certFile}"`);
         }
     }
 }
