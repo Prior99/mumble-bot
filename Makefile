@@ -23,6 +23,14 @@ lint: node_modules
 	yarn lint:src
 	yarn lint:style
 
+.PHONY: test
+test: node_modules
+	yarn test
+
+.PHONY: test-watch
+test-watch: node_modules
+	yarn test --watch
+
 .PHONY: run-web
 run-web: node_modules
 	yarn start:web
