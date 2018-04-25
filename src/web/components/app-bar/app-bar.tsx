@@ -28,7 +28,7 @@ export class AppBar extends React.Component {
     public render() {
         const { user } = this.ownUser;
         return (
-            <Menu color="green" inverted className={css.appBar} attached>
+            <Menu color="violet" inverted className={css.appBar} attached>
                 <Menu.Menu position={"left" as "right"}>
                     {
                         this.sidebarButtonVisible &&
@@ -44,6 +44,7 @@ export class AppBar extends React.Component {
                             <Dropdown
                                 item
                                 key="user"
+                                text={user.name}
                             >
                                 <Dropdown.Menu>
                                     <Dropdown.Header>Logged in in as {this.ownUser.user.name}</Dropdown.Header>
