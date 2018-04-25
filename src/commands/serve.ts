@@ -33,6 +33,7 @@ export default class ServeCommand extends Command { // tslint:disable-line
         const audioInput = tsdi.get(AudioInput);
         const audioOutput = tsdi.get(AudioOutput);
         tsdi.get(AudioCache);
+        api.serve();
 
         let killed = false;
         const kill = async () => {
@@ -44,11 +45,6 @@ export default class ServeCommand extends Command { // tslint:disable-line
             killed = true;
             warn("CTRL^C detected. Secure shutdown initiated.");
             warn("Press CTRL^C again to terminate at your own risk.");
-            audioInput.stop();
-            audioOutput.stop();
-            await mumble.stop();
-            await api.stop();
-            await database.stop();
             tsdi.close();
         };
         process.on("SIGINT", kill);

@@ -1,38 +1,22 @@
 import * as Express from "express";
 import * as FS from "fs";
 import { Request, Response } from "express";
-import ExpressWS = require("express-ws");
+import * as ExpressWS from "express-ws";
 import mkdirp = require("mkdirp-promise");
 import * as BodyParser from "body-parser";
 import { Server } from "http";
 import { Connection } from "typeorm";
-import { component, inject, initialize, TSDI } from "tsdi";
+import { component, inject, initialize, TSDI, destroy } from "tsdi";
 import { info, error } from "winston";
 import { bind } from "bind-decorator";
 import { createReadStream, writeFile, exists } from "async-file";
 import { omit } from "ramda";
 import { hyrest } from "hyrest/middleware";
-import { AuthorizationMode } from "hyrest";
+import { AuthorizationMode, configureController, ControllerMode } from "hyrest";
 import * as morgan from "morgan";
 
 import { ServerConfig } from "../../config";
-import {
-    Cached,
-    Dialogs,
-    Labels,
-    MumbleLinks,
-    Recordings,
-    Sounds,
-    Tokens,
-    Users,
-    Utilities,
-    Validation,
-    Recording,
-    Token,
-    convertWorkItem,
-    Context,
-    getAuthTokenId,
-} from "../../common";
+import { allControllers, Recording, Token, convertWorkItem, Context, getAuthTokenId } from "../../common";
 import { AudioCache, AudioOutput } from "..";
 
 import { cors, catchError } from "./middlewares";
@@ -47,11 +31,25 @@ export class RestApi {
     @inject private tsdi: TSDI;
 
     private connections = new Set<any>();
-    private app: Express.Application;
+    public app: Express.Application;
     private server: Server;
 
+    public serve() {
+        const port = this.config.port;
+        this.server = this.app.listen(port);
+
+        this.server.setTimeout(10000, () => { return; });
+        this.server.on("connection", (conn) => this.onConnection(conn));
+
+        info(`Api started, listening on port ${port}`);
+    }
+
     @initialize
-    private start() {
+    private initialize() {
+        configureController(
+            allControllers,
+            { mode: ControllerMode.SERVER },
+        );
         this.app = Express();
         this.app.use(BodyParser.json({ limit: "100mb" }));
         this.app.use(BodyParser.urlencoded({ limit: "100mb", extended: true }));
@@ -68,37 +66,19 @@ export class RestApi {
         this.app.get("/recording/:id/download", this.downloadRecording);
         this.app.get("/recording/:id/visualized", this.downloadVisualizedRecording);
         this.app.use(
-            hyrest(
-                this.tsdi.get(Cached),
-                this.tsdi.get(Dialogs),
-                this.tsdi.get(Labels),
-                this.tsdi.get(MumbleLinks),
-                this.tsdi.get(Recordings),
-                this.tsdi.get(Sounds),
-                this.tsdi.get(Tokens),
-                this.tsdi.get(Users),
-                this.tsdi.get(Utilities),
-                this.tsdi.get(Validation),
-            )
-            .context(req => new Context(req))
-            .defaultAuthorizationMode(AuthorizationMode.AUTH)
-            .authorization(async req => {
-                const id = getAuthTokenId(req);
-                if (!id) { return false; }
-                const token = await this.tsdi.get(Connection).getRepository(Token).findOne(id);
-                if (!token) { return false; }
-                if (token.deleted) { return false; }
-                return true;
-            }),
+            hyrest(...allControllers.map((controller: any) => this.tsdi.get(controller)))
+                .context(req => new Context(req))
+                .defaultAuthorizationMode(AuthorizationMode.AUTH)
+                .authorization(async req => {
+                    const id = getAuthTokenId(req);
+                    if (!id) { return false; }
+                    const token = await this.tsdi.get(Connection).getRepository(Token).findOne(id);
+                    if (!token) { return false; }
+                    if (token.deleted) { return false; }
+                    return true;
+                }),
         );
 
-        const port = this.config.port;
-        this.server = this.app.listen(port);
-
-        this.server.setTimeout(10000, () => { return; });
-        this.server.on("connection", (conn) => this.onConnection(conn));
-
-        info(`Api started, listening on port ${port}`);
     }
 
     private handleCORS: Express.Handler = (req, res, next) => {
@@ -127,8 +107,10 @@ export class RestApi {
      * Stop the api immediatly.
      * @return Promise which will be resolved when the website has been shut down.
      */
+    @destroy
     public stop() {
         return new Promise((resolve, reject) => {
+            if (!this.server) { return; }
             this.server.close(() => {
                 info(`Terminating ${this.connections.size} open websocket connections.`);
                 for (const socket of this.connections) {

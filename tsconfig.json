@@ -2,17 +2,15 @@
     "compilerOptions": {
         "target": "es6",
         "module": "commonjs",
-        "moduleResolution": "node",
         "declaration": false,
         "noImplicitAny": false,
         "removeComments": true,
         "experimentalDecorators": true,
         "noLib": false,
         "jsx": "react",
-        "outDir": "bot",
+        "outDir": "server",
         "lib": ["es2016", "webworker", "dom"],
         "emitDecoratorMetadata": true,
-        "allowSyntheticDefaultImports": true,
         "skipLibCheck": true,
         "sourceMap": true
     },
@@ -20,5 +18,9 @@
         "typings/*",
         "src/**/*.ts?",
         "src/**/*.ts"
+    ],
+    "exclude": [
+        "**/__tests__/**",
+        "**/__mocks__/**"
     ]
 }

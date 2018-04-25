@@ -1,4 +1,4 @@
-import { component, factory, initialize, inject } from "tsdi";
+import { component, factory, initialize, inject, destroy } from "tsdi";
 import { Connection, connect } from "mumble";
 import { info, error, warn } from "winston";
 
@@ -29,6 +29,7 @@ export class MumbleFactory {
     @factory
     public getConnection(): Connection { return this.conn; }
 
+    @destroy
     public stop(): Promise<undefined> {
         return new Promise(resolve => {
             this.conn.on("disconnect", () => {

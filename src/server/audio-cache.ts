@@ -1,5 +1,5 @@
 import { component, inject, initialize } from "tsdi";
-import mkdirp = require("mkdirp-promise"); // tslint:disable-line
+import mkdirp = require("mkdirp-promise");
 import { Connection } from "typeorm";
 import * as Uuid from "uuid";
 import { writeFile, unlink, readFile } from "async-file";

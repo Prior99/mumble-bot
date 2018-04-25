@@ -2,7 +2,7 @@ import { readdir, exists, writeFile, stat } from "async-file";
 import { basename } from "path";
 import { watch } from "chokidar";
 import * as Winston from "winston";
-import mkdirp = require("mkdirp-promise"); // tslint:disable-line
+import mkdirp = require("mkdirp-promise");
 import { setupWinston } from "../common";
 import { visualizeAudioFile } from "./visualizer";
 

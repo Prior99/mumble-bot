@@ -1,4 +1,4 @@
-import { component, inject, initialize } from "tsdi";
+import { component, inject, initialize, destroy } from "tsdi";
 import { VoiceInputUser } from "./user";
 import { info } from "winston";
 import { EventEmitter } from "events";
@@ -68,6 +68,7 @@ export class AudioInput extends EventEmitter {
     /**
      * Stop all timeouts and shutdown everything.
      */
+    @destroy
     public stop() {
         this.users.forEach(user => user.stop());
         info("Input stopped.");

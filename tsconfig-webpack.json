@@ -22,6 +22,8 @@
     ],
     "exclude": [
         "src/index.ts",
-        "src/commands"
+        "src/commands",
+        "**/__tests__/**",
+        "**/__mocks__/**"
     ]
 }

@@ -1,4 +1,4 @@
-import { component, factory, initialize, inject } from "tsdi";
+import { component, factory, initialize, inject, destroy } from "tsdi";
 import { createConnection, Connection, ConnectionOptions } from "typeorm";
 import { info } from "winston";
 
@@ -25,7 +25,7 @@ export class DatabaseFactory {
 
     public conn: Connection;
 
-    public async connect() {
+    public async connect(dropSchema = false) {
         this.conn = await createConnection({
             synchronize: true,
             entities: [
@@ -50,6 +50,7 @@ export class DatabaseFactory {
             port: this.config.dbPort,
             username: this.config.dbUsername,
             host: this.config.dbHost,
+            dropSchema,
         });
         info("Connected to database.");
     }
@@ -57,6 +58,7 @@ export class DatabaseFactory {
     @factory
     public getConnection(): Connection { return this.conn; }
 
+    @destroy
     public async stop() {
         await this.conn.close();
         info("Disconnected from database.");

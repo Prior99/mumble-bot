@@ -1,7 +1,7 @@
 import Samplerate from "node-samplerate";
 import * as Winston from "winston";
 import { EventEmitter } from "events";
-import mkdirp = require("mkdirp-promise"); // tslint:disable-line
+import mkdirp = require("mkdirp-promise");
 import * as FFMpeg from "fluent-ffmpeg";
 import * as Stream from "stream";
 import { PassThrough as PassThroughStream } from "stream";

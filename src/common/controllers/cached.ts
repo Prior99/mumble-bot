@@ -1,4 +1,4 @@
-import mkdirp = require("mkdirp-promise"); // tslint:disable-line
+import mkdirp = require("mkdirp-promise");
 import { rename } from "async-file";
 import { context, notFound, body, controller, route, param, is, uuid, ok } from "hyrest";
 import { component, inject } from "tsdi";

@@ -7,7 +7,7 @@ import { Route, Switch, Redirect } from "react-router-dom";
 import { Router } from "react-router";
 import { configureController, ControllerOptions } from "hyrest";
 
-import { isProductionEnvironment, Users, Tokens } from "../common";
+import { isProductionEnvironment, allControllers } from "../common";
 import {
     PageLogin,
     PageDashboard,
@@ -85,10 +85,7 @@ const controllerOptions: ControllerOptions = {
     },
 };
 
-configureController([
-    Users,
-    Tokens,
-], controllerOptions);
+configureController(allControllers, controllerOptions);
 
 ReactDOM.render(
     <div>

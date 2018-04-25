@@ -3,7 +3,7 @@ import { Connection as MumbleConnection, InputStream as MumbleInputStream } from
 import * as Stream from "stream";
 import * as FFMpeg from "fluent-ffmpeg";
 import * as Sox from "sox-audio";
-import { inject, component, initialize } from "tsdi";
+import { inject, component, initialize, destroy } from "tsdi";
 import { stat } from "async-file";
 import { EventEmitter } from "events";
 
@@ -214,6 +214,7 @@ export class AudioOutput extends EventEmitter {
     /**
      * Stop playback and shutdown everything.
      */
+    @destroy
     public stop() {
         this.stopped = true;
         this.mumbleStream.close();

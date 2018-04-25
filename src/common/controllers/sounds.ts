@@ -1,5 +1,5 @@
 import { context, body, controller, route, param, is, uuid, ok } from "hyrest";
-import mkdirp = require("mkdirp-promise"); // tslint:disable-line
+import mkdirp = require("mkdirp-promise");
 import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { verbose } from "winston";
