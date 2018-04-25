@@ -97,6 +97,7 @@ module.exports = {
         "fluent-ffmpeg": "{}",
         "fs": "{}",
         "mumble": "{}",
+        "morgan": "{}",
         "net": "{}",
         "readline": "{}",
         "winston": "{}",
