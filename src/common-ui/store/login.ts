@@ -27,7 +27,7 @@ export class LoginStore {
     @inject private users: Users;
     @inject private tokens: Tokens;
     @inject("OwnUserStore") private ownUser: OwnUserStore;
-    @inject private browserHistory: History;
+    @inject("history") private browserHistory: History;
 
     @observable public authToken: string;
     @observable public userId: string;
