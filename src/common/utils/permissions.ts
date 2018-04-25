@@ -24,22 +24,8 @@ registerPermission({
 });
 
 registerPermission({
-    id: "upload-music",
-    name: "Upload sounds",
-    description: "Upload sounds to the bot.",
-    icon: "upload",
-});
-
-registerPermission({
     id: "be-quiet",
     name: "Mute bot",
     description: "Mute the bot.",
     icon: "bell-slash",
-});
-
-registerPermission({
-    id: "log",
-    name: "Show Log",
-    description: "View the log of the bot.",
-    icon: "file-text",
 });
