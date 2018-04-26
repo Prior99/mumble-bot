@@ -22,22 +22,23 @@ export default class ServeCommand extends Command { // tslint:disable-line
             return;
         }
         const tsdi = new TSDI();
-
+        tsdi.enableComponentScanner();
+        // Initialize config.
         tsdi.get(ServerConfigFactory).setConfig(config);
+        // Initialize mumble.
         const mumble = tsdi.get(MumbleFactory);
         await mumble.connect();
+        // Initialize database.
         const database = tsdi.get(DatabaseFactory);
         await database.connect();
+        // Start api.
         const api = tsdi.get(RestApi);
+        api.serve();
         // Initialize audio cache, input and output here as they can't
         // be eager.
         tsdi.get(AudioCache);
         tsdi.get(AudioInput);
         tsdi.get(AudioOutput);
-
-        tsdi.enableComponentScanner();
-
-        api.serve();
 
         let killed = false;
         const kill = async () => {
