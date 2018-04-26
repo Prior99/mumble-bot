@@ -17,6 +17,7 @@ export default class ServeCommand extends Command { // tslint:disable-line
             error(`Unhandled Promise rejection: ${err.message}`);
             console.error(err);
         });
+        // Load the configuration.
         const configConsistent = config.load();
         if (!configConsistent) {
             return;

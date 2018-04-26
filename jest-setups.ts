@@ -2,6 +2,19 @@ import { TSDI } from "tsdi";
 import * as Winston from "winston";
 import { DatabaseFactory, MumbleFactory } from "./src/server";
 
+process.on("unhandledRejection", err => {
+    console.error(`Unhandled Promise rejection: ${err.message}`);
+    console.error(err);
+});
+process.on("uncaughtException", err => {
+    console.error(`Unhandled Promise rejection: ${err.message}`);
+    console.error(err);
+});
+
+// Setup winston.
+Winston.remove(Winston.transports.Console);
+
+// Mock modules.
 jest.mock("./src/config/server-config-factory");
 jest.mock("mumble");
 
@@ -39,9 +52,9 @@ class LocalStorageMock {
     setTimeout(() => callback(10), 10);
 };
 
-let tsdi: TSDI;
 
 // Setup TSDI.
+let tsdi: TSDI;
 beforeEach(() => {
     tsdi = new TSDI();
     tsdi.enableComponentScanner();
@@ -51,8 +64,6 @@ beforeEach(() => {
 afterEach(() => {
     tsdi.close();
 });
-
-Winston.remove(Winston.transports.Console);
 
 // Prepare database.
 beforeEach(async () => {
