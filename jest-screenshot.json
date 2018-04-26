@@ -1,0 +1,5 @@
+{
+    "colorThreshold": 0.02,
+    "pixelThresholdAbsolute": 100,
+    "pixelThresholdRelative": 0.01
+}

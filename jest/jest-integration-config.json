@@ -1,0 +1,16 @@
+{
+    "collectCoverage": false,
+    "moduleFileExtensions": ["ts", "tsx", "js"],
+    "rootDir": "..",
+    "transform": {
+        ".(ts|tsx)": "ts-jest"
+    },
+    "setupTestFrameworkScriptFile": "<rootDir>/jest/jest-integration-setups.ts",
+    "testMatch": [
+        "<rootDir>/**/__tests__/integration-*.(ts|tsx)"
+    ],
+    "reporters": [
+        "default",
+        "jest-screenshot/reporter"
+    ]
+}

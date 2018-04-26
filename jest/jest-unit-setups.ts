@@ -52,7 +52,6 @@ class LocalStorageMock {
     setTimeout(() => callback(10), 10);
 };
 
-
 // Setup TSDI.
 let tsdi: TSDI;
 beforeEach(() => {

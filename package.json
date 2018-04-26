@@ -11,7 +11,8 @@
     "start:server": "TZ=UTC nodemon",
     "lint:src": "tslint --format stylish --project tsconfig.json",
     "lint:style": "stylelint --allow-empty-input src/**/*.scss",
-    "test": "TZ=UTC jest --runInBand"
+    "test": "TZ=UTC jest --runInBand --config jest/jest-unit-config.json",
+    "test:integration": "TZ=UTC jest --config jest/jest-integration-config.json"
   },
   "jest": {
     "collectCoverage": true,
@@ -23,7 +24,11 @@
     "transform": {
       ".(ts|tsx)": "ts-jest"
     },
-    "coverageReporters": ["lcov", "json", "text-summary"],
+    "coverageReporters": [
+      "lcov",
+      "json",
+      "text-summary"
+    ],
     "moduleNameMapper": {
       "^.+\\.(css|scss|sass)$": "identity-obj-proxy"
     },
@@ -96,19 +101,23 @@
     "@types/morgan": "^1.7.35",
     "@types/multer": "^1.3.6",
     "@types/node": "^9.6.6",
+    "@types/puppeteer": "^1.2.2",
     "@types/ramda": "^0.25.24",
     "@types/react": "^16.3.12",
     "@types/supertest": "^2.0.4",
     "@types/uuid": "^3.4.3",
     "@types/winston": "^2.3.9",
     "@types/yamljs": "^0.2.30",
+    "concurrently": "^3.5.1",
     "css-loader": "^0.28.11",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "git-revision-webpack-plugin": "^3.0.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "21",
+    "jest-screenshot": "^0.1.4",
     "node-sass": "^4.8.3",
     "progress-bar-webpack-plugin": "^1.11.0",
+    "puppeteer": "^1.3.0",
     "resolve-url-loader": "^2.3.0",
     "sass-loader": "^7.0.1",
     "stylelint": "^9.2.0",

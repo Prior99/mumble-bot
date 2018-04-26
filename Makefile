@@ -55,3 +55,15 @@ clean:
 .PHONY: db
 db:
 	createdb bot || true
+
+.PHONY: integration-test
+integration-test: node_modules clean-db db
+	yarn concurrently\
+		--success first\
+		--kill-others\
+		--prefix " {name} "\
+		--names "jest,webpack,server"\
+		--prefix-colors "bgYellow.bold,bgBlue.bold,bgGreen.bold"\
+		"sleep 10 && yarn test:integration"\
+		"make run-web"\
+		"make run-server"

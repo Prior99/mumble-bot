@@ -1,0 +1,16 @@
+{
+    "collectCoverage": true,
+    "moduleFileExtensions": ["ts", "tsx", "js"],
+    "rootDir": "..",
+    "transform": {
+        ".(ts|tsx)": "ts-jest"
+    },
+    "coverageReporters": ["lcov", "json", "text-summary"],
+    "moduleNameMapper": {
+        "^.+\\.(css|scss|sass)$": "identity-obj-proxy"
+    },
+    "setupTestFrameworkScriptFile": "<rootDir>/jest/jest-unit-setups.ts",
+    "testMatch": [
+        "<rootDir>/**/__tests__/test-*.(ts|tsx)"
+    ]
+}
