@@ -7,11 +7,11 @@ import { writeFile } from "async-file";
 
 import { AudioOutput } from "../../server";
 import { ServerConfig } from "../../config";
-import { DatabaseSound } from "../models";
+import { Sound } from "../models";
 import { Context } from "../context";
 import { createSound, world } from "../scopes";
 
-export class UploadSound extends DatabaseSound {
+export class UploadSound extends Sound {
     @is()
     public data?: string;
 }
@@ -31,13 +31,13 @@ export class Sounds {
         }
     }
 
-    @route("POST", "/sound").dump(DatabaseSound, world)
+    @route("POST", "/sound").dump(Sound, world)
     public async createSound(
         @body(createSound) sound: UploadSound,
-    ): Promise<DatabaseSound> {
+    ): Promise<Sound> {
         await this.createSoundDirectory();
 
-        await this.db.getRepository(DatabaseSound).save(sound);
+        await this.db.getRepository(Sound).save(sound);
 
         const { data } = sound;
         await writeFile(`${this.config.uploadDir}/${sound.id}`, Buffer.from(data, "base64"));
@@ -49,16 +49,16 @@ export class Sounds {
     }
 
     @route("GET", "/sounds")
-    public async listSounds(): Promise<DatabaseSound[]> {
-        const sounds = await this.db.getRepository(DatabaseSound).find();
+    public async listSounds(): Promise<Sound[]> {
+        const sounds = await this.db.getRepository(Sound).find();
         return ok(sounds);
     }
 
     @route("POST", "/sound/:id/play")
     public async playSound(@param("id") @is().validate(uuid) id: string, @context ctx?: Context): Promise<{}> {
-        const sound = await this.db.getRepository(DatabaseSound).findOne(id);
+        const sound = await this.db.getRepository(Sound).findOne(id);
         sound.used++;
-        await this.db.getRepository(DatabaseSound).save(sound);
+        await this.db.getRepository(Sound).save(sound);
 
         const currentUser = await ctx.currentUser();
         this.audioOutput.playSound(`${this.config.uploadDir}/${id}`, {

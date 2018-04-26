@@ -3,7 +3,7 @@ export { User } from "./user";
 export { Label } from "./label";
 export { CachedAudio } from "./cached-audio";
 export { RecordingLabelRelation } from "./recording-label-relation";
-export { DatabaseSound } from "./database-sound";
+export { Sound } from "./sound";
 export { Dialog } from "./dialog";
 export { DialogPart } from "./dialog-part";
 export { MumbleLink } from "./mumble-link";

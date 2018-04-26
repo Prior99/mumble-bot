@@ -4,7 +4,7 @@ import { info } from "winston";
 
 import {
     CachedAudio,
-    DatabaseSound,
+    Sound,
     User,
     DialogPart,
     Dialog,
@@ -30,7 +30,7 @@ export class DatabaseFactory {
             synchronize: true,
             entities: [
                 CachedAudio,
-                DatabaseSound,
+                Sound,
                 User,
                 DialogPart,
                 Dialog,

@@ -4,7 +4,7 @@ import { is, scope, uuid, DataType } from "hyrest";
 import { world } from "../scopes";
 
 @Entity()
-export class DatabaseSound {
+export class Sound {
     /**
      * Unique id of this sound.
      */

@@ -1,4 +1,4 @@
-import { CachedAudio, User, Recording, DatabaseSound } from "..";
+import { CachedAudio, User, Recording, Sound } from "..";
 
 export interface MetaInformationRecording {
     type: "recording";
@@ -8,7 +8,7 @@ export interface MetaInformationRecording {
 
 export interface MetaInformationSound {
     type: "sound";
-    sound: DatabaseSound;
+    sound: Sound;
     user: User;
 }
 
