@@ -3,7 +3,7 @@ import { component, inject } from "tsdi";
 import { Connection, Transaction, EntityManager, TransactionManager } from "typeorm";
 import { verbose } from "winston";
 
-import { DatabaseUser, PermissionAssociation } from "../models";
+import { User, PermissionAssociation } from "../models";
 import { signup, world, owner } from "../scopes";
 import { Context } from "../context";
 import { Setting } from "../models/setting";
@@ -21,9 +21,9 @@ export class Users {
      *
      * @return A list of all users.
      */
-    @route("GET", "/users").dump(DatabaseUser, world)
-    public async listUsers(): Promise<DatabaseUser[]> {
-        return ok(await this.db.getRepository(DatabaseUser).find());
+    @route("GET", "/users").dump(User, world)
+    public async listUsers(): Promise<User[]> {
+        return ok(await this.db.getRepository(User).find());
     }
 
     /**
@@ -33,10 +33,10 @@ export class Users {
      *
      * @return The specified user.
      */
-    @route("GET", "/user/:id").dump(DatabaseUser, world)
-    public async getUser(@param("id") @is().validate(uuid) id: string): Promise<DatabaseUser> {
-        const user = await this.db.getRepository(DatabaseUser).findOne(id);
-        if (!user) { return notFound<DatabaseUser>(`No user with id "${id}"`); }
+    @route("GET", "/user/:id").dump(User, world)
+    public async getUser(@param("id") @is().validate(uuid) id: string): Promise<User> {
+        const user = await this.db.getRepository(User).findOne(id);
+        if (!user) { return notFound<User>(`No user with id "${id}"`); }
         return ok(user);
     }
 
@@ -47,9 +47,9 @@ export class Users {
      *
      * @return The created user.
      */
-    @route("POST", "/user").dump(DatabaseUser, owner) @noauth
-    public async createUser(@body(signup) user: DatabaseUser): Promise<DatabaseUser> {
-        await this.db.getRepository(DatabaseUser).save(user);
+    @route("POST", "/user").dump(User, owner) @noauth
+    public async createUser(@body(signup) user: User): Promise<User> {
+        await this.db.getRepository(User).save(user);
         verbose(`New user ${user.name} with id ${user.id} just signed up`);
         return created(user);
     }
@@ -75,7 +75,7 @@ export class Users {
             .delete()
             .execute();
 
-        const user = await this.db.getRepository(DatabaseUser).findOne(id);
+        const user = await this.db.getRepository(User).findOne(id);
         const currentUser = await ctx.currentUser();
         verbose(`Permission "${permission}" revoked from ${user.name} by ${currentUser.name}`);
 
@@ -87,11 +87,11 @@ export class Users {
         @param("id") @is().validate(uuid) id: string,
         @param("permission") @is() permission: string,
         @context ctx?: Context,
-    ): Promise<DatabaseUser> {
+    ): Promise<User> {
         const association = { permission, user: { id }};
         await this.db.getRepository(PermissionAssociation).save(association);
 
-        const user = await this.db.getRepository(DatabaseUser).findOne(id);
+        const user = await this.db.getRepository(User).findOne(id);
         const currentUser = await ctx.currentUser();
         verbose(`Permission "${permission}" granted to ${user.name} by ${currentUser.name}`);
 

@@ -1,5 +1,5 @@
 export { Recording } from "./recording";
-export { DatabaseUser } from "./database-user";
+export { User } from "./user";
 export { Label } from "./label";
 export { CachedAudio } from "./cached-audio";
 export { RecordingLabelRelation } from "./recording-label-relation";

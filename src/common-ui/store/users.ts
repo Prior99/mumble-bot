@@ -3,7 +3,7 @@ import { bind } from "decko";
 import { History } from "history";
 import { component, inject, initialize } from "tsdi";
 
-import { DatabaseUser, Users } from "../../common";
+import { User, Users } from "../../common";
 
 import { LoginStore, OwnUserStore } from ".";
 
@@ -11,7 +11,7 @@ import { LoginStore, OwnUserStore } from ".";
 export class UsersStore {
     @inject private usersController: Users;
 
-    @observable private users: Map<string, DatabaseUser> = new Map();
+    @observable private users: Map<string, User> = new Map();
 
     @initialize @bind @action
     private async loadUsers() {
@@ -23,7 +23,7 @@ export class UsersStore {
     }
 
     @computed
-    public get all(): DatabaseUser[] {
+    public get all(): User[] {
         return Array.from(this.users.values());
     }
 

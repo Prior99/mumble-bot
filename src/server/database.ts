@@ -6,7 +6,7 @@ import { existsSync } from "fs";
 import { ServerConfig } from "../config";
 import {
     DatabaseSound,
-    DatabaseUser,
+    User,
     DialogPart,
     Dialog,
     Label,
@@ -31,7 +31,7 @@ export class Database {
             synchronize: true,
             entities: [
                 DatabaseSound,
-                DatabaseUser,
+                User,
                 DialogPart,
                 Dialog,
                 Label,

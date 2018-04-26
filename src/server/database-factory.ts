@@ -5,7 +5,7 @@ import { info } from "winston";
 import {
     CachedAudio,
     DatabaseSound,
-    DatabaseUser,
+    User,
     DialogPart,
     Dialog,
     Label,
@@ -31,7 +31,7 @@ export class DatabaseFactory {
             entities: [
                 CachedAudio,
                 DatabaseSound,
-                DatabaseUser,
+                User,
                 DialogPart,
                 Dialog,
                 Label,

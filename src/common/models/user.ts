@@ -10,7 +10,7 @@ import { Recording, PermissionAssociation, Token, Setting, MumbleLink } from "."
  * A user from the database.
  */
 @Entity()
-export class DatabaseUser {
+export class User {
     @PrimaryGeneratedColumn("uuid")
     @scope(world, createMumbleLink) @is().validate(uuid)
     public id?: string;

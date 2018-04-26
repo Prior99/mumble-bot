@@ -2,7 +2,7 @@ import { observable, computed, action } from "mobx";
 import { bind } from "decko";
 import { component, initialize, inject } from "tsdi";
 
-import { DatabaseUser, Users } from "../../common";
+import { User, Users } from "../../common";
 
 import { LoginStore } from ".";
 
@@ -11,7 +11,7 @@ export class OwnUserStore {
     @inject private users: Users;
     @inject("LoginStore") private login: LoginStore;
 
-    @observable public user: DatabaseUser;
+    @observable public user: User;
 
     @initialize @bind @action
     public async loadUser() {

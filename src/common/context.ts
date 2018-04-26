@@ -3,7 +3,7 @@ import { Request } from "express";
 import { Connection } from "typeorm";
 
 import { Validation } from "./controllers";
-import { DatabaseUser, PermissionAssociation } from "./models";
+import { User, PermissionAssociation } from "./models";
 
 import { getAuthTokenId } from "./utils";
 
@@ -24,7 +24,7 @@ export class Context {
         if (!id) {
             return;
         }
-        return await this.db.getRepository(DatabaseUser).createQueryBuilder("user")
+        return await this.db.getRepository(User).createQueryBuilder("user")
             .innerJoin("user.tokens", "token")
             .where("token.id=:id", { id })
             .getOne();

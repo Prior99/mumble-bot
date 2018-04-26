@@ -2,7 +2,7 @@ import { Column, PrimaryGeneratedColumn, Entity, ManyToOne } from "typeorm";
 import { is, scope, DataType, uuid } from "hyrest";
 import { world, createMumbleLink } from "../scopes";
 
-import { DatabaseUser } from ".";
+import { User } from ".";
 
 /**
  * A Mumble user representation in the database used for storing linkage from mumble user to database users.
@@ -27,7 +27,7 @@ export class MumbleLink {
     /**
      * The in the database.
      */
-    @ManyToOne(() => DatabaseUser, user => user.mumbleLinks)
+    @ManyToOne(() => User, user => user.mumbleLinks)
     @is() @scope(world, createMumbleLink)
-    public user?: DatabaseUser;
+    public user?: User;
 }

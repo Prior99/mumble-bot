@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { DatabaseUser } from "../common";
+import { User } from "../common";
 
 const defaultUser = {
     name: "someone",
@@ -7,7 +7,7 @@ const defaultUser = {
     password: "some secure password",
 };
 
-export async function createUser(data?: DatabaseUser) {
+export async function createUser(data?: User) {
     const response = await api().post("/user").send({ ...defaultUser, ...data });
     return response.body.data;
 }

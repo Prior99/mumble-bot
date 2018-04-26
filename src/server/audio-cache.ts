@@ -7,7 +7,7 @@ import { error, info } from "winston";
 import { EventEmitter } from "events";
 
 import { ServerConfig } from "../config";
-import { CachedAudio, DatabaseUser, compareCachedAudio } from "../common";
+import { CachedAudio, User, compareCachedAudio } from "../common";
 
 @component
 export class AudioCache extends EventEmitter {
@@ -59,7 +59,7 @@ export class AudioCache extends EventEmitter {
      */
     public async add(filename: string, userId: string, duration: number) {
         const id = Uuid.v4();
-        const user = await this.db.getRepository(DatabaseUser).findOne(userId);
+        const user = await this.db.getRepository(User).findOne(userId);
         const cachedAudio: CachedAudio = new CachedAudio(filename, user, duration);
         this.cachedAudios.set(cachedAudio.id, cachedAudio);
         this.emit("cached-audio", cachedAudio);

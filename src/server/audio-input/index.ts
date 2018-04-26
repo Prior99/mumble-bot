@@ -5,7 +5,7 @@ import { EventEmitter } from "events";
 import { User as MumbleUser, Connection as MumbleConnection } from "mumble";
 import { Connection as DatabaseConnection } from "typeorm";
 
-import { DatabaseUser, MumbleLink } from "../../common";
+import { User, MumbleLink } from "../../common";
 
 /**
  * This class handles voice input for all users. It uses instances of user.js
@@ -29,7 +29,7 @@ export class AudioInput extends EventEmitter {
      * @param user The mumble user object.
      * @param databaseUser The user object from the database.
      */
-    private async addRegisteredUser(user: MumbleUser, databaseUser: DatabaseUser) {
+    private async addRegisteredUser(user: MumbleUser, databaseUser: User) {
         info(`Input registered for user ${user.name}`);
         const localUser = new VoiceInputUser(user, databaseUser);
         await localUser.init();

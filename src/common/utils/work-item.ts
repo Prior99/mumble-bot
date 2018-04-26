@@ -1,26 +1,26 @@
-import { CachedAudio, DatabaseUser, Recording, DatabaseSound } from "..";
+import { CachedAudio, User, Recording, DatabaseSound } from "..";
 
 export interface MetaInformationRecording {
     type: "recording";
     recording: Recording;
-    user: DatabaseUser;
+    user: User;
 }
 
 export interface MetaInformationSound {
     type: "sound";
     sound: DatabaseSound;
-    user: DatabaseUser;
+    user: User;
 }
 
 export interface MetaInformationCached {
     type: "cached";
     cachedRecording: CachedAudio;
-    user: DatabaseUser;
+    user: User;
 }
 
 export interface MetaInformationDialog {
     type: "dialog";
-    user: DatabaseUser;
+    user: User;
 }
 
 export type MetaInformation = MetaInformationRecording |

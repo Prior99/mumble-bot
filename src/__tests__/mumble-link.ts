@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { DatabaseUser } from "../common";
+import { User } from "../common";
 
 export async function linkMumbleUser(userId: string, tokenId: string, mumbleId: number) {
     const response = await api().post("/mumble-link")
@@ -11,4 +11,4 @@ export async function linkMumbleUser(userId: string, tokenId: string, mumbleId: 
             },
         });
     return response.body.data;
-};
+}

@@ -9,7 +9,7 @@ import { external, inject } from "tsdi";
 import { User as MumbleUser } from "mumble";
 
 import { ServerConfig } from "../../config";
-import { DatabaseUser } from "../../common";
+import { User } from "../../common";
 import { AudioCache } from "..";
 
 const TIMEOUT_THRESHOLD = 300;
@@ -26,7 +26,7 @@ export class VoiceInputUser extends Stream.Writable {
     @inject private cache: AudioCache;
 
     private user: MumbleUser;
-    private databaseUser: DatabaseUser;
+    private databaseUser: User;
     private speaking = false;
     private connectTime: Date;
     private passthrough: PassThroughStream;

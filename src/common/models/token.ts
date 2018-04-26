@@ -4,7 +4,7 @@ import { is, scope, specify, uuid } from "hyrest";
 import { login, signup, owner } from "../scopes";
 import { hash } from "../utils";
 
-import { DatabaseUser } from ".";
+import { User } from ".";
 
 @Entity()
 export class Token {
@@ -13,9 +13,9 @@ export class Token {
     @is().validate(uuid)
     public id?: string;
 
-    @ManyToOne(() => DatabaseUser, user => user.tokens)
-    @scope(login, owner) @is() @specify(() => DatabaseUser)
-    public user?: DatabaseUser;
+    @ManyToOne(() => User, user => user.tokens)
+    @scope(login, owner) @is() @specify(() => User)
+    public user?: User;
 
     @CreateDateColumn()
     public created?: Date;

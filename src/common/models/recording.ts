@@ -3,7 +3,7 @@ import { is, scope, DataType, specify, uuid } from "hyrest";
 
 import { world, createRecording } from "../scopes";
 
-import { DatabaseUser, DialogPart, RecordingLabelRelation } from ".";
+import { User, DialogPart, RecordingLabelRelation } from ".";
 
 /**
  * A single record as represented in the database.
@@ -34,16 +34,16 @@ export class Recording {
     /**
      * The user who said this record.
      */
-    @ManyToOne(() => DatabaseUser, user => user.recordings)
+    @ManyToOne(() => User, user => user.recordings)
     @is() @scope(world)
-    public user?: DatabaseUser;
+    public user?: User;
 
     /**
      * The user who reported the record.
      */
-    @ManyToOne(() => DatabaseUser, user => user.reported)
+    @ManyToOne(() => User, user => user.reported)
     @is() @scope(world)
-    public reporter?: DatabaseUser;
+    public reporter?: User;
 
     /**
      * Whether this forked record overwrites the original one.

@@ -10,7 +10,7 @@ import {
 import { is, scope, uuid } from "hyrest";
 import { world } from "../scopes";
 import { Permission } from "./permission";
-import { DatabaseUser } from "./database-user";
+import { User } from "./user";
 
 @Entity()
 export class PermissionAssociation {
@@ -22,7 +22,7 @@ export class PermissionAssociation {
     @is() @scope(world)
     public permission?: string;
 
-    @OneToMany(() => DatabaseUser, user => user.permissionAssociations)
+    @OneToMany(() => User, user => user.permissionAssociations)
     @is() @scope(world)
-    public user?: DatabaseUser;
+    public user?: User;
 }

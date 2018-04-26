@@ -4,7 +4,7 @@ import * as isomorphicFetch from "isomorphic-fetch";
 import { History } from "history";
 import { component, inject, initialize } from "tsdi";
 
-import { Users, Tokens, DatabaseUser } from "../../common";
+import { Users, Tokens, User } from "../../common";
 import { routeDashboard } from "../../common-ui";
 import { OwnUserStore  } from ".";
 
@@ -45,7 +45,7 @@ export class LoginStore {
     @bind @action
     public async login(email: string, password: string) {
         const body = { email, password };
-        const response = await this.tokens.createToken({ email, password } as DatabaseUser);
+        const response = await this.tokens.createToken({ email, password } as User);
         if (response) {
             const { id, user } = response;
             this.authToken = id;

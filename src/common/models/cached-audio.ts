@@ -3,13 +3,13 @@ import * as Uuid from "uuid";
 
 import { world } from "../scopes";
 
-import { DatabaseUser } from ".";
+import { User } from ".";
 
 /**
  * A cached audio.
  */
 export class CachedAudio {
-    constructor(filename?: string, user?: DatabaseUser, duration?: number) {
+    constructor(filename?: string, user?: User, duration?: number) {
         if (filename && user && duration) {
             this.file = filename;
             this.user = user;
@@ -36,7 +36,7 @@ export class CachedAudio {
      * The user from which the audio was recorded.
      */
     @is() @scope(world)
-    public user?: DatabaseUser;
+    public user?: User;
 
     /**
      * The id of the cached audio.

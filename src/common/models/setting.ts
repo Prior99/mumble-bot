@@ -4,7 +4,7 @@ import { is, scope, specify, uuid } from "hyrest";
 import { login, signup, owner } from "../scopes";
 import { hash } from "../utils";
 
-import { DatabaseUser } from ".";
+import { User } from ".";
 
 @Entity()
 export class Setting {
@@ -13,9 +13,9 @@ export class Setting {
     @is().validate(uuid)
     public id?: string;
 
-    @ManyToOne(() => DatabaseUser, user => user.settings)
-    @scope(login, owner) @is() @specify(() => DatabaseUser)
-    public user?: DatabaseUser;
+    @ManyToOne(() => User, user => user.settings)
+    @scope(login, owner) @is() @specify(() => User)
+    public user?: User;
 
     @Column("varchar", { length: 32 })
     @is()
