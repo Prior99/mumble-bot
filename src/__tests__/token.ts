@@ -1,5 +1,6 @@
 import { api } from "./api";
 import { createUser } from "./user";
+import { DatabaseUser } from "../common";
 
 export async function createUserWithToken(data?: DatabaseUser) {
     const user = await createUser(data);
