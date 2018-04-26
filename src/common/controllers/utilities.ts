@@ -14,6 +14,14 @@ export class Utilities {
     @inject private mumble: MumbleConnection;
     @inject private audioOutput: AudioOutput;
 
+    /**
+     * A recursive function which returns the sub-tree of the mumble server's channels
+     * and users from the given channel.
+     *
+     * @param channel The channel to start the recursion from.
+     *
+     * @return The sub-tree below the given channel including that channel.
+     */
     @bind private buildChannelTree(channel: Channel) {
         const { name, position } = channel;
         const users = channel.users.map(user => ({
@@ -27,6 +35,11 @@ export class Utilities {
         return { name, position, users, children };
     }
 
+    /**
+     * Retrieves a nested structure of all channels and users in the mumble server.
+     *
+     * @return A tree with a channels and users in the mumble server.
+     */
     @route("GET", "/channel-tree")
     public async channelTree(): Promise<Channel> {
         return ok(this.buildChannelTree(this.mumble.rootChannel));
@@ -38,6 +51,11 @@ export class Utilities {
         return ok();
     }
 
+    /**
+     * Returns a list of all registered users in the mumble server.
+     *
+     * @return A list of all registered users.
+     */
     @route("GET", "/mumble-users").dump(MumbleUser, world)
     public async getMumbleUsers(): Promise<MumbleUser[]> {
         const mumbleUsers = this.mumble.users().filter(user => typeof user.id !== "undefined");

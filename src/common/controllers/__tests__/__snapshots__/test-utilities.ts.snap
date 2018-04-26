@@ -1,0 +1,54 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`utilities controller GET /channel-tree fetches a tree of the server's channels 1`] = `
+Object {
+  "data": Object {
+    "children": Array [
+      Object {
+        "children": Array [
+          Object {
+            "children": Array [],
+            "name": "Subchild 1",
+            "position": 0,
+            "users": Array [
+              Object {
+                "id": 4,
+                "name": "Stranger one",
+                "session": 84,
+              },
+              Object {
+                "id": 7,
+                "name": "Stranger two",
+                "session": 171,
+              },
+            ],
+          },
+        ],
+        "name": "Child 1",
+        "position": 0,
+        "users": Array [],
+      },
+      Object {
+        "children": Array [],
+        "name": "Child 2",
+        "position": 1,
+        "users": Array [
+          Object {
+            "id": 23,
+            "name": "Stranger three",
+            "session": 2134,
+          },
+        ],
+      },
+    ],
+    "name": "Root",
+    "position": 0,
+    "users": Array [
+      Object {
+        "name": "Unregistered Stranger",
+        "session": 2134,
+      },
+    ],
+  },
+}
+`;
