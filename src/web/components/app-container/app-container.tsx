@@ -1,9 +1,8 @@
 import * as React from "react";
 import { observer } from "mobx-react";
-import { Sidebar, Segment, Menu, Icon } from "semantic-ui-react";
+import { Sidebar } from "semantic-ui-react";
 import * as classNames from "classnames/bind";
 import { inject, external } from "tsdi";
-
 import { SidebarStore, LoginStore } from "../../../common-ui";
 import { Errors, AppBar, AppSidebar  } from "..";
 import * as css from "./app-container.scss";

@@ -1,6 +1,6 @@
 import { observable, computed, action } from "mobx";
 import { bind } from "decko";
-import { component, inject, initialize } from "tsdi";
+import { component } from "tsdi";
 
 interface ApiError {
     message: string;

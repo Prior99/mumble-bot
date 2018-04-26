@@ -1,10 +1,7 @@
 import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, CreateDateColumn } from "typeorm";
 import { is, scope, specify, uuid, DataType } from "hyrest";
-
-import { world, login, createDialog } from "../scopes";
-import { hash } from "../utils";
-
-import { Recording, DialogPart } from ".";
+import { world, createDialog } from "../scopes";
+import { DialogPart } from ".";
 
 /**
  * A dialog as represented in the database including all its records.

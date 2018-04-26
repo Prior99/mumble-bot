@@ -1,11 +1,9 @@
 import * as Winston from "winston";
 import * as Canvas from "canvas";
 import * as FFMpeg from "fluent-ffmpeg";
-import * as FS from "fs";
 import { AudioAnalyzer } from "./audioanalyzer";
 import * as ChunkingStreams from "chunking-streams";
 
-const maxUnsignedByte = 240;
 export const audioFreq = 44100;
 const maxByte = 255;
 export const chunkSize = 256;

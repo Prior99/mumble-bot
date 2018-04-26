@@ -1,3 +1,5 @@
+import { PassThrough } from "stream";
+
 const userStrangerOne = {
     id: 4,
     name: "Stranger one",
@@ -55,6 +57,8 @@ const channelRoot = {
 
 export class MockMumbleConnection {
     private disconnectCallback: () => void;
+    public mockInput = new PassThrough();
+    public mockOutput = new PassThrough();
 
     public mockUsers = [
         userStrangerOne,
@@ -104,6 +108,14 @@ export class MockMumbleConnection {
 
     public userById(id: number) {
         return this.mockUsers.find(user => (user as any).id === id);
+    }
+
+    public inputStream() {
+        return this.mockInput;
+    }
+
+    public outputStream() {
+        return this.mockOutput;
     }
 }
 

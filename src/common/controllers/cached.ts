@@ -3,7 +3,7 @@ import { rename } from "async-file";
 import { context, notFound, body, controller, route, param, is, uuid, ok } from "hyrest";
 import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
-import { verbose, error } from "winston";
+import { verbose } from "winston";
 
 import { ServerConfig } from "../../config";
 import { AudioOutput, AudioCache } from "../../server";

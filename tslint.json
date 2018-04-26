@@ -62,6 +62,7 @@
         "no-shadowed-variable": true,
         "no-unsafe-finally": true,
         "no-unused-expression": true,
+        "no-unused-variable": true,
         "no-var-keyword": true,
         "restrict-plus-operands": true,
         "switch-default": true,
@@ -74,7 +75,6 @@
         "no-default-export": true,
         "await-promise": true,
         "no-unnecessary-qualifier": true,
-        "no-misused-new": true,
-        "typeof-compare": true
+        "no-misused-new": true
     }
 }

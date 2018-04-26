@@ -9,7 +9,7 @@ describe("utilities controller", () => {
         });
 
         it("fetches a tree of the server's channels", async () => {
-            const { user, token } = await createUserWithToken();
+            const { token } = await createUserWithToken();
             const response = await api().get("/channel-tree")
                 .set("authorization", `Bearer ${token.id}`);
             expect(response.body).toMatchSnapshot();
@@ -25,7 +25,7 @@ describe("utilities controller", () => {
         });
 
         it("fetches a list of connected mumble users", async () => {
-            const { user, token } = await createUserWithToken();
+            const { token } = await createUserWithToken();
             const response = await api().get("/mumble-users")
                 .set("authorization", `Bearer ${token.id}`);
             expect(response.body).toEqual({

@@ -1,4 +1,4 @@
-import { observable, computed, action } from "mobx";
+import { observable, action } from "mobx";
 import { bind } from "decko";
 import { component, initialize, inject } from "tsdi";
 

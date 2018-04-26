@@ -1,7 +1,5 @@
-import { is, scope, specify, uuid } from "hyrest";
-
+import { is, scope } from "hyrest";
 import { world } from "../scopes";
-import { PermissionAssociation } from ".";
 
 /**
  * A single permission as stored in the database.

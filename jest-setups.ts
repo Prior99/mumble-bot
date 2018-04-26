@@ -2,6 +2,9 @@ import { TSDI } from "tsdi";
 import * as Winston from "winston";
 import { DatabaseFactory, MumbleFactory } from "./src/server";
 
+jest.mock("./src/config/server-config-factory");
+jest.mock("mumble");
+
 // Mock the local storage.
 class LocalStorageMock {
     private store: Object;
@@ -49,9 +52,6 @@ afterEach(() => {
     tsdi.close();
 });
 
-jest.mock("./src/config/server-config-factory");
-jest.mock("mumble");
-
 Winston.remove(Winston.transports.Console);
 
 // Prepare database.
@@ -60,7 +60,7 @@ beforeEach(async () => {
     await databaseFactory.connect(true);
 });
 
-// Prepare mmble.
+// Prepare mumble.
 beforeEach(async () => {
     await tsdi.get(MumbleFactory).connect();
 });

@@ -1,4 +1,3 @@
-import * as React from "react";
 import * as pathToRegexp from "path-to-regexp";
 
 export interface BasicRoute {

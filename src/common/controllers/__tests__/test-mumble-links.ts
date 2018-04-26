@@ -16,7 +16,7 @@ describe("mumble-links controller", () => {
         });
 
         it("responds 403 when attempting to link to another user", async () => {
-            const { user, token } = await createUserWithToken();
+            const { token } = await createUserWithToken();
             const otherUser = await createUser();
             const response = await api().post("/mumble-link")
                 .set("authorization", `Bearer ${token.id}`)
@@ -81,7 +81,7 @@ describe("mumble-links controller", () => {
                 await createUserWithToken({ name: "user2", email: "user2@example.com" });
             await linkMumbleUser(otherUser1.id, otherUser1Token.id, 4);
             await linkMumbleUser(otherUser2.id, otherUser2Token.id, 7);
-            const { user, token } = await createUserWithToken();
+            const { token } = await createUserWithToken();
             const response = await api().get("/mumble-links")
                 .set("authorization", `Bearer ${token.id}`);
             expect(response.body).toMatchObject({

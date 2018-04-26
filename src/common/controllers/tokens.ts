@@ -6,19 +6,11 @@ import {
     unauthorized,
     populate,
     noauth,
-    context,
-    param,
-    uuid,
-    is,
-    notFound,
-    forbidden,
 } from "hyrest";
 import { inject, component } from "tsdi";
 import { Connection } from "typeorm";
-
 import { login, owner } from "../scopes";
 import { User, Token } from "../models";
-import { Context } from "../context";
 
 @controller @component
 export class Tokens {

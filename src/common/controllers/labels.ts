@@ -1,4 +1,4 @@
-import { context, body, controller, route, param, is, uuid, ok, created } from "hyrest";
+import { context, body, controller, route, ok, created } from "hyrest";
 import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { verbose } from "winston";

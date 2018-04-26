@@ -1,16 +1,13 @@
-import { body, controller, route, param, is, uuid, ok, populate } from "hyrest";
+import { controller, route, ok, populate } from "hyrest";
 import { component, inject } from "tsdi";
-import { Connection } from "typeorm";
 import { bind } from "bind-decorator";
 import { Connection as MumbleConnection } from "mumble";
-
 import { Channel, MumbleUser } from "../models";
 import { world } from "../scopes";
 import { AudioOutput } from "../../server";
 
 @controller @component
 export class Utilities {
-    @inject private db: Connection;
     @inject private mumble: MumbleConnection;
     @inject private audioOutput: AudioOutput;
 

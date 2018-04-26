@@ -1,10 +1,9 @@
-import { observable, computed, action } from "mobx";
+import { observable, action } from "mobx";
 import { bind } from "decko";
 import { component, inject } from "tsdi";
 
 import { Users, User } from "../../common";
 import { LoginStore, OwnUserStore } from ".";
-import { routeDashboard } from "../routing";
 
 @component
 export class SignupStore {
@@ -16,7 +15,6 @@ export class SignupStore {
 
     @bind @action
     public async signup(email: string, password: string, name: string) {
-        const body = { email, password };
         const response = await this.users.createUser({ email, password, name } as User);
         if (response) {
             await this.login.login(email, password);

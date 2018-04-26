@@ -1,11 +1,9 @@
 import { component, inject, initialize } from "tsdi";
 import mkdirp = require("mkdirp-promise");
 import { Connection } from "typeorm";
-import * as Uuid from "uuid";
 import { writeFile, unlink, readFile } from "async-file";
 import { error, info } from "winston";
 import { EventEmitter } from "events";
-
 import { ServerConfig } from "../config";
 import { CachedAudio, User, compareCachedAudio } from "../common";
 
@@ -45,7 +43,7 @@ export class AudioCache extends EventEmitter {
     }
 
     @initialize
-    private async initialize() {
+    protected async initialize() {
         await this.createTmpDirectory();
         if (this.config.audioCacheAmount) { this.cacheAmount = this.config.audioCacheAmount; }
         this.importCache();
@@ -58,7 +56,6 @@ export class AudioCache extends EventEmitter {
      * @param duration Duration of the audio.
      */
     public async add(filename: string, userId: string, duration: number) {
-        const id = Uuid.v4();
         const user = await this.db.getRepository(User).findOne(userId);
         const cachedAudio: CachedAudio = new CachedAudio(filename, user, duration);
         this.cachedAudios.set(cachedAudio.id, cachedAudio);
@@ -71,7 +68,6 @@ export class AudioCache extends EventEmitter {
     public get sorted() { return this.all.sort(compareCachedAudio); }
 
     private async cleanUp() {
-        const prot = [];
         const list = this.sorted;
         await Promise.all(list.map(async cachedAudio => {
             if (cachedAudio.protected) { return; }

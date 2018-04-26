@@ -4,7 +4,6 @@ import { info } from "winston";
 import { EventEmitter } from "events";
 import { User as MumbleUser, Connection as MumbleConnection } from "mumble";
 import { Connection as DatabaseConnection } from "typeorm";
-
 import { User, MumbleLink } from "../../common";
 
 /**
@@ -18,7 +17,7 @@ export class AudioInput extends EventEmitter {
     private users = new Map<number, VoiceInputUser>();
 
     @initialize
-    private initConnectedUsers() {
+    protected initConnectedUsers() {
         this.mumble.on("user-connect", this.addUser);
         this.mumble.on("user-disconnect", this.removeUser);
         this.mumble.users().forEach(user => this.addUser(user));

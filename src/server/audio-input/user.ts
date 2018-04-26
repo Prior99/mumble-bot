@@ -1,13 +1,10 @@
-import Samplerate from "node-samplerate";
 import * as Winston from "winston";
-import { EventEmitter } from "events";
 import mkdirp = require("mkdirp-promise");
 import * as FFMpeg from "fluent-ffmpeg";
 import * as Stream from "stream";
 import { PassThrough as PassThroughStream } from "stream";
 import { external, inject } from "tsdi";
 import { User as MumbleUser } from "mumble";
-
 import { ServerConfig } from "../../config";
 import { User } from "../../common";
 import { AudioCache } from "..";
@@ -28,13 +25,11 @@ export class VoiceInputUser extends Stream.Writable {
     private user: MumbleUser;
     private databaseUser: User;
     private speaking = false;
-    private connectTime: Date;
     private passthrough: PassThroughStream;
     private timeout: NodeJS.Timer;
     private speakStartTime: Date;
     private filename: string;
     private encoder: any;
-    private started: boolean;
 
     /**
      * @constructor
@@ -46,7 +41,6 @@ export class VoiceInputUser extends Stream.Writable {
         this.user = user;
         this.databaseUser = databaseUser;
         this.createNewRecordingFile();
-        this.connectTime = new Date();
     }
 
     private get path() {
@@ -116,7 +110,6 @@ export class VoiceInputUser extends Stream.Writable {
      */
     private speechStopped() {
         this.speaking = false;
-        this.started = false;
         this.passthrough.end();
         this.cache.add(
             this.filename,

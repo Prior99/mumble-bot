@@ -2,19 +2,17 @@ import * as Express from "express";
 import * as FS from "fs";
 import { Request, Response } from "express";
 import * as ExpressWS from "express-ws";
-import mkdirp = require("mkdirp-promise");
 import * as BodyParser from "body-parser";
 import { Server } from "http";
 import { Connection } from "typeorm";
 import { component, inject, initialize, TSDI, destroy } from "tsdi";
 import { info, error } from "winston";
 import { bind } from "bind-decorator";
-import { createReadStream, writeFile, exists } from "async-file";
+import { createReadStream, exists } from "async-file";
 import { omit } from "ramda";
 import { hyrest } from "hyrest/middleware";
 import { AuthorizationMode, configureController, ControllerMode } from "hyrest";
 import * as morgan from "morgan";
-
 import { ServerConfig } from "../../config";
 import { allControllers, Recording, Token, convertWorkItem, Context, getAuthTokenId } from "../../common";
 import { AudioCache, AudioOutput } from "..";
@@ -45,7 +43,7 @@ export class RestApi {
     }
 
     @initialize
-    private initialize() {
+    protected initialize() {
         configureController(
             allControllers,
             { mode: ControllerMode.SERVER },

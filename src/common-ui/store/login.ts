@@ -1,10 +1,9 @@
 import { observable, computed, action } from "mobx";
 import { bind } from "decko";
-import * as isomorphicFetch from "isomorphic-fetch";
 import { History } from "history";
 import { component, inject, initialize } from "tsdi";
 
-import { Users, Tokens, User } from "../../common";
+import { Tokens, User } from "../../common";
 import { routeDashboard } from "../../common-ui";
 import { OwnUserStore  } from ".";
 
@@ -18,13 +17,8 @@ interface LocalStorageApi {
     readonly userId: string;
 }
 
-interface ApiError {
-    message: string;
-}
-
 @component("LoginStore")
 export class LoginStore {
-    @inject private users: Users;
     @inject private tokens: Tokens;
     @inject("OwnUserStore") private ownUser: OwnUserStore;
     @inject("history") private browserHistory: History;
@@ -44,7 +38,6 @@ export class LoginStore {
 
     @bind @action
     public async login(email: string, password: string) {
-        const body = { email, password };
         const response = await this.tokens.createToken({ email, password } as User);
         if (response) {
             const { id, user } = response;

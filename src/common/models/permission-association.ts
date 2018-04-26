@@ -2,14 +2,10 @@ import {
     Column,
     PrimaryGeneratedColumn,
     Entity,
-    ManyToOne,
     OneToMany,
-    CreateDateColumn,
-    UpdateDateColumn,
 } from "typeorm";
 import { is, scope, uuid } from "hyrest";
 import { world } from "../scopes";
-import { Permission } from "./permission";
 import { User } from "./user";
 
 @Entity()

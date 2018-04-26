@@ -1,4 +1,4 @@
-import { component, factory, initialize, inject, destroy } from "tsdi";
+import { component, factory, inject, destroy } from "tsdi";
 import { Connection, connect } from "mumble";
 import { info, error, warn } from "winston";
 

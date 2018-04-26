@@ -4,7 +4,6 @@ import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { verbose } from "winston";
 import FFMpeg from "fluent-ffmpeg";
-
 import { AudioOutput } from "../../server";
 import { ServerConfig } from "../../config";
 import { Recording, PlaybackOptions } from "../models";
@@ -57,7 +56,6 @@ export class Recordings {
         @body() playbackOptions: PlaybackOptions,
         @context ctx?: Context,
     ): Promise<{}> {
-        const { pitch } = playbackOptions;
         const recording = await this.getRecording(id);
         recording.used ++;
         await this.db.getRepository(Recording).save(recording);
@@ -100,7 +98,6 @@ export class Recordings {
 
         const currentUser = await ctx.currentUser();
         const { name } = currentUser;
-        const oldDuration = original.duration;
         const newDuration = actions.reduce((result, action) =>
             action.action === "crop" ? action.begin - action.end + result : result,
             0,

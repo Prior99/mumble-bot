@@ -1,13 +1,9 @@
 import * as React from "react";
-import { computed, action } from "mobx";
+import { computed } from "mobx";
 import { observer } from "mobx-react";
 import { inject, external } from "tsdi";
-import { bind } from "decko";
-import { Icon } from "semantic-ui-react";
-
 import { Content } from "../../components";
-import { UsersStore, OwnUserStore, LoginStore } from "../../../common-ui";
-import * as css from "./user.scss";
+import { UsersStore } from "../../../common-ui";
 
 export interface PageUserProps {
     readonly match: {
@@ -20,8 +16,6 @@ export interface PageUserProps {
 @external @observer
 export class PageUser extends React.Component<PageUserProps> {
     @inject private users: UsersStore;
-    @inject private ownUser: OwnUserStore;
-    @inject private login: LoginStore;
 
     @computed private get id() { return this.props.match.params.id; }
 
@@ -32,7 +26,7 @@ export class PageUser extends React.Component<PageUserProps> {
         if (!user) {
             return null;
         }
-        const { name, id } = user;
+        const { name } = user;
         return (
             <Content>
                 <h1>

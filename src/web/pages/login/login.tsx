@@ -8,7 +8,6 @@ import { Input, Button, Form } from "semantic-ui-react";
 
 import { routeSignup, LoginStore } from "../../../common-ui";
 import { Content } from "../../components";
-import * as css from "./login.scss";
 
 @external @observer
 export class PageLogin extends React.Component {

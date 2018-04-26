@@ -1,6 +1,5 @@
 import { observable, computed, action } from "mobx";
 import { bind } from "decko";
-import { History } from "history";
 import { component, inject, initialize } from "tsdi";
 
 import { User, Users } from "../../common";
@@ -14,7 +13,7 @@ export class UsersStore {
     @observable private users: Map<string, User> = new Map();
 
     @initialize @bind @action
-    private async loadUsers() {
+    protected async loadUsers() {
         const users = await this.usersController.listUsers();
         users.forEach(user => {
             this.users.set(user.id, user);

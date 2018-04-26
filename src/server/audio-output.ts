@@ -6,7 +6,6 @@ import * as Sox from "sox-audio";
 import { inject, component, initialize, destroy } from "tsdi";
 import { stat } from "async-file";
 import { EventEmitter } from "events";
-
 import { MetaInformation, WorkItem } from "../common";
 
 const PREBUFFER = 0.5;
@@ -36,7 +35,7 @@ export class AudioOutput extends EventEmitter {
     private transcodeTimeout: NodeJS.Timer;
 
     @initialize
-    private initialize() {
+    protected initialize() {
         this.mumbleStream = this.mumble.inputStream();
     }
 
@@ -114,7 +113,6 @@ export class AudioOutput extends EventEmitter {
             this.playbackAhead -= timePassed;
         }
         if (this.bufferQueue.length > 0) {
-            const start = Date.now();
             if (this.playbackAhead < 0 && this.lastBufferShift) {
                 warn("Buffer underflow.");
             }

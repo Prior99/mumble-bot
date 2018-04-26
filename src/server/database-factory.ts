@@ -1,5 +1,5 @@
-import { component, factory, initialize, inject, destroy } from "tsdi";
-import { createConnection, Connection, ConnectionOptions } from "typeorm";
+import { component, factory, inject, destroy } from "tsdi";
+import { createConnection, Connection } from "typeorm";
 import { info } from "winston";
 
 import {

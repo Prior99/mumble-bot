@@ -1,4 +1,4 @@
-import { is, DataType, specify, scope } from "hyrest";
+import { is, DataType, scope } from "hyrest";
 import { world } from "../scopes";
 
 export class MumbleUser {

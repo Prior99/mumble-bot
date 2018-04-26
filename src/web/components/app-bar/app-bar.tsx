@@ -1,17 +1,15 @@
 import * as React from "react";
-import { Sidebar, Menu, Dropdown, Image } from "semantic-ui-react";
+import { Menu, Dropdown } from "semantic-ui-react";
 import { inject, external } from "tsdi";
 import { observer } from "mobx-react";
 import { computed } from "mobx";
 import { History } from "history";
-
 import {
     routeDashboard,
     routeUser,
     SidebarStore,
     OwnUserStore,
     LoginStore,
-    UsersStore,
 } from "../../../common-ui";
 import * as css from "./style.scss";
 
@@ -21,7 +19,6 @@ export class AppBar extends React.Component {
     @inject private ownUser: OwnUserStore;
     @inject private login: LoginStore;
     @inject private browserHistory: History;
-    @inject private users: UsersStore;
 
     @computed private get sidebarButtonVisible() { return !this.sidebar.alwaysOpen && this.login.loggedIn; }
 

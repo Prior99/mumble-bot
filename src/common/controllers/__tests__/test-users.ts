@@ -41,7 +41,7 @@ describe("users controller", () => {
         });
 
         it("responds 404 for unknown user", async () => {
-            const { user, token } = await createUserWithToken();
+            const { token } = await createUserWithToken();
             const response = await api().get(`/user/65888dad-7250-4756-bd8d-ed3375007405`)
                 .set("authorization", `Bearer ${token.id}`);
             expect(response.body).toEqual({ message: `No user with id "65888dad-7250-4756-bd8d-ed3375007405"` });

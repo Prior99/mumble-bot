@@ -5,8 +5,6 @@ import * as Winston from "winston";
  * @return The formatted timestamp.
  */
 function timestampFunction () {
-    const d = new Date();
-    const actualYear = d.getFullYear();
     return new Date().toISOString();
 }
 

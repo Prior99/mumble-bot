@@ -3,7 +3,7 @@ import { is, scope, uuid } from "hyrest";
 
 import { world, createDialog } from "../scopes";
 
-import { Dialog, Label, Recording  } from ".";
+import { Dialog, Recording  } from ".";
 
 @Entity()
 export class DialogPart {

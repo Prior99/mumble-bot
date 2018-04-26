@@ -1,9 +1,9 @@
-import { metadata, command, Command, Options } from "clime";
+import { metadata, command, Command } from "clime";
 import { TSDI } from "tsdi";
 import { error, warn } from "winston";
 
 import { ServerConfig, ServerConfigFactory } from "../config";
-import { AudioCache, RestApi, AudioOutput, AudioInput, DatabaseFactory, MumbleFactory } from "../server";
+import { AudioInput, AudioOutput, AudioCache, RestApi, DatabaseFactory, MumbleFactory } from "../server";
 
 @command({ description: "Start the API and the bot." })
 export default class ServeCommand extends Command { // tslint:disable-line
@@ -22,7 +22,6 @@ export default class ServeCommand extends Command { // tslint:disable-line
             return;
         }
         const tsdi = new TSDI();
-        tsdi.enableComponentScanner();
 
         tsdi.get(ServerConfigFactory).setConfig(config);
         const mumble = tsdi.get(MumbleFactory);
@@ -30,9 +29,14 @@ export default class ServeCommand extends Command { // tslint:disable-line
         const database = tsdi.get(DatabaseFactory);
         await database.connect();
         const api = tsdi.get(RestApi);
-        const audioInput = tsdi.get(AudioInput);
-        const audioOutput = tsdi.get(AudioOutput);
+        // Initialize audio cache, input and output here as they can't
+        // be eager.
         tsdi.get(AudioCache);
+        tsdi.get(AudioInput);
+        tsdi.get(AudioOutput);
+
+        tsdi.enableComponentScanner();
+
         api.serve();
 
         let killed = false;

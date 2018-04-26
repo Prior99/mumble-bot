@@ -1,12 +1,10 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import DevTools from "mobx-react-devtools";
-import { TSDI, component, factory } from "tsdi";
-import { History } from "history";
+import { TSDI } from "tsdi";
 import { Route, Switch, Redirect } from "react-router-dom";
 import { Router } from "react-router";
 import { configureController, ControllerOptions } from "hyrest";
-
 import { isProductionEnvironment, allControllers } from "../common";
 import {
     PageLogin,

@@ -3,25 +3,18 @@ import {
     body,
     controller,
     route,
-    param,
     is,
-    uuid,
     ok,
-    notFound,
     created,
-    DataType,
     forbidden,
     badRequest,
 } from "hyrest";
 import { component, inject } from "tsdi";
-import { Connection, Transaction, EntityManager, TransactionManager } from "typeorm";
-import { verbose } from "winston";
+import { Connection } from "typeorm";
 import { Connection as MumbleConnection } from "mumble";
-
-import { MumbleLink, MumbleUser } from "../models";
+import { MumbleLink } from "../models";
 import { createMumbleLink, world } from "../scopes";
 import { Context } from "../context";
-import { Setting } from "../models/setting";
 
 export interface Settings {
     [key: string]: string;

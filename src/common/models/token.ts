@@ -1,9 +1,6 @@
 import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { is, scope, specify, uuid } from "hyrest";
-
-import { login, signup, owner } from "../scopes";
-import { hash } from "../utils";
-
+import { login, owner } from "../scopes";
 import { User } from ".";
 
 @Entity()

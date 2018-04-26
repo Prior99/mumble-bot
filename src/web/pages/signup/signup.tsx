@@ -6,13 +6,11 @@ import { inject, external } from "tsdi";
 import bind from "bind-decorator";
 import { Input, Button, Form } from "semantic-ui-react";
 
-import { routeLogin, LoginStore, SignupStore } from "../../../common-ui";
+import { routeLogin, SignupStore } from "../../../common-ui";
 import { Content } from "../../components";
-import * as css from "./signup.scss";
 
 @external @observer
 export class PageSignup extends React.Component {
-    @inject private login: LoginStore;
     @inject private signup: SignupStore;
 
     @observable private email = "";

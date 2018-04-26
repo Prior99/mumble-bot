@@ -1,4 +1,4 @@
-import { is, DataType, specify } from "hyrest";
+import { is, DataType } from "hyrest";
 
 export class PlaybackOptions {
     @is(DataType.float)

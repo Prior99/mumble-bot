@@ -69,7 +69,7 @@ export class Users {
         @param("permission") @is() permission: string,
         @context ctx?: Context,
     ): Promise<{}> {
-        const associations = await this.db.getRepository(PermissionAssociation).createQueryBuilder("association")
+        await this.db.getRepository(PermissionAssociation).createQueryBuilder("association")
             .leftJoin("user", "user")
             .where("user.id = :id AND association.permission = :permission", { id, permission })
             .delete()
