@@ -97,6 +97,14 @@ export class MockMumbleConnection {
     public authenticate() {
         return;
     }
+
+    public get rootChannel() {
+        return channelRoot;
+    }
+
+    public userById(id: number) {
+        return this.mockUsers.find(user => (user as any).id === id);
+    }
 }
 
 export function connect(url, options, callback) {

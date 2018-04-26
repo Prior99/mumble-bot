@@ -1,8 +1,8 @@
 import { api } from "./api";
 import { createUser } from "./user";
 
-export async function createUserWithToken() {
-    const user = await createUser();
+export async function createUserWithToken(data?: DatabaseUser) {
+    const user = await createUser(data);
     const response = await api().post("/token")
         .send({
             password: "some secure password",

@@ -1,7 +1,7 @@
 import { Column, PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
 import { is, scope, specify, length, uuid, transform, only, required } from "hyrest";
 
-import { world, login, owner, signup } from "../scopes";
+import { world, login, owner, signup, createMumbleLink } from "../scopes";
 import { hash } from "../utils";
 
 import { Recording, PermissionAssociation, Token, Setting, MumbleLink } from ".";
@@ -12,7 +12,7 @@ import { Recording, PermissionAssociation, Token, Setting, MumbleLink } from "."
 @Entity()
 export class DatabaseUser {
     @PrimaryGeneratedColumn("uuid")
-    @scope(world) @is().validate(uuid)
+    @scope(world, createMumbleLink) @is().validate(uuid)
     public id?: string;
 
     /**
