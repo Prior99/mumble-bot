@@ -4,15 +4,17 @@ default: debug
 
 all: default lint db
 
-.PHONY: debug
-debug: node_modules
-	yarn build:web
+.PHONY: build-server
+build-server:
 	yarn build:server
 
+.PHONY: debug
+debug: node_modules build-server
+	yarn build:web
+
 .PHONY: release
-release: node_modules
+release: node_modules build-server
 	yarn build:web:release
-	yarn build:server
 
 .PHONY: node_modules
 node_modules:
@@ -40,8 +42,19 @@ run-server: node_modules db
 	yarn start:server
 
 .PHONY: run-server-integration
-run-server-integration: node_modules
-	yarn start:server --db-name bot-test
+run-server-integration: node_modules build-server
+	node server serve\
+		--url $${MUMBLE_URL:-localhost}\
+		--name test-bot\
+		--tmp-dir /tmp/bot-test/tmp\
+		--recordings-dir /tmp/bot-test/recordings\
+		--upload-dir /tmp/bot-test/uploads\
+		--visualizations-dir /tmp/bot-test/visualizations\
+		--port 23278\
+		--db-name $${POSTGRES_DB:-bot-test}\
+		--db-username $${POSTGRES_USER:-$$USER}\
+		--db-host $${POSTGRES_HOST:-localhost}\
+		--db-password $${POSTGRES_PASSWORD:-""}\
 
 .PHONY: clean-db
 clean-db:
@@ -67,7 +80,7 @@ integration-test: node_modules
 		--kill-others\
 		--prefix " {name} "\
 		--names "jest,webpack,server"\
-		--prefix-colors "bgYellow.bold,bgBlue.bold,bgGreen.bold"\
+		--prefix-colors "yellow.bold,blue.bold,green.bold"\
 		"sleep 2 && yarn test:integration"\
 		"make run-web"\
 		"make run-server-integration"

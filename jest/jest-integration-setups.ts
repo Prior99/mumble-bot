@@ -1,6 +1,6 @@
 import * as puppeteer from "puppeteer";
 import { setupJestScreenshot } from "jest-screenshot";
- 
+
 setupJestScreenshot();
 
 beforeAll(async () => {
@@ -20,7 +20,7 @@ afterAll(() => {
 });
 
 beforeEach(async () => {
-    const page = await browser.newPage();
+    const page = await global.browser.newPage();
     page.setViewport({ width: 1920, height: 1080 });
     global.page = page;
 });
