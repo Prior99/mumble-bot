@@ -10,7 +10,7 @@ import { routes, SidebarStore, LoginStore } from "../../../common-ui";
 export class AppSidebar extends React.Component {
     @inject private sidebar: SidebarStore;
     @inject private login: LoginStore;
-    @inject private history: History;
+    @inject("history") private history: History;
 
     public render() {
         return (

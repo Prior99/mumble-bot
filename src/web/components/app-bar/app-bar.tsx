@@ -7,18 +7,19 @@ import { History } from "history";
 import {
     routeDashboard,
     routeUser,
+    routeSettings,
     SidebarStore,
     OwnUserStore,
     LoginStore,
 } from "../../../common-ui";
 import * as css from "./style.scss";
 
-@external @observer
+@observer @external
 export class AppBar extends React.Component {
     @inject private sidebar: SidebarStore;
     @inject private ownUser: OwnUserStore;
     @inject private login: LoginStore;
-    @inject private browserHistory: History;
+    @inject("history") private browserHistory: History;
 
     @computed private get sidebarButtonVisible() { return !this.sidebar.alwaysOpen && this.login.loggedIn; }
 
@@ -52,6 +53,10 @@ export class AppBar extends React.Component {
                                     <Dropdown.Item
                                         content="Profile"
                                         onClick={() => this.browserHistory.push(routeUser.path(this.login.userId))}
+                                    />
+                                    <Dropdown.Item
+                                        content="Settings"
+                                        onClick={() => this.browserHistory.push(routeSettings.path())}
                                     />
                                     <Dropdown.Item content="Logout" onClick={this.login.logout} />
                                 </Dropdown.Menu>
