@@ -6,6 +6,7 @@ import { inject, external } from "tsdi";
 import { SidebarStore, LoginStore } from "../../../common-ui";
 import { Errors, AppBar, AppSidebar  } from "..";
 import * as css from "./app-container.scss";
+import { isProductionEnvironment } from "../../../common";
 
 declare var SOFTWARE_VERSION: string;
 
@@ -31,7 +32,11 @@ export class AppContainer extends React.Component<{}, undefined> {
                         <div className={css.container}>
                             {this.props.children}
                         </div>
-                        <div className={css.version}>{SOFTWARE_VERSION}</div>
+                        {
+                            isProductionEnvironment() && (
+                                <div className={css.version}>{SOFTWARE_VERSION}</div>
+                            )
+                        }
                     </Sidebar.Pusher>
                 </Sidebar.Pushable>
             </div>
