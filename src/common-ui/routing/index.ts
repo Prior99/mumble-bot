@@ -43,9 +43,18 @@ export const routeDashboard: Route = {
     title: "Dashboard",
     icon: "dashboard",
 };
+
 export const routeUser: Route = {
     path: (id: string) => `/user/${id}`,
     pattern: "/user/:id",
+};
+
+export const routeSettings: Route = {
+    path: () => "/settings",
+    pattern: "/settings",
+    navbar: true,
+    title: "Settings",
+    icon: "settings",
 };
 
 export const routes: Route[] = [
@@ -53,6 +62,7 @@ export const routes: Route[] = [
     routeSignup,
     routeDashboard,
     routeUser,
+    routeSettings,
 ];
 
 export function getRoute(url: string) {
