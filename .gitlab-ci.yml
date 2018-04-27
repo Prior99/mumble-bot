@@ -4,37 +4,43 @@ stages:
 
 services:
   - postgres:latest
+  - dcshock/docker-mumble-server:latest
 
 variables:
   POSTGRES_DB: bot-test
   POSTGRES_USER: runner
   POSTGRES_PASSWORD: ""
   POSTGRES_HOST: "postgres"
+  MUMBLE_URL: dcshock-docker-mumble-server
+
+image: "node:9-stretch"
+before_script:
+  - apt-get -qq update
+  - apt-get -qq install -y build-essential
+
+integration-test:
+  before_script:
+    - apt-get -qq update
+    - apt-get -qq install -y gconf-service libasound2 libgconf-2-4 libgtk-3-0 libnspr4 libx11-xcb1
+      libxss1 libxtst6 fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont
+      fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils libpango1.0-dev libgif-dev build-essential
+  script:
+    - make integration-test
+  stage: test
+  artifacts:
+    when: on_failure
+    paths:
+      - jest-screenshot-report/
 
 test:
-  image: "node:8"
-  before_script:
-    - yarn install
   script:
-    - yarn test
+    - make test
   stage: test
-  cache:
-    key: "NODE_8_$CI_PROJECT_ID"
-    paths:
-      - node_modules/
 
 build:
-  image: "node:8"
-  before_script:
-    - yarn install
   script:
-    - yarn build:web:release
-    - yarn build:server
+    - make release
   stage: test
-  cache:
-    key: "NODE_8_$CI_PROJECT_ID"
-    paths:
-      - node_modules/
   artifacts:
     paths:
       - dist/
@@ -49,17 +55,9 @@ build:
       - README.md
 
 lint:
-  image: "node:8"
-  before_script:
-    - yarn install
   script:
-    - yarn lint:src
-    - yarn lint:style
+    - make lint
   stage: test
-  cache:
-    key: "NODE_8_$CI_PROJECT_ID"
-    paths:
-      - node_modules/
 
 deploy:
   image: "alpine:3.5"

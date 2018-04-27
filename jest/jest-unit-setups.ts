@@ -1,6 +1,6 @@
 import { TSDI } from "tsdi";
 import * as Winston from "winston";
-import { DatabaseFactory, MumbleFactory } from "./src/server";
+import { DatabaseFactory, MumbleFactory } from "../src/server";
 
 process.on("unhandledRejection", err => {
     console.error(`Unhandled Promise rejection: ${err.message}`);
@@ -15,7 +15,7 @@ process.on("uncaughtException", err => {
 Winston.remove(Winston.transports.Console);
 
 // Mock modules.
-jest.mock("./src/config/server-config-factory");
+jest.mock("../src/config/server-config-factory");
 jest.mock("mumble");
 
 // Mock the local storage.
