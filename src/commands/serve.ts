@@ -27,14 +27,11 @@ export default class ServeCommand extends Command { // tslint:disable-line
         // Initialize config.
         tsdi.get(ServerConfigFactory).setConfig(config);
         // Initialize mumble.
-        const mumble = tsdi.get(MumbleFactory);
-        await mumble.connect();
+        await tsdi.get(MumbleFactory).connect();
         // Initialize database.
-        const database = tsdi.get(DatabaseFactory);
-        await database.connect();
+        await tsdi.get(DatabaseFactory).connect();
         // Start api.
-        const api = tsdi.get(RestApi);
-        api.serve();
+        tsdi.get(RestApi).serve();
         // Initialize audio cache, input and output here as they can't
         // be eager.
         tsdi.get(AudioCache);

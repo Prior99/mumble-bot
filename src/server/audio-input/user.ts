@@ -19,8 +19,8 @@ const audioFreq = 48000;
  */
 @external
 export class VoiceInputUser extends Stream.Writable {
-    @inject private config: ServerConfig;
-    @inject private cache: AudioCache;
+    private config: ServerConfig;
+    private cache: AudioCache;
 
     private user: MumbleUser;
     private databaseUser: User;
@@ -36,8 +36,10 @@ export class VoiceInputUser extends Stream.Writable {
      * @param user Mumble user to recognize the speech of.
      * @param databaseUser The user from the database.
      */
-    constructor(user, databaseUser) {
+    constructor(user, databaseUser, @inject config?: ServerConfig, @inject cache?: AudioCache) {
         super();
+        this.config = config;
+        this.cache = cache;
         this.user = user;
         this.databaseUser = databaseUser;
         this.createNewRecordingFile();

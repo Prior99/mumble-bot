@@ -14,6 +14,7 @@ import { User, MumbleLink } from "../../common";
 export class AudioInput extends EventEmitter {
     @inject private mumble: MumbleConnection;
     @inject private db: DatabaseConnection;
+
     private users = new Map<number, VoiceInputUser>();
 
     @initialize
