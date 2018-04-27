@@ -1,7 +1,7 @@
 import * as React from "react";
 import { external } from "tsdi";
 import { observer } from "mobx-react";
-import { Grid, Card, Header, Icon } from "semantic-ui-react";
+import { Grid, Header, Icon } from "semantic-ui-react";
 import { requireLogin } from "../../../common-ui";
 import { Content } from "../../components";
 

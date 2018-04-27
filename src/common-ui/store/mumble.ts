@@ -1,5 +1,4 @@
-import { observable, computed, action } from "mobx";
-import { bind } from "decko";
+import { observable } from "mobx";
 import { component, initialize, inject } from "tsdi";
 import { Channel, Utilities, MumbleUser } from "../../common";
 
