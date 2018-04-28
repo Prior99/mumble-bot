@@ -22,7 +22,7 @@ export const visualizeAudioFile = function(filename) {
             const stream = ffmpeg.format("u8")
                 .audioChannels(1)
                 .on("error", (err) => reject(err))
-                .audioFrequency(audioFreq).stream();
+                .audioFrequency(audioFreq).stream(undefined);
             const chunker = new ChunkingStreams.SizeChunker({ chunkSize });
             chunker.on("data", ({ data }) => {
                 const arr = new Float32Array(data.length);

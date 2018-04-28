@@ -3,7 +3,7 @@ import { context, body, controller, route, param, is, uuid, ok, query, specify, 
 import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { verbose } from "winston";
-import FFMpeg from "fluent-ffmpeg";
+import * as FFMpeg from "fluent-ffmpeg";
 import { AudioOutput } from "../../server";
 import { ServerConfig } from "../../config";
 import { Sound, PlaybackOptions } from "../models";

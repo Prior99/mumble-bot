@@ -156,6 +156,13 @@
     "@types/express-serve-static-core" "*"
     "@types/serve-static" "*"
 
+"@types/fluent-ffmpeg@^2.1.6":
+  version "2.1.6"
+  resolved "https://registry.yarnpkg.com/@types/fluent-ffmpeg/-/fluent-ffmpeg-2.1.6.tgz#835d1646d65f1c53eef9319ef8ceacf1a13b2a82"
+  dependencies:
+    "@types/events" "*"
+    "@types/node" "*"
+
 "@types/jest@^22.2.3":
   version "22.2.3"
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-22.2.3.tgz#0157c0316dc3722c43a7b71de3fdf3acbccef10d"

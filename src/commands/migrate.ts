@@ -1,9 +1,12 @@
 import { metadata, command, Command } from "clime";
 import { createConnection, Connection as PostgresConnection } from "typeorm";
+import * as FFMpeg from "fluent-ffmpeg";
 import * as MySQL from "promise-mysql";
+import * as mkdirp from "mkdirp";
 import { info, error, warn } from "winston";
 import { MigrationConfig } from "../config";
-import { allDatabaseModels, User, MumbleLink } from "../common";
+import { allDatabaseModels, User, MumbleLink, Sound } from "../common";
+import { writeFileSync, readFileSync } from "fs";
 
 interface SourceUser {
     id: number;
@@ -16,6 +19,12 @@ interface SourceUser {
 interface SourceLink {
     mumbleId: number;
     user: number;
+}
+
+interface SourceSound {
+    id: number;
+    name: string;
+    used: number;
 }
 
 @command({ description: "Migrate a 0.2.1 database to 1.0.0" })
@@ -116,7 +125,12 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         `);
         info(`Found ${rows.length} links to migrate.`);
         for (let row of rows) {
-            await this.migrateMumbleLink(row);
+            try {
+                await this.migrateMumbleLink(row);
+            } catch (err) {
+                error(`Unable to migrate link ${row.user} -> ${row.mumbleId}: ${err.message}`);
+                console.error(err);
+            }
         }
         info("All links migrated.");
     }
@@ -147,7 +161,59 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         `);
         info(`Found ${rows.length} users to migrate.`);
         for (let row of rows) {
-            await this.migrateUser(row);
+            try {
+                await this.migrateUser(row);
+            } catch (err) {
+                error(`Unable to migrate user ${row.username} (${row.id}): ${err.message}`);
+                console.error(err);
+            }
+        }
+        info("All users migrated.");
+    }
+
+    private async migrateSound(sourceSound: SourceSound) {
+        info(`Migrating uploaded sound ${sourceSound.name} (${sourceSound.id}) ...`);
+        const targetSound = new Sound();
+        const sourcePath = `${this.config.sourceUploadsDir}/${sourceSound.id}`;
+        const soundMeta: any = await new Promise((resolve, reject) => {
+            FFMpeg.ffprobe(sourcePath, (err, result) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(result);
+            });
+        });
+        Object.assign(targetSound, {
+            description: sourceSound.name,
+            used: sourceSound.used,
+            source: "upload",
+            reporter: this.userIdMapping.values().next().value,
+            submitted: new Date(),
+            duration: soundMeta.format.duration,
+        });
+        await this.targetDb.getRepository(Sound).save(targetSound);
+        const targetPath = `${this.config.targetSoundsDir}/${targetSound.id}`;
+        writeFileSync(targetPath, readFileSync(sourcePath));
+    }
+
+    private async migrateSounds() {
+        info("Migrating uploaded sounds ...");
+        const rows = await this.sourceDb.query(`
+            SELECT
+                id,
+                name,
+                used
+            FROM Sounds
+        `);
+        info(`Found ${rows.length} sounds to migrate.`);
+        for (let row of rows) {
+            try {
+                await this.migrateSound(row);
+            } catch (err) {
+                error(`Unable to migrate uploaded sound ${row.name} (${row.id}): ${err.message}`);
+                console.error(err);
+            }
         }
         info("All users migrated.");
     }
@@ -159,8 +225,11 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         if (!await this.connectTargetDatabase()) { return; }
         if (!await this.connectSourceDatabase()) { return; }
 
+        mkdirp.sync(this.config.targetSoundsDir);
+
         await this.migrateUsers();
         await this.migrateMumbleLinks();
+        await this.migrateSounds();
 
         await this.targetDb.close();
         info("Disconnected from target database.");

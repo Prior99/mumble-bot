@@ -99,7 +99,7 @@ export class VoiceInputUser extends Stream.Writable {
         this.encoder = FFMpeg(this.passthrough)
         .inputOptions(
             "-f", "s16le",
-            "-ar", audioFreq,
+            "-ar", String(audioFreq),
             "-ac", "1",
         )
         .on("error", (err) => Winston.error(`Encoder for user ${this.user.name} crashed.`, err))
