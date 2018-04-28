@@ -2,21 +2,7 @@ import { component, factory, inject, destroy } from "tsdi";
 import { createConnection, Connection } from "typeorm";
 import { info } from "winston";
 
-import {
-    CachedAudio,
-    Sound,
-    User,
-    DialogPart,
-    Dialog,
-    Label,
-    MumbleLink,
-    MumbleUser,
-    PermissionAssociation,
-    RecordingLabelRelation,
-    Recording,
-    Setting,
-    Token,
-} from "../common";
+import { allDatabaseModels } from "../common";
 import { ServerConfig } from "../config";
 
 @component
@@ -28,21 +14,7 @@ export class DatabaseFactory {
     public async connect(dropSchema = false) {
         this.conn = await createConnection({
             synchronize: true,
-            entities: [
-                CachedAudio,
-                Sound,
-                User,
-                DialogPart,
-                Dialog,
-                Label,
-                MumbleLink,
-                MumbleUser,
-                PermissionAssociation,
-                RecordingLabelRelation,
-                Recording,
-                Setting,
-                Token,
-            ],
+            entities: allDatabaseModels,
             database: this.config.dbName,
             type: this.config.dbDriver as any,
             logging: this.config.dbLogging,

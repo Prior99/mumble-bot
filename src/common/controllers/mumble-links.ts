@@ -44,7 +44,6 @@ export class MumbleLinks {
         if (!mumbleUser) {
             return badRequest<MumbleLink>("Unknown mumble user.");
         }
-        mumbleLink.name = mumbleUser.name;
         await this.db.getRepository(MumbleLink).save(mumbleLink);
         return created(mumbleLink);
     }

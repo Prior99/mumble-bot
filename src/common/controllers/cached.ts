@@ -7,8 +7,8 @@ import { verbose } from "winston";
 
 import { ServerConfig } from "../../config";
 import { AudioOutput, AudioCache } from "../../server";
-import { CachedAudio, Recording } from "../models";
-import { createRecording, world } from "../scopes";
+import { CachedAudio, Sound } from "../models";
+import { createSound, world } from "../scopes";
 import { Context } from "../context";
 
 @controller @component
@@ -23,39 +23,39 @@ export class Cached {
         return ok(this.cache.sorted);
     }
 
-    private async createRecordingDirectory() {
+    private async createSoundDirectory() {
         try {
-            await mkdirp(this.config.recordingsDir);
+            await mkdirp(this.config.soundsDir);
         }
         catch (e) {
             if (e.code !== "EEXIST") { throw e; }
         }
     }
 
-    @route("POST", "/cached/:id/save").dump(Recording, world)
+    @route("POST", "/cached/:id/save").dump(Sound, world)
     public async saveCached(
         @param("id") @is().validate(uuid) id: string,
-        @body(createRecording) recording: Recording,
+        @body(createSound) sound: Sound,
         @context ctx?: Context,
-    ): Promise<Recording> {
+    ): Promise<Sound> {
         const cached = this.cache.byId(id);
         if (!cached) {
-            return notFound<undefined>(`No cached recording with id "${id}" found.`);
+            return notFound<undefined>(`No cached sound with id "${id}" found.`);
         }
 
         const currentUser = await ctx.currentUser();
-        recording.reporter = currentUser;
-        recording.user = cached.user;
+        sound.reporter = currentUser;
+        sound.user = cached.user;
 
-        await this.createRecordingDirectory();
+        await this.createSoundDirectory();
 
-        await this.db.getRepository(Recording).save(recording);
+        await this.db.getRepository(Sound).save(sound);
 
-        await rename(cached.file, `${this.config.recordingsDir}/${recording.id}`);
-        await rename(cached.file + ".png", `${this.config.visualizationsDir}/${recording.id}.png`);
+        await rename(cached.file, `${this.config.soundsDir}/${sound.id}`);
+        await rename(cached.file + ".png", `${this.config.soundsDir}/${sound.id}.png`);
 
         this.cache.remove(cached.id);
-        verbose(`${currentUser.name} added new record #${recording.id}`);
+        verbose(`${currentUser.name} added new record #${sound.id}`);
 
         return ok();
     }
@@ -65,19 +65,19 @@ export class Cached {
         if (this.cache.protect(id)) {
             return ok();
         }
-        return notFound<undefined>(`No cached recording with id "${id}" found.`);
+        return notFound<undefined>(`No cached sound with id "${id}" found.`);
     }
 
     @route("POST", "/cached/:id/play")
     public async playCached(@param("id") @is().validate(uuid) id: string, @context ctx?: Context): Promise<{}> {
         const cached = this.cache.byId(id);
-        if (!cached) { return notFound<undefined>(`No cached recording with id "${id}" found.`); }
+        if (!cached) { return notFound<undefined>(`No cached sound with id "${id}" found.`); }
 
         const currentUser = await ctx.currentUser();
 
         this.audioOutput.playSound(cached.file, {
             type: "cached",
-            cachedRecording: cached,
+            cachedSound: cached,
             user: currentUser,
         });
         verbose(`${currentUser.name} played back cached audio with id ${id}`);
@@ -89,6 +89,7 @@ export class Cached {
         if (this.cache.remove(id)) {
             return ok();
         }
-        return notFound<undefined>(`No cached recording with id "${id}" found.`);
+        return notFound<undefined>(`No cached sound with id "${id}" found.`);
     }
 }
+

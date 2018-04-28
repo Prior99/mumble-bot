@@ -48,7 +48,7 @@ async function main() {
     Winston.info("Worker starting...");
     try {
         await mkdirp(`${config.paths.tmp}/useraudio`);
-        await mkdirp(config.paths.recordings);
+        await mkdirp(config.paths.sounds);
         await mkdirp(config.paths.visualizations);
     }
     catch (err) {
@@ -59,7 +59,7 @@ async function main() {
     }
 
     watchDirectory(`${config.paths.tmp}/useraudio/**/*.mp3`, file => `${file}.png`);
-    watchDirectory(config.paths.recordings, file => `${config.paths.visualizations}/${basename(file)}.png`);
+    watchDirectory(config.paths.sounds, file => `${config.paths.visualizations}/${basename(file)}.png`);
     Winston.info("Worker started.");
 }
 

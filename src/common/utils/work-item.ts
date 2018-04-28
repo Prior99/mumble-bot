@@ -1,10 +1,4 @@
-import { CachedAudio, User, Recording, Sound } from "..";
-
-export interface MetaInformationRecording {
-    type: "recording";
-    recording: Recording;
-    user: User;
-}
+import { CachedAudio, User, Sound } from "..";
 
 export interface MetaInformationSound {
     type: "sound";
@@ -14,7 +8,7 @@ export interface MetaInformationSound {
 
 export interface MetaInformationCached {
     type: "cached";
-    cachedRecording: CachedAudio;
+    cachedSound: CachedAudio;
     user: User;
 }
 
@@ -23,7 +17,7 @@ export interface MetaInformationDialog {
     user: User;
 }
 
-export type MetaInformation = MetaInformationRecording |
+export type MetaInformation = MetaInformationSound |
     MetaInformationSound |
     MetaInformationCached |
     MetaInformationDialog;
@@ -39,15 +33,6 @@ export interface WorkItem {
 export function convertWorkItem(item: WorkItem) {
     const { meta, time } = item;
     const { user, type } = meta;
-    if (meta.type === "recording") {
-        const { recording } = meta;
-        return {
-            time,
-            user: user.id,
-            recording: recording.id,
-            type,
-        };
-    }
     if (meta.type === "sound") {
         const { sound } = meta;
         return {
@@ -58,11 +43,11 @@ export function convertWorkItem(item: WorkItem) {
         };
     }
     if (meta.type === "cached") {
-        const { cachedRecording } = meta;
+        const { cachedSound } = meta;
         return {
             time,
             user: user.id,
-            cachedRecording: cachedRecording.id,
+            cachedSound: cachedSound.id,
             type,
         };
     }

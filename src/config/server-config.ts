@@ -15,7 +15,7 @@ export class ServerConfig extends Options {
     @option({ flag: "c", description: "Path to the configuration file." })
     public configFile: string;
 
-    @option({ description: "Amount of cached recordings to keep." })
+    @option({ description: "Amount of cached sounds to keep." })
     public audioCacheAmount: number;
 
     @option({ description: "Name of the database to use." })
@@ -60,14 +60,8 @@ export class ServerConfig extends Options {
     @option({ description: "Path to the directory to store temporary files in." })
     public tmpDir: string;
 
-    @option({ description: "Path to the directory to store the recordings in." })
-    public recordingsDir: string;
-
-    @option({ description: "Path to the directory to store the visualizations in." })
-    public visualizationsDir: string;
-
-    @option({ description: "Path to the directory to store the uploaded sounds in." })
-    public uploadDir: string;
+    @option({ description: "Path to the directory to store the sounds, visualizations and sounds in." })
+    public soundsDir: string;
 
     public load() {
         Object.assign(
@@ -95,15 +89,7 @@ export class ServerConfig extends Options {
         check(this.dbName, "Database name not configured. Add 'dbName' to config file or specify --db-name.");
         check(this.name, "Name not configured. Add 'name' to config file or specify --name");
         check(this.tmpDir, "Temp dir not configured. Add 'tmpDir' to config file or specify --tmp-dir");
-        check(
-            this.name,
-            "Recordings dir not configured. Add 'recordingsDir' to config file or specify --recordings-dir",
-        );
-        check(
-            this.visualizationsDir,
-            "Visualizations dir not configured. Add 'visualizationsDir' to config file or specify --visualizations-dir",
-        );
-        check(this.uploadDir, "Upload dir not configured. Add 'uploadDir' to config file or specify --upload-dir");
+        check(this.soundsDir, "Sounds dir not configured. Add 'soundsDir' to config file or specify --sounds-dir");
         return okay;
     }
 

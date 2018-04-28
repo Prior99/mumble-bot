@@ -1,6 +1,6 @@
 {
   "name": "mumble-bot",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "description": "A bot for mumble.",
   "main": "index.js",
   "scripts": {
@@ -14,39 +14,10 @@
     "test": "TZ=UTC jest --runInBand --config jest/jest-unit-config.json",
     "test:integration": "TZ=UTC jest --config jest/jest-integration-config.json"
   },
-  "jest": {
-    "collectCoverage": true,
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ],
-    "transform": {
-      ".(ts|tsx)": "ts-jest"
-    },
-    "coverageReporters": [
-      "lcov",
-      "json",
-      "text-summary"
-    ],
-    "moduleNameMapper": {
-      "^.+\\.(css|scss|sass)$": "identity-obj-proxy"
-    },
-    "setupTestFrameworkScriptFile": "<rootDir>/jest-setups.ts",
-    "testMatch": [
-      "<rootDir>/src/**/__tests__/test-*.(ts|tsx)"
-    ]
-  },
   "nodemonConfig": {
-    "ignore": [
-      "data/**/*",
-      "dist/**/*",
-      "server/**/*"
-    ],
+    "ignore": ["data/**/*", "dist/**/*", "server/**/*"],
     "ext": "ts",
-    "watch": [
-      "src"
-    ],
+    "watch": ["src"],
     "exec": "yarn build:server && node server serve --config-file config.yml"
   },
   "repository": "https://git.cronosx.de/prior/mumble-bot",

@@ -47,9 +47,7 @@ run-server-integration: node_modules build-server
 		--url $${MUMBLE_URL:-localhost}\
 		--name test-bot\
 		--tmp-dir /tmp/bot-test/tmp\
-		--recordings-dir /tmp/bot-test/recordings\
-		--upload-dir /tmp/bot-test/uploads\
-		--visualizations-dir /tmp/bot-test/visualizations\
+		--sounds-dir /tmp/bot-test/sounds\
 		--port 23278\
 		--db-name $${POSTGRES_DB:-bot-test}\
 		--db-username $${POSTGRES_USER:-$$USER}\

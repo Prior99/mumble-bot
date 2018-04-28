@@ -3,7 +3,7 @@ import { is, scope, uuid } from "hyrest";
 
 import { world, createDialog } from "../scopes";
 
-import { Dialog, Recording  } from ".";
+import { Dialog, Sound  } from ".";
 
 @Entity()
 export class DialogPart {
@@ -11,9 +11,9 @@ export class DialogPart {
     @scope(world) @is().validate(uuid)
     public id?: string;
 
-    @OneToMany(() => Recording, recording => recording.dialogParts)
+    @OneToMany(() => Sound, sound => sound.dialogParts)
     @is() @scope(world, createDialog)
-    public recording?: Recording;
+    public sound?: Sound;
 
     @OneToMany(() => Dialog, dialog => dialog.parts)
     @is() @scope(world)

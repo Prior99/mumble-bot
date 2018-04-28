@@ -14,7 +14,7 @@ import { hyrest } from "hyrest/middleware";
 import { AuthorizationMode, configureController, ControllerMode } from "hyrest";
 import * as morgan from "morgan";
 import { ServerConfig } from "../../config";
-import { allControllers, Recording, Token, convertWorkItem, Context, getAuthTokenId } from "../../common";
+import { allControllers, Sound, Token, convertWorkItem, Context, getAuthTokenId } from "../../common";
 import { AudioCache, AudioOutput } from "..";
 
 import { cors, catchError } from "./middlewares";
@@ -61,8 +61,8 @@ export class RestApi {
         (this.app as any).ws("/cached/live", this.websocketQueue);
         this.app.get("/cached/:id/download", this.downloadCached);
         this.app.get("/cached/:id/visualized", this.downloadVisualizedCached);
-        this.app.get("/recording/:id/download", this.downloadRecording);
-        this.app.get("/recording/:id/visualized", this.downloadVisualizedRecording);
+        this.app.get("/sound/:id/download", this.downloadSound);
+        this.app.get("/sound/:id/visualized", this.downloadVisualizedSound);
         this.app.use(
             hyrest(...allControllers.map((controller: any) => this.tsdi.get(controller)))
                 .context(req => new Context(req))
@@ -125,10 +125,10 @@ export class RestApi {
         ws.send(JSON.stringify({
             type: "init",
             cacheAmount: this.cache.cacheAmount,
-            list: this.cache.all.map(recording => omit(["file"], recording)),
+            list: this.cache.all.map(sound => omit(["file"], sound)),
         }));
 
-        const onAdd = audio => ws.send(JSON.stringify({ type: "add", recording: omit(["file"], audio) }));
+        const onAdd = audio => ws.send(JSON.stringify({ type: "add", sound: omit(["file"], audio) }));
         this.cache.on("cached-audio", onAdd);
 
         const onRemoveAudio = ({ id }) => ws.send(JSON.stringify({ type: "remove", id }));
@@ -225,31 +225,31 @@ export class RestApi {
         await trySend();
     }
 
-    @bind public async downloadRecording({ params }: Request, res: Response) {
+    @bind public async downloadSound({ params }: Request, res: Response) {
         const { id } = params;
-        const recording = await this.db.getRepository(Recording).findOne(id);
-        if (!recording) { return res.status(404).send(); }
+        const sound = await this.db.getRepository(Sound).findOne(id);
+        if (!sound) { return res.status(404).send(); }
 
-        res.setHeader("Content-disposition", `attachment; filename='${recording.quote}.mp3'`);
-        const stream = FS.createReadStream(`${this.config.recordingsDir}/${recording.id}`)
+        res.setHeader("Content-disposition", `attachment; filename='${sound.description}.mp3'`);
+        const stream = FS.createReadStream(`${this.config.soundsDir}/${sound.id}`)
             .on("error", (err) => {
                 if (err.code === "ENOENT") { return res.status(404).send(); }
-                error(`Error occured when trying to read record with id ${recording.id}`);
+                error(`Error occured when trying to read record with id ${sound.id}`);
             })
             .on("readable", async () => {
                 try { stream.pipe(res); }
                 catch (err) {
-                    error(`Error occured when trying to stream file to browser for recording ${id}`, err);
+                    error(`Error occured when trying to stream file to browser for sound ${id}`, err);
                 }
             });
     }
 
-    @bind public async downloadVisualizedRecording({ params }: Request, res: Response) {
+    @bind public async downloadVisualizedSound({ params }: Request, res: Response) {
         const { id } = params;
-        const recording = await this.db.getRepository(Recording).findOne(id);
-        if (!recording) { return res.status(404).send(); }
+        const sound = await this.db.getRepository(Sound).findOne(id);
+        if (!sound) { return res.status(404).send(); }
 
-        const fileName = `${this.config.visualizationsDir}/${recording.id}.png`;
+        const fileName = `${this.config.soundsDir}/${sound.id}.png`;
         const trySend = async (retries = 0) => {
             if (!await exists(fileName)) {
                 if (retries === 5) { return res.status(404).send(); }

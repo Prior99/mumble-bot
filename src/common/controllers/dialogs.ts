@@ -24,14 +24,14 @@ export class Dialogs {
     @route("POST", "/dialog/:id/play")
     public async playDialog(@param("id") @is().validate(uuid) id: string, @context ctx?: Context): Promise<{}> {
         const dialog = await this.db.getRepository(Dialog).findOne(id, {
-            relations: ["parts", "parts.recording"],
+            relations: ["parts", "parts.sound"],
         });
         dialog.used++;
         await this.db.getRepository(Dialog).save(dialog);
 
         const currentUser = await ctx.currentUser();
 
-        const files = dialog.parts.map(part => `${this.config.recordingsDir}/${part.recording.id}`);
+        const files = dialog.parts.map(part => `${this.config.soundsDir}/${part.sound.id}`);
         this.audioOutput.playSounds(files, {
             type: "dialog",
             user: currentUser,

@@ -11,6 +11,5 @@ dbHost: localhost
 dbUsername: bot
 dbName: bot
 tmpDir: data/tmp
-recordingsDir: data/recordings
-visualizationsDir: data/visualizations
-uploadDir: data/uploaded
+soundsDir: data/sounds
+

@@ -6,8 +6,6 @@ export { Labels } from "./labels";
 import { Labels } from "./labels";
 export { MumbleLinks } from "./mumble-links";
 import { MumbleLinks } from "./mumble-links";
-export { Recordings } from "./recordings";
-import { Recordings } from "./recordings";
 export { Sounds } from "./sounds";
 import { Sounds } from "./sounds";
 export { Tokens } from "./tokens";
@@ -24,7 +22,7 @@ export const allControllers = [
     Dialogs,
     Labels,
     MumbleLinks,
-    Recordings,
+    Sounds,
     Sounds,
     Tokens,
     Users,

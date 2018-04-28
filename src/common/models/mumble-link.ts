@@ -19,12 +19,8 @@ export class MumbleLink {
     @scope(world, createMumbleLink) @is(DataType.int)
     public mumbleId?: number;
 
-    @Column("varchar", { length: 128 })
-    @scope(world, createMumbleLink) @is()
-    public name?: string;
-
     /**
-     * The in the database.
+     * The id of the user in the database.
      */
     @ManyToOne(() => User, user => user.mumbleLinks)
     @is() @scope(world, createMumbleLink)

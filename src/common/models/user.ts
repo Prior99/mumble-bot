@@ -4,7 +4,7 @@ import { is, scope, specify, length, uuid, transform, only, required } from "hyr
 import { world, login, owner, signup, createMumbleLink } from "../scopes";
 import { hash } from "../utils";
 
-import { Recording, PermissionAssociation, Token, Setting, MumbleLink } from ".";
+import { Sound, PermissionAssociation, Token, Setting, MumbleLink } from ".";
 
 /**
  * A user from the database.
@@ -40,13 +40,16 @@ export class User {
     @scope(owner, login)
     public email?: string;
 
-    @OneToMany(() => Recording, recording => recording.user)
-    @is() @scope(world) @specify(() => Recording)
-    public recordings?: Recording[];
+    @Column("integer")
+    public score?: number;
 
-    @OneToMany(() => Recording, recording => recording.reporter)
-    @is() @scope(world) @specify(() => Recording)
-    public reported?: Recording[];
+    @OneToMany(() => Sound, sound => sound.user)
+    @is() @scope(world) @specify(() => Sound)
+    public sounds?: Sound[];
+
+    @OneToMany(() => Sound, sound => sound.reporter)
+    @is() @scope(world) @specify(() => Sound)
+    public reported?: Sound[];
 
     @OneToMany(() => PermissionAssociation, permissionAssociation => permissionAssociation.user)
     @is() @scope(world) @specify(() => PermissionAssociation)

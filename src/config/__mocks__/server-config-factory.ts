@@ -19,9 +19,7 @@ export class ServerConfigFactory {
             dbPassword: process.env["POSTGRES_PASSWORD"],
             dbHost:  process.env["POSTGRES_HOST"] || "localhost",
             tmpDir: path.join(baseTmpDir, "tmp"),
-            recordingsDir: path.join(baseTmpDir, "recordings"),
-            visualizationsDir: path.join(baseTmpDir, "visualizations"),
-            uploadDir: path.join(baseTmpDir, "upload"),
+            soundsDir: path.join(baseTmpDir, "sound"),
             name: "test-bot",
         });
         this.config.load();
