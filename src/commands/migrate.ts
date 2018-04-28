@@ -27,6 +27,19 @@ interface SourceSound {
     used: number;
 }
 
+interface SourceRecording {
+    id: number;
+    quote: string;
+    submitted: Date;
+    user: number;
+    reporter: number;
+    used: number;
+    changed: Date;
+    duration: number;
+    parent: number;
+    overwrite: boolean;
+}
+
 @command({ description: "Migrate a 0.2.1 database to 1.0.0" })
 export default class MigrateCommand extends Command { // tslint:disable-line
     private config: MigrationConfig;
@@ -184,12 +197,14 @@ export default class MigrateCommand extends Command { // tslint:disable-line
                 resolve(result);
             });
         });
+        const now = new Date();
         Object.assign(targetSound, {
             description: sourceSound.name,
             used: sourceSound.used,
             source: "upload",
             reporter: this.userIdMapping.values().next().value,
-            submitted: new Date(),
+            submitted: now,
+            changed: now,
             duration: soundMeta.format.duration,
         });
         await this.targetDb.getRepository(Sound).save(targetSound);
@@ -215,7 +230,54 @@ export default class MigrateCommand extends Command { // tslint:disable-line
                 console.error(err);
             }
         }
-        info("All users migrated.");
+        info("All uplaoded sounds migrated.");
+    }
+
+    private async migrateRecording(sourceRecording: SourceRecording) {
+        info(`Migrating recording (${sourceRecording.id}) ...`);
+        const targetSound = new Sound();
+        const sourcePath = `${this.config.sourceRecordingsDir}/${sourceRecording.id}`;
+        Object.assign(targetSound, {
+            description: sourceRecording.quote,
+            used: sourceRecording.used,
+            user: this.userIdMapping.get(sourceRecording.user),
+            source: "recording",
+            reporter: this.userIdMapping.get(sourceRecording.reporter),
+            overwrite: sourceRecording.overwrite,
+            submitted: sourceRecording.submitted,
+            updated: sourceRecording.changed,
+            duration: sourceRecording.duration,
+        });
+        await this.targetDb.getRepository(Sound).save(targetSound);
+        const targetPath = `${this.config.targetSoundsDir}/${targetSound.id}`;
+        writeFileSync(targetPath, readFileSync(sourcePath));
+    }
+
+    private async migrateRecordings() {
+        info("Migrating recordings ...");
+        const rows = await this.sourceDb.query(`
+            SELECT
+                id,
+                quote,
+                used,
+                user,
+                reporter,
+                overwrite,
+                submitted,
+                duration,
+                changed
+            FROM Records
+        `);
+        info(`Found ${rows.length} recordings to migrate.`);
+        for (let row of rows) {
+            try {
+                await this.migrateRecording(row);
+            } catch (err) {
+                error(`Unable to migrate recording ${row.name} (${row.id}): ${err.message}`);
+                console.error(err);
+            }
+        }
+        info("All recordings migrated.");
     }
 
     @metadata
@@ -229,6 +291,7 @@ export default class MigrateCommand extends Command { // tslint:disable-line
 
         await this.migrateUsers();
         await this.migrateMumbleLinks();
+        await this.migrateRecordings();
         await this.migrateSounds();
 
         await this.targetDb.close();

@@ -1,4 +1,12 @@
-import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, OneToMany, CreateDateColumn } from "typeorm";
+import {
+    Column,
+    PrimaryGeneratedColumn,
+    Entity,
+    ManyToOne,
+    OneToMany,
+    CreateDateColumn,
+    UpdateDateColumn,
+} from "typeorm";
 import { oneOf, is, scope, DataType, specify, uuid } from "hyrest";
 
 import { world, createSound } from "../scopes";
@@ -40,7 +48,7 @@ export class Sound {
 
     @Column("varchar", { length: 16 })
     @is().validate(oneOf("upload", "sound"))
-    public source?: "upload" | "sound";
+    public source?: "upload" | "recording";
 
     /**
      * The user who reported the record.
@@ -73,6 +81,10 @@ export class Sound {
     @CreateDateColumn()
     @scope(world) @is() @specify(() => Date)
     public submitted?: Date;
+
+    @UpdateDateColumn()
+    @scope(world) @is() @specify(() => Date)
+    public updated?: Date;
 
     /**
      * A list of all labels with which this record was tagged.
