@@ -29,7 +29,7 @@ export class MumbleLinker extends React.Component {
     public render() {
         return (
             <Form>
-                {this.mumble.users.map(user => this.renderMumbleUser(user))}
+                {this.mumble.allUsers.map(user => this.renderMumbleUser(user))}
             </Form>
         );
     }
