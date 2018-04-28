@@ -5,7 +5,7 @@ import * as MySQL from "promise-mysql";
 import * as mkdirp from "mkdirp";
 import { info, error, warn } from "winston";
 import { MigrationConfig } from "../config";
-import { allDatabaseModels, User, MumbleLink, Sound } from "../common";
+import { allDatabaseModels, User, MumbleLink, Sound, Label, SoundLabelRelation } from "../common";
 import { writeFileSync, readFileSync } from "fs";
 
 interface SourceUser {
@@ -40,6 +40,16 @@ interface SourceRecording {
     overwrite: boolean;
 }
 
+interface SourceLabel {
+    id: number;
+    name: string;
+}
+
+interface SourceRecordingLabelRelation {
+    record: number;
+    label: number;
+}
+
 @command({ description: "Migrate a 0.2.1 database to 1.0.0" })
 export default class MigrateCommand extends Command { // tslint:disable-line
     private config: MigrationConfig;
@@ -47,6 +57,8 @@ export default class MigrateCommand extends Command { // tslint:disable-line
     private sourceDb: MySQL.Connection;
 
     private userIdMapping: Map<number, string> = new Map();
+    private labelIdMapping: Map<number, string> = new Map();
+    private recordingIdMapping: Map<number, string> = new Map();
 
     private async confirm() {
         process.stdin.resume();
@@ -146,6 +158,67 @@ export default class MigrateCommand extends Command { // tslint:disable-line
             }
         }
         info("All links migrated.");
+    }
+
+    private async migrateLabel(sourceLabel: SourceLabel) {
+        info(`Migrating label ${sourceLabel.name} (${sourceLabel.id}) ...`);
+        const targetLabel = new Label();
+        Object.assign(targetLabel, { name: sourceLabel.name });
+        await this.targetDb.getRepository(Label).save(targetLabel);
+        this.labelIdMapping.set(sourceLabel.id, targetLabel.id);
+    }
+
+    private async migrateLabels() {
+        info("Migrating labels ...");
+        const rows = await this.sourceDb.query(`
+            SELECT
+                id,
+                name
+            FROM RecordLabels
+        `);
+        info(`Found ${rows.length} labels to migrate.`);
+        for (let row of rows) {
+            try {
+                await this.migrateLabel(row);
+            } catch (err) {
+                error(`Unable to migrate label ${row.name} (${row.id}): ${err.message}`);
+                console.error(err);
+            }
+        }
+        info("All labels migrated.");
+    }
+
+    private async migrateRecordingLabelRelation(sourceRecordingLabelRelation: SourceRecordingLabelRelation) {
+        const targetSoundId = this.recordingIdMapping.get(sourceRecordingLabelRelation.record);
+        const targetLabelId = this.labelIdMapping.get(sourceRecordingLabelRelation.label);
+        info(`Migrating recording label relation ${targetLabelId} (${sourceRecordingLabelRelation.label}) -> ` +
+            `${targetSoundId }(${sourceRecordingLabelRelation.record}) ...`);
+        const targetSoundLabelRelation = new SoundLabelRelation();
+        Object.assign(targetSoundLabelRelation, {
+            sound: { id: targetSoundId },
+            label: { id: targetLabelId },
+        });
+        await this.targetDb.getRepository(SoundLabelRelation).save(targetSoundLabelRelation);
+    }
+
+    private async migrateRecordingLabelRelations() {
+        info("Migrating recording labels relations ...");
+        const rows = await this.sourceDb.query(`
+            SELECT
+                record,
+                label
+            FROM RecordLabelRelation
+        `);
+        info(`Found ${rows.length} relations to migrate.`);
+        for (let row of rows) {
+            try {
+                await this.migrateRecordingLabelRelation(row);
+            } catch (err) {
+                error(`Unable to migrate recording label relation ${row.record} -> ${row.label}): ${err.message}`);
+                console.error(err);
+            }
+        }
+        info("All recording label relations migrated.");
     }
 
     private async migrateUser(sourceUser: SourceUser) {
@@ -251,6 +324,7 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         await this.targetDb.getRepository(Sound).save(targetSound);
         const targetPath = `${this.config.targetSoundsDir}/${targetSound.id}`;
         writeFileSync(targetPath, readFileSync(sourcePath));
+        this.recordingIdMapping.set(sourceRecording.id, targetSound.id);
     }
 
     private async migrateRecordings() {
@@ -292,6 +366,8 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         await this.migrateUsers();
         await this.migrateMumbleLinks();
         await this.migrateRecordings();
+        await this.migrateLabels();
+        await this.migrateRecordingLabelRelations();
         await this.migrateSounds();
 
         await this.targetDb.close();
