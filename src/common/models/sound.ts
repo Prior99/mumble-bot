@@ -89,7 +89,7 @@ export class Sound {
     /**
      * A list of all labels with which this record was tagged.
      */
-    @ManyToOne(() => SoundLabelRelation, soundLabelRelation => soundLabelRelation.sound)
+    @OneToMany(() => SoundLabelRelation, soundLabelRelation => soundLabelRelation.sound)
     @scope(world, createSound) @is() @specify(() => SoundLabelRelation)
     public soundLabelRelations?: SoundLabelRelation[];
 

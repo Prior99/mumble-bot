@@ -192,7 +192,7 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         const targetSoundId = this.recordingIdMapping.get(sourceRecordingLabelRelation.record);
         const targetLabelId = this.labelIdMapping.get(sourceRecordingLabelRelation.label);
         info(`Migrating recording label relation ${targetLabelId} (${sourceRecordingLabelRelation.label}) -> ` +
-            `${targetSoundId }(${sourceRecordingLabelRelation.record}) ...`);
+            `${targetSoundId} (${sourceRecordingLabelRelation.record}) ...`);
         const targetSoundLabelRelation = new SoundLabelRelation();
         Object.assign(targetSoundLabelRelation, {
             sound: { id: targetSoundId },
