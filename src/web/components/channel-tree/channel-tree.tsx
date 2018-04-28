@@ -1,27 +1,25 @@
 import * as React from "react";
 import { inject, external } from "tsdi";
+import { Link } from "react-router-dom";
 import { observer } from "mobx-react";
 import { computed } from "mobx";
 import { List, Icon } from "semantic-ui-react";
-import { MumbleStore, UsersStore } from "../../../common-ui";
+import { MumbleStore, UsersStore, routeUser } from "../../../common-ui";
 import { Channel, MumbleUser } from "../../../common";
 import * as css from "./channel-tree.scss";
+import { link } from "async-file";
 
 @observer @external
 export class TreeUser extends React.Component<{ user: MumbleUser }> {
     @inject private mumble: MumbleStore;
     @inject private users: UsersStore;
 
-    @computed private get isLinked() {
-        return this.mumble.isMumbleUserLinked(this.props.user);
-    }
-
     @computed private get linkedUser() {
         return this.mumble.getUser(this.props.user);
     }
 
     public render() {
-        const { isLinked, linkedUser, props } = this;
+        const { linkedUser, props } = this;
         const { name } = props.user;
         return (
             <List.Item>
@@ -30,10 +28,11 @@ export class TreeUser extends React.Component<{ user: MumbleUser }> {
                     <List.Header>
                         {name}
                         {
-                            isLinked && <span className={css.link}>
-                                <Icon name="linkify" />
-                                {linkedUser ? linkedUser.name : "Loading"}
-                            </span>
+                            linkedUser && (
+                                <Link className={css.link} to={routeUser.path(linkedUser.id)}>
+                                    <Icon name="linkify" /> {linkedUser.name}
+                                </Link>
+                            )
                         }
                     </List.Header>
                 </List.Content>
