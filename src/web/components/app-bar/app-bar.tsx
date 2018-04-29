@@ -1,17 +1,19 @@
 import * as React from "react";
-import { Menu, Dropdown } from "semantic-ui-react";
+import { Menu, Dropdown, Image } from "semantic-ui-react";
 import { inject, external } from "tsdi";
 import { observer } from "mobx-react";
 import { computed } from "mobx";
 import { History } from "history";
 import {
-    routeDashboard,
-    routeUser,
-    routeSettings,
     SidebarStore,
     OwnUserStore,
     LoginStore,
-} from "../../../common-ui";
+} from "../../store";
+import {
+    routeDashboard,
+    routeUser,
+    routeSettings,
+} from "../../routing";
 import * as css from "./style.scss";
 
 @observer @external
@@ -22,6 +24,7 @@ export class AppBar extends React.Component {
     @inject("history") private browserHistory: History;
 
     @computed private get sidebarButtonVisible() { return !this.sidebar.alwaysOpen && this.login.loggedIn; }
+    @computed private get avatar() { return this.ownUser.user && this.ownUser.user.avatarUrl; }
 
     public render() {
         const { user } = this.ownUser;
@@ -43,6 +46,7 @@ export class AppBar extends React.Component {
                                 item
                                 key="user"
                                 text={user.name}
+                                trigger={<Image circular size="mini" src={this.avatar} />}
                             >
                                 <Dropdown.Menu>
                                     <Dropdown.Header>Logged in in as {this.ownUser.user.name}</Dropdown.Header>

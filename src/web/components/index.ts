@@ -6,3 +6,4 @@ export * from "./content";
 export * from "./infos";
 export * from "./channel-tree";
 export * from "./mumble-linker";
+export * from "./user-list";

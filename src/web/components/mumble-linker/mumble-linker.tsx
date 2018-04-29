@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { external, inject } from "tsdi";
 import { bind } from "decko";
 import { Checkbox, Form } from "semantic-ui-react";
-import { MumbleStore } from "../../../common-ui";
+import { MumbleStore } from "../../store";
 import { MumbleUser } from "../../../common";
 
 @observer @external

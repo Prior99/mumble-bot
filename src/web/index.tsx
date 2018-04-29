@@ -2,46 +2,18 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import DevTools from "mobx-react-devtools";
 import { TSDI } from "tsdi";
+import "./factories";
 import { Route, Switch, Redirect } from "react-router-dom";
 import { Router } from "react-router";
 import { configureController, ControllerOptions } from "hyrest";
 import { isProductionEnvironment, allControllers } from "../common";
-import {
-    PageLogin,
-    PageDashboard,
-    PageSignup,
-    PageUser,
-    PageSettings,
-} from "./pages";
 import { AppContainer } from "./components";
-import * as routes from "../common-ui/routing";
+import { routeDashboard, routeLogin } from "./routing";
+import { routes } from "./routing/routes";
 import "./global.scss";
-import { LoginStore, ErrorStore } from "../common-ui";
+import { LoginStore, ErrorStore } from "./store";
 
 declare var baseUrl: string;
-
-export const pages = [
-    {
-        route: routes.routeLogin,
-        component: PageLogin,
-    },
-    {
-        route: routes.routeSignup,
-        component: PageSignup,
-    },
-    {
-        route: routes.routeDashboard,
-        component: PageDashboard,
-    },
-    {
-        route: routes.routeUser,
-        component: PageUser,
-    },
-    {
-        route: routes.routeSettings,
-        component: PageSettings,
-    },
-];
 
 const tsdi: TSDI = new TSDI();
 tsdi.enableComponentScanner();
@@ -52,20 +24,20 @@ function App() {
             <Switch>
                 {
                     tsdi.get(LoginStore).loggedIn ? [
-                        <Redirect exact from="/" to={routes.routeDashboard.path()} key="root" />,
-                        <Redirect exact from="/login" to={routes.routeDashboard.path()} key="login" />,
-                        <Redirect exact from="/signup" to={routes.routeDashboard.path()} key="signup" />,
+                        <Redirect exact from="/" to={routeDashboard.path()} key="root" />,
+                        <Redirect exact from="/login" to={routeDashboard.path()} key="login" />,
+                        <Redirect exact from="/signup" to={routeDashboard.path()} key="signup" />,
                     ] : (
-                        <Redirect exact from="/" to={routes.routeLogin.path()} />
+                        <Redirect exact from="/" to={routeLogin.path()} />
                     )
                 }
                 {
-                    pages
-                        .map((page, index) => (
+                    routes
+                        .map((route, index) => (
                             <Route
                                 key={index}
-                                path={page.route.pattern}
-                                component={page.component}
+                                path={route.route.pattern}
+                                component={route.component}
                             />
                         ))
                 }

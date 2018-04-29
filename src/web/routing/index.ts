@@ -57,14 +57,10 @@ export const routeSettings: Route = {
     icon: "settings",
 };
 
-export const routes: Route[] = [
-    routeLogin,
-    routeSignup,
-    routeDashboard,
-    routeUser,
-    routeSettings,
-];
-
-export function getRoute(url: string) {
-    return routes.find(({ pattern }) => Boolean(pathToRegexp(pattern).exec(url)));
-}
+export const routeUsers: Route = {
+    path: () => "/users",
+    pattern: "/users",
+    navbar: true,
+    title: "Users",
+    icon: "group",
+};

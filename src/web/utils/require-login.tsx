@@ -9,7 +9,7 @@ import { routeLogin } from "../routing";
 export function requireLogin<P, R extends React.ComponentClass<P | void>>(component: R): R {
     @observer @external
     class RequireLogin extends React.Component<P> {
-        @inject private login: LoginStore;
+        @inject("LoginStore") private login: LoginStore;
         public render() {
             if (!this.login.loggedIn) {
                 return (

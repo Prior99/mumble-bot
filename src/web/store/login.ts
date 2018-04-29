@@ -2,9 +2,8 @@ import { observable, computed, action } from "mobx";
 import { bind } from "decko";
 import { History } from "history";
 import { component, inject, initialize } from "tsdi";
-
 import { Tokens, User } from "../../common";
-import { routeDashboard } from "../../common-ui";
+import { routeDashboard } from "../routing";
 import { OwnUserStore  } from ".";
 
 const softwareVersion = 2;

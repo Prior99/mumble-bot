@@ -3,7 +3,7 @@ import { computed } from "mobx";
 import { observer } from "mobx-react";
 import { inject, external } from "tsdi";
 import { Content } from "../../components";
-import { UsersStore } from "../../../common-ui";
+import { UsersStore } from "../../store";
 
 export interface PageUserProps {
     readonly match: {

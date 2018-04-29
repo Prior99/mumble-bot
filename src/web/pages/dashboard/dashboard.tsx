@@ -2,7 +2,7 @@ import * as React from "react";
 import { external } from "tsdi";
 import { observer } from "mobx-react";
 import { Grid, Card, Header, Icon } from "semantic-ui-react";
-import { requireLogin } from "../../../common-ui";
+import { requireLogin } from "../../utils";
 import { Content } from "../../components";
 import { ChannelTree } from "../../components";
 

@@ -1,10 +1,9 @@
 import { Column, PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
-import { oneOf, is, scope, specify, length, uuid, transform, only, required } from "hyrest";
-
+import { oneOf, is, scope, specify, length, uuid, transform, only, required, precompute } from "hyrest";
 import { world, login, owner, signup, createMumbleLink } from "../scopes";
 import { hash } from "../utils";
-
 import { Sound, PermissionAssociation, Token, Setting, MumbleLink, Playlist } from ".";
+import * as gravatar from "gravatar-url";
 
 /**
  * A user from the database.
@@ -74,6 +73,12 @@ export class User {
 
     @OneToMany(() => Playlist, playlist => playlist.creator)
     public playlists?: Playlist[];
+
+    @precompute @scope(world)
+    public get avatarUrl() {
+        if (!this.email) {
+            return;
+        }
+        return gravatar(this.email, { size: 200, default: "identicon" });
+    }
 }
-
-

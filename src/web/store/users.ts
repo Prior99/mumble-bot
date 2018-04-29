@@ -6,7 +6,7 @@ import { User, Users } from "../../common";
 
 import { LoginStore, OwnUserStore } from ".";
 
-@component
+@component({ name: "UsersStore" })
 export class UsersStore {
     @inject private usersController: Users;
 

@@ -3,7 +3,7 @@ import { Modal, Button, Icon, Header } from "semantic-ui-react";
 import { observer } from "mobx-react";
 import { inject, external } from "tsdi";
 
-import { ErrorStore } from "../../../common-ui";
+import { ErrorStore } from "../../store";
 
 @observer @external
 export class Errors extends React.PureComponent<{}> {

@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { Sidebar } from "semantic-ui-react";
 import * as classNames from "classnames/bind";
 import { inject, external } from "tsdi";
-import { SidebarStore, LoginStore } from "../../../common-ui";
+import { SidebarStore, LoginStore } from "../../store";
 import { Errors, AppBar, AppSidebar  } from "..";
 import * as css from "./app-container.scss";
 import { isProductionEnvironment } from "../../../common";

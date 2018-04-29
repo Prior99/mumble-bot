@@ -71,7 +71,7 @@ export class MumbleStore {
     @bind @action public async link(mumbleUser: MumbleUser) {
         const link = await this.mumbleLinks.createMumbleLink({
             mumbleId: mumbleUser.id,
-            user: { id: this.login.userId },
+            user: { id: this.login.userId } as User,
         });
         this.links.push(link);
     }

@@ -5,8 +5,8 @@ import { observer } from "mobx-react";
 import { inject, external } from "tsdi";
 import bind from "bind-decorator";
 import { Input, Button, Form } from "semantic-ui-react";
-
-import { routeLogin, SignupStore } from "../../../common-ui";
+import { SignupStore } from "../../store";
+import { routeLogin } from "../../routing";
 import { Content } from "../../components";
 
 @external @observer

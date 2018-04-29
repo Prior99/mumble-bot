@@ -3,8 +3,8 @@ import { Sidebar, Menu } from "semantic-ui-react";
 import { observer } from "mobx-react";
 import { inject, external } from "tsdi";
 import { History } from "history";
-
-import { routes, SidebarStore, LoginStore } from "../../../common-ui";
+import { SidebarStore, LoginStore } from "../../store";
+import { routes } from "../../routing/routes";
 
 @observer @external
 export class AppSidebar extends React.Component {
@@ -23,10 +23,10 @@ export class AppSidebar extends React.Component {
             >
                 {
                     routes.reduce((result, route) => {
-                        if (!route.navbar) {
+                        if (!route.route.navbar) {
                             return result;
                         }
-                        const { title, icon, path } = route;
+                        const { title, icon, path } = route.route;
                         result.push(
                             <Menu.Item
                                 key={title}
