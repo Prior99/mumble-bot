@@ -11,7 +11,7 @@ import { oneOf, is, scope, DataType, specify, uuid } from "hyrest";
 
 import { world, createSound } from "../scopes";
 
-import { User, DialogPart, SoundLabelRelation } from ".";
+import { User, PlaylistEntry, SoundLabelRelation } from ".";
 
 /**
  * A single record as represented in the database.
@@ -100,7 +100,9 @@ export class Sound {
     @scope(world) @is(DataType.float)
     public duration?: number;
 
-    @ManyToOne(() => DialogPart, dialogPart => dialogPart.sound)
-    @scope(world) @is() @specify(() => DialogPart)
-    public dialogParts?: DialogPart[];
+    @ManyToOne(() => PlaylistEntry, playlistEntry => playlistEntry.sound)
+    @scope(world) @is() @specify(() => PlaylistEntry)
+    public playlistEntrys?: PlaylistEntry[];
 }
+
+

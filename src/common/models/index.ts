@@ -7,10 +7,10 @@ import { Label } from "./label";
 export { CachedAudio } from "./cached-audio";
 export { SoundLabelRelation } from "./sound-label-relation";
 import { SoundLabelRelation } from "./sound-label-relation";
-export { Dialog } from "./dialog";
-import { Dialog } from "./dialog";
-export { DialogPart } from "./dialog-part";
-import { DialogPart } from "./dialog-part";
+export { Playlist } from "./playlist";
+import { Playlist } from "./playlist";
+export { PlaylistEntry } from "./playlist-entry";
+import { PlaylistEntry } from "./playlist-entry";
 export { MumbleLink } from "./mumble-link";
 import { MumbleLink } from "./mumble-link";
 export { Permission } from "./permission";
@@ -30,8 +30,8 @@ export const allDatabaseModels = [
     Label,
     SoundLabelRelation,
     Sound,
-    Dialog,
-    DialogPart,
+    Playlist,
+    PlaylistEntry,
     MumbleLink,
     PermissionAssociation,
     Token,

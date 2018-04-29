@@ -1,7 +1,7 @@
 export { Cached } from "./cached";
 import { Cached } from "./cached";
-export { Dialogs } from "./dialogs";
-import { Dialogs } from "./dialogs";
+export { Playlists } from "./playlists";
+import { Playlists } from "./playlists";
 export { Labels } from "./labels";
 import { Labels } from "./labels";
 export { MumbleLinks } from "./mumble-links";
@@ -19,7 +19,7 @@ import { Validation } from "./validation";
 
 export const allControllers = [
     Cached,
-    Dialogs,
+    Playlists,
     Labels,
     MumbleLinks,
     Sounds,

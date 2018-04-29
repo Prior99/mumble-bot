@@ -13,7 +13,7 @@ import {
     Label,
     SoundLabelRelation,
     PermissionAssociation,
-    Dialog,
+    Playlist,
 } from "../common";
 import { writeFileSync, readFileSync } from "fs";
 
@@ -64,15 +64,15 @@ interface SourcePermission {
     permission: string;
 }
 
-interface SourceDialog {
+interface SourcePlaylist {
     id: number;
     submitted: Date;
     used: number;
 }
 
-interface SourceDialogPart {
+interface SourcePlaylistEntry {
     id: number;
-    dialogId: number;
+    playlistId: number;
     position: number;
     recordId: number;
 }
@@ -86,7 +86,7 @@ export default class MigrateCommand extends Command { // tslint:disable-line
     private userIdMapping: Map<number, string> = new Map();
     private labelIdMapping: Map<number, string> = new Map();
     private recordingIdMapping: Map<number, string> = new Map();
-    private dialogIdMapping: Map<number, string> = new Map();
+    private playlistIdMapping: Map<number, string> = new Map();
 
     private async confirm() {
         process.stdin.resume();
@@ -283,16 +283,17 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         info("All permissions migrated.");
     }
 
-    private async migrateDialog(sourceDialog: SourceDialog) {
-        info(`Migrating dialog ${sourceDialog.id} ...`);
-        const targetDialog = new Dialog();
-        Object.assign(targetDialog, {
-            created: sourceDialog.submitted,
-            used: sourceDialog.used,
+    private async migrateDialog(sourcePlaylist: SourcePlaylist) {
+        info(`Migrating playlist ${sourcePlaylist.id} ...`);
+        const targetPlaylist = new Playlist();
+        Object.assign(targetPlaylist, {
+            created: sourcePlaylist.submitted,
+            used: sourcePlaylist.used,
             creator: { id: this.userIdMapping.values().next().value },
+            name: `Playlist from ${sourcePlaylist.submitted.toISOString()}`,
         });
-        await this.targetDb.getRepository(Dialog).save(targetDialog);
-        this.dialogIdMapping.set(sourceDialog.id, targetDialog.id);
+        await this.targetDb.getRepository(Playlist).save(targetPlaylist);
+        this.playlistIdMapping.set(sourcePlaylist.id, targetPlaylist.id);
     }
 
     private async migrateDialogs() {
@@ -304,16 +305,16 @@ export default class MigrateCommand extends Command { // tslint:disable-line
                 used
             FROM Dialogs
         `);
-        info(`Found ${rows.length} dialogs to migrate.`);
+        info(`Found ${rows.length} playlists to migrate.`);
         for (let row of rows) {
             try {
                 await this.migrateDialog(row);
             } catch (err) {
-                error(`Unable to migrate dialog ${row.id}: ${err.message}`);
+                error(`Unable to migrate playlist ${row.id}: ${err.message}`);
                 console.error(err);
             }
         }
-        info("All dialogs migrated.");
+        info("All playlists migrated.");
     }
 
     private async migrateUser(sourceUser: SourceUser) {

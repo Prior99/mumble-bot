@@ -12,15 +12,15 @@ export interface MetaInformationCached {
     user: User;
 }
 
-export interface MetaInformationDialog {
-    type: "dialog";
+export interface MetaInformationPlaylist {
+    type: "playlist";
     user: User;
 }
 
 export type MetaInformation = MetaInformationSound |
     MetaInformationSound |
     MetaInformationCached |
-    MetaInformationDialog;
+    MetaInformationPlaylist;
 
 export interface WorkItem {
     file: string;
@@ -51,7 +51,7 @@ export function convertWorkItem(item: WorkItem) {
             type,
         };
     }
-    if (meta.type === "dialog") {
+    if (meta.type === "playlist") {
         return {
             time,
             user: user.id,
