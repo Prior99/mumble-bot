@@ -3,7 +3,7 @@ import { createConnection, Connection as PostgresConnection } from "typeorm";
 import * as FFMpeg from "fluent-ffmpeg";
 import * as MySQL from "promise-mysql";
 import * as mkdirp from "mkdirp";
-import { info, error, warn } from "winston";
+import { info, error } from "winston";
 import { MigrationConfig } from "../config";
 import {
     allDatabaseModels,
@@ -77,6 +77,8 @@ interface SourceDialogPart {
     position: number;
     recordId: number;
 }
+
+// tslint:disable:await-promise
 
 @command({ description: "Migrate a 0.2.1 database to 1.0.0" })
 export default class MigrateCommand extends Command { // tslint:disable-line

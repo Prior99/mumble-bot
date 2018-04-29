@@ -1,5 +1,3 @@
-import * as pathToRegexp from "path-to-regexp";
-
 export interface BasicRoute {
     path: (...args: string[]) => string;
     pattern: string;

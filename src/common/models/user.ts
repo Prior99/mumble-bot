@@ -1,5 +1,5 @@
 import { Column, PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
-import { oneOf, is, scope, specify, length, uuid, transform, only, required, precompute } from "hyrest";
+import { is, scope, specify, length, uuid, transform, only, required, precompute } from "hyrest";
 import { world, login, owner, signup, createMumbleLink } from "../scopes";
 import { hash } from "../utils";
 import { Sound, PermissionAssociation, Token, Setting, MumbleLink, Playlist } from ".";

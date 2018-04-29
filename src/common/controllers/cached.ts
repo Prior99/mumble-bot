@@ -92,4 +92,3 @@ export class Cached {
         return notFound<undefined>(`No cached sound with id "${id}" found.`);
     }
 }
-

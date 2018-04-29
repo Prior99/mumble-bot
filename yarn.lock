@@ -9847,10 +9847,6 @@ window-size@0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/window-size/-/window-size-0.1.0.tgz#5438cd2ea93b202efa3a19fe8887aee7c94f9c9d"
 
-winston-mysql-transport@0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/winston-mysql-transport/-/winston-mysql-transport-0.1.2.tgz#647b69c555b63f96341d3111ea45962b1447c883"
-
 winston@^2.4.2:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/winston/-/winston-2.4.2.tgz#3ca01f763116fc48db61053b7544e750431f8db0"
