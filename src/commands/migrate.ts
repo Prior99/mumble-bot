@@ -14,6 +14,7 @@ import {
     SoundLabelRelation,
     PermissionAssociation,
     Playlist,
+    PlaylistEntry,
 } from "../common";
 import { writeFileSync, readFileSync } from "fs";
 
@@ -64,15 +65,15 @@ interface SourcePermission {
     permission: string;
 }
 
-interface SourcePlaylist {
+interface SourceDialog {
     id: number;
     submitted: Date;
     used: number;
 }
 
-interface SourcePlaylistEntry {
+interface SourceDialogPart {
     id: number;
-    playlistId: number;
+    dialogId: number;
     position: number;
     recordId: number;
 }
@@ -283,17 +284,50 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         info("All permissions migrated.");
     }
 
-    private async migrateDialog(sourcePlaylist: SourcePlaylist) {
-        info(`Migrating playlist ${sourcePlaylist.id} ...`);
+    private async migrateDialogPart(sourceDialogPart: SourceDialogPart) {
+        info(`Migrating dialog part ${sourceDialogPart.id} ...`);
+        const targetPlaylistEntry = new PlaylistEntry();
+        Object.assign(targetPlaylistEntry, {
+            sound: { id: this.recordingIdMapping.get(sourceDialogPart.recordId) },
+            playlist: { id: this.playlistIdMapping.get(sourceDialogPart.dialogId) },
+            position: sourceDialogPart.position,
+        });
+        await this.targetDb.getRepository(PlaylistEntry).save(targetPlaylistEntry);
+    }
+
+    private async migrateDialogParts() {
+        info("Migrating dialog parts ...");
+        const rows = await this.sourceDb.query(`
+            SELECT
+                id,
+                dialogId,
+                position,
+                recordId
+            FROM DialogParts
+        `);
+        info(`Found ${rows.length} dialog parts to migrate.`);
+        for (let row of rows) {
+            try {
+                await this.migrateDialogPart(row);
+            } catch (err) {
+                error(`Unable to migrate dialog part ${row.id}: ${err.message}`);
+                console.error(err);
+            }
+        }
+        info("All dialog parts migrated.");
+    }
+
+    private async migrateDialog(sourceDialog: SourceDialog) {
+        info(`Migrating dialog ${sourceDialog.id} ...`);
         const targetPlaylist = new Playlist();
         Object.assign(targetPlaylist, {
-            created: sourcePlaylist.submitted,
-            used: sourcePlaylist.used,
+            created: sourceDialog.submitted,
+            used: sourceDialog.used,
             creator: { id: this.userIdMapping.values().next().value },
-            name: `Playlist from ${sourcePlaylist.submitted.toISOString()}`,
+            name: `Playlist from ${sourceDialog.submitted.toISOString()}`,
         });
         await this.targetDb.getRepository(Playlist).save(targetPlaylist);
-        this.playlistIdMapping.set(sourcePlaylist.id, targetPlaylist.id);
+        this.playlistIdMapping.set(sourceDialog.id, targetPlaylist.id);
     }
 
     private async migrateDialogs() {
@@ -305,16 +339,16 @@ export default class MigrateCommand extends Command { // tslint:disable-line
                 used
             FROM Dialogs
         `);
-        info(`Found ${rows.length} playlists to migrate.`);
+        info(`Found ${rows.length} dialogs to migrate.`);
         for (let row of rows) {
             try {
                 await this.migrateDialog(row);
             } catch (err) {
-                error(`Unable to migrate playlist ${row.id}: ${err.message}`);
+                error(`Unable to migrate dialog ${row.id}: ${err.message}`);
                 console.error(err);
             }
         }
-        info("All playlists migrated.");
+        info("All dialogs migrated.");
     }
 
     private async migrateUser(sourceUser: SourceUser) {
@@ -399,7 +433,7 @@ export default class MigrateCommand extends Command { // tslint:disable-line
                 console.error(err);
             }
         }
-        info("All uplaoded sounds migrated.");
+        info("All uploaded sounds migrated.");
     }
 
     private async migrateRecording(sourceRecording: SourceRecording) {
@@ -463,10 +497,11 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         await this.migratePermissions();
         await this.migrateMumbleLinks();
         await this.migrateRecordings();
+        await this.migrateDialogs();
+        await this.migrateDialogParts();
         await this.migrateLabels();
         await this.migrateRecordingLabelRelations();
         await this.migrateSounds();
-        await this.migrateDialogs();
 
         await this.targetDb.close();
         info("Disconnected from target database.");

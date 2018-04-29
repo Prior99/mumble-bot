@@ -100,9 +100,7 @@ export class Sound {
     @scope(world) @is(DataType.float)
     public duration?: number;
 
-    @ManyToOne(() => PlaylistEntry, playlistEntry => playlistEntry.sound)
+    @OneToMany(() => PlaylistEntry, playlistEntry => playlistEntry.sound)
     @scope(world) @is() @specify(() => PlaylistEntry)
     public playlistEntrys?: PlaylistEntry[];
 }
-
-

@@ -1,4 +1,4 @@
-import { PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
+import { PrimaryGeneratedColumn, Entity, ManyToOne, Column } from "typeorm";
 import { is, scope, uuid } from "hyrest";
 
 import { world, createPlaylist } from "../scopes";
@@ -11,13 +11,15 @@ export class PlaylistEntry {
     @scope(world) @is().validate(uuid)
     public id?: string;
 
-    @OneToMany(() => Sound, sound => sound.playlistEntrys)
+    @ManyToOne(() => Sound, sound => sound.playlistEntrys)
     @is() @scope(world, createPlaylist)
     public sound?: Sound;
 
-    @OneToMany(() => Playlist, playlist => playlist.parts)
-    @is() @scope(world)
+    @ManyToOne(() => Playlist, playlist => playlist.parts)
+    @is() @scope(world, createPlaylist)
     public playlist?: Playlist;
+
+    @Column("integer")
+    @is() @scope(world, createPlaylist)
+    public position?: number;
 }
-
-
