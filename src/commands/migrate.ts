@@ -5,7 +5,16 @@ import * as MySQL from "promise-mysql";
 import * as mkdirp from "mkdirp";
 import { info, error, warn } from "winston";
 import { MigrationConfig } from "../config";
-import { allDatabaseModels, User, MumbleLink, Sound, Label, SoundLabelRelation, PermissionAssociation } from "../common";
+import {
+    allDatabaseModels,
+    User,
+    MumbleLink,
+    Sound,
+    Label,
+    SoundLabelRelation,
+    PermissionAssociation,
+    Dialog,
+} from "../common";
 import { writeFileSync, readFileSync } from "fs";
 
 interface SourceUser {
@@ -30,9 +39,9 @@ interface SourceSound {
 interface SourceRecording {
     id: number;
     quote: string;
-    submitted: Date;
+    created: Date;
     user: number;
-    reporter: number;
+    creator: number;
     used: number;
     changed: Date;
     duration: number;
@@ -55,6 +64,19 @@ interface SourcePermission {
     permission: string;
 }
 
+interface SourceDialog {
+    id: number;
+    submitted: Date;
+    used: number;
+}
+
+interface SourceDialogPart {
+    id: number;
+    dialogId: number;
+    position: number;
+    recordId: number;
+}
+
 @command({ description: "Migrate a 0.2.1 database to 1.0.0" })
 export default class MigrateCommand extends Command { // tslint:disable-line
     private config: MigrationConfig;
@@ -64,6 +86,7 @@ export default class MigrateCommand extends Command { // tslint:disable-line
     private userIdMapping: Map<number, string> = new Map();
     private labelIdMapping: Map<number, string> = new Map();
     private recordingIdMapping: Map<number, string> = new Map();
+    private dialogIdMapping: Map<number, string> = new Map();
 
     private async confirm() {
         process.stdin.resume();
@@ -260,6 +283,39 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         info("All permissions migrated.");
     }
 
+    private async migrateDialog(sourceDialog: SourceDialog) {
+        info(`Migrating dialog ${sourceDialog.id} ...`);
+        const targetDialog = new Dialog();
+        Object.assign(targetDialog, {
+            created: sourceDialog.submitted,
+            used: sourceDialog.used,
+            creator: { id: this.userIdMapping.values().next().value },
+        });
+        await this.targetDb.getRepository(Dialog).save(targetDialog);
+        this.dialogIdMapping.set(sourceDialog.id, targetDialog.id);
+    }
+
+    private async migrateDialogs() {
+        info("Migrating dialogs ...");
+        const rows = await this.sourceDb.query(`
+            SELECT
+                id,
+                submitted,
+                used
+            FROM Dialogs
+        `);
+        info(`Found ${rows.length} dialogs to migrate.`);
+        for (let row of rows) {
+            try {
+                await this.migrateDialog(row);
+            } catch (err) {
+                error(`Unable to migrate dialog ${row.id}: ${err.message}`);
+                console.error(err);
+            }
+        }
+        info("All dialogs migrated.");
+    }
+
     private async migrateUser(sourceUser: SourceUser) {
         info(`Migrating user ${sourceUser.username} (${sourceUser.id}) ...`);
         const targetUser = new User();
@@ -314,8 +370,8 @@ export default class MigrateCommand extends Command { // tslint:disable-line
             description: sourceSound.name,
             used: sourceSound.used,
             source: "upload",
-            reporter: this.userIdMapping.values().next().value,
-            submitted: now,
+            creator: this.userIdMapping.values().next().value,
+            created: now,
             changed: now,
             duration: soundMeta.format.duration,
         });
@@ -354,9 +410,9 @@ export default class MigrateCommand extends Command { // tslint:disable-line
             used: sourceRecording.used,
             user: this.userIdMapping.get(sourceRecording.user),
             source: "recording",
-            reporter: this.userIdMapping.get(sourceRecording.reporter),
+            creator: this.userIdMapping.get(sourceRecording.creator),
             overwrite: sourceRecording.overwrite,
-            submitted: sourceRecording.submitted,
+            created: sourceRecording.created,
             updated: sourceRecording.changed,
             duration: sourceRecording.duration,
         });
@@ -409,6 +465,7 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         await this.migrateLabels();
         await this.migrateRecordingLabelRelations();
         await this.migrateSounds();
+        await this.migrateDialogs();
 
         await this.targetDb.close();
         info("Disconnected from target database.");

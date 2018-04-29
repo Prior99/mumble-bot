@@ -1,7 +1,8 @@
-import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, CreateDateColumn } from "typeorm";
+import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, CreateDateColumn, OneToMany } from "typeorm";
 import { is, scope, specify, uuid, DataType } from "hyrest";
 import { world, createDialog } from "../scopes";
 import { DialogPart } from ".";
+import { User } from "./";
 
 /**
  * A dialog as represented in the database including all its records.
@@ -14,14 +15,17 @@ export class Dialog {
      */
     @PrimaryGeneratedColumn("uuid")
     @scope(world) @is().validate(uuid)
-    public id?: number;
+    public id?: string;
+
+    @ManyToOne(() => User, user => user.dialogs)
+    public creator?: User;
 
     /**
-     * The date when this dialog was submitted.
+     * The date when this dialog was created.
      */
     @CreateDateColumn()
     @scope(world) @is() @specify(() => Date)
-    public submitted?: Date;
+    public created?: Date;
 
     /**
      * How often this dialog was used.
@@ -33,7 +37,7 @@ export class Dialog {
     /**
      * All records belonging to this dialog.
      */
-    @ManyToOne(() => DialogPart, dialogPart => dialogPart.dialog)
+    @OneToMany(() => DialogPart, dialogPart => dialogPart.dialog)
     @is() @scope(world, createDialog) @specify(() => DialogPart)
     public parts?: DialogPart[];
 }

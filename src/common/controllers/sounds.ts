@@ -43,7 +43,7 @@ export class Sounds {
     ): Promise<Sound[]> {
         const queryBuilder = this.db.getRepository(Sound).createQueryBuilder("sound");
         if (since) {
-            queryBuilder.andWhere("submitted > :since", { since });
+            queryBuilder.andWhere("created > :since", { since });
         }
         const sounds = await queryBuilder.getMany();
 
@@ -108,7 +108,7 @@ export class Sounds {
             quote,
             overwrite,
             duration: newDuration,
-            reporter: currentUser,
+            creator: currentUser,
         });
 
         verbose(`${name} is forking record #${id}`);

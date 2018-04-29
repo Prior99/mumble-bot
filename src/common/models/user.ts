@@ -1,10 +1,10 @@
 import { Column, PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
-import { is, scope, specify, length, uuid, transform, only, required } from "hyrest";
+import { oneOf, is, scope, specify, length, uuid, transform, only, required } from "hyrest";
 
 import { world, login, owner, signup, createMumbleLink } from "../scopes";
 import { hash } from "../utils";
 
-import { Sound, PermissionAssociation, Token, Setting, MumbleLink } from ".";
+import { Sound, PermissionAssociation, Token, Setting, MumbleLink, Dialog } from ".";
 
 /**
  * A user from the database.
@@ -40,14 +40,14 @@ export class User {
     @scope(owner, login)
     public email?: string;
 
-    @Column("integer")
+    @Column("integer", { default: 0 })
     public score?: number;
 
     @OneToMany(() => Sound, sound => sound.user)
     @is() @scope(world) @specify(() => Sound)
     public sounds?: Sound[];
 
-    @OneToMany(() => Sound, sound => sound.reporter)
+    @OneToMany(() => Sound, sound => sound.creator)
     @is() @scope(world) @specify(() => Sound)
     public reported?: Sound[];
 
@@ -71,4 +71,7 @@ export class User {
     @OneToMany(() => MumbleLink, mumbleLink => mumbleLink.user)
     @is() @specify(() => MumbleLink)
     public mumbleLinks?: MumbleLink[];
+
+    @OneToMany(() => Dialog, dialog => dialog.creator)
+    public dialogs?: Dialog[];
 }

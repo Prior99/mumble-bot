@@ -44,7 +44,7 @@ export class Cached {
         }
 
         const currentUser = await ctx.currentUser();
-        sound.reporter = currentUser;
+        sound.creator = currentUser;
         sound.user = cached.user;
 
         await this.createSoundDirectory();

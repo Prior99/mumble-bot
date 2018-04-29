@@ -55,7 +55,7 @@ export class Sound {
      */
     @ManyToOne(() => User, user => user.reported)
     @is() @scope(world)
-    public reporter?: User;
+    public creator?: User;
 
     /**
      * Whether this forked record overwrites the original one.
@@ -80,7 +80,7 @@ export class Sound {
      */
     @CreateDateColumn()
     @scope(world) @is() @specify(() => Date)
-    public submitted?: Date;
+    public created?: Date;
 
     @UpdateDateColumn()
     @scope(world) @is() @specify(() => Date)
