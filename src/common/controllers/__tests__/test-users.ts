@@ -1,5 +1,6 @@
 import { pick } from "ramda";
 import { api, createUserWithToken, createUser } from "../../../__tests__";
+import { User } from "../..";
 
 describe("users controller", () => {
     describe("GET /users", () => {
@@ -12,15 +13,28 @@ describe("users controller", () => {
         it("returns a list of users when logged in", async () => {
             const { user, token } = await createUserWithToken();
             const users = [
-                user,
-                await createUser({ name: "2nd-user", email: "2nd@example.com" }),
-                await createUser({ name: "3rd-user", email: "3rd@example.com" }),
-                await createUser({ name: "4th-user", email: "4th@example.com" }),
+                {
+                    ...user,
+                    avatarUrl:
+                        "https://gravatar.com/avatar/146d377bd4771d03c8a6cd18bf26964c?size=200&default=identicon",
+                }, {
+                    ...(await createUser({ name: "2nd-user", email: "2nd@example.com" } as User)),
+                    avatarUrl:
+                        "https://gravatar.com/avatar/ded0c14e09f3c07d977ed341f38164eb?size=200&default=identicon",
+                }, {
+                    ...(await await createUser({ name: "3rd-user", email: "3rd@example.com" } as User)),
+                    avatarUrl:
+                        "https://gravatar.com/avatar/40b80c89af474114102231e71bbebdda?size=200&default=identicon",
+                }, {
+                    ...(await createUser({ name: "4th-user", email: "4th@example.com" } as User)),
+                    avatarUrl:
+                        "https://gravatar.com/avatar/07a03b338ba7d1eb4ab1959546334d80?size=200&default=identicon",
+                },
             ];
             const response = await api().get("/users")
                 .set("authorization", `Bearer ${token.id}`);
             expect(response.body).toEqual({
-                data: users.map(current => pick(["name", "id"], current)),
+                data: users.map(current => pick(["name", "id", "avatarUrl"], current)),
             });
             expect(response.status).toBe(200);
         });
@@ -53,7 +67,11 @@ describe("users controller", () => {
             const response = await api().get(`/user/${user.id}`)
                 .set("authorization", `Bearer ${token.id}`);
             expect(response.body).toEqual({
-                data: pick(["name", "id"], user),
+                data: {
+                    ...pick(["name", "id"], user),
+                    avatarUrl:
+                        "https://gravatar.com/avatar/146d377bd4771d03c8a6cd18bf26964c?size=200&default=identicon",
+                },
             });
             expect(response.status).toBe(200);
         });

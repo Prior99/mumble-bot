@@ -57,7 +57,6 @@ describe("mumble-links controller", () => {
             expect(response.body).toMatchObject({
                 data: {
                     mumbleId: 4,
-                    name: "Stranger one",
                     user: {
                         id: user.id,
                     },
@@ -88,14 +87,12 @@ describe("mumble-links controller", () => {
                 data: [
                     {
                         mumbleId: 4,
-                        name: "Stranger one",
                         user: {
                             id: otherUser1.id,
                             name: "user1",
                         },
                     }, {
                         mumbleId: 7,
-                        name: "Stranger two",
                         user: {
                             id: otherUser2.id,
                             name: "user2",
