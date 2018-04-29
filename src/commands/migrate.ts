@@ -5,7 +5,7 @@ import * as MySQL from "promise-mysql";
 import * as mkdirp from "mkdirp";
 import { info, error, warn } from "winston";
 import { MigrationConfig } from "../config";
-import { allDatabaseModels, User, MumbleLink, Sound, Label, SoundLabelRelation } from "../common";
+import { allDatabaseModels, User, MumbleLink, Sound, Label, SoundLabelRelation, PermissionAssociation } from "../common";
 import { writeFileSync, readFileSync } from "fs";
 
 interface SourceUser {
@@ -48,6 +48,11 @@ interface SourceLabel {
 interface SourceRecordingLabelRelation {
     record: number;
     label: number;
+}
+
+interface SourcePermission {
+    user: number;
+    permission: string;
 }
 
 @command({ description: "Migrate a 0.2.1 database to 1.0.0" })
@@ -221,6 +226,40 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         info("All recording label relations migrated.");
     }
 
+    private async migratePermission(sourcePermission: SourcePermission) {
+        info(`Migrating permission ${sourcePermission.user} -> ${sourcePermission.permission} ...`);
+        const targetPermission = new PermissionAssociation();
+        Object.assign(targetPermission, {
+            user: this.userIdMapping.get(sourcePermission.user),
+            permission: sourcePermission.permission,
+        });
+        await this.targetDb.getRepository(PermissionAssociation).save(targetPermission);
+    }
+
+    private async migratePermissions() {
+        info("Migrating permissions ...");
+        const rows = await this.sourceDb.query(`
+            SELECT
+                user,
+                permission
+            FROM UserPermissions
+            WHERE
+                permission = "login" OR
+                permission = "grant" OR
+                permission = "be-quiet"
+        `);
+        info(`Found ${rows.length} permissions to migrate.`);
+        for (let row of rows) {
+            try {
+                await this.migratePermission(row);
+            } catch (err) {
+                error(`Unable to migrate permission ${row.user} -> ${row.permission}: ${err.message}`);
+                console.error(err);
+            }
+        }
+        info("All permissions migrated.");
+    }
+
     private async migrateUser(sourceUser: SourceUser) {
         info(`Migrating user ${sourceUser.username} (${sourceUser.id}) ...`);
         const targetUser = new User();
@@ -364,6 +403,7 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         mkdirp.sync(this.config.targetSoundsDir);
 
         await this.migrateUsers();
+        await this.migratePermissions();
         await this.migrateMumbleLinks();
         await this.migrateRecordings();
         await this.migrateLabels();

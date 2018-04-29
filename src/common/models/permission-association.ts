@@ -2,7 +2,7 @@ import {
     Column,
     PrimaryGeneratedColumn,
     Entity,
-    OneToMany,
+    ManyToOne,
 } from "typeorm";
 import { is, scope, uuid } from "hyrest";
 import { world } from "../scopes";
@@ -18,7 +18,7 @@ export class PermissionAssociation {
     @is() @scope(world)
     public permission?: string;
 
-    @OneToMany(() => User, user => user.permissionAssociations)
+    @ManyToOne(() => User, user => user.permissionAssociations)
     @is() @scope(world)
     public user?: User;
 }
