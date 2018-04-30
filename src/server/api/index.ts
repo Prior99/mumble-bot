@@ -8,7 +8,7 @@ import { Connection } from "typeorm";
 import { component, inject, initialize, TSDI, destroy } from "tsdi";
 import { info, error } from "winston";
 import { bind } from "bind-decorator";
-import { createReadStream, exists } from "async-file";
+import { createReadStream, existsSync } from "fs-extra";
 import { omit } from "ramda";
 import { hyrest } from "hyrest/middleware";
 import { AuthorizationMode, configureController, ControllerMode } from "hyrest";
@@ -204,7 +204,7 @@ export class RestApi {
 
         const fileName = `${sound.file}.png`;
         const trySend = async (retries = 0) => {
-            if (!await exists(fileName)) {
+            if (!existsSync(fileName)) {
                 if (retries === 5) { return res.status(404).send(); }
                 setTimeout(() => trySend(retries + 1), 500);
                 return;
@@ -251,7 +251,7 @@ export class RestApi {
 
         const fileName = `${this.config.soundsDir}/${sound.id}.png`;
         const trySend = async (retries = 0) => {
-            if (!await exists(fileName)) {
+            if (!existsSync(fileName)) {
                 if (retries === 5) { return res.status(404).send(); }
                 setTimeout(() => trySend(retries + 1), 500);
                 return;

@@ -4,7 +4,7 @@ import * as Stream from "stream";
 import * as FFMpeg from "fluent-ffmpeg";
 import * as Sox from "sox-audio";
 import { inject, component, initialize, destroy } from "tsdi";
-import { stat } from "async-file";
+import { stat } from "fs-extra";
 import { EventEmitter } from "events";
 import { MetaInformation, WorkItem } from "../common";
 

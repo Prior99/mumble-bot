@@ -1,4 +1,4 @@
-import * as Winston from "winston";
+import { error } from "winston";
 import * as Canvas from "canvas";
 import * as FFMpeg from "fluent-ffmpeg";
 import { AudioAnalyzer } from "./audioanalyzer";
@@ -39,7 +39,7 @@ export const visualizeAudioFile = function(filename) {
             stream.pipe(chunker);
         }
         catch (err) {
-            Winston.error("Error visualizing audio file:", err);
+            error("Error visualizing audio file:", err);
             reject(err);
         }
     });

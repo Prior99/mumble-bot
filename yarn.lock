@@ -163,6 +163,12 @@
     "@types/events" "*"
     "@types/node" "*"
 
+"@types/fs-extra@^5.0.2":
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-5.0.2.tgz#235a7e2b56452cc0a6a4809b53e1d1eaffff9c96"
+  dependencies:
+    "@types/node" "*"
+
 "@types/gravatar-url@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@types/gravatar-url/-/gravatar-url-2.0.0.tgz#78b072475a087a3459473fb24a742ecd4dfe0689"
@@ -601,12 +607,6 @@ astral-regex@^1.0.0:
 async-each@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/async-each/-/async-each-1.0.1.tgz#19d386a1d9edc6e7c1c85d388aedbcc56d33602d"
-
-async-file@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/async-file/-/async-file-2.0.2.tgz#02ad07856ac3717e836b20aec5a4cfe00c46df23"
-  dependencies:
-    rimraf "^2.5.2"
 
 async-foreach@^0.1.3:
   version "0.1.3"
@@ -3525,6 +3525,14 @@ from@~0:
 fs-extra@^4.0.2:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-4.0.3.tgz#0d852122e5bc5beb453fb028e9c0c9bf36340c94"
+  dependencies:
+    graceful-fs "^4.1.2"
+    jsonfile "^4.0.0"
+    universalify "^0.1.0"
+
+fs-extra@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-5.0.0.tgz#414d0110cdd06705734d055652c5411260c31abd"
   dependencies:
     graceful-fs "^4.1.2"
     jsonfile "^4.0.0"
@@ -8047,7 +8055,7 @@ rimraf@2, rimraf@^2.2.8, rimraf@^2.5.4, rimraf@^2.6.2:
   dependencies:
     glob "^7.0.5"
 
-rimraf@^2.5.2, rimraf@^2.6.1:
+rimraf@^2.6.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.6.1.tgz#c2338ec643df7a1b7fe5c54fa86f57428a55f33d"
   dependencies:

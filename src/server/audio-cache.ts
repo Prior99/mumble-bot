@@ -1,7 +1,7 @@
 import { component, inject, initialize } from "tsdi";
 import mkdirp = require("mkdirp-promise");
 import { Connection } from "typeorm";
-import { writeFile, unlink, readFile } from "async-file";
+import { writeFile, unlink, readFile } from "fs-extra";
 import { error, info } from "winston";
 import { EventEmitter } from "events";
 import { ServerConfig } from "../config";
@@ -28,7 +28,7 @@ export class AudioCache extends EventEmitter {
 
     private async importCache() {
         try {
-            const obj = JSON.parse(await readFile(this.cachedAudioIndexFilePath));
+            const obj = JSON.parse(await readFile(this.cachedAudioIndexFilePath, "utf8"));
             Object.keys(obj).forEach(key => this.cachedAudios.set(key, obj[key]));
         } catch (err) {
             if (err.code !== "ENOENT") { throw err; }

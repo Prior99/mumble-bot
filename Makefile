@@ -41,6 +41,10 @@ run-web: node_modules
 run-server: node_modules db
 	yarn start:server
 
+.PHONY: run-worker
+run-worker: node_modules db
+	yarn start:worker
+
 .PHONY: run-server-integration
 run-server-integration: node_modules build-server
 	node server serve\

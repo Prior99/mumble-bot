@@ -17,6 +17,9 @@ import {
     PlaylistEntry,
 } from "../common";
 import { writeFileSync, readFileSync } from "fs";
+import { setupWinston } from "../common";
+
+setupWinston();
 
 interface SourceUser {
     id: number;

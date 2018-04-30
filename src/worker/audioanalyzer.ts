@@ -17,15 +17,13 @@ interface Values {
 export class AudioAnalyzer {
     public list: Values[];
 
-    /**
-     * @constructor
-     * @param {number} samplesPerPixel - Number of samples represented by one pixel.
-     */
     constructor() {
-        this.list = [{
-            amplitude: 0.5,
-            freq: 0,
-        }];
+        this.list = [
+            {
+                amplitude: 0.5,
+                freq: 0,
+            },
+        ];
     }
 
     /**

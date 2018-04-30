@@ -18,10 +18,7 @@ export default class ServeCommand extends Command { // tslint:disable-line
             console.error(err);
         });
         // Load the configuration.
-        const configConsistent = config.load();
-        if (!configConsistent) {
-            return;
-        }
+        if (!config.load()) { return; }
         const tsdi = new TSDI();
         tsdi.enableComponentScanner();
         // Initialize config.
