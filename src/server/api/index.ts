@@ -59,10 +59,6 @@ export class RestApi {
         this.app.use(this.handleCORS);
         (this.app as any).ws("/queue", this.websocketQueue);
         (this.app as any).ws("/cached/live", this.websocketQueue);
-        this.app.get("/cached/:id/download", this.downloadCached);
-        this.app.get("/cached/:id/visualized", this.downloadVisualizedCached);
-        this.app.get("/sound/:id/download", this.downloadSound);
-        this.app.get("/sound/:id/visualized", this.downloadVisualizedSound);
         this.app.use(
             hyrest(...allControllers.map((controller: any) => this.tsdi.get(controller)))
                 .context(req => new Context(req))
@@ -76,6 +72,10 @@ export class RestApi {
                     return true;
                 }),
         );
+        this.app.get("/cached/:id/download", this.downloadCached);
+        this.app.get("/cached/:id/visualized", this.downloadVisualizedCached);
+        this.app.get("/sound/:id/download", this.downloadSound);
+        this.app.get("/sound/:id/visualized", this.downloadVisualizedSound);
 
     }
 
@@ -188,8 +188,8 @@ export class RestApi {
         res.setHeader("Content-disposition", `attachment; filename='cached_${id}.mp3'`);
         const stream = FS.createReadStream(sound.file)
             .on("error", (err) => {
-                error(`Error occured when trying to read cached record with id ${id}`);
                 if (err.code === "ENOENT") { return res.status(404).send(); }
+                error(`Error occured when trying to read cached record with id ${id}`);
             })
             .on("readable", () => {
                 try { stream.pipe(res); }
@@ -212,8 +212,8 @@ export class RestApi {
             try {
                 res.status(200);
                 createReadStream(fileName).on("error", (err) => {
-                    error(`Error sending visualization of ${sound.file} to client.`, err);
                     res.status(500).send();
+                    error(`Error sending visualization of ${sound.file} to client.`, err);
                 }).pipe(res);
             }
             catch (err) {
@@ -230,18 +230,25 @@ export class RestApi {
         const sound = await this.db.getRepository(Sound).findOne(id);
         if (!sound) { return res.status(404).send(); }
 
+        const fileName = `${this.config.soundsDir}/${sound.id}`;
+        if (!existsSync(fileName)) {
+            error(`Missing audio file for sound ${sound.id}.`);
+            res.status(404).send();
+            return;
+        }
+
         res.setHeader("Content-disposition", `attachment; filename='${sound.description}.mp3'`);
-        const stream = FS.createReadStream(`${this.config.soundsDir}/${sound.id}`)
-            .on("error", (err) => {
-                if (err.code === "ENOENT") { return res.status(404).send(); }
-                error(`Error occured when trying to read record with id ${sound.id}`);
-            })
-            .on("readable", async () => {
-                try { stream.pipe(res); }
-                catch (err) {
-                    error(`Error occured when trying to stream file to browser for sound ${id}`, err);
-                }
-            });
+        try {
+            res.status(200);
+            createReadStream(fileName).on("error", (err) => {
+                error(`Error sending audio file ${fileName} to client.`, err);
+                res.status(500).send();
+            }).pipe(res);
+        }
+        catch (err) {
+            error("Error occured during request of sound visualization.", err);
+            return res.status(500).send();
+        }
     }
 
     @bind public async downloadVisualizedSound({ params }: Request, res: Response) {
@@ -250,25 +257,21 @@ export class RestApi {
         if (!sound) { return res.status(404).send(); }
 
         const fileName = `${this.config.soundsDir}/${sound.id}.png`;
-        const trySend = async (retries = 0) => {
-            if (!existsSync(fileName)) {
-                if (retries === 5) { return res.status(404).send(); }
-                setTimeout(() => trySend(retries + 1), 500);
-                return;
-            }
-            try {
-                res.status(200);
-                createReadStream(fileName).on("error", (err) => {
-                    error(`Error sending visualization of ${fileName} to client.`, err);
-                    res.status(500).send();
-                }).pipe(res);
-            }
-            catch (err) {
-                error("Error occured during request of sound visualization.", err);
-                return res.status(500).send();
-            }
-        };
-
-        await trySend();
+        if (!existsSync(fileName)) {
+            error(`Missing visalization file ${fileName} for sound ${sound.id}.`);
+            res.status(404).send();
+            return;
+        }
+        try {
+            res.status(200);
+            createReadStream(fileName).on("error", (err) => {
+                error(`Error sending visualization of ${fileName} to client.`, err);
+                res.status(500).send();
+            }).pipe(res);
+        }
+        catch (err) {
+            error("Error occured during request of sound visualization.", err);
+            return res.status(500).send();
+        }
     }
 }
