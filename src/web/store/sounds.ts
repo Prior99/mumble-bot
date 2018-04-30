@@ -1,5 +1,4 @@
 import { observable, computed } from "mobx";
-import { bind } from "decko";
 import { component, initialize, inject } from "tsdi";
 import { Sounds, Sound } from "../../common";
 

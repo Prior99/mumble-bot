@@ -1,7 +1,7 @@
 import * as React from "react";
 import { external, inject } from "tsdi";
 import { observer } from "mobx-react";
-import { Grid, Card, Header, Icon } from "semantic-ui-react";
+import { Grid, Header, Icon } from "semantic-ui-react";
 import { requireLogin } from "../../utils";
 import { SoundsStore } from "../../store";
 import { SoundCard, Content } from "../../components";

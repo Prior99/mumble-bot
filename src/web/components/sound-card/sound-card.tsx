@@ -1,8 +1,7 @@
 import * as React from "react";
 import { observer } from "mobx-react";
 import { computed } from "mobx";
-import { external, inject } from "tsdi";
-import { bind } from "decko";
+import { external } from "tsdi";
 import { Image, Card, Button, Icon } from "semantic-ui-react";
 import { Sound } from "../../../common";
 
