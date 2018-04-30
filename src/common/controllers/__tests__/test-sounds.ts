@@ -1,6 +1,4 @@
-import { pick } from "ramda";
 import { api, createSoundWithCreatorAndSpeaker, createUserWithToken, createTag, tagSound } from "../../../__tests__";
-import { User } from "../..";
 import { Token, Sound, Tag } from "../../";
 
 describe("sounds controller", () => {
@@ -27,7 +25,7 @@ describe("sounds controller", () => {
         });
 
         it("fetches a sound with a specific id", async () => {
-            const { user, token } = await createUserWithToken();
+            const { token } = await createUserWithToken();
             const tag = await createTag("Some tag", token);
             const { sound, creator, speaker } = await createSoundWithCreatorAndSpeaker();
             await tagSound(sound, tag, token);
@@ -64,16 +62,11 @@ describe("sounds controller", () => {
     });
 
     describe("POST /sound/:id/tags", () => {
-        let token: Token, sound: Sound, tag: Tag, user: User, creator: User, speaker: User;
+        let token: Token, sound: Sound, tag: Tag;
 
         beforeEach(async () => {
-            const userWithToken = await createUserWithToken();
-            token = userWithToken.token;
-            user = userWithToken.user;
-            const soundWithCreatorAndSpeaker = await createSoundWithCreatorAndSpeaker();
-            sound = soundWithCreatorAndSpeaker.sound;
-            creator = soundWithCreatorAndSpeaker.creator;
-            speaker = soundWithCreatorAndSpeaker.speaker;
+            token = (await createUserWithToken()).token;
+            sound = (await createSoundWithCreatorAndSpeaker()).sound;
             tag = await createTag("Some tag", token);
         });
 
