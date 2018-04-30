@@ -42,7 +42,7 @@ run-server: node_modules db
 	yarn start:server
 
 .PHONY: run-worker
-run-worker: node_modules db
+run-worker: node_modules db build-server
 	yarn start:worker
 
 .PHONY: run-server-integration

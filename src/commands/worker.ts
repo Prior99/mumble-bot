@@ -13,14 +13,13 @@ setupWinston();
 export default class WorkerCommand extends Command { // tslint:disable-line
     private getVisualizationFilename = file => `${file}.png`;
     private watcher: FSWatcher;
+    private killed = false;
 
     private async generateVisualization(file: string) {
         const destination = this.getVisualizationFilename(file);
-        info(`Generating visualization for ${file} ...`);
         try {
             const buffer = await visualizeAudioFile(file);
             await writeFile(destination, buffer);
-            info(`Generated visualization for ${file} to ${destination}.`);
         } catch (err) {
             error(`Failed to generate visualization for file ${file}:`, err);
         }
@@ -36,10 +35,15 @@ export default class WorkerCommand extends Command { // tslint:disable-line
     private async generateMissingVisualizations(path: string) {
         const missingFiles = (await readdir(path))
             .map(file => `${path}/${file}`)
-            .filter(file => this.shouldGenerateVisualization(path));
+            .filter(file => this.shouldGenerateVisualization(file));
         if (missingFiles.length === 0) { return; }
         info(`Found ${missingFiles.length} missing visualizations in ${path}.`);
-        for (let file of missingFiles) {
+        for (let [index, file] of missingFiles.entries()) {
+            if (this.killed) { return; }
+            const percent = (index / missingFiles.length).toFixed(2);
+            info(`Visualizing ${file} to ${this.getVisualizationFilename(file)}. ` +
+                `File ${index}/${missingFiles.length} (${percent}% done.)`,
+            );
             await this.generateVisualization(file);
         }
         info(`All missing visualizations generated.`);
@@ -74,14 +78,13 @@ export default class WorkerCommand extends Command { // tslint:disable-line
         this.generateMissingVisualizations(config.soundsDir);
         this.watchDirectory(config.tmpDir);
 
-        let killed = false;
         process.on("SIGINT", () => {
-            if (killed) {
+            if (this.killed) {
                 error("CTRL^C detected. Terminating!");
                 process.exit(1);
                 return;
             }
-            killed = true;
+            this.killed = true;
             warn("CTRL^C detected. Secure shutdown initiated.");
             warn("Press CTRL^C again to terminate at your own risk.");
             this.watcher.close();
