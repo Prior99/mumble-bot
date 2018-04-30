@@ -12,5 +12,19 @@
     "setupTestFrameworkScriptFile": "<rootDir>/jest/jest-unit-setups.ts",
     "testMatch": [
         "<rootDir>/**/__tests__/test-*.(ts|tsx)"
+    ],
+    "globals": {
+        "ts-jest": {
+            "ignoreCoverageForDecorators": true,
+            "ignoreCoverageForAllDecorators": true
+        }
+    },
+    "coveragePathIgnorePatterns": [
+        "/node_modules/",
+        "/__tests__/",
+        "/jest/"
+    ],
+    "collectCoverageFrom": [
+        "src/**/*.{ts,tsx}"
     ]
 }

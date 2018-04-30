@@ -28,7 +28,7 @@ integration-test:
     - make integration-test
   stage: test
   artifacts:
-    when: on_failure
+    when: always
     paths:
       - jest-screenshot-report/
 
@@ -36,6 +36,10 @@ test:
   script:
     - make test
   stage: test
+  artifacts:
+    when: always
+    paths:
+      - coverage/
 
 build:
   script:

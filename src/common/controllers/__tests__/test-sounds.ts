@@ -1,5 +1,13 @@
-import { api, createSoundWithCreatorAndSpeaker, createUserWithToken, createTag, tagSound } from "../../../__tests__";
-import { Token, Sound, Tag } from "../../";
+import { omit } from "ramda";
+import {
+    api,
+    createSoundWithCreatorAndSpeaker,
+    createUserWithToken,
+    createTag,
+    tagSound,
+    createSound,
+} from "../../../__tests__";
+import { Token, Sound, Tag, User } from "../..";
 
 describe("sounds controller", () => {
     describe("GET /sound/:id", () => {
@@ -176,6 +184,201 @@ describe("sounds controller", () => {
             const response = await api().delete(`/sound/${sound.id}/tag/${tag.id}`)
                 .set("authorization", `Bearer ${token.id}`);
             expect(response.body.data.soundTagRelations).toEqual([]);
+            expect(response.status).toBe(200);
+        });
+    });
+
+    describe("GET /sounds", () => {
+        let sounds: Sound[];
+        let responseSounds: any[];
+        let tags: Tag[];
+        let userA: { token: Token, user: User };
+        let userB: { token: Token, user: User };
+
+        beforeEach(async () => {
+            userA = await createUserWithToken({ name: "User A", email: "usera@example.com" } as User);
+            userB = await createUserWithToken({ name: "User B", email: "userb@example.com" } as User);
+            tags = [
+                await createTag("Tag A", userA.token),
+                await createTag("Tag B", userA.token),
+            ];
+            sounds = [
+                await createSound({
+                    description: "C First sound something",
+                    creator: userA.user,
+                    user: userA.user,
+                    used: 100,
+                    duration: 3.5,
+                }),
+                await createSound({
+                    description: "A Second sound someone",
+                    creator: userB.user,
+                    user: userB.user,
+                    used: 15,
+                    duration: 3.2,
+                }),
+                await createSound({
+                    description: "B Third sound anyone",
+                    creator: userA.user,
+                    user: userB.user,
+                    used: 30,
+                    source: "upload",
+                    duration: 0.5,
+                }),
+            ];
+            await tagSound(sounds[0], tags[0], userA.token);
+            await tagSound(sounds[1], tags[0], userA.token);
+            await tagSound(sounds[1], tags[1], userA.token);
+            await tagSound(sounds[2], tags[1], userA.token);
+            responseSounds = sounds.map(sound => ({
+                ...sound,
+                created: sound.created.toISOString(),
+                updated: sound.updated.toISOString(),
+                creator: omit(["email"], sound.creator),
+                user: omit(["email"], sound.user),
+            }));
+        });
+
+        it("returns 401 without a valid token", async () => {
+            const response = await api().get("/sounds");
+            expect(response.body).toEqual({ message: "Unauthorized." });
+            expect(response.status).toBe(401);
+        });
+
+        it("returns all sounds without any parameters", async () => {
+            const response = await api().get("/sounds")
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body).toMatchObject({
+                data: responseSounds,
+            });
+            expect(response.status).toBe(200);
+        });
+
+        it("returns all sounds matching a creator", async () => {
+            const response = await api().get(`/sounds?creator=${userA.user.id}`)
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject([ responseSounds[0], responseSounds[2] ]);
+            expect(response.status).toBe(200);
+        });
+
+        it("returns all sounds matching a user", async () => {
+            const response = await api().get(`/sounds?user=${userA.user.id}`)
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject([ responseSounds[0] ]);
+            expect(response.status).toBe(200);
+        });
+
+        describe("returns all sounds with specified tags", () => {
+            it("matches the first tag", async () => {
+                const response = await api().get(`/sounds?tags=${tags[0].id}`)
+                    .set("authorization", `Bearer ${userA.token.id}`);
+                expect(response.body.data).toMatchObject([ responseSounds[0], responseSounds[1] ]);
+                expect(response.status).toBe(200);
+            });
+
+            it("matches the second tag", async () => {
+                const response = await api().get(`/sounds?tags=${tags[1].id}`)
+                    .set("authorization", `Bearer ${userA.token.id}`);
+                expect(response.body.data).toMatchObject([ responseSounds[1], responseSounds[2] ]);
+                expect(response.status).toBe(200);
+            });
+
+            it("matches both tags", async () => {
+                const response = await api().get(`/sounds?tags=${tags[1].id},${tags[0].id}`)
+                    .set("authorization", `Bearer ${userA.token.id}`);
+                expect(response.body.data).toMatchObject([ responseSounds[1] ]);
+                expect(response.status).toBe(200);
+            });
+        });
+
+        it("returns all sounds matching a start date", async () => {
+            const response = await api().get(`/sounds?startDate=${sounds[1].created.toISOString()}`)
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject([ responseSounds[1], responseSounds[2] ]);
+            expect(response.status).toBe(200);
+        });
+
+        it("returns all sounds matching an end date", async () => {
+            const response = await api().get(`/sounds?endDate=${sounds[1].created.toISOString()}`)
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject([ responseSounds[0] ]);
+            expect(response.status).toBe(200);
+        });
+
+        it("returns all sounds matching a search string", async () => {
+            const response = await api().get("/sounds?search=one")
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject([ responseSounds[1], responseSounds[2] ]);
+            expect(response.status).toBe(200);
+        });
+
+        it("returns all sounds matching a source", async () => {
+            const response = await api().get("/sounds?source=upload")
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject([ responseSounds[2] ]);
+            expect(response.status).toBe(200);
+        });
+
+        it("sorts the sounds by updated", async () => {
+            const response = await api().get("/sounds?sort=updated")
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject([ responseSounds[0], responseSounds[1], responseSounds[2] ]);
+            expect(response.status).toBe(200);
+        });
+
+        it("sorts the sounds by created", async () => {
+            const response = await api().get("/sounds?sort=created")
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject([ responseSounds[0], responseSounds[1], responseSounds[2] ]);
+            expect(response.status).toBe(200);
+        });
+
+        it("sorts the sounds by duration", async () => {
+            const response = await api().get("/sounds?sort=duration")
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject([ responseSounds[2], responseSounds[1], responseSounds[0] ]);
+            expect(response.status).toBe(200);
+        });
+
+        it("sorts the sounds by description", async () => {
+            const response = await api().get("/sounds?sort=description")
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject([ responseSounds[1], responseSounds[2], responseSounds[0] ]);
+            expect(response.status).toBe(200);
+        });
+
+        it("sorts the sounds by usage count ascending", async () => {
+            const response = await api().get("/sounds?sort=used&sortDirection=asc")
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject([ responseSounds[1], responseSounds[2], responseSounds[0] ]);
+            expect(response.status).toBe(200);
+        });
+
+        it("sorts the sounds by usage count descending", async () => {
+            const response = await api().get("/sounds?sort=used&sortDirection=desc")
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject([ responseSounds[0], responseSounds[2], responseSounds[1] ]);
+            expect(response.status).toBe(200);
+        });
+
+        it("with limit and offset", async () => {
+            const response = await api().get("/sounds?sort=used&sortDirection=desc&limit=1&offset=1")
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject([ responseSounds[2] ]);
+            expect(response.status).toBe(200);
+        });
+
+        it("combined query", async () => {
+            const response = await api().get("/sounds" +
+                "?sort=used" +
+                "&sortDirection=desc" +
+                "&limit=1" +
+                "&offset=0" +
+                `&tags=${tags[0].id}` +
+                "&search=some" +
+                `&creator=${userA.user.id}`,
+            ).set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject([ responseSounds[0] ]);
             expect(response.status).toBe(200);
         });
     });

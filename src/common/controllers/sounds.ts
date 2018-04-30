@@ -16,7 +16,7 @@ import {
     notFound,
 } from "hyrest";
 import { component, inject } from "tsdi";
-import { Connection } from "typeorm";
+import { Connection, Brackets } from "typeorm";
 import { verbose } from "winston";
 import * as FFMpeg from "fluent-ffmpeg";
 import { AudioOutput } from "../../server";
@@ -192,8 +192,8 @@ export class Sounds {
             soundQuery.search,
             soundQuery.limit,
             soundQuery.offset,
-            soundQuery.startDate,
-            soundQuery.endDate,
+            soundQuery.startDate.toString(),
+            soundQuery.endDate.toString(),
             soundQuery.creator,
             soundQuery.user,
             soundQuery.tags.join(","),
@@ -208,8 +208,8 @@ export class Sounds {
         @query("search") @is() search?: string,
         @query("limit") @is(DataType.int) limit?: number,
         @query("offset") @is(DataType.int) offset?: number,
-        @query("startDate") @is() @specify(() => Date) startDate?: Date,
-        @query("endDate") @is() @specify(() => Date) endDate?: Date,
+        @query("startDate") @is() startDate?: string,
+        @query("endDate") @is() endDate?: string,
         @query("creator") @is().validate(uuid) creator?: string,
         @query("user") @is().validate(uuid) user?: string,
         @query("tags") @is() tags?: string,
@@ -218,21 +218,32 @@ export class Sounds {
         @query("sortDirection") @is().validate(oneOf("asc", "desc")) sortDirection?: string,
     ): Promise<Sound[]> {
         const queryBuilder = this.db.getRepository(Sound).createQueryBuilder("sound")
-            .leftJoinAndSelect("sound.soundTagRelations", "soundTagRelation");
-        if (startDate) { queryBuilder.andWhere("created > :startDate", { startDate }); }
-        if (endDate) { queryBuilder.andWhere("created < :endDate", { endDate }); }
-        if (search) { queryBuilder.andWhere("to_tsvector(description) @@ to_tsquery(:search)", { search }); }
-        if (creator) { queryBuilder.andWhere("creatorId = :creator", { creator }); }
-        if (user) { queryBuilder.andWhere("userId = :user", { user }); }
+            .leftJoinAndSelect("sound.soundTagRelations", "soundTagRelation")
+            .leftJoinAndSelect("sound.creator", "creator")
+            .leftJoinAndSelect("sound.user", "user");
+        if (startDate) { queryBuilder.andWhere("created > :startDate", { startDate: new Date(startDate) }); }
+        if (endDate) { queryBuilder.andWhere("created < :endDate", { endDate: new Date(endDate) }); }
+        if (search) {
+            queryBuilder.andWhere(new Brackets(subQuery => {
+                subQuery.where("to_tsvector(description) @@ to_tsquery(:search)", { search })
+                    .orWhere("description ILIKE :escapedSearch", { escapedSearch: `%${search}%` });
+            }));
+        }
+        if (creator) { queryBuilder.andWhere("creator.id = :creator", { creator }); }
+        if (user) { queryBuilder.andWhere("user.id = :user", { user }); }
         if (tags) {
-            const tagsArray = tags.split(",");
-            tagsArray.forEach(tag => {
-                queryBuilder.andWhere("soundTagRelation.id = :tag", { tag });
-            });
+            queryBuilder.andWhere(`
+                ARRAY(
+                    SELECT "tagId"
+                    FROM sound innerSound
+                    LEFT JOIN sound_tag_relation innerRelation ON innerRelation."soundId" = sound.id
+                    WHERE innerSound.id = sound.id
+                ) @> :tags
+            `, { tags: tags.split(",") });
         }
         if (source) { queryBuilder.andWhere("source = :source", { source }); }
 
-        const direction = sortDirection === "asc" ? "ASC" : "DESC";
+        const direction = sortDirection === "desc" ? "DESC" : "ASC";
         switch (sort) {
             case "updated": queryBuilder.orderBy("updated", direction); break;
             case "used": queryBuilder.orderBy("used", direction); break;
@@ -244,7 +255,7 @@ export class Sounds {
 
         if (limit) { queryBuilder.limit(limit); }
         else { queryBuilder.limit(100); }
-        if (offset) { queryBuilder.limit(offset); }
+        if (offset) { queryBuilder.offset(offset); }
 
         const sounds = await queryBuilder.getMany();
         return ok(sounds);

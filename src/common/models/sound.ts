@@ -47,7 +47,7 @@ export class Sound {
     public user?: User;
 
     @Column("varchar", { length: 16 })
-    @is().validate(oneOf("upload", "sound"))
+    @is().validate(oneOf("upload", "sound")) @scope(world)
     public source?: "upload" | "recording";
 
     /**
