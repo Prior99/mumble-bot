@@ -9,7 +9,6 @@ import {
     uuid,
     ok,
     query,
-    specify,
     created,
     DataType,
     oneOf,
