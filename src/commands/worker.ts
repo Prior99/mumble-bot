@@ -11,7 +11,6 @@ setupWinston();
 
 @command({ description: "Start the worker." })
 export default class WorkerCommand extends Command { // tslint:disable-line
-    private config: WorkerConfig;
     private getVisualizationFilename = file => `${file}.png`;
     private watcher: FSWatcher;
 
