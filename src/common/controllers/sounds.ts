@@ -1,7 +1,7 @@
 import { ForkOptions } from "../models";
-import { context, body, controller, route, param, is, uuid, ok, query, specify, created } from "hyrest";
+import { context, body, controller, route, param, is, uuid, ok, query, specify, created, DataType } from "hyrest";
 import { component, inject } from "tsdi";
-import { Connection } from "typeorm";
+import { Connection, Brackets } from "typeorm";
 import { verbose } from "winston";
 import * as FFMpeg from "fluent-ffmpeg";
 import { AudioOutput } from "../../server";
@@ -39,14 +39,32 @@ export class Sounds {
 
     @route("GET", "/sounds").dump(Sound, world)
     public async listSounds(
-        @query("since") @is() @specify(() => Date) since?: Date,
+        @query("search") @is() search?: string,
+        @query("limit") @is(DataType.int) limit?: number,
+        @query("offset") @is(DataType.int) offset?: number,
+        @query("startDate") @is() @specify(() => Date) startDate?: Date,
+        @query("endDate") @is() @specify(() => Date) endDate?: Date,
+        @query("creator") @is().validate(uuid) creator?: string,
+        @query("user") @is().validate(uuid) user?: string,
+        @query("labels") @is() labels?: string,
     ): Promise<Sound[]> {
-        const queryBuilder = this.db.getRepository(Sound).createQueryBuilder("sound");
-        if (since) {
-            queryBuilder.andWhere("created > :since", { since });
+        const queryBuilder = this.db.getRepository(Sound).createQueryBuilder("sound")
+            .leftJoinAndSelect("sound.soundLabelRelations", "soundLabelRelation");
+        if (startDate) { queryBuilder.andWhere("created > :startDate", { startDate }); }
+        if (endDate) { queryBuilder.andWhere("created > :endDate", { endDate }); }
+        if (search) { queryBuilder.andWhere("to_tsvector(description) @@ to_tsquery(:search)", { search }); }
+        if (creator) { queryBuilder.andWhere("creatorId = :creator", { creator }); }
+        if (user) { queryBuilder.andWhere("userId = :user", { user }); }
+        if (labels) {
+            const labelsArray = labels.split(",");
+            labelsArray.forEach(label => {
+                queryBuilder.andWhere("soundLabelRelation.id = :label", { label });
+            });
         }
-        const sounds = await queryBuilder.getMany();
+        if (limit) { queryBuilder.limit(limit); }
+        if (offset) { queryBuilder.limit(offset); }
 
+        const sounds = await queryBuilder.getMany();
         return ok(sounds);
     }
 
