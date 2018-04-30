@@ -101,6 +101,7 @@ module.exports = {
         "net": "{}",
         "readline": "{}",
         "winston": "{}",
+        "graceful-fs": "{}",
         "react-native-sqlite-storage": "{}"
     },
     devtool: "source-map",
