@@ -45,7 +45,7 @@ interface SourceRecording {
     quote: string;
     created: Date;
     user: number;
-    creator: number;
+    reporter: number;
     used: number;
     changed: Date;
     duration: number;
@@ -450,7 +450,7 @@ export default class MigrateCommand extends Command { // tslint:disable-line
             used: sourceRecording.used,
             user: this.userIdMapping.get(sourceRecording.user),
             source: "recording",
-            creator: this.userIdMapping.get(sourceRecording.creator),
+            creator: this.userIdMapping.get(sourceRecording.reporter),
             overwrite: sourceRecording.overwrite,
             created: sourceRecording.created,
             updated: sourceRecording.changed,
