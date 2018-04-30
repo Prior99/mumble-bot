@@ -11,7 +11,7 @@ import { oneOf, is, scope, DataType, specify, uuid } from "hyrest";
 
 import { world, createSound } from "../scopes";
 
-import { User, PlaylistEntry, SoundLabelRelation } from ".";
+import { User, PlaylistEntry, SoundTagRelation } from ".";
 
 /**
  * A single record as represented in the database.
@@ -89,9 +89,9 @@ export class Sound {
     /**
      * A list of all labels with which this record was tagged.
      */
-    @OneToMany(() => SoundLabelRelation, soundLabelRelation => soundLabelRelation.sound)
-    @scope(world, createSound) @is() @specify(() => SoundLabelRelation)
-    public soundLabelRelations?: SoundLabelRelation[];
+    @OneToMany(() => SoundTagRelation, soundTagRelation => soundTagRelation.sound)
+    @scope(world, createSound) @is() @specify(() => SoundTagRelation)
+    public soundTagRelations?: SoundTagRelation[];
 
     /**
      * Duration in seconds of this sound.

@@ -2,11 +2,11 @@ export { Sound } from "./sound";
 import { Sound } from "./sound";
 export { User } from "./user";
 import { User } from "./user";
-export { Label } from "./label";
-import { Label } from "./label";
+export { Tag } from "./tag";
+import { Tag } from "./tag";
 export { CachedAudio } from "./cached-audio";
-export { SoundLabelRelation } from "./sound-label-relation";
-import { SoundLabelRelation } from "./sound-label-relation";
+export { SoundTagRelation } from "./sound-tag-relation";
+import { SoundTagRelation } from "./sound-tag-relation";
 export { Playlist } from "./playlist";
 import { Playlist } from "./playlist";
 export { PlaylistEntry } from "./playlist-entry";
@@ -27,8 +27,8 @@ import { Setting } from "./setting";
 
 export const allDatabaseModels = [
     User,
-    Label,
-    SoundLabelRelation,
+    Tag,
+    SoundTagRelation,
     Sound,
     Playlist,
     PlaylistEntry,

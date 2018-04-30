@@ -10,8 +10,8 @@ import {
     User,
     MumbleLink,
     Sound,
-    Label,
-    SoundLabelRelation,
+    Tag,
+    SoundTagRelation,
     PermissionAssociation,
     Playlist,
     PlaylistEntry,
@@ -196,10 +196,10 @@ export default class MigrateCommand extends Command { // tslint:disable-line
 
     private async migrateLabel(sourceLabel: SourceLabel) {
         info(`Migrating label ${sourceLabel.name} (${sourceLabel.id}) ...`);
-        const targetLabel = new Label();
-        Object.assign(targetLabel, { name: sourceLabel.name });
-        await this.targetDb.getRepository(Label).save(targetLabel);
-        this.labelIdMapping.set(sourceLabel.id, targetLabel.id);
+        const targetTag = new Tag();
+        Object.assign(targetTag, { name: sourceLabel.name });
+        await this.targetDb.getRepository(Tag).save(targetTag);
+        this.labelIdMapping.set(sourceLabel.id, targetTag.id);
     }
 
     private async migrateLabels() {
@@ -224,15 +224,15 @@ export default class MigrateCommand extends Command { // tslint:disable-line
 
     private async migrateRecordingLabelRelation(sourceRecordingLabelRelation: SourceRecordingLabelRelation) {
         const targetSoundId = this.recordingIdMapping.get(sourceRecordingLabelRelation.record);
-        const targetLabelId = this.labelIdMapping.get(sourceRecordingLabelRelation.label);
-        info(`Migrating recording label relation ${targetLabelId} (${sourceRecordingLabelRelation.label}) -> ` +
+        const targetTagId = this.labelIdMapping.get(sourceRecordingLabelRelation.label);
+        info(`Migrating recording label relation ${targetTagId} (${sourceRecordingLabelRelation.label}) -> ` +
             `${targetSoundId} (${sourceRecordingLabelRelation.record}) ...`);
-        const targetSoundLabelRelation = new SoundLabelRelation();
-        Object.assign(targetSoundLabelRelation, {
+        const targetSoundTagRelation = new SoundTagRelation();
+        Object.assign(targetSoundTagRelation, {
             sound: { id: targetSoundId },
-            label: { id: targetLabelId },
+            tag: { id: targetTagId },
         });
-        await this.targetDb.getRepository(SoundLabelRelation).save(targetSoundLabelRelation);
+        await this.targetDb.getRepository(SoundTagRelation).save(targetSoundTagRelation);
     }
 
     private async migrateRecordingLabelRelations() {

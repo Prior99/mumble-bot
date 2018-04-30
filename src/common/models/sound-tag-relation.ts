@@ -3,19 +3,19 @@ import { is, scope, uuid } from "hyrest";
 
 import { world, createSound } from "../scopes";
 
-import { Sound, Label } from ".";
+import { Sound, Tag } from ".";
 
 @Entity()
-export class SoundLabelRelation {
+export class SoundTagRelation {
     @PrimaryGeneratedColumn("uuid")
     @scope(world) @is().validate(uuid)
     public id?: string;
 
-    @ManyToOne(() => Sound, sound => sound.soundLabelRelations)
+    @ManyToOne(() => Sound, sound => sound.soundTagRelations)
     @is() @scope(world)
     public sound?: Sound;
 
-    @ManyToOne(() => Label, label => label.soundLabelRelations)
+    @ManyToOne(() => Tag, tag => tag.soundTagRelations)
     @is() @scope(world, createSound)
-    public label?: Label;
+    public tag?: Tag;
 }

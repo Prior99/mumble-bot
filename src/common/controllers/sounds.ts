@@ -1,7 +1,7 @@
 import { ForkOptions } from "../models";
 import { context, body, controller, route, param, is, uuid, ok, query, specify, created, DataType } from "hyrest";
 import { component, inject } from "tsdi";
-import { Connection, Brackets } from "typeorm";
+import { Connection } from "typeorm";
 import { verbose } from "winston";
 import * as FFMpeg from "fluent-ffmpeg";
 import { AudioOutput } from "../../server";
@@ -46,19 +46,19 @@ export class Sounds {
         @query("endDate") @is() @specify(() => Date) endDate?: Date,
         @query("creator") @is().validate(uuid) creator?: string,
         @query("user") @is().validate(uuid) user?: string,
-        @query("labels") @is() labels?: string,
+        @query("tags") @is() tags?: string,
     ): Promise<Sound[]> {
         const queryBuilder = this.db.getRepository(Sound).createQueryBuilder("sound")
-            .leftJoinAndSelect("sound.soundLabelRelations", "soundLabelRelation");
+            .leftJoinAndSelect("sound.soundTagRelations", "soundTagRelation");
         if (startDate) { queryBuilder.andWhere("created > :startDate", { startDate }); }
         if (endDate) { queryBuilder.andWhere("created > :endDate", { endDate }); }
         if (search) { queryBuilder.andWhere("to_tsvector(description) @@ to_tsquery(:search)", { search }); }
         if (creator) { queryBuilder.andWhere("creatorId = :creator", { creator }); }
         if (user) { queryBuilder.andWhere("userId = :user", { user }); }
-        if (labels) {
-            const labelsArray = labels.split(",");
-            labelsArray.forEach(label => {
-                queryBuilder.andWhere("soundLabelRelation.id = :label", { label });
+        if (tags) {
+            const tagsArray = tags.split(",");
+            tagsArray.forEach(tag => {
+                queryBuilder.andWhere("soundTagRelation.id = :tag", { tag });
             });
         }
         if (limit) { queryBuilder.limit(limit); }
