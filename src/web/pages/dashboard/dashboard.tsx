@@ -20,9 +20,9 @@ export class PageDashboard extends React.Component {
                         </Header>
                     </Grid.Row>
                     <Grid.Row>
-                        <Grid.Column width={10}>
+                        <Grid.Column mobile={16} computer={10} tablet={10}>
                         </Grid.Column>
-                        <Grid.Column width={6}>
+                        <Grid.Column mobile={16} computer={6} tablet={6}>
                             <Card fluid>
                                 <Card.Content>Server Tree</Card.Content>
                                 <Card.Content>
