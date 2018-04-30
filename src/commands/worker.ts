@@ -40,7 +40,7 @@ export default class WorkerCommand extends Command { // tslint:disable-line
         info(`Found ${missingFiles.length} missing visualizations in ${path}.`);
         for (let [index, file] of missingFiles.entries()) {
             if (this.killed) { return; }
-            const percent = (index / missingFiles.length).toFixed(2);
+            const percent = (100 * index / missingFiles.length).toFixed(2);
             info(`Visualizing ${file} to ${this.getVisualizationFilename(file)}. ` +
                 `File ${index}/${missingFiles.length} (${percent}% done.)`,
             );

@@ -1,14 +1,84 @@
 import { ForkOptions } from "../models";
-import { context, body, controller, route, param, is, uuid, ok, query, specify, created, DataType } from "hyrest";
+import {
+    context,
+    body,
+    controller,
+    route,
+    param,
+    is,
+    uuid,
+    ok,
+    query,
+    specify,
+    created,
+    DataType,
+    oneOf,
+    notFound,
+} from "hyrest";
 import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { verbose } from "winston";
 import * as FFMpeg from "fluent-ffmpeg";
 import { AudioOutput } from "../../server";
 import { ServerConfig } from "../../config";
-import { Sound, PlaybackOptions } from "../models";
-import { updateSound, world } from "../scopes";
+import { Sound, PlaybackOptions, Tag, SoundTagRelation } from "../models";
+import { updateSound, world, tagSound } from "../scopes";
 import { Context } from "../context";
+
+export interface SoundsQuery {
+    /**
+     * A string to search in the description of a sound for.
+     */
+    search?: string;
+    /**
+     * Limit the amount of returned sounds to this amount.
+     */
+    limit?: number;
+    /**
+     * Offset for the pagination by absolute amount of sounds.
+     */
+    offset?: number;
+    /**
+     * Limit the returned sounds to sounds created after this date.
+     */
+    startDate?: Date;
+    /**
+     * Limit the returned sounds to sounds created before this date.
+     */
+    endDate?: Date;
+    /**
+     * Limit the returned sounds to sounds created by this user.
+     */
+    creator?: string;
+    /**
+     * Limit the returned sounds to sounds spoken by this user.
+     */
+    user?: string;
+    /**
+     * Limit the returned sounds tagged with the ids of these labels.
+     */
+    tags?: string[];
+    /**
+     * Limit the returned sounds to sounds from the specified source.
+     * Sources are: `upload` and `recording`.
+     */
+    source?: "upload" | "recording";
+    /**
+     * Sort the returned list by the given column, before limiting.
+     * Accepted column names are:
+     *
+     *  - `created`
+     *  - `updated`
+     *  - `used`
+     *  - `duration`
+     *  - `description`
+     */
+    sort?: "created" | "updated" | "used" | "duration" | "description";
+    /**
+     * The direction of the sorting. Ascending or Descending.
+     */
+    sortDirection?: string;
+}
 
 @controller @component
 export class Sounds {
@@ -16,10 +86,85 @@ export class Sounds {
     @inject private audioOutput: AudioOutput;
     @inject private config: ServerConfig;
 
+    /**
+     * Fetch a single sound with a specified id.
+     *
+     * @param id The id of the sound to retrieve.
+     *
+     * @return The sound with the specified id.
+     */
     @route("GET", "/sound/:id").dump(Sound, world)
     public async getSound(@param("id") @is().validate(uuid) id: string): Promise<Sound> {
-        const sound = await this.db.getRepository(Sound).findOne(id);
+        const sound = await this.db.getRepository(Sound).createQueryBuilder("sound")
+            .where("sound.id = :id", { id })
+            .leftJoinAndSelect("sound.creator", "creator")
+            .leftJoinAndSelect("sound.user", "user")
+            .leftJoinAndSelect("sound.soundTagRelations", "soundTagRelation")
+            .leftJoinAndSelect("soundTagRelation.tag", "tag")
+            .getOne();
+        if (!sound) {
+            return notFound<Sound>(`No sound with id "${id}"`);
+        }
         return ok(sound);
+    }
+
+    /**
+     * Remove a tag from a sound.
+     *
+     * @param soundId The id of the sound from which the tag should be deleted.
+     * @param tagId The id of the tag to remove from the sound
+     *
+     * @return The modified sound.
+     */
+    @route("DELETE", "/sound/:soundId/tag/:tagId").dump(Sound, world)
+    public async untagSound(
+        @param("soundId") @is().validate(uuid) soundId: string,
+        @param("tagId") @is().validate(uuid) tagId: string,
+        @context ctx?: Context,
+    ): Promise<Sound>{
+        if (!await this.db.getRepository(Sound).findOne(soundId)) {
+            return notFound<Sound>(`No sound with id "${soundId}"`);
+        }
+        if (!await this.db.getRepository(Tag).findOne(tagId)) {
+            return notFound<Sound>(`No tag with id "${tagId}"`);
+        }
+        await this.db.getRepository(SoundTagRelation).delete({
+            sound: { id: soundId },
+            tag: { id: tagId },
+        });
+        const { name } = await ctx.currentUser();
+        verbose(`${name} removed tag #${tagId} from sound #${soundId}`);
+        return ok(await this.getSound(soundId));
+    }
+
+    /**
+     * Add a tag to a sound.
+     *
+     * @param id The id of the sound to which the tag should be added.
+     * @param tag The tag to add to the sound.
+     *
+     * @return The modified sound.
+     */
+    @route("POST", "/sound/:id/tags").dump(Sound, world)
+    public async tagSound(
+        @param("id") @is().validate(uuid) id: string,
+        @body(tagSound) tag: Tag,
+        @context ctx?: Context,
+    ): Promise<Sound>{
+        if (!await this.db.getRepository(Sound).findOne(id)) {
+            return notFound<Sound>(`No sound with id "${id}"`);
+        }
+        if (!await this.db.getRepository(Tag).findOne(tag.id)) {
+            return notFound<Sound>(`No tag with id "${tag.id}"`);
+        }
+        await this.db.getRepository(SoundTagRelation).save({
+            sound: { id },
+            tag,
+        });
+
+        const { name } = await ctx.currentUser();
+        verbose(`${name} tagged sound #${id} with ${tag.id}`);
+        return created(await this.getSound(id));
     }
 
     @route("POST", "/sound/:id").dump(Sound, world)
@@ -31,14 +176,35 @@ export class Sounds {
         await this.db.getRepository(Sound).update(id, sound);
 
         const { name } = await ctx.currentUser();
-        verbose(`${name} edited record #${id}`);
+        verbose(`${name} edited sound #${id}`);
 
         const updated = await this.getSound(id);
         return ok(updated);
     }
 
+    /**
+     * Query the sounds from the database using a `SoundsQuery`.
+     *
+     * @return A list of all sounds matching the given criteria.
+     */
+    public async querySounds(soundQuery: SoundsQuery = {}) {
+        return await this.listSounds(
+            soundQuery.search,
+            soundQuery.limit,
+            soundQuery.offset,
+            soundQuery.startDate,
+            soundQuery.endDate,
+            soundQuery.creator,
+            soundQuery.user,
+            soundQuery.tags.join(","),
+            soundQuery.source,
+            soundQuery.sort,
+            soundQuery.sortDirection,
+        );
+    }
+
     @route("GET", "/sounds").dump(Sound, world)
-    public async listSounds(
+    protected async listSounds(
         @query("search") @is() search?: string,
         @query("limit") @is(DataType.int) limit?: number,
         @query("offset") @is(DataType.int) offset?: number,
@@ -47,11 +213,14 @@ export class Sounds {
         @query("creator") @is().validate(uuid) creator?: string,
         @query("user") @is().validate(uuid) user?: string,
         @query("tags") @is() tags?: string,
+        @query("source") @is().validate(oneOf("upload", "recording")) source?: string,
+        @query("sort") @is().validate(oneOf("created", "updated", "used", "duration", "description")) sort?: string,
+        @query("sortDirection") @is().validate(oneOf("asc", "desc")) sortDirection?: string,
     ): Promise<Sound[]> {
         const queryBuilder = this.db.getRepository(Sound).createQueryBuilder("sound")
             .leftJoinAndSelect("sound.soundTagRelations", "soundTagRelation");
         if (startDate) { queryBuilder.andWhere("created > :startDate", { startDate }); }
-        if (endDate) { queryBuilder.andWhere("created > :endDate", { endDate }); }
+        if (endDate) { queryBuilder.andWhere("created < :endDate", { endDate }); }
         if (search) { queryBuilder.andWhere("to_tsvector(description) @@ to_tsquery(:search)", { search }); }
         if (creator) { queryBuilder.andWhere("creatorId = :creator", { creator }); }
         if (user) { queryBuilder.andWhere("userId = :user", { user }); }
@@ -61,7 +230,20 @@ export class Sounds {
                 queryBuilder.andWhere("soundTagRelation.id = :tag", { tag });
             });
         }
+        if (source) { queryBuilder.andWhere("source = :source", { source }); }
+
+        const direction = sortDirection === "asc" ? "ASC" : "DESC";
+        switch (sort) {
+            case "updated": queryBuilder.orderBy("updated", direction); break;
+            case "used": queryBuilder.orderBy("used", direction); break;
+            case "duration": queryBuilder.orderBy("duration", direction); break;
+            case "description": queryBuilder.orderBy("description", direction); break;
+            default:
+            case "created": queryBuilder.orderBy("created", direction); break;
+        }
+
         if (limit) { queryBuilder.limit(limit); }
+        else { queryBuilder.limit(100); }
         if (offset) { queryBuilder.limit(offset); }
 
         const sounds = await queryBuilder.getMany();

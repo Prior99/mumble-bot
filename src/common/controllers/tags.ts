@@ -20,7 +20,7 @@ export class Tags {
     public async createTag(@body(createTag) tag: Tag, @context ctx?: Context): Promise<Tag> {
         await this.db.getRepository(Tag).save(tag);
         const currentUser = await ctx.currentUser();
-        verbose(`${currentUser.name} added new tag for records: "${tag.name}"`);
+        verbose(`${currentUser.name} added new tag: "${tag.name}"`);
         return created(tag);
     }
 }

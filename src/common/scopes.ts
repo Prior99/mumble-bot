@@ -9,3 +9,4 @@ export const signup = createScope().include(login);
 export const owner = createScope().include(world);
 export const createSound = createScope();
 export const createMumbleLink = createScope();
+export const tagSound = createScope();
