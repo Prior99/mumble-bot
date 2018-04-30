@@ -4,3 +4,4 @@ export { PageSignup } from "./signup";
 export { PageUser } from "./user";
 export { PageSettings } from "./settings";
 export { PageUsers } from "./users";
+export { PageSounds } from "./sounds";

@@ -5,6 +5,7 @@ import {
     PageUser,
     PageSettings,
     PageUsers,
+    PageSounds,
 } from "../pages";
 import {
     routeLogin,
@@ -13,6 +14,7 @@ import {
     routeUser,
     routeSettings,
     routeUsers,
+    routeSounds,
 } from ".";
 
 export const routes = [
@@ -34,5 +36,8 @@ export const routes = [
     }, {
         component: PageUsers,
         route: routeUsers,
+    }, {
+        component: PageSounds,
+        route: routeSounds,
     },
 ];

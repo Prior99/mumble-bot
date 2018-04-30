@@ -186,16 +186,16 @@ export class Sounds {
      *
      * @return A list of all sounds matching the given criteria.
      */
-    public async querySounds(soundQuery: SoundsQuery = {}) {
+    public async querySounds(soundQuery: SoundsQuery = {}): Promise<Sound[]> {
         return await this.listSounds(
             soundQuery.search,
             soundQuery.limit,
             soundQuery.offset,
-            soundQuery.startDate.toString(),
-            soundQuery.endDate.toString(),
+            soundQuery.startDate && soundQuery.startDate.toString(),
+            soundQuery.endDate && soundQuery.endDate.toString(),
             soundQuery.creator,
             soundQuery.user,
-            soundQuery.tags.join(","),
+            soundQuery.tags && soundQuery.tags.join(","),
             soundQuery.source,
             soundQuery.sort,
             soundQuery.sortDirection,

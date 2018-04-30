@@ -5,3 +5,4 @@ export * from "./own-user";
 export * from "./errors";
 export * from "./users";
 export * from "./mumble";
+export * from "./sounds";

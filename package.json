@@ -45,7 +45,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^5.0.0",
     "gravatar-url": "^2.0.0",
-    "hyrest": "0.7.12",
+    "hyrest": "^0.7.13",
     "mkdirp-promise": "^5.0.1",
     "mobx": "^4.2.0",
     "mobx-react": "^5.0.0",

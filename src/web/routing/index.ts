@@ -62,3 +62,11 @@ export const routeUsers: Route = {
     title: "Users",
     icon: "group",
 };
+
+export const routeSounds: Route = {
+    path: () => "/sounds",
+    pattern: "/sounds",
+    navbar: true,
+    title: "Sounds",
+    icon: "music",
+};

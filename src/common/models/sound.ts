@@ -43,7 +43,7 @@ export class Sound {
      * The user who said this record.
      */
     @ManyToOne(() => User, user => user.sounds, { nullable: true })
-    @is() @scope(world)
+    @is() @scope(world) @specify(() => User)
     public user?: User;
 
     @Column("varchar", { length: 16 })
@@ -54,7 +54,7 @@ export class Sound {
      * The user who reported the record.
      */
     @ManyToOne(() => User, user => user.reported)
-    @is() @scope(world)
+    @is() @scope(world) @specify(() => User)
     public creator?: User;
 
     /**

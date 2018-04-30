@@ -4249,9 +4249,9 @@ hyphenate@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/hyphenate/-/hyphenate-0.2.1.tgz#531f403332dc128c3c616ea93fc0f54353a87e85"
 
-hyrest@0.7.12:
-  version "0.7.12"
-  resolved "https://registry.yarnpkg.com/hyrest/-/hyrest-0.7.12.tgz#a7a5cff3e45334ef1c223ff7e2d392d496977651"
+hyrest@^0.7.13:
+  version "0.7.13"
+  resolved "https://registry.yarnpkg.com/hyrest/-/hyrest-0.7.13.tgz#8bd699d9cbd0ee0b8e21619c31ffa93192fa0932"
   dependencies:
     express "^4.16.2"
     http-status-codes "^1.3.0"
