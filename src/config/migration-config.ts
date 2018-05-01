@@ -61,7 +61,4 @@ export class MigrationConfig extends Options {
 
     @option({ required: true, description: "Path to the directory to read the source uploads from." })
     public sourceUploadsDir: string;
-
-    @option({ required: true, description: "Path to the directory to read the source visualizations from." })
-    public sourceVisualizationsDir: string;
 }

@@ -83,6 +83,6 @@ integration-test: node_modules
 		--prefix " {name} "\
 		--names "jest,webpack,server"\
 		--prefix-colors "yellow.bold,blue.bold,green.bold"\
-		"sleep 2 && yarn test:integration"\
+		"sleep 10 && yarn test:integration"\
 		"make run-web"\
 		"make run-server-integration"

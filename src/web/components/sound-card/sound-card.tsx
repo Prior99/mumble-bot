@@ -1,12 +1,10 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
-import { observer } from "mobx-react";
-import { computed } from "mobx";
-import { external } from "tsdi";
-import { Image, Card, Button, Icon, Grid } from "semantic-ui-react";
+import { Image, Card  } from "semantic-ui-react";
 import { Sound } from "../../../common";
-import { routeUser } from "../../routing";
-import * as css from "./sound-card.scss";
+import { Description } from "./description";
+import { Tags } from "./tags";
+import { Meta } from "./meta";
+import { Buttons } from "./buttons";
 
 export interface SoundCardProps {
     sound: Sound;
@@ -14,50 +12,27 @@ export interface SoundCardProps {
 
 declare const baseUrl: string;
 
-@observer @external
 export class SoundCard extends React.Component<SoundCardProps> {
-    @computed private get sound() { return this.props.sound; }
+    private get sound() { return this.props.sound; }
 
-    @computed private get visualizationUrl() { return `${baseUrl}/sound/${this.sound.id}/visualized`; }
+    private get visualizationUrl() { return `${baseUrl}/sound/${this.sound.id}/visualized`; }
 
     public render() {
         const { sound, visualizationUrl } = this;
-        const { description, used, user, creator, source } = sound;
         return (
             <Card fluid>
                 <Image height={80} src={visualizationUrl} />
                 <Card.Content>
-                    <Card.Description>{description}</Card.Description>
-                    <Card.Meta>
-                        <div className={css.flexContainer}>
-                            {
-                                source === "recording" ? (
-                                        <Link to={routeUser.path(user.id)}>
-                                            <Icon name="microphone" />
-                                            <Image className={css.avatar} size="mini" avatar src={user.avatarUrl} />
-                                            {user.name}
-                                        </Link>
-                                ) : (
-                                    <span>
-                                        <Icon name="upload" /> This file was uploaded.
-                                    </span>
-                                )
-                            }
-                            <Link to={routeUser.path(user.id)}>
-                                <Icon name="user" />
-                                <Image className={css.avatar} size="mini" avatar src={creator.avatarUrl} />
-                                {creator.name}
-                            </Link>
-                        </div>
-                    </Card.Meta>
+                    <Card.Description><Description sound={sound} /></Card.Description>
+                </Card.Content>
+                <Card.Content>
+                    <Meta sound={sound} />
+                </Card.Content>
+                <Card.Content>
+                    <Tags sound={sound} />
                 </Card.Content>
                 <Card.Content extra>
-                    <Button
-                        content="Play"
-                        icon="volume up"
-                        label={{ as: "a", basic: true, pointing: "right", content: used }}
-                        labelPosition="left"
-                    />
+                    <Buttons sound={sound} />
                 </Card.Content>
             </Card>
         );

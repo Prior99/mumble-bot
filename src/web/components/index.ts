@@ -8,3 +8,4 @@ export * from "./channel-tree";
 export * from "./mumble-linker";
 export * from "./user-list";
 export * from "./sound-card";
+export * from "./tag-label";

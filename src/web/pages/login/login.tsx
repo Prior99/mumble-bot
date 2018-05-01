@@ -57,7 +57,7 @@ export class PageLogin extends React.Component {
                             onChange={this.handlePassword}
                         />
                     </Form.Field>
-                    <Button disabled={!this.allValid} type="submit" fluid color="green">Login</Button>
+                    <Button disabled={!this.allValid} type="submit" fluid color="violet">Login</Button>
                 </Form>
                 <p>Don't have an account? Signup <Link to={routeSignup.path()}>here</Link>.</p>
             </Content>

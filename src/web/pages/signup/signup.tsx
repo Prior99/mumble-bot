@@ -86,7 +86,7 @@ export class PageSignup extends React.Component {
                             onChange={this.handleRepeat}
                         />
                     </Form.Field>
-                    <Button disabled={!this.allValid} type="submit" fluid color="green">Signup</Button>
+                    <Button disabled={!this.allValid} type="submit" fluid color="violet">Signup</Button>
                 </Form>
                 <p>Already have an account? Login <Link to={routeLogin.path()}>here</Link>.</p>
             </Content>

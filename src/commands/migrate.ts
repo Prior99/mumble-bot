@@ -43,7 +43,7 @@ interface SourceSound {
 interface SourceRecording {
     id: number;
     quote: string;
-    created: Date;
+    submitted: Date;
     user: number;
     reporter: number;
     used: number;
@@ -405,14 +405,11 @@ export default class MigrateCommand extends Command { // tslint:disable-line
                 resolve(result);
             });
         });
-        const now = new Date();
         Object.assign(targetSound, {
             description: sourceSound.name,
             used: sourceSound.used,
             source: "upload",
             creator: this.userIdMapping.values().next().value,
-            created: now,
-            changed: now,
             duration: soundMeta.format.duration,
         });
         await this.targetDb.getRepository(Sound).save(targetSound);
@@ -452,11 +449,16 @@ export default class MigrateCommand extends Command { // tslint:disable-line
             source: "recording",
             creator: this.userIdMapping.get(sourceRecording.reporter),
             overwrite: sourceRecording.overwrite,
-            created: sourceRecording.created,
+            created: sourceRecording.submitted,
             updated: sourceRecording.changed,
             duration: sourceRecording.duration,
         });
         await this.targetDb.getRepository(Sound).save(targetSound);
+        await this.targetDb.getRepository(Sound).createQueryBuilder("sound")
+            .update()
+            .set({ created: sourceRecording.submitted })
+            .where("id = :id", { id: targetSound.id })
+            .execute();
         const targetPath = `${this.config.targetSoundsDir}/${targetSound.id}`;
         writeFileSync(targetPath, readFileSync(sourcePath));
         this.recordingIdMapping.set(sourceRecording.id, targetSound.id);

@@ -167,7 +167,7 @@ export class Sounds {
     }
 
     @route("POST", "/sound/:id").dump(Sound, world)
-    public async postSound(
+    public async updateSound(
         @param("id") @is().validate(uuid) id: string,
         @body(updateSound) sound: Sound,
         @context ctx?: Context,
@@ -218,6 +218,7 @@ export class Sounds {
     ): Promise<Sound[]> {
         const queryBuilder = this.db.getRepository(Sound).createQueryBuilder("sound")
             .leftJoinAndSelect("sound.soundTagRelations", "soundTagRelation")
+            .leftJoinAndSelect("soundTagRelation.tag", "tag")
             .leftJoinAndSelect("sound.creator", "creator")
             .leftJoinAndSelect("sound.user", "user");
         if (startDate) { queryBuilder.andWhere("created > :startDate", { startDate: new Date(startDate) }); }

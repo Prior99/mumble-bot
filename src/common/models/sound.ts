@@ -9,7 +9,7 @@ import {
 } from "typeorm";
 import { oneOf, is, scope, DataType, specify, uuid } from "hyrest";
 
-import { world, createSound } from "../scopes";
+import { world, createSound, updateSound } from "../scopes";
 
 import { User, PlaylistEntry, SoundTagRelation } from ".";
 
@@ -29,7 +29,7 @@ export class Sound {
      * The quote for this record (textual description).
      */
     @Column("text")
-    @is() @scope(world, createSound)
+    @is() @scope(world, createSound, updateSound)
     public description?: string;
 
     /**
