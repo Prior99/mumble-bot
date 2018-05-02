@@ -6,7 +6,7 @@ export { Tags } from "./tags";
 import { Tags } from "./tags";
 export { MumbleLinks } from "./mumble-links";
 import { MumbleLinks } from "./mumble-links";
-export { Sounds } from "./sounds";
+export { SoundsQuery, Sounds } from "./sounds";
 import { Sounds } from "./sounds";
 export { Tokens } from "./tokens";
 import { Tokens } from "./tokens";

@@ -33,7 +33,7 @@ export class Meta extends React.Component<MetaProps> {
                                 </span>
                             )
                         }
-                        <Link to={routeUser.path(user.id)}>
+                        <Link to={routeUser.path(creator.id)}>
                             <Icon name="user" />
                             <Image className={css.avatar} size="mini" avatar src={creator.avatarUrl} />
                             {creator.name}

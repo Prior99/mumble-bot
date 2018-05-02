@@ -22,14 +22,6 @@ export class Tags extends React.Component<TagsProps> {
     @observable private editTags = false;
     @observable private tagsLoading = false;
 
-    @computed private get tagOptions() {
-        return this.tags.all.map(tag => ({
-            key: tag.id,
-            value: tag.id,
-            text: tag.name,
-        }));
-    }
-
     @bind @action private handleUntag(tag: Tag) { this.sounds.untag(this.props.sound, tag); }
 
     @bind @action private handleStartEditTags() { this.editTags = true; }
@@ -68,7 +60,7 @@ export class Tags extends React.Component<TagsProps> {
                             selection
                             selectOnNavigation={false}
                             selectOnBlur={false}
-                            options={this.tagOptions}
+                            options={this.tags.dropdownOptions}
                             onChange={this.handleAddTagChange}
                             loading={this.tagsLoading}
                             disabled={this.tagsLoading}

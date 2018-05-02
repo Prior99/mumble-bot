@@ -28,4 +28,12 @@ export class TagsStore {
         this.tags.set(newTag.id, newTag);
         return newTag;
     }
+
+    @computed public get dropdownOptions() {
+        return this.all.map(tag => ({
+            key: tag.id,
+            value: tag.id,
+            text: tag.name,
+        }));
+    }
 }

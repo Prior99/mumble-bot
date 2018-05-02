@@ -3,6 +3,7 @@ import { bind } from "decko";
 import { component, initialize, inject } from "tsdi";
 import { Sounds, Sound, Tag, Queue, QueueItem } from "../../common";
 import { TagsStore } from "./tags";
+import { SoundsQuery } from "../../common/controllers/sounds";
 
 @component
 export class SoundsStore {
@@ -23,6 +24,10 @@ export class SoundsStore {
 
     @computed public get all() {
         return Array.from(this.sounds.values());
+    }
+
+    @computed public get initial() {
+        return this.all;
     }
 
     @bind @action public async untag(sound: Sound, tag: Tag) {
@@ -48,5 +53,13 @@ export class SoundsStore {
             sound: { id: sound.id },
         } as QueueItem);
         sound.used++;
+    }
+
+    @bind @action public async query(query: SoundsQuery) {
+        const result = await this.soundsController.querySounds(query);
+        result.forEach(sound => {
+            this.sounds.set(sound.id, sound);
+        });
+        return result;
     }
 }

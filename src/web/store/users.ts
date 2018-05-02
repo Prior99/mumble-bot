@@ -30,4 +30,12 @@ export class UsersStore {
     public byId(id: string) {
         return this.users.get(id);
     }
+
+    @computed public get dropdownOptions() {
+        return this.all.map(user => ({
+            key: user.id,
+            value: user.id,
+            text: user.name,
+        }));
+    }
 }
