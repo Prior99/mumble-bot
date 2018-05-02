@@ -1,12 +1,13 @@
 import { observable, computed, action } from "mobx";
 import { bind } from "decko";
 import { component, initialize, inject } from "tsdi";
-import { Sounds, Sound, Tag } from "../../common";
+import { Sounds, Sound, Tag, Queue, QueueItem } from "../../common";
 import { TagsStore } from "./tags";
 
 @component
 export class SoundsStore {
     @inject private soundsController: Sounds;
+    @inject private queue: Queue;
     @inject private tags: TagsStore;
 
     @observable public sounds = new Map<string, Sound>();
@@ -39,5 +40,13 @@ export class SoundsStore {
 
     @bind @action public async update(id: string, sound: Sound) {
         this.sounds.set(id, await this.soundsController.updateSound(id, sound));
+    }
+
+    @bind @action public async play(sound: Sound) {
+        await this.queue.enqueue({
+            type: "sound",
+            sound: { id: sound.id },
+        } as QueueItem);
+        sound.used++;
     }
 }

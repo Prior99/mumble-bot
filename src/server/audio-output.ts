@@ -1,4 +1,5 @@
 import { warn, info, error } from "winston";
+import { Connection } from "typeorm";
 import { Connection as MumbleConnection, InputStream as MumbleInputStream } from "mumble";
 import * as Stream from "stream";
 import * as FFMpeg from "fluent-ffmpeg";
@@ -6,7 +7,8 @@ import * as Sox from "sox-audio";
 import { inject, component, initialize, destroy } from "tsdi";
 import { stat } from "fs-extra";
 import { EventEmitter } from "events";
-import { MetaInformation, WorkItem } from "../common";
+import { QueueItem, Playlist } from "../common";
+import { ServerConfig } from "../config";
 
 const PREBUFFER = 0.5;
 const audioFreq = 48000;
@@ -19,11 +21,12 @@ const msInS = 1000;
 @component
 export class AudioOutput extends EventEmitter {
     @inject private mumble: MumbleConnection;
+    @inject private config: ServerConfig;
+    @inject private db: Connection;
 
     public busy = false;
-    public workItemQueue: WorkItem[] = [];
+    public queue: QueueItem[] = [];
 
-    private currentWorkItem: WorkItem;
     private mumbleStream: MumbleInputStream;
     private stopped = false;
     private bufferQueue: Buffer[] = [];
@@ -154,9 +157,28 @@ export class AudioOutput extends EventEmitter {
         if (this.pcmTimeout) { clearTimeout(this.pcmTimeout); }
         if (this.transcodeTimeout) { clearTimeout(this.transcodeTimeout); }
         if (this.ffmpeg) { this.ffmpeg.kill(); }
-        this.workItemQueue = [];
+        this.queue = [];
         this.bufferQueue = [];
         this.emit("clear");
+    }
+
+    private async getFiles(queueItem: QueueItem) {
+        switch (queueItem.type) {
+            case "sound":
+                return [`${this.config.soundsDir}/${queueItem.sound.id}`];
+            case "cached audio":
+                return [`${this.config.tmpDir}/${queueItem.cachedAudio.id}`];
+            case "playlist":
+                const playlist = await this.db.getRepository(Playlist).createQueryBuilder("playlist")
+                    .where("playlist.id = :id", { id: queueItem.playlist.id })
+                    .leftJoinAndSelect("playlist.entries", "entry")
+                    .leftJoinAndSelect("entry.sound", "sound")
+                    .orderBy("entry.position", "ASC")
+                    .getOne();
+                return playlist.entries.map(entry => `${this.config.soundsDir}/${entry.sound.id}`);
+            default:
+                return [];
+        }
     }
 
     /**
@@ -165,48 +187,31 @@ export class AudioOutput extends EventEmitter {
     private async next() {
         if (this.busy) { return; }
         this.busy = true;
-        while (this.workItemQueue.length > 0 && !this.stopped) {
-            this.currentWorkItem = this.workItemQueue.shift();
-            this.emit("start", this.currentWorkItem);
-            const { file, pitch, callback } = this.currentWorkItem;
-            await this.play(file, pitch);
-            this.emit("stop");
-            callback();
+        while (this.queue.length > 0 && !this.stopped) {
+            const current = this.queue.shift();
+            for (let file of await this.getFiles(current)) {
+                await this.play(file, current.pitch);
+            }
         }
-        this.currentWorkItem = undefined;
         this.busy = false;
         this.emit("dequeue");
-        this.emit("change", this.workItemQueue);
+        this.emit("change", this.queue);
     }
 
     /**
-     * Queue playing back a soundfile. The soundfile needs to be exactly: Raw PCM
-     * audio data (*.wav is fine), 44,100Hz and mono-channel.
-     * @param file Name of the soundfile to play.
-     * @param meta Metadata displayed in queue.
-     * @param pitch The pitch to which the audio should be transformed.
-     * @returns Resolved once the sound has finished playing.
+     * Enqueue a new sound, playlist or cached audio.
+     *
+     * @param queueItem The item to enqueue.
      */
-    public playSound(file: string, meta: MetaInformation, pitch = 0): Promise<{}> {
+    public enqueue(queueItem: QueueItem) {
         return new Promise((callback, reject) => {
-            const workItem = { file, meta, callback, time: new Date(), pitch };
-            this.workItemQueue.push(workItem);
-            this.emit("enqueue", workItem);
-            this.emit("change", this.workItemQueue);
+            this.queue.push(queueItem);
+            this.emit("enqueue", queueItem);
+            this.emit("change", this.queue);
             if (!this.busy) {
                 this.next();
             }
         });
-    }
-
-    /**
-     * Also enqueues sounds, but many at once (automically?)
-     * @param filelist The files to be played.
-     * @param pitch The pitch to which the audio should be transformed.
-     * @param meta Metadata displayed in queue.
-     */
-    public playSounds(filelist: string[], meta: MetaInformation, pitch = 0) {
-        filelist.forEach(file => this.playSound(file, meta, pitch));
     }
 
     /**

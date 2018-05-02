@@ -15,7 +15,7 @@ export class PlaylistEntry {
     @is() @scope(world, createPlaylist)
     public sound?: Sound;
 
-    @ManyToOne(() => Playlist, playlist => playlist.parts)
+    @ManyToOne(() => Playlist, playlist => playlist.entries)
     @is() @scope(world, createPlaylist)
     public playlist?: Playlist;
 

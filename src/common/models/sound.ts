@@ -9,7 +9,7 @@ import {
 } from "typeorm";
 import { oneOf, is, scope, DataType, specify, uuid } from "hyrest";
 
-import { world, createSound, updateSound } from "../scopes";
+import { world, createSound, updateSound, enqueue } from "../scopes";
 
 import { User, PlaylistEntry, SoundTagRelation } from ".";
 
@@ -22,7 +22,7 @@ export class Sound {
      * Unique id of this record which is used as the mapping to the audio file.
      */
     @PrimaryGeneratedColumn("uuid")
-    @scope(world) @is().validate(uuid)
+    @scope(world, enqueue) @is().validate(uuid)
     public id?: string;
 
     /**

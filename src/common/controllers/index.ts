@@ -16,6 +16,8 @@ export { Utilities } from "./utilities";
 import { Utilities } from "./utilities";
 export { Validation } from "./validation";
 import { Validation } from "./validation";
+export { Queue } from "./queue";
+import { Queue } from "./queue";
 
 export const allControllers = [
     Cached,
@@ -28,4 +30,5 @@ export const allControllers = [
     Users,
     Utilities,
     Validation,
+    Queue,
 ];

@@ -99,6 +99,10 @@ export class AudioCache extends EventEmitter {
         return this.cachedAudios.get(id);
     }
 
+    public hasId(id: string) {
+        return this.cachedAudios.has(id);
+    }
+
     /**
      * Protected the cached audio with the given id.
      * @param id Id of the audio to protect.

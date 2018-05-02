@@ -11,10 +11,10 @@ import { bind } from "bind-decorator";
 import { createReadStream, existsSync } from "fs-extra";
 import { omit } from "ramda";
 import { hyrest } from "hyrest/middleware";
-import { AuthorizationMode, configureController, ControllerMode } from "hyrest";
+import { AuthorizationMode, configureController, ControllerMode, dump } from "hyrest";
 import * as morgan from "morgan";
 import { ServerConfig } from "../../config";
-import { allControllers, Sound, Token, convertWorkItem, Context, getAuthTokenId } from "../../common";
+import { allControllers, Sound, Token, Context, getAuthTokenId, world } from "../../common";
 import { AudioCache, AudioOutput } from "..";
 
 import { cors, catchError } from "./middlewares";
@@ -147,29 +147,22 @@ export class RestApi {
     @bind public websocketQueue(ws, req: Request) {
         try {
             ws.send(JSON.stringify({
-                type: "init",
-                queue: this.audioOutput.workItemQueue.map(convertWorkItem),
+                event: "init",
+                queue: dump(world, this.audioOutput.queue),
             }));
         }
         catch (err) {
             error("Error sending initial packet to live queue websocket:", err);
         }
-        const onEnqueue = (workitem) => {
+        const onEnqueue = queueItem => {
             ws.send(JSON.stringify({
-                type: "enqueue",
-                workitem: convertWorkItem(workitem),
+                event: "enqueue",
+                workitem: dump(world, queueItem),
             }));
         };
-        const onDequeue = () => {
-            ws.send(JSON.stringify({
-                type: "dequeue",
-            }));
-        };
-        const onClear = () => {
-            ws.send(JSON.stringify({
-                type: "clear",
-            }));
-        };
+        const onDequeue = () => ws.send(JSON.stringify({ event: "dequeue" }));
+        const onClear = () => ws.send(JSON.stringify({ event: "clear" }));
+
         this.audioOutput.on("clear", onClear);
         this.audioOutput.on("enqueue", onEnqueue);
         this.audioOutput.on("dequeue", onDequeue);

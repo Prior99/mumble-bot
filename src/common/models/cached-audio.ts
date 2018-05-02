@@ -1,7 +1,7 @@
 import { is, scope, DataType, specify, uuid } from "hyrest";
 import * as Uuid from "uuid";
 
-import { world } from "../scopes";
+import { world, enqueue } from "../scopes";
 
 import { User } from ".";
 
@@ -41,7 +41,7 @@ export class CachedAudio {
     /**
      * The id of the cached audio.
      */
-    @scope(world) @is().validate(uuid)
+    @scope(world, enqueue) @is().validate(uuid)
     public id?: string;
 
     /**

@@ -1,6 +1,6 @@
 import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, CreateDateColumn, OneToMany } from "typeorm";
 import { is, scope, specify, uuid, DataType } from "hyrest";
-import { world, createPlaylist } from "../scopes";
+import { world, createPlaylist, enqueue } from "../scopes";
 import { PlaylistEntry } from ".";
 import { User } from "./";
 
@@ -14,7 +14,7 @@ export class Playlist {
      * Unique id of this playlist.
      */
     @PrimaryGeneratedColumn("uuid")
-    @scope(world) @is().validate(uuid)
+    @scope(world, enqueue) @is().validate(uuid)
     public id?: string;
 
     @ManyToOne(() => User, user => user.playlists)
@@ -43,5 +43,5 @@ export class Playlist {
      */
     @OneToMany(() => PlaylistEntry, playlistEntry => playlistEntry.playlist)
     @is() @scope(world, createPlaylist) @specify(() => PlaylistEntry)
-    public parts?: PlaylistEntry[];
+    public entries?: PlaylistEntry[];
 }

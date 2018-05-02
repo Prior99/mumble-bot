@@ -3,7 +3,7 @@ import "jest-screenshot";
 export async function browse(url: string): Promise<void> {
     await page.goto(`http://localhost:3020${url}`, {
         waitUntil: "networkidle0",
-        timeout: 60000
+        timeout: 60000,
     });
 }
 

@@ -20,7 +20,7 @@ export { Token } from "./token";
 import { Token } from "./token";
 export { MumbleUser } from "./mumble-user";
 export { Channel } from "./channel";
-export { PlaybackOptions } from "./playback-options";
+export { QueueItem } from "./queue-item";
 export { ForkOptions } from "./fork-options";
 export { Setting } from "./setting";
 import { Setting } from "./setting";

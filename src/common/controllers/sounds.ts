@@ -18,9 +18,8 @@ import { component, inject } from "tsdi";
 import { Connection, Brackets } from "typeorm";
 import { verbose } from "winston";
 import * as FFMpeg from "fluent-ffmpeg";
-import { AudioOutput } from "../../server";
 import { ServerConfig } from "../../config";
-import { Sound, PlaybackOptions, Tag, SoundTagRelation } from "../models";
+import { Sound, Tag, SoundTagRelation } from "../models";
 import { updateSound, world, tagSound } from "../scopes";
 import { Context } from "../context";
 
@@ -82,7 +81,6 @@ export interface SoundsQuery {
 @controller @component
 export class Sounds {
     @inject private db: Connection;
-    @inject private audioOutput: AudioOutput;
     @inject private config: ServerConfig;
 
     /**
@@ -259,30 +257,6 @@ export class Sounds {
 
         const sounds = await queryBuilder.getMany();
         return ok(sounds);
-    }
-
-    @route("POST", "/sound/:id/play")
-    public async playSound(
-        @param("id") @is().validate(uuid) id: string,
-        @body() playbackOptions: PlaybackOptions,
-        @context ctx?: Context,
-    ): Promise<{}> {
-        const sound = await this.getSound(id);
-        sound.used ++;
-        await this.db.getRepository(Sound).save(sound);
-
-        const currentUser = await ctx.currentUser();
-        const { name } = currentUser;
-
-        this.audioOutput.playSound(`${this.config.soundsDir}/${id}`, {
-            type: "sound",
-            sound,
-            user: currentUser,
-        });
-
-        verbose(`${name} played back record #${id}`);
-
-        return ok(sound);
     }
 
     private crop(begin: number, end: number, oldId: string, newId: string): Promise<undefined> {

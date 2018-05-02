@@ -4,9 +4,8 @@ import { context, notFound, body, controller, route, param, is, uuid, ok } from 
 import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { verbose } from "winston";
-
 import { ServerConfig } from "../../config";
-import { AudioOutput, AudioCache } from "../../server";
+import { AudioCache } from "../../server";
 import { CachedAudio, Sound } from "../models";
 import { createSound, world } from "../scopes";
 import { Context } from "../context";
@@ -14,7 +13,6 @@ import { Context } from "../context";
 @controller @component
 export class Cached {
     @inject private db: Connection;
-    @inject private audioOutput: AudioOutput;
     @inject private config: ServerConfig;
     @inject private cache: AudioCache;
 
@@ -66,22 +64,6 @@ export class Cached {
             return ok();
         }
         return notFound<undefined>(`No cached sound with id "${id}" found.`);
-    }
-
-    @route("POST", "/cached/:id/play")
-    public async playCached(@param("id") @is().validate(uuid) id: string, @context ctx?: Context): Promise<{}> {
-        const cached = this.cache.byId(id);
-        if (!cached) { return notFound<undefined>(`No cached sound with id "${id}" found.`); }
-
-        const currentUser = await ctx.currentUser();
-
-        this.audioOutput.playSound(cached.file, {
-            type: "cached",
-            cachedSound: cached,
-            user: currentUser,
-        });
-        verbose(`${currentUser.name} played back cached audio with id ${id}`);
-        return ok();
     }
 
     @route("DELETE", "/cached/:id")
