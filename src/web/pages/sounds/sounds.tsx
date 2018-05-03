@@ -263,6 +263,7 @@ export class PageSounds extends React.Component {
                         }
                         <Grid.Column width={16}>
                             <Pagination
+                                stackable
                                 ellipsisItem={{ content: <Icon name="ellipsis horizontal" />, icon: true }}
                                 firstItem={{ content: <Icon name="angle double left" />, icon: true }}
                                 lastItem={{ content: <Icon name="angle double right" />, icon: true }}
@@ -271,7 +272,7 @@ export class PageSounds extends React.Component {
                                 totalPages={this.totalPages}
                                 activePage={this.activePage}
                                 onPageChange={this.handlePageChange}
-                                siblingRange={2}
+                                siblingRange={3}
                             />
                         </Grid.Column>
                     </Dimmer.Dimmable>
