@@ -1,6 +1,5 @@
 import * as React from "react";
 import { observer } from "mobx-react";
-import { computed } from "mobx";
 import { action, observable } from "mobx";
 import { bind } from "decko";
 import { external, inject } from "tsdi";

@@ -1,4 +1,3 @@
-import { Sound } from "../../../common";
 import * as React from "react";
 import { external, inject, initialize } from "tsdi";
 import { observer } from "mobx-react";
@@ -8,12 +7,10 @@ import {
     Grid,
     Header,
     Icon,
-    Dropdown,
     Form,
     Pagination,
     Dimmer,
     Loader,
-    PaginationProps,
     DropdownProps,
     InputProps,
 } from "semantic-ui-react";
@@ -68,7 +65,7 @@ const sortOptions = [
     { key: 9, value: 9, text: "Name (Z-A)", icon: "sort alphabet descending" },
 ];
 
-const limit = 50;
+const limit = 48;
 
 @requireLogin @observer @external
 export class PageSounds extends React.Component {
@@ -131,8 +128,20 @@ export class PageSounds extends React.Component {
         this.filterSource = value as "upload" | "recording";
     }
 
-    @bind @action private async handlePageChange(_, { activePage }: PaginationProps) {
-        await this.query((Number(activePage) - 1) * limit);
+    @bind private getPaginationEventPage({ currentTarget }: React.SyntheticEvent<HTMLAnchorElement>) {
+        const { type, text } = currentTarget;
+        switch (type) {
+            case "prevItem": return this.activePage - 1;
+            case "nextItem": return this.activePage + 1;
+            case "firstItem": return 1;
+            case "lastItem": return this.totalPages;
+            case "pageItem": return Number(text);
+            default: return 1;
+        }
+    }
+
+    @bind @action private async handlePageChange(event: React.SyntheticEvent<HTMLAnchorElement>) {
+        await this.query(this.getPaginationEventPage(event) * limit);
     }
 
     @bind @action private async handleSearchSubmit() {
@@ -140,8 +149,8 @@ export class PageSounds extends React.Component {
     }
 
     @computed private get totalPages() {
-        if (!this.queryResult) { return 0; }
-        return Math.ceil(this.queryResult.totalSounds / this.queryResult.limit);
+        if (!this.queryResult) { return 1; }
+        return Math.floor(this.queryResult.totalSounds / this.queryResult.limit);
     }
 
     @computed private get hasLoaded() {
@@ -149,8 +158,8 @@ export class PageSounds extends React.Component {
     }
 
     @computed private get activePage() {
-        if (!this.queryResult) { return 0; }
-        return Math.ceil(this.queryResult.offset / this.queryResult.limit);
+        if (!this.queryResult) { return 1; }
+        return Math.max(Math.ceil((this.queryResult.offset || 0) / this.queryResult.limit), 1);
     }
 
     public render() {
@@ -233,7 +242,7 @@ export class PageSounds extends React.Component {
                                             defaultValue={0}
                                             options={sortOptions}
                                         />
-                                        <Form.Button fluid width={3} icon labelPosition="left">
+                                        <Form.Button fluid width={3} icon labelPosition="left" label="Search">
                                             Search <Icon name="search" />
                                         </Form.Button>
                                     </Form.Group>
@@ -254,7 +263,6 @@ export class PageSounds extends React.Component {
                         }
                         <Grid.Column width={16}>
                             <Pagination
-                                fluid
                                 ellipsisItem={{ content: <Icon name="ellipsis horizontal" />, icon: true }}
                                 firstItem={{ content: <Icon name="angle double left" />, icon: true }}
                                 lastItem={{ content: <Icon name="angle double right" />, icon: true }}

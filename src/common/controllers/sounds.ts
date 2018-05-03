@@ -244,17 +244,16 @@ export class Sounds {
         const totalSounds = await queryBuilder.getCount();
         const direction = sortDirection === "desc" ? "DESC" : "ASC";
         switch (sort) {
-            case "updated": queryBuilder.orderBy("updated", direction); break;
-            case "used": queryBuilder.orderBy("used", direction); break;
-            case "duration": queryBuilder.orderBy("duration", direction); break;
-            case "description": queryBuilder.orderBy("description", direction); break;
-            default:
-            case "created": queryBuilder.orderBy("created", direction); break;
+            case "updated": queryBuilder.orderBy("sound.updated", direction); break;
+            case "used": queryBuilder.orderBy("sound.used", direction); break;
+            case "duration": queryBuilder.orderBy("sound.duration", direction); break;
+            case "description": queryBuilder.orderBy("sound.description", direction); break;
+            case "created": default: queryBuilder.orderBy("sound.created", direction); break;
         }
 
-        if (limit) { queryBuilder.limit(limit); }
+        if (offset) { queryBuilder.skip(offset); }
+        if (limit) { queryBuilder.take(limit); }
         else { queryBuilder.limit(100); }
-        if (offset) { queryBuilder.offset(offset); }
 
         const sounds = await queryBuilder.getMany();
         return ok({ totalSounds, limit, offset, sounds });
