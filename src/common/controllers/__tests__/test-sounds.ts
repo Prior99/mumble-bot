@@ -249,7 +249,10 @@ describe("sounds controller", () => {
             const response = await api().get("/sounds")
                 .set("authorization", `Bearer ${userA.token.id}`);
             expect(response.body).toMatchObject({
-                data: responseSounds,
+                data: {
+                    totalSounds: 3,
+                    sounds: responseSounds,
+                },
             });
             expect(response.status).toBe(200);
         });
@@ -257,14 +260,20 @@ describe("sounds controller", () => {
         it("returns all sounds matching a creator", async () => {
             const response = await api().get(`/sounds?creator=${userA.user.id}`)
                 .set("authorization", `Bearer ${userA.token.id}`);
-            expect(response.body.data).toMatchObject([ responseSounds[0], responseSounds[2] ]);
+            expect(response.body.data).toMatchObject({
+                totalSounds: 2,
+                sounds: [ responseSounds[0], responseSounds[2] ],
+            });
             expect(response.status).toBe(200);
         });
 
         it("returns all sounds matching a user", async () => {
             const response = await api().get(`/sounds?user=${userA.user.id}`)
                 .set("authorization", `Bearer ${userA.token.id}`);
-            expect(response.body.data).toMatchObject([ responseSounds[0] ]);
+            expect(response.body.data).toMatchObject({
+                sounds: [ responseSounds[0] ],
+                totalSounds: 1,
+            });
             expect(response.status).toBe(200);
         });
 
@@ -272,21 +281,30 @@ describe("sounds controller", () => {
             it("matches the first tag", async () => {
                 const response = await api().get(`/sounds?tags=${tags[0].id}`)
                     .set("authorization", `Bearer ${userA.token.id}`);
-                expect(response.body.data).toMatchObject([ responseSounds[0], responseSounds[1] ]);
+                expect(response.body.data).toMatchObject({
+                    totalSounds: 2,
+                    sounds: [ responseSounds[0], responseSounds[1] ],
+                });
                 expect(response.status).toBe(200);
             });
 
             it("matches the second tag", async () => {
                 const response = await api().get(`/sounds?tags=${tags[1].id}`)
                     .set("authorization", `Bearer ${userA.token.id}`);
-                expect(response.body.data).toMatchObject([ responseSounds[1], responseSounds[2] ]);
+                expect(response.body.data).toMatchObject({
+                    totalSounds : 2,
+                    sounds: [ responseSounds[1], responseSounds[2] ],
+                });
                 expect(response.status).toBe(200);
             });
 
             it("matches both tags", async () => {
                 const response = await api().get(`/sounds?tags=${tags[1].id},${tags[0].id}`)
                     .set("authorization", `Bearer ${userA.token.id}`);
-                expect(response.body.data).toMatchObject([ responseSounds[1] ]);
+                expect(response.body.data).toMatchObject({
+                    totalSounds : 1,
+                    sounds: [ responseSounds[1] ],
+                });
                 expect(response.status).toBe(200);
             });
         });
@@ -294,77 +312,112 @@ describe("sounds controller", () => {
         it("returns all sounds matching a start date", async () => {
             const response = await api().get(`/sounds?startDate=${sounds[1].created.toISOString()}`)
                 .set("authorization", `Bearer ${userA.token.id}`);
-            expect(response.body.data).toMatchObject([ responseSounds[1], responseSounds[2] ]);
+            expect(response.body.data).toMatchObject({
+                totalSounds : 2,
+                sounds: [ responseSounds[1], responseSounds[2] ],
+            });
             expect(response.status).toBe(200);
         });
 
         it("returns all sounds matching an end date", async () => {
             const response = await api().get(`/sounds?endDate=${sounds[1].created.toISOString()}`)
                 .set("authorization", `Bearer ${userA.token.id}`);
-            expect(response.body.data).toMatchObject([ responseSounds[0] ]);
+            expect(response.body.data).toMatchObject({
+                totalSounds : 1,
+                sounds: [ responseSounds[0] ],
+            });
             expect(response.status).toBe(200);
         });
 
         it("returns all sounds matching a search string", async () => {
             const response = await api().get("/sounds?search=one")
                 .set("authorization", `Bearer ${userA.token.id}`);
-            expect(response.body.data).toMatchObject([ responseSounds[1], responseSounds[2] ]);
+            expect(response.body.data).toMatchObject({
+                totalSounds: 2,
+                sounds: [ responseSounds[1], responseSounds[2] ],
+            });
             expect(response.status).toBe(200);
         });
 
         it("returns all sounds matching a source", async () => {
             const response = await api().get("/sounds?source=upload")
                 .set("authorization", `Bearer ${userA.token.id}`);
-            expect(response.body.data).toMatchObject([ responseSounds[2] ]);
+            expect(response.body.data).toMatchObject({
+                totalSounds: 1,
+                sounds: [ responseSounds[2] ],
+            });
             expect(response.status).toBe(200);
         });
 
         it("sorts the sounds by updated", async () => {
             const response = await api().get("/sounds?sort=updated")
                 .set("authorization", `Bearer ${userA.token.id}`);
-            expect(response.body.data).toMatchObject([ responseSounds[0], responseSounds[1], responseSounds[2] ]);
+            expect(response.body.data).toMatchObject({
+                totalSounds: 3,
+                sounds: [ responseSounds[0], responseSounds[1], responseSounds[2] ],
+            });
             expect(response.status).toBe(200);
         });
 
         it("sorts the sounds by created", async () => {
             const response = await api().get("/sounds?sort=created")
                 .set("authorization", `Bearer ${userA.token.id}`);
-            expect(response.body.data).toMatchObject([ responseSounds[0], responseSounds[1], responseSounds[2] ]);
+            expect(response.body.data).toMatchObject({
+                totalSounds: 3,
+                sounds: [ responseSounds[0], responseSounds[1], responseSounds[2] ],
+            });
             expect(response.status).toBe(200);
         });
 
         it("sorts the sounds by duration", async () => {
             const response = await api().get("/sounds?sort=duration")
                 .set("authorization", `Bearer ${userA.token.id}`);
-            expect(response.body.data).toMatchObject([ responseSounds[2], responseSounds[1], responseSounds[0] ]);
+            expect(response.body.data).toMatchObject({
+                totalSounds: 3,
+                sounds: [ responseSounds[2], responseSounds[1], responseSounds[0] ],
+            });
             expect(response.status).toBe(200);
         });
 
         it("sorts the sounds by description", async () => {
             const response = await api().get("/sounds?sort=description")
                 .set("authorization", `Bearer ${userA.token.id}`);
-            expect(response.body.data).toMatchObject([ responseSounds[1], responseSounds[2], responseSounds[0] ]);
+            expect(response.body.data).toMatchObject({
+                totalSounds: 3,
+                sounds: [ responseSounds[1], responseSounds[2], responseSounds[0] ],
+            });
             expect(response.status).toBe(200);
         });
 
         it("sorts the sounds by usage count ascending", async () => {
             const response = await api().get("/sounds?sort=used&sortDirection=asc")
                 .set("authorization", `Bearer ${userA.token.id}`);
-            expect(response.body.data).toMatchObject([ responseSounds[1], responseSounds[2], responseSounds[0] ]);
+            expect(response.body.data).toMatchObject({
+                totalSounds: 3,
+                sounds: [ responseSounds[1], responseSounds[2], responseSounds[0] ],
+            });
             expect(response.status).toBe(200);
         });
 
         it("sorts the sounds by usage count descending", async () => {
             const response = await api().get("/sounds?sort=used&sortDirection=desc")
                 .set("authorization", `Bearer ${userA.token.id}`);
-            expect(response.body.data).toMatchObject([ responseSounds[0], responseSounds[2], responseSounds[1] ]);
+            expect(response.body.data).toMatchObject({
+                totalSounds: 3,
+                sounds: [ responseSounds[0], responseSounds[2], responseSounds[1] ],
+            });
             expect(response.status).toBe(200);
         });
 
         it("with limit and offset", async () => {
             const response = await api().get("/sounds?sort=used&sortDirection=desc&limit=1&offset=1")
                 .set("authorization", `Bearer ${userA.token.id}`);
-            expect(response.body.data).toMatchObject([ responseSounds[2] ]);
+            expect(response.body.data).toMatchObject({
+                totalSounds: 3,
+                limit: 1,
+                offset: 1,
+                sounds: [ responseSounds[2] ],
+            });
             expect(response.status).toBe(200);
         });
 
@@ -378,7 +431,12 @@ describe("sounds controller", () => {
                 "&search=some" +
                 `&creator=${userA.user.id}`,
             ).set("authorization", `Bearer ${userA.token.id}`);
-            expect(response.body.data).toMatchObject([ responseSounds[0] ]);
+            expect(response.body.data).toMatchObject({
+                totalSounds: 1,
+                limit: 1,
+                offset: 0,
+                sounds: [ responseSounds[0] ],
+            });
             expect(response.status).toBe(200);
         });
     });

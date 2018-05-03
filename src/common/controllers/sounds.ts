@@ -13,16 +13,16 @@ import {
     DataType,
     oneOf,
     notFound,
+    populate,
 } from "hyrest";
 import { component, inject } from "tsdi";
 import { Connection, Brackets } from "typeorm";
 import { verbose } from "winston";
 import * as FFMpeg from "fluent-ffmpeg";
 import { ServerConfig } from "../../config";
-import { Sound, Tag, SoundTagRelation } from "../models";
+import { SoundsQueryResult, Sound, Tag, SoundTagRelation } from "../models";
 import { updateSound, world, tagSound } from "../scopes";
 import { Context } from "../context";
-import { SoundsQueryResult } from "../";
 
 export interface SoundsQuery {
     /**
@@ -253,10 +253,10 @@ export class Sounds {
 
         if (offset) { queryBuilder.skip(offset); }
         if (limit) { queryBuilder.take(limit); }
-        else { queryBuilder.limit(100); }
+        else { queryBuilder.take(100); }
 
         const sounds = await queryBuilder.getMany();
-        return ok({ totalSounds, limit, offset, sounds });
+        return ok(populate(world, SoundsQueryResult, { totalSounds, limit, offset, sounds }));
     }
 
     private crop(begin: number, end: number, oldId: string, newId: string): Promise<undefined> {

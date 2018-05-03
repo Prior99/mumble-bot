@@ -150,7 +150,7 @@ export class PageSounds extends React.Component {
 
     @computed private get totalPages() {
         if (!this.queryResult) { return 1; }
-        return Math.floor(this.queryResult.totalSounds / this.queryResult.limit);
+        return Math.floor(this.queryResult.totalSounds / limit);
     }
 
     @computed private get hasLoaded() {
@@ -159,7 +159,7 @@ export class PageSounds extends React.Component {
 
     @computed private get activePage() {
         if (!this.queryResult) { return 1; }
-        return Math.max(Math.ceil((this.queryResult.offset || 0) / this.queryResult.limit), 1);
+        return Math.max(Math.ceil((this.queryResult.offset || 0) / limit), 1);
     }
 
     public render() {
