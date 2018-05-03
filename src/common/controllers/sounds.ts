@@ -22,6 +22,7 @@ import { ServerConfig } from "../../config";
 import { Sound, Tag, SoundTagRelation } from "../models";
 import { updateSound, world, tagSound } from "../scopes";
 import { Context } from "../context";
+import { SoundsQueryResult } from "../";
 
 export interface SoundsQuery {
     /**
@@ -184,7 +185,7 @@ export class Sounds {
      *
      * @return A list of all sounds matching the given criteria.
      */
-    public async querySounds(soundQuery: SoundsQuery = {}): Promise<Sound[]> {
+    public async querySounds(soundQuery: SoundsQuery = {}): Promise<SoundsQueryResult> {
         return await this.listSounds(
             soundQuery.search,
             soundQuery.limit,
@@ -200,7 +201,7 @@ export class Sounds {
         );
     }
 
-    @route("GET", "/sounds").dump(Sound, world)
+    @route("GET", "/sounds").dump(SoundsQueryResult, world)
     protected async listSounds(
         @query("search") @is() search?: string,
         @query("limit") @is(DataType.int) limit?: number,
@@ -213,7 +214,7 @@ export class Sounds {
         @query("source") @is().validate(oneOf("upload", "recording")) source?: string,
         @query("sort") @is().validate(oneOf("created", "updated", "used", "duration", "description")) sort?: string,
         @query("sortDirection") @is().validate(oneOf("asc", "desc")) sortDirection?: string,
-    ): Promise<Sound[]> {
+    ): Promise<SoundsQueryResult> {
         const queryBuilder = this.db.getRepository(Sound).createQueryBuilder("sound")
             .leftJoinAndSelect("sound.soundTagRelations", "soundTagRelation")
             .leftJoinAndSelect("soundTagRelation.tag", "tag")
@@ -240,7 +241,7 @@ export class Sounds {
             `, { tags: tags.split(",") });
         }
         if (source) { queryBuilder.andWhere("source = :source", { source }); }
-
+        const totalSounds = await queryBuilder.getCount();
         const direction = sortDirection === "desc" ? "DESC" : "ASC";
         switch (sort) {
             case "updated": queryBuilder.orderBy("updated", direction); break;
@@ -256,7 +257,7 @@ export class Sounds {
         if (offset) { queryBuilder.offset(offset); }
 
         const sounds = await queryBuilder.getMany();
-        return ok(sounds);
+        return ok({ totalSounds, limit, offset, sounds });
     }
 
     private crop(begin: number, end: number, oldId: string, newId: string): Promise<undefined> {

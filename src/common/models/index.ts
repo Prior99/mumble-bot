@@ -24,6 +24,8 @@ export { QueueItem } from "./queue-item";
 export { ForkOptions } from "./fork-options";
 export { Setting } from "./setting";
 import { Setting } from "./setting";
+export { SoundsQueryResult } from "./sounds-query-result";
+import { SoundsQueryResult } from "./sounds-query-result";
 
 export const allDatabaseModels = [
     User,
@@ -36,4 +38,5 @@ export const allDatabaseModels = [
     PermissionAssociation,
     Token,
     Setting,
+    SoundsQueryResult,
 ];

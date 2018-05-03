@@ -6,7 +6,7 @@ import { inject, external } from "tsdi";
 import { ErrorStore } from "../../store";
 
 @observer @external
-export class Errors extends React.PureComponent<{}> {
+export class Errors extends React.Component {
     @inject private errors: ErrorStore;
 
     public render() {

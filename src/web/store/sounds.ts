@@ -12,22 +12,9 @@ export class SoundsStore {
     @inject private tags: TagsStore;
 
     @observable public sounds = new Map<string, Sound>();
-    @observable public loading = false;
-
-    @initialize
-    protected async initialize() {
-        this.loading = true;
-        const sounds = await this.soundsController.querySounds();
-        sounds.forEach(sound => this.sounds.set(sound.id, sound));
-        this.loading = false;
-    }
 
     @computed public get all() {
         return Array.from(this.sounds.values());
-    }
-
-    @computed public get initial() {
-        return this.all;
     }
 
     @bind @action public async untag(sound: Sound, tag: Tag) {
@@ -57,7 +44,7 @@ export class SoundsStore {
 
     @bind @action public async query(query: SoundsQuery) {
         const result = await this.soundsController.querySounds(query);
-        result.forEach(sound => {
+        result.sounds.forEach(sound => {
             this.sounds.set(sound.id, sound);
         });
         return result;

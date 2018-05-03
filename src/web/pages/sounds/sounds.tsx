@@ -4,14 +4,26 @@ import { external, inject, initialize } from "tsdi";
 import { observer } from "mobx-react";
 import { bind } from "decko";
 import { observable, computed, action } from "mobx";
-import { Grid, Header, Icon, Dropdown, Form } from "semantic-ui-react";
+import {
+    Grid,
+    Header,
+    Icon,
+    Dropdown,
+    Form,
+    Pagination,
+    Dimmer,
+    Loader,
+    PaginationProps,
+    DropdownProps,
+    InputProps,
+} from "semantic-ui-react";
 import { requireLogin } from "../../utils";
 import { SoundsStore, TagsStore, UsersStore } from "../../store";
 import { SoundCard, Content } from "../../components";
-import { Tag, User, SoundsQuery  } from "../../../common";
+import { Tag, User, SoundsQuery , SoundsQueryResult } from "../../../common";
 import * as css from "./sounds.scss";
 
-const sortOptions: SoundsQuery[] = [
+const sortOptionValues: SoundsQuery[] = [
     { sort: "created", sortDirection: "asc" },
     { sort: "created", sortDirection: "desc" },
     { sort: "updated", sortDirection: "asc" },
@@ -23,6 +35,40 @@ const sortOptions: SoundsQuery[] = [
     { sort: "description", sortDirection: "asc" },
     { sort: "description", sortDirection: "desc" },
 ];
+
+const sourceOptions = [
+    {
+        key: "any",
+        text: "Any",
+    },
+    {
+        key: "recording",
+        value: "recording",
+        text: "Recording",
+        icon: "microphone",
+    },
+    {
+        key: "upload",
+        value: "upload",
+        text: "Upload",
+        icon: "upload",
+    },
+];
+
+const sortOptions = [
+    { key: 0, value: 0, text: "Created (oldest first)", icon: "sort content ascending" },
+    { key: 1, value: 1, text: "Created (newest first)", icon: "sort content descending" },
+    { key: 2, value: 2, text: "Modified (oldest first)", icon: "sort content ascending" },
+    { key: 3, value: 3, text: "Modified (newest first)", icon: "sort content descending" },
+    { key: 4, value: 4, text: "Usages (ascending)", icon: "sort numeric ascending" },
+    { key: 5, value: 5, text: "Usages (descending)", icon: "sort numeric descending" },
+    { key: 6, value: 6, text: "Duration (shortest first)", icon: "sort content ascending" },
+    { key: 7, value: 7, text: "Duration (longest first)", icon: "sort content descending" },
+    { key: 8, value: 8, text: "Name (A-Z)", icon: "sort alphabet ascending" },
+    { key: 9, value: 9, text: "Name (Z-A)", icon: "sort alphabet descending" },
+];
+
+const limit = 50;
 
 @requireLogin @observer @external
 export class PageSounds extends React.Component {
@@ -36,10 +82,17 @@ export class PageSounds extends React.Component {
     @observable private filterCreator: User;
     @observable private filterSource: "upload" | "recording";
     @observable private loading = false;
-    @observable private queryResult: Sound[];
-    @observable private sort = sortOptions[1];
+    @observable private queryResult: SoundsQueryResult;
+    @observable private sort = sortOptionValues[1];
 
-    @bind @action private async query() {
+    @initialize
+    protected async initialize() {
+        this.loading = true;
+        await this.query();
+        this.loading = false;
+    }
+
+    @bind @action private async query(offset?: number) {
         this.loading = true;
         this.queryResult = await this.sounds.query({
             tags: this.filterTags.map(tag => tag.id),
@@ -48,43 +101,56 @@ export class PageSounds extends React.Component {
             user: this.filterUser && this.filterUser.id,
             source: this.filterSource,
             ...this.sort,
-            limit: 20,
+            limit,
+            offset,
         });
         this.loading = false;
     }
 
-    @computed private get visibleEntries() {
-        if (this.queryResult) { return this.queryResult; }
-        if (!this.sounds) { return []; }
-        return this.sounds.initial;
+    @bind @action private handleTagChange(_, { value }: DropdownProps) {
+        this.filterTags = (value as string[]).map(tagId => this.tags.byId(tagId));
     }
 
-    @bind @action private handleTagChange(_: React.SyntheticInputEvent, { value }: { value: string[] }) {
-        this.filterTags = value.map(tagId => this.tags.byId(tagId));
+    @bind @action private handleUserChange(_, { value }: DropdownProps) {
+        this.filterUser = this.users.byId(value as string);
     }
 
-    @bind @action private handleUserChange(_: React.SyntheticInputEvent, { value }: { value: string }) {
-        this.filterUser = this.users.byId(value);
+    @bind @action private handleCreatorChange(_, { value }: DropdownProps) {
+        this.filterCreator = this.users.byId(value as string);
     }
 
-    @bind @action private handleCreatorChange(_: React.SyntheticInputEvent, { value }: { value: string }) {
-        this.filterCreator = this.users.byId(value);
-    }
-
-    @bind @action private handleSearchChange(_: React.SyntheticInputEvent, { value }: { value: string }) {
+    @bind @action private handleSearchChange(_, { value }: InputProps) {
         this.filterSearch = value;
     }
 
-    @bind @action private handleSortChange(_: React.SyntheticInputEvent, { value }: { value: number }) {
-        this.sort = sortOptions[value];
+    @bind @action private handleSortChange(_, { value }: DropdownProps) {
+        this.sort = sortOptionValues[value as number];
     }
 
-    @bind @action private handleSourceChange(_: React.SyntheticInputEvent, { value }: { value: string }) {
+    @bind @action private handleSourceChange(_, { value }: DropdownProps) {
         this.filterSource = value as "upload" | "recording";
+    }
+
+    @bind @action private async handlePageChange(_, { activePage }: PaginationProps) {
+        await this.query((Number(activePage) - 1) * limit);
     }
 
     @bind @action private async handleSearchSubmit() {
         await this.query();
+    }
+
+    @computed private get totalPages() {
+        if (!this.queryResult) { return 0; }
+        return Math.ceil(this.queryResult.totalSounds / this.queryResult.limit);
+    }
+
+    @computed private get hasLoaded() {
+        return this.queryResult !== undefined;
+    }
+
+    @computed private get activePage() {
+        if (!this.queryResult) { return 0; }
+        return Math.ceil(this.queryResult.offset / this.queryResult.limit);
     }
 
     public render() {
@@ -98,9 +164,12 @@ export class PageSounds extends React.Component {
                             <Header.Subheader>All sounds on this server.</Header.Subheader>
                         </Header>
                     </Grid.Row>
-                    <Grid.Row>
-                        <Grid.Column>
-                            <Form loading={this.loading} onSubmit={this.handleSearchSubmit}>
+                    <Dimmer.Dimmable as={Grid.Row} dimmed={this.loading}>
+                        <Dimmer active={this.loading} inverted>
+                            <Loader>Loading</Loader>
+                        </Dimmer>
+                        <Grid.Column width={16}>
+                            <Form onSubmit={this.handleSearchSubmit}>
                                     <Form.Group>
                                         <Form.Dropdown
                                             label="Search for Tag"
@@ -151,54 +220,53 @@ export class PageSounds extends React.Component {
                                             placeholder="Source"
                                             selection
                                             fluid
-                                            options={[
-                                                { text: "Any" },
-                                                { value: "recording", text: "Recording", icon: "microphone" },
-                                                { value: "upload", text: "Upload", icon: "upload" },
-                                            ]}
+                                            options={sourceOptions}
                                             onChange={this.handleSourceChange}
                                         />
                                         <Form.Dropdown
                                             label="Sort"
-                                            width={4}
+                                            width={5}
                                             placeholder="Sort"
                                             selection
                                             fluid
                                             onChange={this.handleSortChange}
                                             defaultValue={0}
-                                            options={[
-                                                { value: 0, text: "Created", icon: "sort content ascending" },
-                                                { value: 1, text: "Created", icon: "sort content descending" },
-                                                { value: 2, text: "Modified", icon: "sort content ascending" },
-                                                { value: 3, text: "Modified", icon: "sort content descending" },
-                                                { value: 4, text: "Usages", icon: "sort numeric ascending" },
-                                                { value: 5, text: "Usages", icon: "sort numeric descending" },
-                                                { value: 6, text: "Duration", icon: "sort content ascending" },
-                                                { value: 7, text: "Duration", icon: "sort content descending" },
-                                                { value: 8, text: "Name", icon: "sort alphabet ascending" },
-                                                { value: 9, text: "Name", icon: "sort alphabet descending" },
-                                            ]}
+                                            options={sortOptions}
                                         />
-                                        <Form.Button fluid width={1} label="Search" icon="search" />
+                                        <Form.Button fluid width={3} icon labelPosition="left">
+                                            Search <Icon name="search" />
+                                        </Form.Button>
                                     </Form.Group>
                             </Form>
                         </Grid.Column>
-                    </Grid.Row>
-                    <Grid.Row>
-                            {
-                                this.visibleEntries.map(sound => (
-                                    <Grid.Column
-                                        className={css.column}
-                                        mobile={16}
-                                        tablet={8}
-                                        computer={4}
-                                        key={sound.id}
-                                    >
-                                        <SoundCard sound={sound} />
-                                    </Grid.Column>
-                                ))
-                            }
-                    </Grid.Row>
+                        {
+                            this.hasLoaded && this.queryResult.sounds.map(sound => (
+                                <Grid.Column
+                                    className={css.column}
+                                    mobile={16}
+                                    tablet={8}
+                                    computer={4}
+                                    key={sound.id}
+                                >
+                                    <SoundCard sound={sound} />
+                                </Grid.Column>
+                            ))
+                        }
+                        <Grid.Column width={16}>
+                            <Pagination
+                                fluid
+                                ellipsisItem={{ content: <Icon name="ellipsis horizontal" />, icon: true }}
+                                firstItem={{ content: <Icon name="angle double left" />, icon: true }}
+                                lastItem={{ content: <Icon name="angle double right" />, icon: true }}
+                                prevItem={{ content: <Icon name="angle left" />, icon: true }}
+                                nextItem={{ content: <Icon name="angle right" />, icon: true }}
+                                totalPages={this.totalPages}
+                                activePage={this.activePage}
+                                onPageChange={this.handlePageChange}
+                                siblingRange={2}
+                            />
+                        </Grid.Column>
+                    </Dimmer.Dimmable>
                 </Grid>
             </Content>
         );

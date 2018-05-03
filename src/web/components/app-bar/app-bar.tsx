@@ -46,7 +46,7 @@ export class AppBar extends React.Component {
                                 item
                                 key="user"
                                 text={user.name}
-                                trigger={<Image circular size="mini" src={this.avatar} />}
+                                icon={<Image className={css.avatar} circular size="mini" src={this.avatar} />}
                             >
                                 <Dropdown.Menu>
                                     <Dropdown.Header>Logged in in as {this.ownUser.user.name}</Dropdown.Header>
