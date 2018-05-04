@@ -39,7 +39,7 @@ test("Linking a user", async () => {
     // Click on the "Settings" page.
     await (await dropdown.$$("div[role='option']"))[2].click();
     await screenshot();
-    const superUserCheckbox = (await page.$x("//label[contains(text(), 'SuperUser')]"))[0];
+    const superUserCheckbox = (await page.$x("//label[contains(text(), 'Someone')]"))[0];
     await superUserCheckbox.click();
 });
 

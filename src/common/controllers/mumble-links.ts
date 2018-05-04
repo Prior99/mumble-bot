@@ -9,6 +9,7 @@ import {
     forbidden,
     badRequest,
 } from "hyrest";
+import { verbose } from "winston";
 import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { Connection as MumbleConnection } from "mumble";
@@ -47,6 +48,7 @@ export class MumbleLinks {
         if (!mumbleUser) {
             return badRequest<MumbleLink>("Unknown mumble user.");
         }
+        verbose(`Linked user ${currentUser.id} to mumble user "${mumbleUser.name}" with id ${mumbleUser.id}`);
         await this.db.getRepository(MumbleLink).save(mumbleLink);
         await this.audioInput.addRegisteredUser(mumbleUser, currentUser);
         return created(mumbleLink);

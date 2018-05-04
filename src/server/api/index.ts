@@ -177,7 +177,7 @@ export class RestApi {
         if (!sound) { return res.status(404).send(); }
 
         res.setHeader("Content-disposition", `attachment; filename='cached_${id}.mp3'`);
-        const stream = FS.createReadStream(sound.file)
+        const stream = FS.createReadStream(`${this.config.tmpDir}/${sound.id}`)
             .on("error", (err) => {
                 if (err.code === "ENOENT") { return res.status(404).send(); }
                 error(`Error occured when trying to read cached record with id ${id}`);
@@ -193,7 +193,7 @@ export class RestApi {
         const sound = this.cache.byId(id);
         if (!sound) { return res.status(404).send(); }
 
-        const fileName = `${sound.file}.png`;
+        const fileName = `${this.config.tmpDir}/${sound.id}.png`;
         const trySend = async (retries = 0) => {
             if (!existsSync(fileName)) {
                 if (retries === 5) { return res.status(404).send(); }
@@ -204,7 +204,7 @@ export class RestApi {
                 res.status(200);
                 createReadStream(fileName).on("error", (err) => {
                     res.status(500).send();
-                    error(`Error sending visualization of ${sound.file} to client.`, err);
+                    error(`Error sending visualization of ${sound.id} to client.`, err);
                 }).pipe(res);
             }
             catch (err) {

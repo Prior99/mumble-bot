@@ -9,22 +9,15 @@ import { User } from ".";
  * A cached audio.
  */
 export class CachedAudio {
-    constructor(filename?: string, user?: User, duration?: number) {
-        if (filename && user && duration) {
-            this.file = filename;
+    constructor(id?: string, user?: User, duration?: number) {
+        if (id && user && duration) {
             this.user = user;
             this.duration = duration;
-            this.id = Uuid.v4();
+            this.id = id;
             this.protected = false;
             this.date = new Date();
         }
     }
-
-    /**
-     * The filename of the audio.
-     */
-    @is() @scope(world)
-    public file?: string;
 
     /**
      * The date the audio was recorded.

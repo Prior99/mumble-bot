@@ -1,9 +1,11 @@
-import * as Winston from "winston";
+import { error, info } from "winston";
+import * as uuid from "uuid";
 import mkdirp = require("mkdirp-promise");
+import { bind } from "decko";
 import * as FFMpeg from "fluent-ffmpeg";
 import * as Stream from "stream";
 import { PassThrough as PassThroughStream } from "stream";
-import { external, inject } from "tsdi";
+import { external, inject, initialize } from "tsdi";
 import { User as MumbleUser } from "mumble";
 import { ServerConfig } from "../../config";
 import { User } from "../../common";
@@ -19,8 +21,8 @@ const audioFreq = 48000;
  */
 @external
 export class VoiceInputUser extends Stream.Writable {
-    private config: ServerConfig;
-    private cache: AudioCache;
+    @inject private config: ServerConfig;
+    @inject private cache: AudioCache;
 
     private user: MumbleUser;
     private databaseUser: User;
@@ -28,7 +30,7 @@ export class VoiceInputUser extends Stream.Writable {
     private passthrough: PassThroughStream;
     private timeout: NodeJS.Timer;
     private speakStartTime: Date;
-    private filename: string;
+    private currentId: string;
     private encoder: any;
 
     /**
@@ -36,24 +38,15 @@ export class VoiceInputUser extends Stream.Writable {
      * @param user Mumble user to recognize the speech of.
      * @param databaseUser The user from the database.
      */
-    constructor(user, databaseUser, @inject config?: ServerConfig, @inject cache?: AudioCache) {
+    constructor(user, databaseUser) {
         super();
-        this.config = config;
-        this.cache = cache;
         this.user = user;
         this.databaseUser = databaseUser;
+    }
+
+    @initialize
+    protected initialize() {
         this.createNewRecordingFile();
-    }
-
-    private get path() {
-        return `${this.config.tmpDir}/useraudio/${this.user.id}`;
-    }
-
-    /**
-     * Has to be called from outside, before the stream is connected.
-     */
-    public async init() {
-        await mkdirp(this.path);
     }
 
     /**
@@ -90,21 +83,25 @@ export class VoiceInputUser extends Stream.Writable {
         this.speakStartTime = new Date();
     }
 
+    @bind private handleEncoderError(err: Error) {
+        error(`Encoder for user ${this.user.name} crashed.`, err);
+    }
+
     /**
      * Creates a new temporary record file.
      */
     private createNewRecordingFile = () => {
-        this.filename = `${this.path}/${Date.now()}.mp3`;
+        this.currentId = uuid.v4();
         this.passthrough = new PassThroughStream();
         this.encoder = FFMpeg(this.passthrough)
-        .inputOptions(
-            "-f", "s16le",
-            "-ar", String(audioFreq),
-            "-ac", "1",
-        )
-        .on("error", (err) => Winston.error(`Encoder for user ${this.user.name} crashed.`, err))
-        .audioCodec("libmp3lame")
-        .save(this.filename);
+            .inputOptions(
+                "-f", "s16le",
+                "-ar", String(audioFreq),
+                "-ac", "1",
+            )
+            .on("error", this.handleEncoderError)
+            .audioCodec("libmp3lame")
+            .save(`${this.config.tmpDir}/${this.currentId}`);
     }
 
     /**
@@ -114,7 +111,7 @@ export class VoiceInputUser extends Stream.Writable {
         this.speaking = false;
         this.passthrough.end();
         this.cache.add(
-            this.filename,
+            this.currentId,
             this.databaseUser.id,
             (Date.now() - this.speakStartTime.getTime()) / msInS,
         );
@@ -135,11 +132,16 @@ export class VoiceInputUser extends Stream.Writable {
      * Stop all timeouts and shutdown everything.
      */
     public stop() {
-        this.encoder.kill();
+        // Ignore error when killing encoder.
+        this.encoder.removeListener("error", this.handleEncoderError);
+        this.encoder.once("error", () => { return; });
+        try {
+            this.encoder.kill();
+        } catch (err) {} // tslint:disable-line
         this.end();
         if (this.timeout) {
             clearTimeout(this.timeout);
         }
-        Winston.info(`Input stopped for user ${this.user.name}`);
+        info(`Input stopped for user ${this.user.name}`);
     }
 }

@@ -49,8 +49,8 @@ export class Cached {
 
         await this.db.getRepository(Sound).save(sound);
 
-        await rename(cached.file, `${this.config.soundsDir}/${sound.id}`);
-        await rename(cached.file + ".png", `${this.config.soundsDir}/${sound.id}.png`);
+        await rename(`${this.config.tmpDir}/${cached.id}`, `${this.config.soundsDir}/${sound.id}`);
+        await rename(`${this.config.tmpDir}/${cached.id}.png`, `${this.config.soundsDir}/${sound.id}.png`);
 
         this.cache.remove(cached.id);
         verbose(`${currentUser.name} added new record #${sound.id}`);

@@ -12,7 +12,8 @@
         "lib": ["es2016", "webworker", "dom"],
         "emitDecoratorMetadata": true,
         "skipLibCheck": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "rootDir": "src/"
     },
     "include": [
         "typings/*",
@@ -21,6 +22,8 @@
     ],
     "exclude": [
         "**/__tests__/**",
-        "**/__mocks__/**"
+        "**/__mocks__/**",
+        "typings/global-puppeteer.d.ts",
+        "**/jest/*.ts"
     ]
 }

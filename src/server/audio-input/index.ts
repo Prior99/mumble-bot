@@ -1,4 +1,5 @@
 import { component, inject, initialize, destroy } from "tsdi";
+import * as mkdirp from "mkdirp";
 import { EventEmitter } from "events";
 import { info } from "winston";
 import { User as MumbleUser, Connection as MumbleConnection } from "mumble";
@@ -6,6 +7,7 @@ import { Connection as DatabaseConnection } from "typeorm";
 import { bind } from "decko";
 import { VoiceInputUser } from "./user";
 import { User, MumbleLink } from "../../common";
+import { ServerConfig } from "../../config";
 
 /**
  * This class handles voice input for all users. It uses instances of user.js
@@ -15,12 +17,14 @@ import { User, MumbleLink } from "../../common";
 export class AudioInput extends EventEmitter {
     @inject private mumble: MumbleConnection;
     @inject private db: DatabaseConnection;
+    @inject private config: ServerConfig;
 
     private users = new Map<number, VoiceInputUser>();
 
     @initialize
     protected initConnectedUsers() {
-        this.mumble.on("user-connect", this.addUser);
+        mkdirp(this.config.tmpDir);
+        this.mumble.on("user-connect", user => this.addUser(user));
         this.mumble.on("user-disconnect", this.removeUser);
         this.mumble.users().forEach(user => this.addUser(user));
     }
@@ -33,7 +37,6 @@ export class AudioInput extends EventEmitter {
     @bind public async addRegisteredUser(user: MumbleUser, databaseUser: User) {
         info(`Input registered for user ${user.name}`);
         const localUser = new VoiceInputUser(user, databaseUser);
-        await localUser.init();
         this.users.set(user.id, localUser);
         user.outputStream(true).pipe(localUser);
     }

@@ -51,13 +51,13 @@ export class AudioCache extends EventEmitter {
 
     /**
      * Add an audio file to the list of cached audios.
-     * @param filename Filename of the cached audio file.
+     * @param id Id of the cached audio file.
      * @param user User that emitted the audio.
      * @param duration Duration of the audio.
      */
-    public async add(filename: string, userId: string, duration: number) {
+    public async add(id: string, userId: string, duration: number) {
         const user = await this.db.getRepository(User).findOne(userId);
-        const cachedAudio: CachedAudio = new CachedAudio(filename, user, duration);
+        const cachedAudio: CachedAudio = new CachedAudio(id, user, duration);
         this.cachedAudios.set(cachedAudio.id, cachedAudio);
         this.emit("cached-audio", cachedAudio);
         this.cleanUp();
@@ -74,10 +74,10 @@ export class AudioCache extends EventEmitter {
             if (this.cachedAudios.size <= this.cacheAmount) { return; }
             this.cachedAudios.delete(cachedAudio.id);
             try {
-                await unlink(cachedAudio.file);
-                await unlink(`${cachedAudio.file}.png`);
+                await unlink(`${this.config.tmpDir}/${cachedAudio.id}`);
+                await unlink(`${this.config.tmpDir}/${cachedAudio.id}.png`);
                 this.emit("removed-cached-audio", cachedAudio);
-                info(`Deleted cached audio file "${cachedAudio.file}" and "${cachedAudio.file}.png".`);
+                info(`Deleted files for cached audio"${cachedAudio.id}".`);
             } catch (err) {
                 error("Error when cleaning up cached audios!", err);
             }
