@@ -57,8 +57,8 @@ export class RestApi {
         ExpressWS(this.app);
 
         this.app.use(this.handleCORS);
-        (this.app as any).ws("/queue", this.websocketQueue);
-        (this.app as any).ws("/cached/live", this.websocketQueue);
+        // (this.app as any).ws("/queue", this.websocketQueue);
+        // (this.app as any).ws("/cached/live", this.websocketQueue);
         this.app.use(
             hyrest(...allControllers.map((controller: any) => this.tsdi.get(controller)))
                 .context(req => new Context(req))
@@ -122,12 +122,6 @@ export class RestApi {
     }
 
     @bind public websocketCached(ws, req: Request) {
-        ws.send(JSON.stringify({
-            type: "init",
-            cacheAmount: this.cache.cacheAmount,
-            list: this.cache.all.map(sound => omit(["file"], sound)),
-        }));
-
         const onAdd = audio => ws.send(JSON.stringify({ type: "add", sound: omit(["file"], audio) }));
         this.cache.on("cached-audio", onAdd);
 
@@ -144,11 +138,15 @@ export class RestApi {
         });
     }
 
-    @bind public websocketQueue(ws, req: Request) {
+    @bind public websocket(ws, req: Request) {
         try {
             ws.send(JSON.stringify({
                 event: "init",
                 queue: dump(world, this.audioOutput.queue),
+                cachedAudio: {
+                    max: this.cache.cacheAmount,
+                    list: this.cache.all.map(sound => omit(["file"], sound)),
+                },
             }));
         }
         catch (err) {

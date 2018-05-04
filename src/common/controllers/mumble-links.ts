@@ -15,6 +15,7 @@ import { Connection as MumbleConnection } from "mumble";
 import { MumbleLink } from "../models";
 import { createMumbleLink, world } from "../scopes";
 import { Context } from "../context";
+import { AudioInput } from "../../server/audio-input/index";
 
 export interface Settings {
     [key: string]: string;
@@ -24,6 +25,7 @@ export interface Settings {
 export class MumbleLinks {
     @inject private db: Connection;
     @inject private mumble: MumbleConnection;
+    @inject private audioInput: AudioInput;
 
     /**
      * Create a new linkage between a database user and a user in the mumble server.
@@ -37,7 +39,8 @@ export class MumbleLinks {
         @body(createMumbleLink) @is() mumbleLink: MumbleLink,
         @context ctx?: Context,
     ): Promise<MumbleLink> {
-        if (mumbleLink.user.id !== (await ctx.currentUser()).id) {
+        const currentUser = await ctx.currentUser();
+        if (mumbleLink.user.id !== currentUser.id) {
             return forbidden<MumbleLink>("Can't link a mumble user to a foreign user.");
         }
         const mumbleUser = this.mumble.userById(mumbleLink.mumbleId);
@@ -45,6 +48,7 @@ export class MumbleLinks {
             return badRequest<MumbleLink>("Unknown mumble user.");
         }
         await this.db.getRepository(MumbleLink).save(mumbleLink);
+        await this.audioInput.addRegisteredUser(mumbleUser, currentUser);
         return created(mumbleLink);
     }
 

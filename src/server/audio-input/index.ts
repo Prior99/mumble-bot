@@ -1,9 +1,10 @@
 import { component, inject, initialize, destroy } from "tsdi";
-import { VoiceInputUser } from "./user";
-import { info } from "winston";
 import { EventEmitter } from "events";
+import { info } from "winston";
 import { User as MumbleUser, Connection as MumbleConnection } from "mumble";
 import { Connection as DatabaseConnection } from "typeorm";
+import { bind } from "decko";
+import { VoiceInputUser } from "./user";
 import { User, MumbleLink } from "../../common";
 
 /**
@@ -29,7 +30,7 @@ export class AudioInput extends EventEmitter {
      * @param user The mumble user object.
      * @param databaseUser The user object from the database.
      */
-    private async addRegisteredUser(user: MumbleUser, databaseUser: User) {
+    @bind public async addRegisteredUser(user: MumbleUser, databaseUser: User) {
         info(`Input registered for user ${user.name}`);
         const localUser = new VoiceInputUser(user, databaseUser);
         await localUser.init();
@@ -41,7 +42,7 @@ export class AudioInput extends EventEmitter {
      * Called when a user joined the server, or was there before the bot joined.
      * @param user The user who should be registered.
      */
-    private async addUser(user: MumbleUser) {
+    @bind private async addUser(user: MumbleUser) {
         const link = await this.db.getRepository(MumbleLink).findOne({
             where: { mumbleId: user.id },
             relations: ["user"],
@@ -57,7 +58,7 @@ export class AudioInput extends EventEmitter {
      * Called when user disconnects. Unregisters the user.
      * @param user The user which disconnected.
      */
-    private removeUser(user: MumbleUser) {
+    @bind private removeUser(user: MumbleUser) {
         const localUser = this.users[user.id];
         if (localUser) {
             this.users[user.id].stop();

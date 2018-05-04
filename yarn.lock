@@ -6142,9 +6142,8 @@ multimatch@^2.0.0:
     arrify "^1.0.0"
     minimatch "^3.0.0"
 
-mumble@^0.3.13:
+"mumble@file:../node-mumble":
   version "0.3.13"
-  resolved "https://registry.yarnpkg.com/mumble/-/mumble-0.3.13.tgz#676a50c3d19bf5b59060e6d5be2cc437254a65bb"
   dependencies:
     celt "^0.1.11"
     jitterbuffer "^0.1.12"

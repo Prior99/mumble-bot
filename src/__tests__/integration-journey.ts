@@ -1,10 +1,10 @@
-import { browse, screenshot } from "./utils";
+import { signup, screenshot, browse } from "./utils";
+
+const username = "Someone";
+const email = "someone@example.com";
+const password = "some secure password";
 
 test("Signing up", async () => {
-    const username = "Someone";
-    const email = "someone@example.com";
-    const password = "some secure password";
-
     // Browse to login page.
     await browse("/");
     await screenshot();
@@ -29,4 +29,27 @@ test("Signing up", async () => {
     await (await page.$("button[type='submit']")).click();
     await page.waitFor(600);
     await screenshot();
+});
+
+test("Linking a user", async () => {
+    // Open the dropdown from the top right corner.
+    const dropdown = await page.$("div.right.menu > div[role='listbox']");
+    await dropdown.click();
+    await screenshot();
+    // Click on the "Settings" page.
+    await (await dropdown.$$("div[role='option']"))[2].click();
+    await screenshot();
+    const superUserCheckbox = (await page.$x("//label[contains(text(), 'SuperUser')]"))[0];
+    await superUserCheckbox.click();
+});
+
+test("Listing all users", async () => {
+    const usersLink = (await page.$x("//a[contains(text(), 'Users')]"))[0];
+    await usersLink.click();
+    await page.waitFor(600);
+    await screenshot();
+});
+
+test("Recording", async () => {
+    await mumbleAgent.play();
 });
