@@ -161,6 +161,14 @@
   dependencies:
     "@types/node" "*"
 
+"@types/express-ws@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@types/express-ws/-/express-ws-3.0.0.tgz#89674edba2e9141916fc4d4d30fbd4f810e6b80b"
+  dependencies:
+    "@types/express" "*"
+    "@types/express-serve-static-core" "*"
+    "@types/ws" "*"
+
 "@types/express@*":
   version "4.0.35"
   resolved "https://registry.yarnpkg.com/@types/express/-/express-4.0.35.tgz#6267c7b60a51fac473467b3c4a02cd1e441805fe"
@@ -265,6 +273,13 @@
   version "2.3.9"
   resolved "https://registry.yarnpkg.com/@types/winston/-/winston-2.3.9.tgz#1ff9f1bb57952fe3d88c1b21c4899ede316a35bc"
   dependencies:
+    "@types/node" "*"
+
+"@types/ws@*":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@types/ws/-/ws-5.1.0.tgz#a6382c1ad2dc3a68d0650fbb4ce214ca78f2e5bf"
+  dependencies:
+    "@types/events" "*"
     "@types/node" "*"
 
 "@types/yamljs@^0.2.30":

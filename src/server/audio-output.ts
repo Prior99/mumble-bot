@@ -89,7 +89,7 @@ export class AudioOutput extends EventEmitter {
                         const timeAlreadyTaken = Date.now() - startTime;
                         const totalTime = (samplesTotal / audioFreq) * msInS;
                         const waitTime = totalTime - timeAlreadyTaken;
-                        this.transcodeTimeout = setTimeout(resolve, waitTime);
+                        this.transcodeTimeout = global.setTimeout(resolve, waitTime);
                     });
             } catch (err) {
                 error(`Error reading file ${filename}`, err);
@@ -136,12 +136,11 @@ export class AudioOutput extends EventEmitter {
         while (this.queue.length > 0 && !this.stopped) {
             const current = this.queue.shift();
             for (let file of await this.getFiles(current)) {
+                this.emit("shift", current);
                 await this.play(file, current.pitch);
             }
         }
         this.busy = false;
-        this.emit("dequeue");
-        this.emit("change", this.queue);
     }
 
     /**
@@ -152,8 +151,7 @@ export class AudioOutput extends EventEmitter {
     public enqueue(queueItem: QueueItem) {
         return new Promise((callback, reject) => {
             this.queue.push(queueItem);
-            this.emit("enqueue", queueItem);
-            this.emit("change", this.queue);
+            this.emit("push", queueItem);
             if (!this.busy) {
                 this.next();
             }

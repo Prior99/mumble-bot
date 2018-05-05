@@ -1,27 +1,32 @@
 import { PassThrough } from "stream";
 
-const userStrangerOne = {
+function mockUser(user: any): any {
+    user.outputStream = () => new PassThrough();
+    return user;
+}
+
+const userStrangerOne = mockUser({
     id: 4,
     name: "Stranger one",
     session: 84,
-};
+});
 
-const userStrangerTwo = {
+const userStrangerTwo = mockUser({
     id: 7,
     name: "Stranger two",
     session: 171,
-};
+});
 
-const userStrangerThree = {
+const userStrangerThree = mockUser({
     id: 23,
     name: "Stranger three",
     session: 2134,
-};
+});
 
-const userUnregistered = {
+const userUnregistered = mockUser({
     name: "Unregistered Stranger",
     session: 2134,
-};
+});
 
 const channelSubchild1 = {
     id: 3,

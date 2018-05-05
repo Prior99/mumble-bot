@@ -22,11 +22,11 @@ export class AudioInput extends EventEmitter {
     private users = new Map<number, VoiceInputUser>();
 
     @initialize
-    protected initConnectedUsers() {
+    public async initialize() {
         mkdirp(this.config.tmpDir);
         this.mumble.on("user-connect", user => this.addUser(user));
         this.mumble.on("user-disconnect", this.removeUser);
-        this.mumble.users().forEach(user => this.addUser(user));
+        await Promise.all(this.mumble.users().map(user => this.addUser(user)));
     }
 
     /**

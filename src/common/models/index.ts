@@ -26,7 +26,7 @@ export { Setting } from "./setting";
 import { Setting } from "./setting";
 export { SoundsQueryResult } from "./sounds-query-result";
 import { SoundsQueryResult } from "./sounds-query-result";
-export { WsEvent } from "./ws-event";
+export { LiveEvent } from "./live-event";
 
 export const allDatabaseModels = [
     User,

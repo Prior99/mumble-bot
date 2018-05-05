@@ -132,16 +132,14 @@ export class VoiceInputUser extends Stream.Writable {
      * Stop all timeouts and shutdown everything.
      */
     public stop() {
+        this.passthrough.end();
         // Ignore error when killing encoder.
         this.encoder.removeListener("error", this.handleEncoderError);
         this.encoder.once("error", () => { return; });
         try {
             this.encoder.kill();
         } catch (err) {} // tslint:disable-line
-        this.end();
-        if (this.timeout) {
-            clearTimeout(this.timeout);
-        }
+        if (this.timeout) { clearTimeout(this.timeout); }
         info(`Input stopped for user ${this.user.name}`);
     }
 }

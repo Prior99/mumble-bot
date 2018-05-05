@@ -1,6 +1,6 @@
 import { is, scope, DataType, specify, uuid } from "hyrest";
 
-import { world, enqueue } from "../scopes";
+import { world, enqueue, live } from "../scopes";
 
 import { User } from ".";
 
@@ -8,12 +8,15 @@ import { User } from ".";
  * A cached audio.
  */
 export class CachedAudio {
-    constructor(id?: string, user?: User, duration?: number) {
+    constructor(id?: string, user?: User, duration?: number, date?: Date) {
         if (id && user && duration) {
             this.user = user;
             this.duration = duration;
             this.id = id;
-            this.protected = false;
+        }
+        if (date) {
+            this.date = new Date();
+        } else {
             this.date = new Date();
         }
     }
@@ -21,30 +24,24 @@ export class CachedAudio {
     /**
      * The date the audio was recorded.
      */
-    @is() @scope(world) @specify(() => Date)
+    @is() @scope(world, live) @specify(() => Date)
     public date?: Date;
 
     /**
      * The user from which the audio was recorded.
      */
-    @is() @scope(world)
+    @is() @scope(world, live)
     public user?: User;
 
     /**
      * The id of the cached audio.
      */
-    @scope(world, enqueue) @is().validate(uuid)
+    @scope(world, enqueue, live) @is().validate(uuid)
     public id?: string;
 
     /**
      * The duration of the audio in seconds.
      */
-    @is(DataType.float) @scope(world)
+    @is(DataType.float) @scope(world, live)
     public duration?: number;
-
-    /**
-     * Whether the audio was protected by someone or not.
-     */
-    @is(DataType.bool) @scope(world)
-    public protected?: boolean;
 }

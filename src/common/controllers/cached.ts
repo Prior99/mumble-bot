@@ -58,14 +58,6 @@ export class Cached {
         return ok();
     }
 
-    @route("POST", "/cached/:id/protect").dump(CachedAudio, world)
-    public async protectCached(@param("id") @is().validate(uuid) id: string): Promise<CachedAudio> {
-        if (this.cache.protect(id)) {
-            return ok();
-        }
-        return notFound<undefined>(`No cached sound with id "${id}" found.`);
-    }
-
     @route("DELETE", "/cached/:id")
     public async deleteCached(@param("id") @is().validate(uuid) id: string): Promise<{}> {
         if (this.cache.remove(id)) {

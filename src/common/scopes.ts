@@ -11,3 +11,4 @@ export const createSound = createScope();
 export const createMumbleLink = createScope();
 export const tagSound = createScope();
 export const enqueue = createScope();
+export const live = createScope();

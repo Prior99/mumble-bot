@@ -1,6 +1,6 @@
 import { TSDI } from "tsdi";
 import * as Winston from "winston";
-import { DatabaseFactory, MumbleFactory } from "../src/server";
+import { DatabaseFactory, MumbleFactory, AudioInput } from "../src/server";
 
 process.on("unhandledRejection", err => {
     console.error(`Unhandled Promise rejection: ${err.message}`);
@@ -60,17 +60,14 @@ beforeEach(() => {
     (global as any).tsdi = tsdi;
 });
 
-afterEach(() => {
-    tsdi.close();
-});
-
 // Prepare database.
 beforeEach(async () => {
     const databaseFactory = tsdi.get(DatabaseFactory);
     await databaseFactory.connect(true);
+    await tsdi.get(MumbleFactory).connect();
+    await tsdi.get(AudioInput).initialize();
 });
 
-// Prepare mumble.
-beforeEach(async () => {
-    await tsdi.get(MumbleFactory).connect();
+afterEach(() => {
+    tsdi.close();
 });

@@ -1,6 +1,6 @@
 import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, CreateDateColumn, OneToMany } from "typeorm";
 import { is, scope, specify, uuid, DataType } from "hyrest";
-import { world, createPlaylist, enqueue } from "../scopes";
+import { world, createPlaylist, enqueue, live } from "../scopes";
 import { PlaylistEntry } from ".";
 import { User } from "./";
 
@@ -14,7 +14,7 @@ export class Playlist {
      * Unique id of this playlist.
      */
     @PrimaryGeneratedColumn("uuid")
-    @scope(world, enqueue) @is().validate(uuid)
+    @scope(world, enqueue, live) @is().validate(uuid)
     public id?: string;
 
     @ManyToOne(() => User, user => user.playlists)

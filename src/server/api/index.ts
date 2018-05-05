@@ -1,7 +1,7 @@
 import * as Express from "express";
-import * as FS from "fs";
+import { Socket } from "net";
 import { Request, Response } from "express";
-import * as ExpressWS from "express-ws";
+import * as expressWS from "express-ws";
 import * as BodyParser from "body-parser";
 import { Server } from "http";
 import { Connection } from "typeorm";
@@ -9,38 +9,25 @@ import { component, inject, initialize, TSDI, destroy } from "tsdi";
 import { info, error } from "winston";
 import { bind } from "bind-decorator";
 import { createReadStream, existsSync } from "fs-extra";
-import { omit } from "ramda";
 import { hyrest } from "hyrest/middleware";
-import { AuthorizationMode, configureController, ControllerMode, dump } from "hyrest";
+import { AuthorizationMode, configureController, ControllerMode } from "hyrest";
 import * as morgan from "morgan";
 import { ServerConfig } from "../../config";
-import { allControllers, Sound, Token, Context, getAuthTokenId, world } from "../../common";
-import { AudioCache, AudioOutput } from "..";
-
+import { allControllers, Sound, Token, Context, getAuthTokenId } from "../../common";
+import { AudioCache } from "..";
 import { cors, catchError } from "./middlewares";
+import { createLiveWebsocket } from "./live-websocket";
 
 @component
 export class RestApi {
-    @inject private audioOutput: AudioOutput;
     @inject private db: Connection;
     @inject private config: ServerConfig;
-    @inject private cache: AudioCache;
-
+    @inject private audioCache: AudioCache;
     @inject private tsdi: TSDI;
 
-    private connections = new Set<any>();
+    private connections = new Set<Socket>();
     public app: Express.Application;
     private server: Server;
-
-    public serve() {
-        const port = this.config.port;
-        this.server = this.app.listen(port);
-
-        this.server.setTimeout(10000, () => { return; });
-        this.server.on("connection", (conn) => this.onConnection(conn));
-
-        info(`Api started, listening on port ${port}`);
-    }
 
     @initialize
     protected initialize() {
@@ -54,11 +41,7 @@ export class RestApi {
         this.app.use(morgan("tiny", { stream: { write: msg => info(msg.trim()) } }));
         this.app.use(cors);
         this.app.use(catchError);
-        ExpressWS(this.app);
-
-        this.app.use(this.handleCORS);
-        // (this.app as any).ws("/queue", this.websocketQueue);
-        // (this.app as any).ws("/cached/live", this.websocketQueue);
+        expressWS(this.app).app.ws("/live", this.websocket);
         this.app.use(
             hyrest(...allControllers.map((controller: any) => this.tsdi.get(controller)))
                 .context(req => new Context(req))
@@ -76,29 +59,22 @@ export class RestApi {
         this.app.get("/cached/:id/visualized", this.downloadVisualizedCached);
         this.app.get("/sound/:id/download", this.downloadSound);
         this.app.get("/sound/:id/visualized", this.downloadVisualizedSound);
-
     }
 
-    private handleCORS: Express.Handler = (req, res, next) => {
-        res.header("Access-Control-Allow-Origin", "*");
-        res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
-        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-        if (req.method === "OPTIONS") {
-            res.sendStatus(200);
-            return;
-        }
-        return next();
+    public serve() {
+        const port = this.config.port;
+        this.server = this.app.listen(port);
+        this.server.on("connection", this.onConnection);
+        info(`Api started, listening on port ${port}.`);
     }
 
     /**
      * Called when a new connection was opened by the webserver.
      * @param conn The socket that was opened.
      */
-    private onConnection(conn) {
+    @bind private onConnection(conn: Socket) {
         this.connections.add(conn);
-        conn.on("close", () => {
-            this.connections.delete(conn);
-        });
+        conn.on("close", () => this.connections.delete(conn));
     }
 
     /**
@@ -121,63 +97,17 @@ export class RestApi {
         });
     }
 
-    @bind public websocketCached(ws, req: Request) {
-        const onAdd = audio => ws.send(JSON.stringify({ type: "add", sound: omit(["file"], audio) }));
-        this.cache.on("cached-audio", onAdd);
-
-        const onRemoveAudio = ({ id }) => ws.send(JSON.stringify({ type: "remove", id }));
-        this.cache.on("removed-cached-audio", onRemoveAudio);
-
-        const onProtect = ({ id }) => ws.send(JSON.stringify({ type: "protect", id }));
-        this.cache.on("protect-cached-audio", onProtect);
-
-        ws.on("close", () => {
-            this.cache.removeListener("cached-audio", onAdd);
-            this.cache.removeListener("removed-cached-audio", onRemoveAudio);
-            this.cache.removeListener("protect-cached-audio", onProtect);
-        });
-    }
-
-    @bind public websocket(ws, req: Request) {
-        try {
-            ws.send(JSON.stringify({
-                event: "init",
-                queue: dump(world, this.audioOutput.queue),
-                cachedAudio: {
-                    max: this.cache.cacheAmount,
-                    list: this.cache.all.map(sound => omit(["file"], sound)),
-                },
-            }));
-        }
-        catch (err) {
-            error("Error sending initial packet to live queue websocket:", err);
-        }
-        const onEnqueue = queueItem => {
-            ws.send(JSON.stringify({
-                event: "enqueue",
-                workitem: dump(world, queueItem),
-            }));
-        };
-        const onDequeue = () => ws.send(JSON.stringify({ event: "dequeue" }));
-        const onClear = () => ws.send(JSON.stringify({ event: "clear" }));
-
-        this.audioOutput.on("clear", onClear);
-        this.audioOutput.on("enqueue", onEnqueue);
-        this.audioOutput.on("dequeue", onDequeue);
-        ws.on("close", () => {
-            this.audioOutput.removeListener("clear", onClear);
-            this.audioOutput.removeListener("enqueue", onEnqueue);
-            this.audioOutput.removeListener("dequeue", onDequeue);
-        });
+    @bind public websocket(ws) {
+        createLiveWebsocket(ws);
     }
 
     @bind public downloadCached({ params }: Request, res: Response) {
         const { id } = params;
-        const sound = this.cache.byId(id);
+        const sound = this.audioCache.byId(id);
         if (!sound) { return res.status(404).send(); }
 
         res.setHeader("Content-disposition", `attachment; filename='cached_${id}.mp3'`);
-        const stream = FS.createReadStream(`${this.config.tmpDir}/${sound.id}`)
+        const stream = createReadStream(`${this.config.tmpDir}/${sound.id}`)
             .on("error", (err) => {
                 if (err.code === "ENOENT") { return res.status(404).send(); }
                 error(`Error occured when trying to read cached record with id ${id}`);
@@ -190,7 +120,7 @@ export class RestApi {
 
     @bind public async downloadVisualizedCached({ params }: Request, res: Response) {
         const { id } = params;
-        const sound = this.cache.byId(id);
+        const sound = this.audioCache.byId(id);
         if (!sound) { return res.status(404).send(); }
 
         const fileName = `${this.config.tmpDir}/${sound.id}.png`;

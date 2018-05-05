@@ -5,7 +5,7 @@ import { writeFile, unlink, readFile } from "fs-extra";
 import { error, info } from "winston";
 import { EventEmitter } from "events";
 import { ServerConfig } from "../config";
-import { CachedAudio, User, compareCachedAudio } from "../common";
+import { CachedAudio, User } from "../common";
 
 @component
 export class AudioCache extends EventEmitter {
@@ -28,8 +28,11 @@ export class AudioCache extends EventEmitter {
 
     private async importCache() {
         try {
-            const obj = JSON.parse(await readFile(this.cachedAudioIndexFilePath, "utf8"));
-            Object.keys(obj).forEach(key => this.cachedAudios.set(key, obj[key]));
+            const json = JSON.parse(await readFile(this.cachedAudioIndexFilePath, "utf8"));
+            json.map(async ({ id, userId, duration, date }) => {
+                const user = await this.db.getRepository(User).findOne(userId);
+                this.cachedAudios.set(id, new CachedAudio(id, user, duration, date));
+            });
         } catch (err) {
             if (err.code !== "ENOENT") { throw err; }
             info("No previous index of cached audios found.");
@@ -37,9 +40,13 @@ export class AudioCache extends EventEmitter {
     }
 
     private async exportCache() {
-        const obj = {};
-        this.cachedAudios.forEach((value, key) => obj[key] = value);
-        await writeFile(this.cachedAudioIndexFilePath, JSON.stringify(obj));
+        const exported = this.all.map(cachedAudio => ({
+            id: cachedAudio.id,
+            userId: cachedAudio.user.id,
+            duration: cachedAudio.duration,
+            date: cachedAudio.date,
+        }));
+        await writeFile(this.cachedAudioIndexFilePath, JSON.stringify(exported));
     }
 
     @initialize
@@ -59,24 +66,30 @@ export class AudioCache extends EventEmitter {
         const user = await this.db.getRepository(User).findOne(userId);
         const cachedAudio: CachedAudio = new CachedAudio(id, user, duration);
         this.cachedAudios.set(cachedAudio.id, cachedAudio);
-        this.emit("cached-audio", cachedAudio);
+        this.emit("add", cachedAudio);
         this.cleanUp();
         this.exportCache();
     }
 
     public get all() { return Array.from(this.cachedAudios.values()); }
-    public get sorted() { return this.all.sort(compareCachedAudio); }
+
+    public get sorted() {
+        return this.all.sort((a, b) => {
+            if (a.date > b.date) { return -1; }
+            if (a.date < b.date) { return 1; }
+            return 0;
+        });
+    }
 
     private async cleanUp() {
         const list = this.sorted;
         await Promise.all(list.map(async cachedAudio => {
-            if (cachedAudio.protected) { return; }
             if (this.cachedAudios.size <= this.cacheAmount) { return; }
             this.cachedAudios.delete(cachedAudio.id);
             try {
                 await unlink(`${this.config.tmpDir}/${cachedAudio.id}`);
                 await unlink(`${this.config.tmpDir}/${cachedAudio.id}.png`);
-                this.emit("removed-cached-audio", cachedAudio);
+                this.emit("remove", cachedAudio);
                 info(`Deleted files for cached audio"${cachedAudio.id}".`);
             } catch (err) {
                 error("Error when cleaning up cached audios!", err);
@@ -101,21 +114,5 @@ export class AudioCache extends EventEmitter {
 
     public hasId(id: string) {
         return this.cachedAudios.has(id);
-    }
-
-    /**
-     * Protected the cached audio with the given id.
-     * @param id Id of the audio to protect.
-     * @return False when the id was invalid.
-     */
-    public protect(id: string): boolean {
-        const cachedAudio = this.byId(id);
-        if (!cachedAudio) { return false; }
-        else {
-            cachedAudio.protected = true;
-            this.emit("protect-cached-audio", cachedAudio);
-            this.exportCache();
-            return true;
-        }
     }
 }

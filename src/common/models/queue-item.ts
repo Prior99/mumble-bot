@@ -3,28 +3,28 @@ import { Sound } from "./sound";
 import { CachedAudio } from "./cached-audio";
 import { Playlist } from "./playlist";
 import { User } from "./user";
-import { enqueue, world } from "../scopes";
+import { enqueue, world, live } from "../scopes";
 
 export class QueueItem {
-    @is(DataType.float) @scope(enqueue, world)
+    @is(DataType.float) @scope(enqueue, world, live)
     public pitch = 0;
 
-    @is(DataType.str).validate(required, oneOf("sound", "cached audio", "playlist")) @scope(enqueue, world)
+    @is(DataType.str).validate(required, oneOf("sound", "cached audio", "playlist")) @scope(enqueue, world, live)
     public type: "sound" | "cached audio" | "playlist";
 
-    @is() @scope(enqueue, world)
+    @is() @scope(enqueue, world, live)
     public sound?: Sound;
 
-    @is() @scope(enqueue, world)
+    @is() @scope(enqueue, world, live)
     public cachedAudio?: CachedAudio;
 
-    @is() @scope(enqueue, world)
+    @is() @scope(enqueue, world, live)
     public playlist?: Playlist;
 
-    @is() @scope(world)
+    @is() @scope(world, live)
     public user?: User;
 
-    @is() @scope(world)
+    @is() @scope(world, live)
     public created?: Date;
 
     public get relevantId() {
