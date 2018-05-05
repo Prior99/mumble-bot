@@ -16,8 +16,8 @@ export class LiveWebsocket extends EventEmitter {
     @inject private usersStore: UsersStore;
     @inject private soundsStore: SoundsStore;
 
-    @observable private loading = true;
-    @observable private initialized = false;
+    @observable public loading = true;
+    @observable public initialized = false;
     @observable public queue: QueueItem[] = [];
     @observable private cachedAudios: Map<string, CachedAudio> = new Map();
 
@@ -85,7 +85,6 @@ export class LiveWebsocket extends EventEmitter {
     }
 
     @bind private handleMessage({ data }: MessageEvent) {
-        console.log(data, "LOLOL")
         const liveEvent = populate(live, LiveEvent, JSON.parse(data));
         switch (liveEvent.event) {
             case "init": this.handleInit(liveEvent); break;
