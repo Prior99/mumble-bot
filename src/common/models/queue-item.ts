@@ -35,4 +35,13 @@ export class QueueItem {
             default: return undefined;
         }
     }
+
+    public get duration() {
+        switch (this.type) {
+            case "sound": return this.sound.duration;
+            case "cached audio": return this.cachedAudio.duration;
+            case "playlist": return this.playlist.duration;
+            default: return 0;
+        }
+    }
 }

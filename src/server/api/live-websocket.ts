@@ -27,6 +27,7 @@ export class LiveWebsocket {
     @inject private db: Connection;
 
     private ws: WebSocket;
+    private authorized = false;
 
     constructor(ws: WebSocket) {
         this.ws = ws;
@@ -57,6 +58,7 @@ export class LiveWebsocket {
                 info(`Received unknown token from websocket.`);
                 return;
             }
+            this.authorized = true;
             this.send(new LiveEvent("init", this.audioOutput.queue, this.audioCache.all));
         } catch (err) {
             info(`Received malformed message from websocket.`);
@@ -97,6 +99,7 @@ export class LiveWebsocket {
     }
 
     private send(event: LiveEvent) {
+        if (!this.authorized) { return; }
         try {
             this.ws.send(JSON.stringify(dump(live, event)));
         } catch (err) {

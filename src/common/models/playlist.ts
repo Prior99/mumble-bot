@@ -44,4 +44,8 @@ export class Playlist {
     @OneToMany(() => PlaylistEntry, playlistEntry => playlistEntry.playlist)
     @is() @scope(world, createPlaylist) @specify(() => PlaylistEntry)
     public entries?: PlaylistEntry[];
+
+    public get duration() {
+        return this.entries.reduce((result, entry) => entry.sound.duration + result, 0);
+    }
 }

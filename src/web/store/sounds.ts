@@ -49,4 +49,13 @@ export class SoundsStore {
         });
         return result;
     }
+
+    @bind public async byId(id: string) {
+        if (this.sounds.has(id)) {
+            return this.sounds.get(id);
+        }
+        const sound = await this.soundsController.getSound(id);
+        this.sounds.set(id, sound);
+        return sound;
+    }
 }

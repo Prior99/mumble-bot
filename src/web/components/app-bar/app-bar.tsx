@@ -14,6 +14,7 @@ import {
     routeUser,
     routeSettings,
 } from "../../routing";
+import { MiniQueue } from "./mini-queue";
 import * as css from "./style.scss";
 
 @observer @external
@@ -38,6 +39,7 @@ export class AppBar extends React.Component {
                             onClick={this.sidebar.toggleVisibility}
                         />
                     }
+                    <Menu.Item><MiniQueue /></Menu.Item>
                 </Menu.Menu>
                 <Menu.Menu position="right">
                     {

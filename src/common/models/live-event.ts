@@ -11,11 +11,13 @@ type EventName = "init" |
     "queue clear";
 
 export class LiveEvent {
+    constructor();
     constructor(event: "cache add" | "cache remove", arg2: CachedAudio);
     constructor(event: "queue shift" | "queue push", arg2: QueueItem);
     constructor(event: "queue clear");
     constructor(event: "init", arg2: QueueItem[], arg3: CachedAudio[]);
-    constructor(event: EventName, arg2?: QueueItem | CachedAudio | QueueItem[], arg3?: CachedAudio[]) {
+    constructor(event?: EventName, arg2?: QueueItem | CachedAudio | QueueItem[], arg3?: CachedAudio[]) {
+        if (!event) { return; }
         this.event = event;
         switch (event) {
             case "init":

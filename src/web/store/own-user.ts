@@ -4,7 +4,7 @@ import { component, initialize, inject } from "tsdi";
 
 import { User, Users } from "../../common";
 
-import { LoginStore } from ".";
+import { LoginStore } from "./login";
 
 @component("OwnUserStore")
 export class OwnUserStore {

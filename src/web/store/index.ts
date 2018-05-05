@@ -7,3 +7,4 @@ export * from "./users";
 export * from "./mumble";
 export * from "./sounds";
 export * from "./tags";
+export * from "./live-websocket";

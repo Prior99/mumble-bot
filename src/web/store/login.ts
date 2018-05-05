@@ -4,7 +4,7 @@ import { History } from "history";
 import { component, inject, initialize } from "tsdi";
 import { Tokens, User } from "../../common";
 import { routeDashboard } from "../routing";
-import { OwnUserStore  } from ".";
+import { OwnUserStore  } from "./own-user";
 
 const softwareVersion = 2;
 const localStorageIdentifier = "software-login";
