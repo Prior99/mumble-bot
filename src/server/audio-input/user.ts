@@ -84,7 +84,7 @@ export class VoiceInputUser extends Stream.Writable {
     }
 
     @bind private handleEncoderError(err: Error) {
-        error(`Encoder for user ${this.user.name} crashed.`, err);
+        error(`Encoder for user ${this.user.name} crashed.`, this.encoder. err);
     }
 
     /**
@@ -101,6 +101,7 @@ export class VoiceInputUser extends Stream.Writable {
             )
             .on("error", this.handleEncoderError)
             .audioCodec("libmp3lame")
+            .format("mp3")
             .save(`${this.config.tmpDir}/${this.currentId}`);
     }
 

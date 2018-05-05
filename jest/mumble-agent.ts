@@ -40,7 +40,7 @@ export class MumbleAgent {
         const input = createReadStream(`${__dirname}/sin.pcm`);
         input.pipe(this.connection.inputStream());
         return new Promise(resolve => {
-            setTimeout(resolve, 10000);
+            setTimeout(resolve, 5000);
         });
     }
 

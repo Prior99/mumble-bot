@@ -1,4 +1,4 @@
-import * as FFT from "fft-js";
+import { fft, util } from "fft-js";
 import { chunkSize } from "./visualizer";
 import * as Color from "onecolor";
 
@@ -40,9 +40,9 @@ export class AudioAnalyzer {
             const value = array[i];
             if (i === 0 || value > max) { max = value; }
         }
-        const phasors = FFT.fft(array);
-        const frequencies = FFT.util.fftFreq(phasors, 44100);
-        const magnitudes = FFT.util.fftMag(phasors);
+        const phasors = fft(array);
+        const frequencies = util.fftFreq(phasors, 44100);
+        const magnitudes = util.fftMag(phasors);
         const maxIndex = magnitudes.reduce((result, value, index) => value > magnitudes[result] ? index : result, 0);
         this.list.push({
             amplitude: max,
