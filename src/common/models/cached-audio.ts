@@ -1,5 +1,4 @@
 import { is, scope, DataType, specify, uuid } from "hyrest";
-import * as Uuid from "uuid";
 
 import { world, enqueue } from "../scopes";
 

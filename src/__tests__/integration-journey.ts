@@ -1,4 +1,4 @@
-import { signup, screenshot, browse } from "./utils";
+import { screenshot, browse } from "./utils";
 
 const username = "Someone";
 const email = "someone@example.com";

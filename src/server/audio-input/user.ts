@@ -1,6 +1,5 @@
 import { error, info } from "winston";
 import * as uuid from "uuid";
-import mkdirp = require("mkdirp-promise");
 import { bind } from "decko";
 import * as FFMpeg from "fluent-ffmpeg";
 import * as Stream from "stream";

@@ -1,4 +1,4 @@
-import { warn, info, error } from "winston";
+import { info, error } from "winston";
 import { Connection } from "typeorm";
 import { Connection as MumbleConnection, InputStream as MumbleInputStream } from "mumble";
 import * as Stream from "stream";
@@ -10,7 +10,6 @@ import { EventEmitter } from "events";
 import { QueueItem, Playlist } from "../common";
 import { ServerConfig } from "../config";
 
-const PREBUFFER = 0.5;
 const audioFreq = 48000;
 const msInS = 1000;
 
@@ -29,12 +28,8 @@ export class AudioOutput extends EventEmitter {
 
     private mumbleStream: MumbleInputStream;
     private stopped = false;
-    private bufferQueue: Buffer[] = [];
-    private playbackAhead = 0;
-    private lastBufferShift: number;
     private ffmpeg: any;
 
-    private pcmTimeout: NodeJS.Timer;
     private transcodeTimeout: NodeJS.Timer;
 
     @initialize
@@ -61,12 +56,11 @@ export class AudioOutput extends EventEmitter {
                     .format("s16le")
                     .audioChannels(1)
                     .audioFrequency(audioFreq);
-                this.ffmpeg
-                    .on("error", (err) => {
+                this.ffmpeg.on("error", (err) => {
                         error(`Error decoding file ${filename}`, err);
                         reject();
                     });
-                const transform = new Sox()
+                const sox = new Sox()
                     .input(this.ffmpeg.stream())
                     .inputSampleRate("48k")
                     .inputBits(16)
@@ -74,29 +68,28 @@ export class AudioOutput extends EventEmitter {
                     .inputFileType("raw")
                     .inputEncoding("signed");
                 const passThrough = new Stream.PassThrough();
-                const output = transform.output(passThrough)
+                const output = sox.output(passThrough)
                     .outputSampleRate("48k")
                     .outputEncoding("signed")
                     .outputBits(16)
                     .outputChannels(1)
                     .outputFileType("raw");
                 output.addEffect("pitch", [pitch]);
-                transform
-                    .on("error", (err) => {
-                        error(`Error transforming file ${filename}`, err);
+                sox.on("error", (err) => {
+                        error(`Error processing file "${filename}" with sox.`, err);
                         reject();
                     });
-                transform.run();
+                sox.run();
                 passThrough
                     .on("data", (chunk: Buffer) => {
                         samplesTotal += chunk.length / 2;
-                        this.writePcm(chunk);
+                        this.mumbleStream.write(chunk);
                     })
                     .on("end", () => {
                         const timeAlreadyTaken = Date.now() - startTime;
                         const totalTime = (samplesTotal / audioFreq) * msInS;
                         const waitTime = totalTime - timeAlreadyTaken;
-                        this.transcodeTimeout = global.setTimeout(resolve, waitTime);
+                        this.transcodeTimeout = setTimeout(resolve, waitTime);
                     });
             } catch (err) {
                 error(`Error reading file ${filename}`, err);
@@ -106,59 +99,12 @@ export class AudioOutput extends EventEmitter {
     }
 
     /**
-     * Processes the buffer and keeps the stream to mumble filled.
-     */
-    private shiftBuffer() {
-        // Here be dragons.
-        if (this.stopped) { return; }
-        if (this.lastBufferShift) {
-            const timePassed = (Date.now() - this.lastBufferShift) / msInS;
-            this.playbackAhead -= timePassed;
-        }
-        if (this.bufferQueue.length > 0) {
-            if (this.playbackAhead < 0 && this.lastBufferShift) {
-                warn("Buffer underflow.");
-            }
-            while (this.playbackAhead < PREBUFFER && this.bufferQueue.length > 0) {
-                const b = this.bufferQueue.shift();
-                const lengthOfBuffer = (b.length / 2) / audioFreq;
-                this.playbackAhead += lengthOfBuffer;
-                this.mumbleStream.write(b);
-            }
-            const overfilled = this.playbackAhead - PREBUFFER;
-            let waitFor = overfilled > 0 ? msInS * overfilled : 100;
-            this.pcmTimeout = global.setTimeout(this.shiftBuffer.bind(this), waitFor);
-            this.lastBufferShift = Date.now();
-            return;
-        }
-        this.playbackAhead = 0;
-        this.lastBufferShift = undefined;
-        this.pcmTimeout = undefined;
-    }
-
-    /**
-     * Write something into this stream.
-     * @param chunk Chunk to be written to the queue.
-     * @param encoding Encoding of the cunk if any.
-     * @param done Called when the data is shifted into the queue.
-     */
-    public writePcm(chunk: Buffer) {
-        this.bufferQueue.push(chunk);
-        // Not currently processing queue? Sleeping? Wake up!
-        if (!this.pcmTimeout) {
-            this.shiftBuffer();
-        }
-    }
-
-    /**
      * Clear the whole queue and stop current playback.
      */
     public clear() {
-        if (this.pcmTimeout) { clearTimeout(this.pcmTimeout); }
         if (this.transcodeTimeout) { clearTimeout(this.transcodeTimeout); }
         if (this.ffmpeg) { this.ffmpeg.kill(); }
         this.queue = [];
-        this.bufferQueue = [];
         this.emit("clear");
     }
 
