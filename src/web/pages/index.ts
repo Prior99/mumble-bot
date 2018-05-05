@@ -5,3 +5,4 @@ export { PageUser } from "./user";
 export { PageSettings } from "./settings";
 export { PageUsers } from "./users";
 export { PageSounds } from "./sounds";
+export { PageCached } from "./cached";

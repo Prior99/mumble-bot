@@ -1,0 +1,1 @@
+export { PageCached } from "./cached";

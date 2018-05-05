@@ -6,7 +6,7 @@ import { bind } from "decko";
 import { component, inject, initialize } from "tsdi";
 import { live, LiveEvent, QueueItem, CachedAudio } from "../../common";
 import { LoginStore } from "./login";
-import { UsersStore } from "./";
+import { UsersStore } from "./users";
 
 declare const baseUrl: string;
 

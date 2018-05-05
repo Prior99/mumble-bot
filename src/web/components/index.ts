@@ -9,3 +9,5 @@ export * from "./mumble-linker";
 export * from "./user-list";
 export * from "./sound-card";
 export * from "./tag-label";
+export * from "./cached-audio-slider";
+export * from "./cached-audio-timeline";
