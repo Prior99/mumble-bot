@@ -1,7 +1,7 @@
 import { component, inject, initialize } from "tsdi";
 import mkdirp = require("mkdirp-promise");
 import { Connection } from "typeorm";
-import { writeFile, unlink, readFile } from "fs-extra";
+import { existsSync, writeFile, unlink, readFile } from "fs-extra";
 import { error, info } from "winston";
 import { EventEmitter } from "events";
 import { ServerConfig } from "../config";
@@ -27,6 +27,7 @@ export class AudioCache extends EventEmitter {
     }
 
     private async importCache() {
+        if (!existsSync(this.cachedAudioIndexFilePath)) { return; }
         try {
             const json = JSON.parse(await readFile(this.cachedAudioIndexFilePath, "utf8"));
             json.map(async ({ id, userId, duration, date }) => {
