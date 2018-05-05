@@ -52,7 +52,7 @@
     "mobx-react": "^5.0.0",
     "mobx-react-devtools": "^5.0.1",
     "morgan": "^1.9.0",
-    "mumble": "file:../node-mumble",
+    "mumble": "0.3.14",
     "node-samplerate": "^0.2.0",
     "nodemon": "^1.17.3",
     "onecolor": "3.0.5",
