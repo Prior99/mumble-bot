@@ -1,5 +1,5 @@
 import * as React from "react";
-import { external, inject } from "tsdi";
+import { external } from "tsdi";
 import { observer } from "mobx-react";
 import { User } from "../../../common";
 

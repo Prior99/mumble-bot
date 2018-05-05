@@ -1,6 +1,6 @@
 import * as React from "react";
 import { distanceInWordsStrict, addSeconds } from "date-fns";
-import { Progress, Menu } from "semantic-ui-react";
+import { Progress } from "semantic-ui-react";
 import { inject, external } from "tsdi";
 import { observer } from "mobx-react";
 import { computed } from "mobx";

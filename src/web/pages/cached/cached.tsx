@@ -3,7 +3,7 @@ import { external, inject } from "tsdi";
 import { observer } from "mobx-react";
 import { Grid, Header, Icon } from "semantic-ui-react";
 import { requireLogin } from "../../utils";
-import { Content, MumbleLinker, CachedAudioSlider, CachedAudioTimeline } from "../../components";
+import { Content, CachedAudioSlider, CachedAudioTimeline } from "../../components";
 import { UsersStore } from "../../store";
 
 @requireLogin @observer @external

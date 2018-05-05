@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as classNames from "classnames";
-import { external, inject } from "tsdi";
+import { external } from "tsdi";
 import { observer } from "mobx-react";
 import * as css from "./cached-audio-slider.scss";
 
