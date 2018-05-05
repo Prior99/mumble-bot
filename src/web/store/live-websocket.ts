@@ -1,6 +1,6 @@
 import { SoundsStore } from "./";
 import { EventEmitter } from "events";
-import { observable, action } from "mobx";
+import { observable, action, computed } from "mobx";
 import { populate } from "hyrest";
 import { bind } from "decko";
 import { component, inject, initialize } from "tsdi";
@@ -19,7 +19,9 @@ export class LiveWebsocket extends EventEmitter {
     @observable public loading = true;
     @observable public initialized = false;
     @observable public queue: QueueItem[] = [];
+    @observable public currentItem: QueueItem;
     @observable private cachedAudios: Map<string, CachedAudio> = new Map();
+    @observable public maxDurationSinceLastClear = 0;
 
     private ws: WebSocket;
 
@@ -31,6 +33,11 @@ export class LiveWebsocket extends EventEmitter {
         this.ws.addEventListener("message", this.handleMessage);
         this.ws.addEventListener("open", this.handleOpen);
         this.initialized = true;
+    }
+
+    @computed public get totalQueueSeconds() {
+        const currentDuration = this.currentItem ? this.currentItem.duration : 0;
+        return this.queue.reduce((result, queueItem) => result + queueItem.duration, currentDuration);
     }
 
     @bind private addCachedAudio(cachedAudio: CachedAudio) {
@@ -47,6 +54,7 @@ export class LiveWebsocket extends EventEmitter {
             queueItem.cachedAudio.user = this.usersStore.byId(queueItem.cachedAudio.user.id);
         }
         this.queue.push(queueItem);
+        this.maxDurationSinceLastClear = Math.max(this.maxDurationSinceLastClear, this.totalQueueSeconds);
     }
 
     @bind private handleOpen() {
@@ -73,7 +81,10 @@ export class LiveWebsocket extends EventEmitter {
     }
 
     @bind @action private handleQueueShift() {
-        this.queue.shift();
+        this.currentItem = this.queue.shift();
+        if (this.queue.length === 0) {
+            this.maxDurationSinceLastClear = 0;
+        }
     }
 
     @bind @action private handleQueuePush({ queueItem }: LiveEvent) {

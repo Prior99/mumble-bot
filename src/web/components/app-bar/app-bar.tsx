@@ -39,7 +39,10 @@ export class AppBar extends React.Component {
                             onClick={this.sidebar.toggleVisibility}
                         />
                     }
-                    <Menu.Item><MiniQueue /></Menu.Item>
+                    {
+                        !this.sidebarButtonVisible &&
+                        <Menu.Item><MiniQueue /></Menu.Item>
+                    }
                 </Menu.Menu>
                 <Menu.Menu position="right">
                     {
