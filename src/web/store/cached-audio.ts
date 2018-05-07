@@ -1,8 +1,8 @@
 import { observable, action, computed } from "mobx";
 import { bind } from "decko";
-import { subDays } from "date-fns";
+import { subDays, addSeconds, areRangesOverlapping } from "date-fns";
 import { component, inject } from "tsdi";
-import { CachedAudio } from "../../common";
+import { CachedAudio, User } from "../../common";
 import { UsersStore } from "./users";
 
 @component
@@ -56,6 +56,25 @@ export class CachedAudioStore {
     @computed public get selectedRange() {
         const { selectionStart, selectionEnd } = this;
         return selectionEnd.getTime() - selectionStart.getTime();
+    }
+
+    public byUser(user: User) {
+        return this.all.filter(cachedAudio => cachedAudio.user.id === user.id);
+    }
+
+    @bind public isInSelection({ date: start, duration }: CachedAudio) {
+        const { selectionStart, selectionEnd } = this;
+        const end = addSeconds(start, duration);
+        return areRangesOverlapping(start, end, selectionStart, selectionEnd);
+    }
+
+    @computed public get inSelection() {
+        return this.all.filter(this.isInSelection);
+    }
+
+    public inSelectionByUser(user: User) {
+        const { selectionStart, selectionEnd } = this;
+        return this.inSelection.filter(cachedAudio => cachedAudio.user.id === user.id);
     }
 
     @bind @action public add(cachedAudio: CachedAudio) {

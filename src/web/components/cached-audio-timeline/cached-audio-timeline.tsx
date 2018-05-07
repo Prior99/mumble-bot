@@ -12,15 +12,6 @@ import * as css from "./cached-audio-timeline.scss";
 export class CachedAudioTimeline extends React.Component<{ user: User }> {
     @inject private cachedAudio: CachedAudioStore;
 
-    @computed private get all() {
-        return this.cachedAudio.all.filter(cachedAudio => cachedAudio.user.id === this.props.user.id);
-    }
-
-    @computed private get inRange() {
-        const { selectionStart, selectionEnd } = this.cachedAudio;
-        return this.all.filter(({ date }) => date >= selectionStart && date <= selectionEnd);
-    }
-
     public render() {
         return (
             <div className={css.wrapper}>
@@ -30,7 +21,7 @@ export class CachedAudioTimeline extends React.Component<{ user: User }> {
                 <div className={classNames(css.timeline, "ui", "card", "fluid")}>
                     <div />
                     {
-                        this.inRange.map(cachedAudio => (
+                        this.cachedAudio.inSelection.map(cachedAudio => (
                             <CachedAudioTimelineBlock cachedAudio={cachedAudio} key={cachedAudio.id} />
                         ))
                     }

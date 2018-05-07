@@ -7,7 +7,7 @@
     background-color: rgb(162, 145, 251);
     margin-top: 0;
 
-    &:hover {
+    &:hover, &.open {
         z-index: 100;
         background-color: rgb(100, 53, 201);
     }

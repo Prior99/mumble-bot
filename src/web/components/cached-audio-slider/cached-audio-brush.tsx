@@ -70,6 +70,9 @@ export class CachedAudioBrush extends React.Component<CachedAudioBrushProps> {
     }
 
     @bind private refBrush(div: HTMLDivElement) {
+        if (!div) {
+            delete this.parent;
+        }
         this.parent = div.parentElement;
     }
 
