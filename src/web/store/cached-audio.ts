@@ -1,5 +1,6 @@
 import { observable, action, computed } from "mobx";
 import { bind } from "decko";
+import { subDays } from "date-fns";
 import { component, inject } from "tsdi";
 import { CachedAudio } from "../../common";
 import { UsersStore } from "./users";
@@ -15,8 +16,15 @@ export class CachedAudioStore {
     }
 
     @computed public get newest() {
+        console.log(this.all.length)
+        console.log(this.all.reduce((newest, cachedAudio) => {
+            if (!newest || cachedAudio.date > newest.date) {
+                return cachedAudio;
+            }
+            return newest;
+        }, undefined))
         return this.all.reduce((newest, cachedAudio) => {
-            if (!newest || cachedAudio.date < newest.date) {
+            if (!newest || cachedAudio.date > newest.date) {
                 return cachedAudio;
             }
             return newest;
@@ -30,6 +38,23 @@ export class CachedAudioStore {
             }
             return oldest;
         }, undefined);
+    }
+
+    @computed public get oldestTime() {
+        const { oldest } = this;
+        if (!oldest) { return subDays(new Date(), 1).getTime(); }
+        return this.oldest.date.getTime();
+    }
+
+    @computed public get newestTime() {
+        const { newest } = this;
+        if (!newest) { return Date.now(); }
+        return this.newest.date.getTime() + newest.duration * 1000;
+    }
+
+    @computed public get range() {
+        const { newestTime, oldestTime } = this;
+        return newestTime - oldestTime;
     }
 
     @bind @action public add(cachedAudio: CachedAudio) {
