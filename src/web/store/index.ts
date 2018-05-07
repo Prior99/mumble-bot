@@ -8,3 +8,5 @@ export * from "./mumble";
 export * from "./sounds";
 export * from "./tags";
 export * from "./live-websocket";
+export * from "./cached-audio";
+export * from "./queue";

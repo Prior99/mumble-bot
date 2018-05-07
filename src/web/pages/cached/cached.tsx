@@ -7,12 +7,11 @@ import { bind } from "decko";
 import { subDays } from "date-fns";
 import { requireLogin } from "../../utils";
 import { Content, CachedAudioSlider, CachedAudioTimeline } from "../../components";
-import { UsersStore, LiveWebsocket } from "../../store";
+import { UsersStore } from "../../store";
 
 @requireLogin @observer @external
 export class PageCached extends React.Component {
     @inject private users: UsersStore;
-    @inject private liveWebsocket: LiveWebsocket;
 
     @observable private start: Date = subDays(new Date(), 1);
     @observable private end: Date = new Date();

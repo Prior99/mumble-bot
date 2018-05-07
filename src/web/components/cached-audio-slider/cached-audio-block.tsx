@@ -4,22 +4,22 @@ import { external, inject } from "tsdi";
 import { observer } from "mobx-react";
 import { computed } from "mobx";
 import { CachedAudio } from "../../../common";
-import { LiveWebsocket } from "../../store";
+import { CachedAudioStore } from "../../store";
 import * as css from "./cached-audio-block.scss";
 
 @external @observer
 export class CachedAudioBlock extends React.Component<{ cachedAudio: CachedAudio }> {
-    @inject private liveWebsocket: LiveWebsocket;
+    @inject private cachedAudio: CachedAudioStore;
 
     @computed private get range() {
-        const { oldestCachedAudio} = this.liveWebsocket;
-        return Date.now() - oldestCachedAudio.date.getTime();
+        const { oldest } = this.cachedAudio;
+        return Date.now() - oldest.date.getTime();
     }
 
     @computed private get left() {
-        const { liveWebsocket, props, range } = this;
-        const { oldestCachedAudio } = liveWebsocket;
-        return (props.cachedAudio.date.getTime() - oldestCachedAudio.date.getTime()) / range;
+        const { cachedAudio, props, range } = this;
+        const { oldest } = cachedAudio;
+        return (props.cachedAudio.date.getTime() - oldest.date.getTime()) / range;
     }
 
     @computed private get width() {

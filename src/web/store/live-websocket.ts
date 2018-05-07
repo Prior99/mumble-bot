@@ -5,23 +5,20 @@ import { populate } from "hyrest";
 import { bind } from "decko";
 import { component, inject, initialize } from "tsdi";
 import { live, LiveEvent, QueueItem, CachedAudio } from "../../common";
+import { CachedAudioStore } from "./cached-audio";
+import { QueueStore } from "./queue";
 import { LoginStore } from "./login";
-import { UsersStore } from "./users";
 
 declare const baseUrl: string;
 
-@component("LiveWebsocket")
+@component({ name: "LiveWebsocket", eager: true })
 export class LiveWebsocket extends EventEmitter {
     @inject private loginStore: LoginStore;
-    @inject private usersStore: UsersStore;
-    @inject private soundsStore: SoundsStore;
+    @inject private cachedAudio: CachedAudioStore;
+    @inject private queue: QueueStore;
 
     @observable public loading = true;
     @observable public initialized = false;
-    @observable public queue: QueueItem[] = [];
-    @observable public currentItem: QueueItem;
-    @observable private cachedAudios: Map<string, CachedAudio> = new Map();
-    @observable public maxDurationSinceLastClear = 0;
 
     private ws: WebSocket;
 
@@ -35,86 +32,39 @@ export class LiveWebsocket extends EventEmitter {
         this.initialized = true;
     }
 
-    @computed public get totalQueueSeconds() {
-        const currentDuration = this.currentItem ? this.currentItem.duration : 0;
-        return this.queue.reduce((result, queueItem) => result + queueItem.duration, currentDuration);
-    }
-
-    @computed public get allCachedAudios() {
-        return Array.from(this.cachedAudios.values());
-    }
-
-    @computed public get newestCachedAudio() {
-        return this.allCachedAudios.reduce((newest, cachedAudio) => {
-            if (!newest || cachedAudio.date < newest.date) {
-                return cachedAudio;
-            }
-            return newest;
-        }, undefined);
-    }
-
-    @computed public get oldestCachedAudio() {
-        return this.allCachedAudios.reduce((oldest, cachedAudio) => {
-            if (!oldest || cachedAudio.date < oldest.date) {
-                return cachedAudio;
-            }
-            return oldest;
-        }, undefined);
-    }
-
-    @bind private addCachedAudio(cachedAudio: CachedAudio) {
-        cachedAudio.user = this.usersStore.byId(cachedAudio.user.id);
-        this.cachedAudios.set(cachedAudio.id, cachedAudio);
-    }
-
-    @bind private async addQueueItem(queueItem: QueueItem) {
-        queueItem.user = this.usersStore.byId(queueItem.user.id);
-        if (queueItem.sound) {
-            queueItem.sound = await this.soundsStore.byId(queueItem.sound.id);
-        }
-        if (queueItem.cachedAudio) {
-            queueItem.cachedAudio.user = this.usersStore.byId(queueItem.cachedAudio.user.id);
-        }
-        this.queue.push(queueItem);
-        this.maxDurationSinceLastClear = Math.max(this.maxDurationSinceLastClear, this.totalQueueSeconds);
-    }
-
     @bind private handleOpen() {
         this.ws.send(JSON.stringify({
             token: { id: this.loginStore.authToken },
         }));
     }
 
-    @bind @action private async handleInit({ queue, cachedAudios }: LiveEvent) {
+    @bind private async handleInit({ queue, cachedAudios }: LiveEvent) {
         // Needs to be done in order and hence `Promise.all` can't be used.
         for (let queueItem of queue) {
-            await this.addQueueItem(queueItem);
+            await this.queue.add(queueItem);
         }
-        await Promise.all(cachedAudios.map(this.addCachedAudio));
+        await Promise.all(cachedAudios.map(this.cachedAudio.add));
         this.loading = false;
     }
 
-    @bind @action private async handleCacheAdd({ cachedAudio }: LiveEvent) {
-        this.addCachedAudio(cachedAudio);
+    @bind private async handleCacheAdd({ cachedAudio }: LiveEvent) {
+        this.cachedAudio.add(cachedAudio);
     }
 
-    @bind @action private handleCacheRemove({ cachedAudio }: LiveEvent) {
-        this.cachedAudios.delete(cachedAudio.id);
+    @bind private handleCacheRemove({ cachedAudio }: LiveEvent) {
+        this.cachedAudio.remove(cachedAudio);
     }
 
-    @bind @action private handleQueueShift() {
-        this.currentItem = this.queue.shift();
-        if (this.queue.length === 0) {
-            this.maxDurationSinceLastClear = 0;
-        }
+    @bind private handleQueueShift() {
+        this.queue.shift();
     }
 
-    @bind @action private handleQueuePush({ queueItem }: LiveEvent) {
-        this.addQueueItem(queueItem);
+    @bind private handleQueuePush({ queueItem }: LiveEvent) {
+        this.queue.add(queueItem);
     }
 
-    @bind @action private handleQueueClear() {
-        this.queue = [];
+    @bind private handleQueueClear() {
+        this.queue.clear();
     }
 
     @bind private handleMessage({ data }: MessageEvent) {

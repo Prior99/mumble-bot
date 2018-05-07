@@ -4,7 +4,7 @@ import { external, inject } from "tsdi";
 import { observer } from "mobx-react";
 import { computed } from "mobx";
 import { CachedAudio } from "../../../common";
-import { LiveWebsocket } from "../../store";
+import { CachedAudioStore } from "../../store";
 import * as css from "./cached-audio-timeline-block.scss";
 
 export interface BlockInfo {
@@ -16,17 +16,17 @@ export interface BlockInfo {
 
 @external @observer
 export class CachedAudioTimelineBlock extends React.Component<{ info: BlockInfo }> {
-    @inject private liveWebsocket: LiveWebsocket;
+    @inject private cachedAudio: CachedAudioStore;
 
     @computed private get range() {
-        const { oldestCachedAudio, newestCachedAudio } = this.liveWebsocket;
-        return newestCachedAudio.date.getTime() - oldestCachedAudio.date.getTime();
+        const { oldest } = this.cachedAudio;
+        return Date.now() - oldest.date.getTime();
     }
 
     @computed private get left() {
-        const { liveWebsocket, props, range } = this;
-        const { oldestCachedAudio } = liveWebsocket;
-        return (props.info.start.getTime() - oldestCachedAudio.date.getTime()) / range;
+        const { cachedAudio, props, range } = this;
+        const { oldest } = cachedAudio;
+        return (props.info.start.getTime() - oldest.date.getTime()) / range;
     }
 
     @computed private get duration() {

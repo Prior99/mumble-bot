@@ -7,7 +7,7 @@ import { observable, computed } from "mobx";
 import { subDays } from "date-fns";
 import * as css from "./cached-audio-slider.scss";
 import { CachedAudio } from "../../../common";
-import { LiveWebsocket } from "../../store";
+import { CachedAudioStore } from "../../store";
 import { CachedAudioBlock } from "./cached-audio-block";
 import { CachedAudioBrush } from "./cached-audio-brush";
 
@@ -19,7 +19,7 @@ export interface CachedAudioSliderProps {
 
 @external @observer
 export class CachedAudioSlider extends React.Component<CachedAudioSliderProps> {
-    @inject private liveWebsocket: LiveWebsocket;
+    @inject private cachedAudio: CachedAudioStore;
 
     @bind private handleBrushChange(left: number, right: number) {
         const start = new Date(this.oldestTime + left * this.range);
@@ -28,9 +28,9 @@ export class CachedAudioSlider extends React.Component<CachedAudioSliderProps> {
     }
 
     @computed private get oldestTime() {
-        const { oldestCachedAudio } = this.liveWebsocket;
-        if (!oldestCachedAudio) { return subDays(new Date(), 1).getTime(); }
-        return this.liveWebsocket.oldestCachedAudio.date.getTime();
+        const { oldest } = this.cachedAudio;
+        if (!oldest) { return subDays(new Date(), 1).getTime(); }
+        return this.cachedAudio.oldest.date.getTime();
     }
 
     @computed private get range() {
@@ -49,8 +49,9 @@ export class CachedAudioSlider extends React.Component<CachedAudioSliderProps> {
         const classes = classNames("ui", "card", "fluid", css.container);
         return (
             <div className={classes}>
+                <div />
                 {
-                    this.liveWebsocket.allCachedAudios.map(cachedAudio => (
+                    this.cachedAudio.all.map(cachedAudio => (
                         <CachedAudioBlock cachedAudio={cachedAudio} key={cachedAudio.id} />
                     ))
                 }

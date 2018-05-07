@@ -4,15 +4,15 @@ import { Progress } from "semantic-ui-react";
 import { inject, external } from "tsdi";
 import { observer } from "mobx-react";
 import { computed } from "mobx";
-import { LiveWebsocket } from "../../store";
+import { LiveWebsocket, QueueStore } from "../../store";
 import * as css from "./mini-queue.scss";
 
 @observer @external
 export class MiniQueue extends React.Component {
-    @inject private liveWebsocket: LiveWebsocket;
+    @inject private queue: QueueStore;
 
     @computed private get doneDate() {
-        return addSeconds(new Date(), this.liveWebsocket.totalQueueSeconds);
+        return addSeconds(new Date(), this.queue.totalSeconds);
     }
 
     @computed private get formattedDuration() {
@@ -20,11 +20,11 @@ export class MiniQueue extends React.Component {
     }
 
     @computed private get queueCount() {
-        return this.liveWebsocket.queue.length;
+        return this.queue.queue.length;
     }
 
     @computed private get percent() {
-        const fraction = this.liveWebsocket.totalQueueSeconds / this.liveWebsocket.maxDurationSinceLastClear;
+        const fraction = this.queue.totalSeconds / this.queue.maxDurationSinceLastClear;
         return 100 - Math.round(100 * fraction);
     }
 
