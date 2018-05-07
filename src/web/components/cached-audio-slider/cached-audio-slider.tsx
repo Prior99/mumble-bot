@@ -10,31 +10,24 @@ import { CachedAudioStore } from "../../store";
 import { CachedAudioBlock } from "./cached-audio-block";
 import { CachedAudioBrush } from "./cached-audio-brush";
 
-export interface CachedAudioSliderProps {
-    start: Date;
-    end: Date;
-    onChange: (start: Date, end: Date) => void;
-}
-
 @external @observer
-export class CachedAudioSlider extends React.Component<CachedAudioSliderProps> {
+export class CachedAudioSlider extends React.Component {
     @inject private cachedAudio: CachedAudioStore;
 
     @bind private handleBrushChange(left: number, right: number) {
-        const { range, oldestTime } = this.cachedAudio;
-        const start = new Date(oldestTime + left * range);
-        const end = new Date(oldestTime + right * range);
-        this.props.onChange(start, end);
+        const { totalRange, oldestTime } = this.cachedAudio;
+        this.cachedAudio.selectionStart = new Date(oldestTime + left * totalRange);
+        this.cachedAudio.selectionEnd = new Date(oldestTime + right * totalRange);
     }
 
     @computed private get brushLeft() {
-        const { range, oldestTime } = this.cachedAudio;
-        return (this.props.start.getTime() - oldestTime) / range;
+        const { totalRange, selectionStart, oldestTime } = this.cachedAudio;
+        return (selectionStart.getTime() - oldestTime) / totalRange;
     }
 
     @computed private get brushRight() {
-        const { range, oldestTime } = this.cachedAudio;
-        return (this.props.end.getTime() - oldestTime) / range;
+        const { totalRange, oldestTime, selectionEnd } = this.cachedAudio;
+        return (selectionEnd.getTime() - oldestTime) / totalRange;
     }
 
     public render() {

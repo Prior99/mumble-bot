@@ -13,12 +13,12 @@ export class CachedAudioBlock extends React.Component<{ cachedAudio: CachedAudio
 
     @computed private get left() {
         const { cachedAudio, props } = this;
-        const { oldestTime, range } = cachedAudio;
-        return (props.cachedAudio.date.getTime() - oldestTime) / range;
+        const { oldestTime, totalRange } = cachedAudio;
+        return (props.cachedAudio.date.getTime() - oldestTime) / totalRange;
     }
 
     @computed private get width() {
-        return this.props.cachedAudio.duration * 1000 / this.cachedAudio.range;
+        return this.props.cachedAudio.duration * 1000 / this.cachedAudio.totalRange;
     }
 
     public render() {

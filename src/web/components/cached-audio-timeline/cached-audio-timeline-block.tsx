@@ -7,39 +7,28 @@ import { CachedAudio } from "../../../common";
 import { CachedAudioStore } from "../../store";
 import * as css from "./cached-audio-timeline-block.scss";
 
-export interface BlockInfo {
-    status: "offline" | "quiet" | "speech";
-    cachedAudio?: CachedAudio;
-    start: Date;
-    end: Date;
-}
-
 @external @observer
-export class CachedAudioTimelineBlock extends React.Component<{ info: BlockInfo }> {
+export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: CachedAudio }> {
     @inject private cachedAudio: CachedAudioStore;
 
-    @computed private get range() {
-        const { oldest } = this.cachedAudio;
-        return Date.now() - oldest.date.getTime();
+    @computed private get start() {
+        return this.props.cachedAudio.date.getTime();
     }
 
     @computed private get left() {
-        const { cachedAudio, props, range } = this;
-        const { oldest } = cachedAudio;
-        return (props.info.start.getTime() - oldest.date.getTime()) / range;
-    }
-
-    @computed private get duration() {
-        return this.props.info.end.getTime() - this.props.info.start.getTime();
+        const { cachedAudio, props } = this;
+        const { selectionStart, selectedRange } = cachedAudio;
+        return (props.cachedAudio.date.getTime() - selectionStart.getTime()) / selectedRange;
     }
 
     @computed private get width() {
-        return this.duration / this.range;
+        return this.props.cachedAudio.duration * 1000 / this.cachedAudio.selectedRange;
     }
 
     public render() {
-        const { left, width } = this;
         const classes = classNames(css.block, "inverted", "violet");
+        const left = `${100 * this.left}%`;
+        const width = `${100 * this.width}%`;
         return (
             <div className={classes} style={{ left, width }} />
         );

@@ -4,4 +4,11 @@
     box-model: border-box;
     padding: 10px;
     border-radius: 5px;
+    background-color: rgb(162, 145, 251);
+    margin-top: 0;
+
+    &:hover {
+        z-index: 100;
+        background-color: rgb(100, 53, 201);
+    }
 }

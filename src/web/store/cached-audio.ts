@@ -11,18 +11,14 @@ export class CachedAudioStore {
 
     @observable private cachedAudios: Map<string, CachedAudio> = new Map();
 
+    @observable public selectionStart: Date = subDays(new Date(), 1);
+    @observable public selectionEnd: Date = new Date();
+
     @computed public get all() {
         return Array.from(this.cachedAudios.values());
     }
 
     @computed public get newest() {
-        console.log(this.all.length)
-        console.log(this.all.reduce((newest, cachedAudio) => {
-            if (!newest || cachedAudio.date > newest.date) {
-                return cachedAudio;
-            }
-            return newest;
-        }, undefined))
         return this.all.reduce((newest, cachedAudio) => {
             if (!newest || cachedAudio.date > newest.date) {
                 return cachedAudio;
@@ -52,9 +48,14 @@ export class CachedAudioStore {
         return this.newest.date.getTime() + newest.duration * 1000;
     }
 
-    @computed public get range() {
+    @computed public get totalRange() {
         const { newestTime, oldestTime } = this;
         return newestTime - oldestTime;
+    }
+
+    @computed public get selectedRange() {
+        const { selectionStart, selectionEnd } = this;
+        return selectionEnd.getTime() - selectionStart.getTime();
     }
 
     @bind @action public add(cachedAudio: CachedAudio) {
