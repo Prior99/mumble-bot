@@ -1,0 +1,34 @@
+$grey: 100;
+
+.brush {
+    cursor: move;
+    background: rgba($grey, $grey, $grey, 0.8);
+    border-top: 1px solid rgb($grey, $grey, $grey);
+    border-bottom: 1px solid rgb($grey, $grey, $grey);
+    box-sizing: border-box;
+    position: absolute;
+    height: 100%;
+
+    @mixin resize {
+        cursor: ew-resize;
+        width: 8px;
+        position: absolute;
+        box-sizing: border-box;
+        height: 100%;
+        border-radius: 0 !important;
+    }
+
+    .left {
+        @include resize;
+        border-left: 1px solid rgb($grey, $grey, $grey);
+        background-color: transparent;
+        left: 0;
+    }
+
+    .right {
+        @include resize;
+        border-right: 1px solid rgb($grey, $grey, $grey);
+        background-color: transparent;
+        right: 0;
+    }
+}

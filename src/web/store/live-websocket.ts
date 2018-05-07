@@ -40,6 +40,28 @@ export class LiveWebsocket extends EventEmitter {
         return this.queue.reduce((result, queueItem) => result + queueItem.duration, currentDuration);
     }
 
+    @computed public get allCachedAudios() {
+        return Array.from(this.cachedAudios.values());
+    }
+
+    @computed public get newestCachedAudio() {
+        return this.allCachedAudios.reduce((newest, cachedAudio) => {
+            if (!newest || cachedAudio.date < newest.date) {
+                return cachedAudio;
+            }
+            return newest;
+        }, undefined);
+    }
+
+    @computed public get oldestCachedAudio() {
+        return this.allCachedAudios.reduce((oldest, cachedAudio) => {
+            if (!oldest || cachedAudio.date < oldest.date) {
+                return cachedAudio;
+            }
+            return oldest;
+        }, undefined);
+    }
+
     @bind private addCachedAudio(cachedAudio: CachedAudio) {
         cachedAudio.user = this.usersStore.byId(cachedAudio.user.id);
         this.cachedAudios.set(cachedAudio.id, cachedAudio);
