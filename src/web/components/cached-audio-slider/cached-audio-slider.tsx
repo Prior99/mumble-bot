@@ -3,24 +3,46 @@ import * as classNames from "classnames";
 import { bind } from "decko";
 import { external, inject } from "tsdi";
 import { observer } from "mobx-react";
-import { observable } from "mobx";
+import { observable, computed } from "mobx";
+import { subDays } from "date-fns";
 import * as css from "./cached-audio-slider.scss";
 import { CachedAudio } from "../../../common";
 import { LiveWebsocket } from "../../store";
 import { CachedAudioBlock } from "./cached-audio-block";
 import { CachedAudioBrush } from "./cached-audio-brush";
 
+export interface CachedAudioSliderProps {
+    start: Date;
+    end: Date;
+    onChange: (start: Date, end: Date) => void;
+}
+
 @external @observer
-export class CachedAudioSlider extends React.Component {
+export class CachedAudioSlider extends React.Component<CachedAudioSliderProps> {
     @inject private liveWebsocket: LiveWebsocket;
 
-    @observable private brushLeft = 0.3;
-    @observable private brushRight = 0.5;
-
     @bind private handleBrushChange(left: number, right: number) {
-        console.log(left, right);
-        this.brushLeft = left;
-        this.brushRight = right;
+        const start = new Date(this.oldestTime + left * this.range);
+        const end = new Date(this.oldestTime + right * this.range);
+        this.props.onChange(start, end);
+    }
+
+    @computed private get oldestTime() {
+        const { oldestCachedAudio } = this.liveWebsocket;
+        if (!oldestCachedAudio) { return subDays(new Date(), 1).getTime(); }
+        return this.liveWebsocket.oldestCachedAudio.date.getTime();
+    }
+
+    @computed private get range() {
+        return Date.now() - this.oldestTime;
+    }
+
+    @computed private get brushLeft() {
+        return (this.props.start.getTime() - this.oldestTime) / this.range;
+    }
+
+    @computed private get brushRight() {
+        return (this.props.end.getTime() - this.oldestTime) / this.range;
     }
 
     public render() {
