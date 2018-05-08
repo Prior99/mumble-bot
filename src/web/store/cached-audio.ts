@@ -11,8 +11,8 @@ export class CachedAudioStore {
 
     @observable private cachedAudios: Map<string, CachedAudio> = new Map();
 
-    @observable public selectionStart: Date = subDays(new Date(), 1);
-    @observable public selectionEnd: Date = new Date();
+    @observable public selectionStart: Date;
+    @observable public selectionEnd: Date;
 
     @computed public get all() {
         return Array.from(this.cachedAudios.values());
@@ -64,6 +64,7 @@ export class CachedAudioStore {
 
     @bind public isInSelection({ date: start, duration }: CachedAudio) {
         const { selectionStart, selectionEnd } = this;
+        if (!selectionStart || !selectionEnd) { return false; }
         const end = addSeconds(start, duration);
         if (selectionStart > selectionEnd) {
             return areRangesOverlapping(start, end, selectionEnd, selectionStart);

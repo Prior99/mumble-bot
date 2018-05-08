@@ -2,12 +2,19 @@ $grey: 100;
 
 .brush {
     cursor: move;
+    cursor: -webkit-grab;
+    cursor: -moz-grab;
     background: rgba($grey, $grey, $grey, 0.8);
     border-top: 1px solid rgb($grey, $grey, $grey);
     border-bottom: 1px solid rgb($grey, $grey, $grey);
     box-sizing: border-box;
     position: absolute;
     height: 100%;
+
+    &.moving {
+        cursor: -webkit-grabbing;
+        cursor: -moz-grabbing;
+    }
 
     @mixin resize {
         cursor: ew-resize;

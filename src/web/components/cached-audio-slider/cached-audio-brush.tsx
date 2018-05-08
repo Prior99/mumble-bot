@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as classNames from "classnames";
 import { bind } from "decko";
 import { observer } from "mobx-react";
 import { observable } from "mobx";
@@ -22,10 +23,14 @@ export class CachedAudioBrush extends React.Component<CachedAudioBrushProps> {
     private parent: HTMLElement;
     private lastBrushPosition: number;
 
-    constructor(props: CachedAudioBrushProps) {
-        super(props);
+    public componentDidMount() {
         window.addEventListener("mousemove", this.handleMouseMove);
         window.addEventListener("mouseup", this.handleMouseUp);
+    }
+
+    public componentWillUnmount() {
+        window.removeEventListener("mousemove", this.handleMouseMove);
+        window.removeEventListener("mouseup", this.handleMouseUp);
     }
 
     @bind private handleMouseMove(event: MouseEvent) {
@@ -84,7 +89,7 @@ export class CachedAudioBrush extends React.Component<CachedAudioBrushProps> {
         return (
             <div
                 ref={this.refBrush}
-                className={css.brush}
+                className={classNames(css.brush, { [css.moving]: this.brushDragging })}
                 style={{ left, width }}
                 onMouseDown={this.handleBrushMouseDown}
             >
