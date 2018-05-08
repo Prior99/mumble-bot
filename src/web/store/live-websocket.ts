@@ -1,17 +1,17 @@
 import { SoundsStore } from "./";
 import { EventEmitter } from "events";
-import { observable, action, computed } from "mobx";
+import { observable } from "mobx";
 import { populate } from "hyrest";
 import { bind } from "decko";
 import { component, inject, initialize } from "tsdi";
-import { live, LiveEvent, QueueItem, CachedAudio } from "../../common";
+import { live, LiveEvent } from "../../common";
 import { CachedAudioStore } from "./cached-audio";
 import { QueueStore } from "./queue";
 import { LoginStore } from "./login";
 
 declare const baseUrl: string;
 
-@component({ name: "LiveWebsocket", eager: true })
+@component("LiveWebsocket")
 export class LiveWebsocket extends EventEmitter {
     @inject private loginStore: LoginStore;
     @inject private cachedAudio: CachedAudioStore;

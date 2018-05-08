@@ -2,8 +2,8 @@ import { EventEmitter } from "events";
 import { observable, action, computed } from "mobx";
 import { populate } from "hyrest";
 import { bind } from "decko";
-import { component, inject, initialize } from "tsdi";
-import { live, LiveEvent, QueueItem, CachedAudio } from "../../common";
+import { component, inject } from "tsdi";
+import { QueueItem } from "../../common";
 import { UsersStore } from "./users";
 import { SoundsStore } from "./sounds";
 

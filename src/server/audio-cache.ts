@@ -32,7 +32,7 @@ export class AudioCache extends EventEmitter {
             const json = JSON.parse(await readFile(this.cachedAudioIndexFilePath, "utf8"));
             json.map(async ({ id, userId, duration, date }) => {
                 const user = await this.db.getRepository(User).findOne(userId);
-                this.cachedAudios.set(id, new CachedAudio(id, user, duration, date));
+                this.cachedAudios.set(id, new CachedAudio(id, user, duration, new Date(date)));
             });
         } catch (err) {
             if (err.code !== "ENOENT") { throw err; }

@@ -65,6 +65,9 @@ export class CachedAudioStore {
     @bind public isInSelection({ date: start, duration }: CachedAudio) {
         const { selectionStart, selectionEnd } = this;
         const end = addSeconds(start, duration);
+        if (selectionStart > selectionEnd) {
+            return areRangesOverlapping(start, end, selectionEnd, selectionStart);
+        }
         return areRangesOverlapping(start, end, selectionStart, selectionEnd);
     }
 

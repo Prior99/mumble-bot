@@ -29,6 +29,7 @@ export class CachedAudioBrush extends React.Component<CachedAudioBrushProps> {
     }
 
     @bind private handleMouseMove(event: MouseEvent) {
+        if (!this.parent) { return; }
         const { left, right } = this.props;
         const rect = this.parent.getBoundingClientRect();
         const x = (event.screenX - rect.left) / rect.width;
@@ -72,6 +73,7 @@ export class CachedAudioBrush extends React.Component<CachedAudioBrushProps> {
     @bind private refBrush(div: HTMLDivElement) {
         if (!div) {
             delete this.parent;
+            return;
         }
         this.parent = div.parentElement;
     }

@@ -3,7 +3,7 @@ import * as classNames from "classnames";
 import { external, inject } from "tsdi";
 import { observer } from "mobx-react";
 import { computed } from "mobx";
-import { User, CachedAudio } from "../../../common";
+import { User } from "../../../common";
 import { CachedAudioStore } from "../../store";
 import { CachedAudioTimelineBlock } from "./cached-audio-timeline-block";
 import * as css from "./cached-audio-timeline.scss";
@@ -21,7 +21,7 @@ export class CachedAudioTimeline extends React.Component<{ user: User }> {
                 <div className={classNames(css.timeline, "ui", "card", "fluid")}>
                     <div />
                     {
-                        this.cachedAudio.inSelection.map(cachedAudio => (
+                        this.cachedAudio.inSelectionByUser(this.props.user).map(cachedAudio => (
                             <CachedAudioTimelineBlock cachedAudio={cachedAudio} key={cachedAudio.id} />
                         ))
                     }

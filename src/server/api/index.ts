@@ -14,7 +14,7 @@ import { AuthorizationMode, configureController, ControllerMode } from "hyrest";
 import * as morgan from "morgan";
 import { ServerConfig } from "../../config";
 import { allControllers, Sound, Token, Context, getAuthTokenId } from "../../common";
-import { AudioCache } from "..";
+import { AudioCache } from "../audio-cache";
 import { cors, catchError } from "./middlewares";
 import { createLiveWebsocket } from "./live-websocket";
 
@@ -41,6 +41,10 @@ export class RestApi {
         this.app.use(morgan("tiny", { stream: { write: msg => info(msg.trim()) } }));
         this.app.use(cors);
         this.app.use(catchError);
+        this.app.get("/cached/:id/download", this.downloadCached);
+        this.app.get("/cached/:id/visualized", this.downloadVisualizedCached);
+        this.app.get("/sound/:id/download", this.downloadSound);
+        this.app.get("/sound/:id/visualized", this.downloadVisualizedSound);
         expressWS(this.app).app.ws("/live", this.websocket);
         this.app.use(
             hyrest(...allControllers.map((controller: any) => this.tsdi.get(controller)))
@@ -55,10 +59,6 @@ export class RestApi {
                     return true;
                 }),
         );
-        this.app.get("/cached/:id/download", this.downloadCached);
-        this.app.get("/cached/:id/visualized", this.downloadVisualizedCached);
-        this.app.get("/sound/:id/download", this.downloadSound);
-        this.app.get("/sound/:id/visualized", this.downloadVisualizedSound);
     }
 
     public serve() {
@@ -124,6 +124,7 @@ export class RestApi {
         if (!sound) { return res.status(404).send(); }
 
         const fileName = `${this.config.tmpDir}/${sound.id}.png`;
+        console.log(id, sound, fileName);
         const trySend = async (retries = 0) => {
             if (!existsSync(fileName)) {
                 if (retries === 5) { return res.status(404).send(); }

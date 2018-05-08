@@ -10,6 +10,7 @@ import { LoginStore, OwnUserStore } from ".";
 export class UsersStore {
     @inject private usersController: Users;
 
+    @observable public loading = true;
     @observable private users: Map<string, User> = new Map();
 
     @initialize @bind @action
@@ -18,6 +19,7 @@ export class UsersStore {
         users.forEach(user => {
             this.users.set(user.id, user);
         });
+        this.loading = false;
         return users;
     }
 
@@ -35,8 +37,7 @@ export class UsersStore {
         });
     }
 
-    @bind
-    public byId(id: string) {
+    @bind public byId(id: string) {
         return this.users.get(id);
     }
 

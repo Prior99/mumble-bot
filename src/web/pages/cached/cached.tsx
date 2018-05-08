@@ -1,7 +1,7 @@
 import * as React from "react";
 import { external, inject } from "tsdi";
 import { observer } from "mobx-react";
-import { observable, computed } from "mobx";
+import { computed } from "mobx";
 import { Grid, Header, Icon } from "semantic-ui-react";
 import { bind } from "decko";
 import { subDays } from "date-fns";

@@ -17,7 +17,7 @@ import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { Connection as MumbleConnection } from "mumble";
 import { MumbleLink } from "../models";
-import { createMumbleLink, deleteMumbleLink, world } from "../scopes";
+import { createMumbleLink, world } from "../scopes";
 import { Context } from "../context";
 import { AudioInput } from "../../server/audio-input/index";
 

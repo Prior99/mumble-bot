@@ -1,9 +1,9 @@
 import * as React from "react";
 import { observer } from "mobx-react";
-import { Sidebar } from "semantic-ui-react";
+import { Sidebar, Dimmer, Loader } from "semantic-ui-react";
 import * as classNames from "classnames/bind";
 import { inject, external } from "tsdi";
-import { SidebarStore, LoginStore } from "../../store";
+import { SidebarStore, LoginStore, UsersStore } from "../../store";
 import { Errors, AppBar, AppSidebar  } from "..";
 import * as css from "./app-container.scss";
 import { isProductionEnvironment } from "../../../common";
@@ -16,12 +16,19 @@ const cx = classNames.bind(css);
 export class AppContainer extends React.Component<{}, undefined> {
     @inject private sidebar: SidebarStore;
     @inject private login: LoginStore;
+    @inject private users: UsersStore;
 
     public render() {
         const pageClasses = cx({
             pageSidebarActive: this.sidebar.alwaysOpen && this.login.loggedIn,
         });
-
+        if (this.users.loading) {
+            return (
+                <Dimmer active>
+                    <Loader />
+                </Dimmer>
+            );
+        }
         return (
             <div>
                 <Errors />

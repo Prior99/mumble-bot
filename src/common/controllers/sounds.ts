@@ -1,4 +1,5 @@
 import { ForkOptions } from "../models";
+import mkdirp = require("mkdirp-promise");
 import {
     context,
     body,
@@ -14,14 +15,17 @@ import {
     oneOf,
     notFound,
     populate,
+    badRequest,
 } from "hyrest";
+import { rename } from "fs-extra";
 import { component, inject } from "tsdi";
 import { Connection, Brackets } from "typeorm";
 import { verbose } from "winston";
 import * as FFMpeg from "fluent-ffmpeg";
 import { ServerConfig } from "../../config";
-import { SoundsQueryResult, Sound, Tag, SoundTagRelation } from "../models";
-import { updateSound, world, tagSound } from "../scopes";
+import { CachedAudio, SoundsQueryResult, Sound, Tag, SoundTagRelation } from "../models";
+import { createSound, updateSound, world, tagSound } from "../scopes";
+import { AudioCache } from "../../server";
 import { Context } from "../context";
 
 export interface SoundsQuery {
@@ -83,6 +87,7 @@ export interface SoundsQuery {
 export class Sounds {
     @inject private db: Connection;
     @inject private config: ServerConfig;
+    @inject private cache: AudioCache;
 
     /**
      * Fetch a single sound with a specified id.
@@ -270,6 +275,38 @@ export class Sounds {
                 .save(`${this.config.soundsDir}/${newId}`)
                 .on("end", () => resolve());
         });
+    }
+
+    @route("POST", "/sounds").dump(Sound, world)
+    public async save(@body(createSound) { id }: CachedAudio, @context ctx?: Context): Promise<Sound> {
+        const cachedAudio = this.cache.byId(id);
+        if (!cachedAudio) {
+            return badRequest<undefined>(`No cached sound with id "${cachedAudio.id}" found.`);
+        }
+        const { date, duration, user } = cachedAudio;
+        try {
+            await mkdirp(this.config.soundsDir);
+        } catch (e) {
+            if (e.code !== "EEXIST") { throw e; }
+        }
+        const currentUser = await ctx.currentUser();
+        const sound = Object.assign(new Sound(), {
+            duration,
+            user,
+            created: date,
+            creator: currentUser,
+            description: `Recording from ${date.toISOString()}`,
+            source: "recording",
+        });
+        await this.db.getRepository(Sound).save(sound);
+
+        await rename(`${this.config.tmpDir}/${id}`, `${this.config.soundsDir}/${sound.id}`);
+        await rename(`${this.config.tmpDir}/${id}.png`, `${this.config.soundsDir}/${sound.id}.png`);
+
+        this.cache.remove(id);
+        verbose(`${currentUser.name} added new recording #${sound.id}`);
+
+        return created(sound);
     }
 
     @route("POST", "/sound/:id/fork").dump(Sound, world)

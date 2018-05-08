@@ -1,6 +1,6 @@
 import { is, scope, DataType, specify, uuid } from "hyrest";
 
-import { world, enqueue, live } from "../scopes";
+import { world, enqueue, live, createSound } from "../scopes";
 
 import { User } from ".";
 
@@ -15,7 +15,7 @@ export class CachedAudio {
             this.id = id;
         }
         if (date) {
-            this.date = new Date();
+            this.date = date;
         } else {
             this.date = new Date();
         }
@@ -36,7 +36,7 @@ export class CachedAudio {
     /**
      * The id of the cached audio.
      */
-    @scope(world, enqueue, live) @is().validate(uuid)
+    @scope(world, enqueue, live, createSound) @is().validate(uuid)
     public id?: string;
 
     /**

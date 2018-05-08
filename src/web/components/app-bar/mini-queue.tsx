@@ -4,7 +4,7 @@ import { Progress } from "semantic-ui-react";
 import { inject, external } from "tsdi";
 import { observer } from "mobx-react";
 import { computed } from "mobx";
-import { LiveWebsocket, QueueStore } from "../../store";
+import { QueueStore } from "../../store";
 import * as css from "./mini-queue.scss";
 
 @observer @external

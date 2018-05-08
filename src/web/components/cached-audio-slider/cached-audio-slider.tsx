@@ -3,7 +3,7 @@ import * as classNames from "classnames";
 import { bind } from "decko";
 import { external, inject } from "tsdi";
 import { observer } from "mobx-react";
-import { observable, computed } from "mobx";
+import { computed } from "mobx";
 import * as css from "./cached-audio-slider.scss";
 import { CachedAudio } from "../../../common";
 import { CachedAudioStore } from "../../store";
