@@ -14,6 +14,21 @@ export class CachedAudioStore {
     @observable public selectionStart: Date;
     @observable public selectionEnd: Date;
 
+    @computed public get totalDuration() {
+        return this.all.reduce((sum, cachedAudio) => sum + cachedAudio.duration, 0);
+    }
+
+    @computed public get selectionFollowing() {
+        if (!this.selectionDefined) { return false; }
+        if (this.selectionEnd.getTime() - this.newestTime > -5000) {
+            return true;
+        }
+    }
+
+    @computed public get selectionDefined() {
+        return Boolean(this.selectionStart && this.selectionEnd);
+    }
+
     @computed public get all() {
         return Array.from(this.cachedAudios.values());
     }
@@ -83,6 +98,11 @@ export class CachedAudioStore {
     @bind @action public add(cachedAudio: CachedAudio) {
         cachedAudio.user = this.usersStore.byId(cachedAudio.user.id);
         this.cachedAudios.set(cachedAudio.id, cachedAudio);
+        if (this.selectionFollowing) {
+            const distance = addSeconds(cachedAudio.date, cachedAudio.duration).getTime() - this.newestTime;
+            this.selectionEnd = addSeconds(this.selectionEnd, distance / 1000);
+            this.selectionStart = addSeconds(this.selectionStart, distance / 1000);
+        }
     }
 
     @bind @action public remove(cachedAudio: CachedAudio) {

@@ -88,7 +88,7 @@ export class CachedAudioSlider extends React.Component {
                     ))
                 }
                 {
-                    this.cachedAudio.selectionStart && this.cachedAudio.selectionEnd && (
+                    this.cachedAudio.selectionDefined && (
                         <CachedAudioBrush
                             left={this.brushLeft}
                             right={this.brushRight}
