@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as classNames from "classnames";
 import { external, inject } from "tsdi";
-import { Popup, Form, Image, Input } from "semantic-ui-react";
+import { Popup, Form, Image } from "semantic-ui-react";
 import { observer } from "mobx-react";
 import { computed, observable, action } from "mobx";
 import { bind } from "decko";
@@ -19,10 +19,6 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
     @observable private description = "";
     @observable private isOpen = false;
     @observable private loading = false;
-
-    @computed private get start() {
-        return this.props.cachedAudio.date.getTime();
-    }
 
     @computed private get left() {
         const { cachedAudio, props } = this;
@@ -54,14 +50,6 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
 
     private get visualizationUrl() { return `${baseUrl}/cached/${this.props.cachedAudio.id}/visualized`; }
 
-    @bind private refForm(form: HTMLFormElement) {
-        console.log(form)
-        return;
-        // if (!form) { return; }
-        // const input: HTMLInputElement = form.querySelector(`input[type="input"]`);
-        // if (input) { input.focus(); }
-    }
-
     public render() {
         const classes = classNames(
             css.block,
@@ -87,7 +75,7 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
             >
                 <Image className={css.image} height={40} src={this.visualizationUrl} />
                 <Popup.Content>
-                    <Form unstackable ref={this.refForm} onSubmit={this.handleSave} loading={this.loading}>
+                    <Form unstackable onSubmit={this.handleSave} loading={this.loading}>
                         <Form.Group unstackable>
                             <Form.Input
                                 label="Description"

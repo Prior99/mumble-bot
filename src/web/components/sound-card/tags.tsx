@@ -13,7 +13,7 @@ export interface TagsProps {
     sound: Sound;
 }
 
-@observer @external
+@external @observer
 export class Tags extends React.Component<TagsProps> {
     @inject private sounds: SoundsStore;
     @inject private tags: TagsStore;

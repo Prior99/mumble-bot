@@ -1,7 +1,5 @@
 import { notFound, controller, route, param, is, uuid, ok } from "hyrest";
 import { component, inject } from "tsdi";
-import { Connection } from "typeorm";
-import { ServerConfig } from "../../config";
 import { AudioCache } from "../../server";
 import { CachedAudio } from "../models";
 import { world } from "../scopes";

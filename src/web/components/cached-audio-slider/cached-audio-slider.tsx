@@ -5,7 +5,6 @@ import { external, inject } from "tsdi";
 import { observer } from "mobx-react";
 import { computed } from "mobx";
 import * as css from "./cached-audio-slider.scss";
-import { CachedAudio } from "../../../common";
 import { CachedAudioStore } from "../../store";
 import { CachedAudioBlock } from "./cached-audio-block";
 import { CachedAudioBrush } from "./cached-audio-brush";

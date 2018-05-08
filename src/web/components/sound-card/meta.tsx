@@ -12,10 +12,10 @@ export interface MetaProps {
     sound: Sound;
 }
 
-@observer @external
+@external @observer
 export class Meta extends React.Component<MetaProps> {
     public render() {
-        const { user, creator, source, created } = this.props.sound;
+        const { user, creator, source, created, duration } = this.props.sound;
         return (
             <>
                 <Card.Meta>
@@ -29,7 +29,7 @@ export class Meta extends React.Component<MetaProps> {
                                     </Link>
                             ) : (
                                 <span>
-                                    <Icon name="upload" /> This file was uploaded.
+                                    <Icon name="upload" /> Uploaded
                                 </span>
                             )
                         }
@@ -42,6 +42,9 @@ export class Meta extends React.Component<MetaProps> {
                 </Card.Meta>
                 <Card.Meta>
                     <Icon name="add to calendar" /> {distanceInWordsToNow(created)} ago
+                </Card.Meta>
+                <Card.Meta>
+                    <Icon name="time" /> {duration.toFixed(2)}s
                 </Card.Meta>
             </>
         );

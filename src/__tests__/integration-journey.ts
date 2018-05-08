@@ -27,7 +27,7 @@ test("Signing up", async () => {
     await screenshot();
     // Click on submit.
     await (await page.$("button[type='submit']")).click();
-    await page.waitFor(600);
+    await page.waitFor(5000);
     await screenshot();
 });
 

@@ -76,7 +76,6 @@ export class CachedAudioStore {
     }
 
     public inSelectionByUser(user: User) {
-        const { selectionStart, selectionEnd } = this;
         return this.inSelection.filter(cachedAudio => cachedAudio.user.id === user.id);
     }
 

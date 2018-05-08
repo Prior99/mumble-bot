@@ -20,7 +20,8 @@ export class SoundsStore {
     }
 
     @bind @action public async untag(sound: Sound, tag: Tag) {
-        this.sounds.set(sound.id, await this.soundsController.untagSound(sound.id, tag.id));
+        const updatedSound = await this.soundsController.untagSound(sound.id, tag.id);
+        Object.assign(this.sounds.get(sound.id), updatedSound);
     }
 
     @bind @action public async tag(sound: Sound, tagIdOrName: string) {
@@ -29,11 +30,12 @@ export class SoundsStore {
             this.sounds.set(sound.id, await this.soundsController.tagSound(sound.id, { id: tag.id }));
             return;
         }
-        this.sounds.set(sound.id, await this.soundsController.tagSound(sound.id, { id: tagIdOrName }));
+        const updatedSound = await this.soundsController.tagSound(sound.id, { id: tagIdOrName });
+        Object.assign(this.sounds.get(sound.id), updatedSound);
     }
 
     @bind @action public async update(id: string, sound: Sound) {
-        this.sounds.set(id, await this.soundsController.updateSound(id, sound));
+        Object.assign(this.sounds.get(id), await this.soundsController.updateSound(id, sound));
     }
 
     @bind @action public async play(sound: Sound) {

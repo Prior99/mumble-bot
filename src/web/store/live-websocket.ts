@@ -1,4 +1,3 @@
-import { SoundsStore } from "./";
 import { EventEmitter } from "events";
 import { observable } from "mobx";
 import { populate } from "hyrest";

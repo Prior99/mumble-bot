@@ -11,7 +11,7 @@ export interface DescriptionProps {
     sound: Sound;
 }
 
-@observer @external
+@external @observer
 export class Description extends React.Component<DescriptionProps> {
     @inject private sounds: SoundsStore;
 

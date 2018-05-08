@@ -2,7 +2,6 @@ import * as React from "react";
 import * as classNames from "classnames";
 import { external, inject } from "tsdi";
 import { observer } from "mobx-react";
-import { computed } from "mobx";
 import { User } from "../../../common";
 import { CachedAudioStore } from "../../store";
 import { CachedAudioTimelineBlock } from "./cached-audio-timeline-block";

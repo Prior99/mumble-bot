@@ -67,7 +67,7 @@ const sortOptions = [
 
 const limit = 48;
 
-@requireLogin @observer @external
+@requireLogin @external @observer
 export class PageSounds extends React.Component {
     @inject private sounds: SoundsStore;
     @inject private tags: TagsStore;

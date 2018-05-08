@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Image, Card  } from "semantic-ui-react";
+import { observer } from "mobx-react";
 import { Sound } from "../../../common";
 import { Description } from "./description";
 import { Tags } from "./tags";
@@ -12,6 +13,7 @@ export interface SoundCardProps {
 
 declare const baseUrl: string;
 
+@observer
 export class SoundCard extends React.Component<SoundCardProps> {
     private get sound() { return this.props.sound; }
 

@@ -124,7 +124,6 @@ export class RestApi {
         if (!sound) { return res.status(404).send(); }
 
         const fileName = `${this.config.tmpDir}/${sound.id}.png`;
-        console.log(id, sound, fileName);
         const trySend = async (retries = 0) => {
             if (!existsSync(fileName)) {
                 if (retries === 5) { return res.status(404).send(); }
