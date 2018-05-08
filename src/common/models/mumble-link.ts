@@ -1,6 +1,6 @@
 import { Column, PrimaryGeneratedColumn, Entity, ManyToOne } from "typeorm";
 import { is, scope, DataType, uuid } from "hyrest";
-import { world, createMumbleLink } from "../scopes";
+import { world, createMumbleLink, deleteMumbleLink } from "../scopes";
 import { User } from ".";
 
 /**
@@ -9,7 +9,7 @@ import { User } from ".";
 @Entity()
 export class MumbleLink {
     @PrimaryGeneratedColumn("uuid")
-    @scope(world) @is().validate(uuid)
+    @scope(world, deleteMumbleLink) @is().validate(uuid)
     public id?: string;
 
     /**

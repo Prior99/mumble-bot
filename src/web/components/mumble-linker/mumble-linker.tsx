@@ -20,7 +20,7 @@ export class MumbleLinker extends React.Component {
                     label={name}
                     disabled={disabled}
                     checked={checked}
-                    onClick={() => this.mumble.link(mumbleUser)}
+                    onClick={() => this.mumble.toggle(mumbleUser)}
                 />
             </Form.Field>
         );
