@@ -20,6 +20,17 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
     @observable private isOpen = false;
     @observable private loading = false;
 
+    private audio: HTMLAudioElement;
+
+    public componentDidMount() {
+        this.audio = new Audio(this.audioUrl);
+    }
+
+    public componentWillUnmount() {
+        this.audio.pause();
+        delete this.audio;
+    }
+
     @computed private get left() {
         const { cachedAudio, props } = this;
         const { selectionStart, selectedRange } = cachedAudio;
@@ -42,13 +53,27 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
 
     @bind @action private handleOpen() {
         this.isOpen = true;
+        this.audio.play();
     }
 
     @bind @action private handleClose() {
         this.isOpen = false;
     }
 
+    @bind @action private handlePlay(event: React.MouseEvent<HTMLButtonElement>) {
+        this.audio.currentTime = 0;
+        this.audio.play();
+        event.preventDefault();
+    }
+
+    @bind @action private handlePause(event: React.MouseEvent<HTMLButtonElement>) {
+        this.audio.currentTime = 0;
+        this.audio.pause();
+        event.preventDefault();
+    }
+
     private get visualizationUrl() { return `${baseUrl}/cached/${this.props.cachedAudio.id}/visualized`; }
+    private get audioUrl() { return `${baseUrl}/cached/${this.props.cachedAudio.id}/download`; }
 
     public render() {
         const classes = classNames(
@@ -84,9 +109,24 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
                                 onChange={this.handleDescriptionChange}
                                 autoFocus
                             />
-                            <Form.Button label="Pause" icon="pause" color="grey" />
-                            <Form.Button label="Play" icon="play" color="blue" />
-                            <Form.Button label="Save" icon="checkmark" color="green" />
+                            <Form.Button
+                                onClick={this.handlePause}
+                                label="Pause"
+                                icon="pause"
+                                color="grey"
+                            />
+                            <Form.Button
+                                onClick={this.handlePlay}
+                                label="Play"
+                                icon="play"
+                                color="blue"
+                            />
+                            <Form.Button
+                                role="submit"
+                                label="Save"
+                                icon="checkmark"
+                                color="green"
+                            />
                         </Form.Group>
                     </Form>
                 </Popup.Content>

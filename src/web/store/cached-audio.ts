@@ -96,9 +96,10 @@ export class CachedAudioStore {
     }
 
     @bind @action public add(cachedAudio: CachedAudio) {
+        const { selectionFollowing } = this;
         cachedAudio.user = this.usersStore.byId(cachedAudio.user.id);
         this.cachedAudios.set(cachedAudio.id, cachedAudio);
-        if (this.selectionFollowing) {
+        if (selectionFollowing) {
             const distance = addSeconds(cachedAudio.date, cachedAudio.duration).getTime() - this.newestTime;
             this.selectionEnd = addSeconds(this.selectionEnd, distance / 1000);
             this.selectionStart = addSeconds(this.selectionStart, distance / 1000);
