@@ -2,12 +2,13 @@ import { observable, action, computed } from "mobx";
 import { bind } from "decko";
 import { subDays, addSeconds, areRangesOverlapping } from "date-fns";
 import { component, inject } from "tsdi";
-import { CachedAudio, User } from "../../common";
+import { CachedAudio, User, Cached } from "../../common";
 import { UsersStore } from "./users";
 
 @component
 export class CachedAudioStore {
     @inject private usersStore: UsersStore;
+    @inject private cachedAudioController: Cached;
 
     @observable private cachedAudios: Map<string, CachedAudio> = new Map();
 
@@ -106,7 +107,13 @@ export class CachedAudioStore {
         }
     }
 
-    @bind @action public remove(cachedAudio: CachedAudio) {
-        this.cachedAudios.delete(cachedAudio.id);
+    @bind @action public remove({ id }: CachedAudio) {
+        if (!this.cachedAudios.has(id)) { return; }
+        this.cachedAudios.delete(id);
+    }
+
+    @bind @action public async delete({ id }: CachedAudio) {
+        await this.cachedAudioController.deleteCached(id);
+        this.cachedAudios.delete(id);
     }
 }

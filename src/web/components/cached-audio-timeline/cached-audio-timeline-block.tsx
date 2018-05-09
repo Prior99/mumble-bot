@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as classNames from "classnames";
 import { external, inject } from "tsdi";
-import { Popup, Form, Image } from "semantic-ui-react";
+import { Popup, Form, Image, Icon } from "semantic-ui-react";
 import { observer } from "mobx-react";
 import { computed, observable, action } from "mobx";
 import { bind } from "decko";
@@ -19,11 +19,15 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
     @observable private description = "";
     @observable private isOpen = false;
     @observable private loading = false;
+    @observable private paused = true;
 
     private audio: HTMLAudioElement;
 
     public componentDidMount() {
         this.audio = new Audio(this.audioUrl);
+        this.audio.addEventListener("pause", () => this.paused = true);
+        this.audio.addEventListener("ended", () => this.paused = true);
+        this.audio.addEventListener("play", () => this.paused = false);
     }
 
     public componentWillUnmount() {
@@ -61,15 +65,20 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
     }
 
     @bind @action private handlePlay(event: React.MouseEvent<HTMLButtonElement>) {
-        this.audio.currentTime = 0;
-        this.audio.play();
         event.preventDefault();
+        if (this.audio.paused) {
+            this.audio.currentTime = 0;
+            this.audio.play();
+            return;
+        }
+        this.audio.pause();
     }
 
-    @bind @action private handlePause(event: React.MouseEvent<HTMLButtonElement>) {
-        this.audio.currentTime = 0;
-        this.audio.pause();
+    @bind @action private async handleDelete(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
+        this.loading = true;
+        await this.cachedAudio.delete(this.props.cachedAudio);
+        this.loading = false;
     }
 
     private get visualizationUrl() { return `${baseUrl}/cached/${this.props.cachedAudio.id}/visualized`; }
@@ -95,7 +104,7 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
                 onClose={this.handleClose}
                 hideOnScroll
                 wide="very"
-                horizontalOffset={5}
+                position="top center"
                 className={css.popup}
             >
                 <Image className={css.image} height={40} src={this.visualizationUrl} />
@@ -110,15 +119,15 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
                                 autoFocus
                             />
                             <Form.Button
-                                onClick={this.handlePause}
-                                label="Pause"
-                                icon="pause"
-                                color="grey"
+                                onClick={this.handleDelete}
+                                label="Delete"
+                                icon="trash"
+                                color="red"
                             />
                             <Form.Button
                                 onClick={this.handlePlay}
                                 label="Play"
-                                icon="play"
+                                icon={this.paused ? "play" : "stop"}
                                 color="blue"
                             />
                             <Form.Button
@@ -129,6 +138,10 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
                             />
                         </Form.Group>
                     </Form>
+                    <div className={css.info}>
+                        <div><Icon name="time" /> {this.props.cachedAudio.duration}s</div>
+                        <div><Icon name="calendar" /> {this.props.cachedAudio.date.toLocaleString()}</div>
+                    </div>
                 </Popup.Content>
             </Popup>
         );

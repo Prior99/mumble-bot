@@ -281,7 +281,7 @@ export class Sounds {
     public async save(@body(createSound) { id }: CachedAudio, @context ctx?: Context): Promise<Sound> {
         const cachedAudio = this.cache.byId(id);
         if (!cachedAudio) {
-            return badRequest<undefined>(`No cached sound with id "${cachedAudio.id}" found.`);
+            return badRequest<undefined>(`No cached sound with id "${id}" found.`);
         }
         const { date, duration, user } = cachedAudio;
         try {
