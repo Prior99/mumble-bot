@@ -301,7 +301,11 @@ export class Sounds {
         await this.db.getRepository(Sound).save(sound);
 
         await rename(`${this.config.tmpDir}/${id}`, `${this.config.soundsDir}/${sound.id}`);
-        await rename(`${this.config.tmpDir}/${id}.png`, `${this.config.soundsDir}/${sound.id}.png`);
+        try {
+            await rename(`${this.config.tmpDir}/${id}.png`, `${this.config.soundsDir}/${sound.id}.png`);
+        } catch (err) {
+            if (err.code !== "ENOENT") { throw err; }
+        }
 
         this.cache.remove(id);
         verbose(`${currentUser.name} added new recording #${sound.id}`);
