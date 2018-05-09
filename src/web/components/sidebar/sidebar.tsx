@@ -53,15 +53,6 @@ export class AppSidebar extends React.Component {
                     icon={"sign out"}
                 />
                 <Menu.Item
-                    name="logout"
-                    content="Logout"
-                    onClick={() => {
-                        this.login.logout();
-                        this.sidebar.visibilityToggled = false;
-                    }}
-                    icon={"sign out"}
-                />
-                <Menu.Item
                     disabled
                     content={this.liveWebsocket.loading ? "Websocket connecting ..." : "Websocket connected"}
                     icon={this.liveWebsocket.loading ? <Icon loading name="spinner" /> : <Icon name="check" />}
