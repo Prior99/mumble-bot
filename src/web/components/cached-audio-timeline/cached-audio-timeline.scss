@@ -12,3 +12,38 @@
         font-weight: bold;
     }
 }
+
+.tickContainer {
+    position: relative;
+
+    .tick {
+        top: 0px;
+        position: absolute;
+
+        .tickLine {
+            position: absolute;
+            border-left: 1px solid rgb(212, 212, 213);
+            z-index: 10;
+        }
+
+        .tickLabel {
+            top: 25px;
+            position: absolute;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 0.8rem;
+        }
+
+        &:not(:nth-child(2)) {
+            .tickLine {
+                height: 25px;
+            }
+        }
+
+        &:nth-child(2) {
+            .tickLine {
+                top: 20px;
+                height: 5px;
+            }
+        }
+    }
+}
