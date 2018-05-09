@@ -46,9 +46,9 @@ export class CachedAudioTimeline extends React.Component<{ user: User }> {
         const { selectionStart, selectionEnd, selectedRange } = this.cachedAudio;
         const secondsPerTick = (selectedRange / this.width) * tickWidth / 1000;
         const tickTime = addSeconds(selectionStart, secondsPerTick * tick);
-        if (secondsPerTick > 60 * 60 * 24) {
-            return format(tickTime, "MM-DD");
-        } else if (secondsPerTick > 60) {
+        if (selectedRange > 60 * 60 * 24) {
+            return format(tickTime, "MM-DD HH:mm");
+        } else if (selectedRange > 60) {
             return format(tickTime, "HH:mm");
         }
         return format(tickTime, "HH:mm:ss");

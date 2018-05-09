@@ -9,6 +9,7 @@ $grey: 100;
     border-bottom: 1px solid rgb($grey, $grey, $grey);
     box-sizing: border-box;
     position: absolute;
+    z-index: 30;
     height: 100%;
 
     &.moving {

@@ -3,23 +3,23 @@ import { external, inject } from "tsdi";
 import { observer } from "mobx-react";
 import { computed } from "mobx";
 import { distanceInWordsStrict, addSeconds } from "date-fns";
-import { Grid, Header, Icon } from "semantic-ui-react";
+import { Grid, Header, Icon, Dimmer, Loader } from "semantic-ui-react";
 import { requireLogin } from "../../utils";
 import { Content, CachedAudioSlider, CachedAudioTimeline } from "../../components";
-import { UsersStore, CachedAudioStore } from "../../store";
+import { UsersStore, CachedAudioStore, LiveWebsocket } from "../../store";
 import * as css from "./cached.scss";
 
 @requireLogin @observer @external
 export class PageCached extends React.Component {
     @inject private users: UsersStore;
     @inject private cachedAudio: CachedAudioStore;
+    @inject private liveWebsocket: LiveWebsocket;
 
     @computed private get visibleUsers() {
         return this.users.alphabetical.filter(user => this.cachedAudio.inSelectionByUser(user).length > 0);
     }
 
     @computed private get totalDuration() {
-
         return distanceInWordsStrict(new Date(0), addSeconds(new Date(0), this.cachedAudio.totalDuration));
     }
 
@@ -34,7 +34,10 @@ export class PageCached extends React.Component {
 
     public render() {
         return (
-            <Content>
+            <Dimmer.Dimmable as={Content} dimmed={this.liveWebsocket.loading}>
+                <Dimmer active={this.liveWebsocket.loading} inverted>
+                    <Loader />
+                </Dimmer>
                 <Grid>
                     <Grid.Row>
                         <Grid.Column>
@@ -67,7 +70,7 @@ export class PageCached extends React.Component {
                         </Grid.Column>
                     </Grid.Row>
                 </Grid>
-            </Content>
+            </Dimmer.Dimmable>
         );
     }
 }

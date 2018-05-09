@@ -4,3 +4,38 @@
     overflow: hidden;
     cursor: crosshair;
 }
+
+.tickContainer {
+    position: relative;
+    height: 70px;
+    padding-top: 5px;
+    margin-bottom: 15px;
+
+    .tick {
+        top: 5px;
+        position: absolute;
+
+        .tickLine {
+            position: absolute;
+            z-index: 10;
+        }
+
+        .tickLabel {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 100px;
+            top: 50px;
+            position: absolute;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 0.8rem;
+        }
+
+        &:not(:nth-child(2)) {
+            .tickLine {
+                height: 50px;
+                border-left: 1px solid rgb(212, 212, 213);
+            }
+        }
+    }
+}

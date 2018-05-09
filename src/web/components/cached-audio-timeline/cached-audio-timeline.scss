@@ -22,11 +22,14 @@
 
         .tickLine {
             position: absolute;
-            border-left: 1px solid rgb(212, 212, 213);
             z-index: 10;
         }
 
         .tickLabel {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 100px;
             top: 25px;
             position: absolute;
             color: rgba(0, 0, 0, 0.6);
@@ -36,13 +39,7 @@
         &:not(:nth-child(2)) {
             .tickLine {
                 height: 25px;
-            }
-        }
-
-        &:nth-child(2) {
-            .tickLine {
-                top: 20px;
-                height: 5px;
+                border-left: 1px solid rgb(212, 212, 213);
             }
         }
     }
