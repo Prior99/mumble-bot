@@ -1,6 +1,6 @@
 import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, CreateDateColumn, OneToMany } from "typeorm";
 import { is, scope, specify, uuid, DataType } from "hyrest";
-import { world, createPlaylist, enqueue, live } from "../scopes";
+import { world, createPlaylist, enqueue, live, listPlaylists } from "../scopes";
 import { PlaylistEntry } from ".";
 import { User } from "./";
 
@@ -14,35 +14,35 @@ export class Playlist {
      * Unique id of this playlist.
      */
     @PrimaryGeneratedColumn("uuid")
-    @scope(world, enqueue, live) @is().validate(uuid)
+    @scope(world, enqueue, live, listPlaylists) @is().validate(uuid)
     public id?: string;
 
-    @ManyToOne(() => User, user => user.playlists)
+    @ManyToOne(() => User, user => user.playlists) @scope(listPlaylists, world)
     public creator?: User;
 
     /**
      * The date when this playlist was created.
      */
     @CreateDateColumn()
-    @scope(world) @is() @specify(() => Date)
+    @scope(world, listPlaylists) @is() @specify(() => Date)
     public created?: Date;
 
     @Column("text")
-    @scope(world, createPlaylist) @is()
+    @scope(world, createPlaylist, listPlaylists) @is()
     public name?: string;
 
     /**
      * How often this playlist was used.
      */
     @Column("int", { default: 0 })
-    @is(DataType.int) @scope(world)
+    @is(DataType.int) @scope(world, listPlaylists)
     public used?: number;
 
     /**
      * All records belonging to this playlist.
      */
     @OneToMany(() => PlaylistEntry, playlistEntry => playlistEntry.playlist)
-    @is() @scope(world, createPlaylist) @specify(() => PlaylistEntry)
+    @is() @scope(world, createPlaylist, listPlaylists) @specify(() => PlaylistEntry)
     public entries?: PlaylistEntry[];
 
     public get duration() {

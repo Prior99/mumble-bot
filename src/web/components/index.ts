@@ -11,3 +11,4 @@ export * from "./sound-card";
 export * from "./tag-label";
 export * from "./cached-audio-slider";
 export * from "./cached-audio-timeline";
+export * from "./playlist-card";

@@ -1,6 +1,6 @@
 import { Column, PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
 import { is, scope, specify, length, uuid, transform, only, required, precompute } from "hyrest";
-import { live, world, login, owner, signup, createMumbleLink } from "../scopes";
+import { live, world, login, owner, signup, createMumbleLink, listPlaylists } from "../scopes";
 import { hash } from "../utils";
 import { Sound, PermissionAssociation, Token, Setting, MumbleLink, Playlist } from ".";
 import * as gravatar from "gravatar-url";
@@ -11,7 +11,7 @@ import * as gravatar from "gravatar-url";
 @Entity()
 export class User {
     @PrimaryGeneratedColumn("uuid")
-    @scope(world, createMumbleLink, live) @is().validate(uuid)
+    @scope(world, createMumbleLink, live, listPlaylists) @is().validate(uuid)
     public id?: string;
 
     /**

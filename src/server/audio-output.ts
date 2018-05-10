@@ -136,9 +136,9 @@ export class AudioOutput extends EventEmitter {
         while (this.queue.length > 0 && !this.stopped) {
             const current = this.queue.shift();
             for (let file of await this.getFiles(current)) {
-                this.emit("shift", current);
                 await this.play(file, current.pitch);
             }
+            this.emit("shift", current);
         }
         this.busy = false;
     }

@@ -13,3 +13,4 @@ export const deleteMumbleLink = createScope();
 export const tagSound = createScope();
 export const enqueue = createScope();
 export const live = createScope();
+export const listPlaylists = createScope();

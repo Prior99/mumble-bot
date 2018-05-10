@@ -5,11 +5,13 @@ import { component, inject } from "tsdi";
 import { QueueItem } from "../../common";
 import { UsersStore } from "./users";
 import { SoundsStore } from "./sounds";
+import { PlaylistsStore } from "./playlists";
 
 @component
 export class QueueStore extends EventEmitter {
     @inject private usersStore: UsersStore;
     @inject private soundsStore: SoundsStore;
+    @inject private playlistsStore: PlaylistsStore;
 
     @observable public queue: QueueItem[] = [];
     @observable public currentItem: QueueItem;
@@ -27,6 +29,9 @@ export class QueueStore extends EventEmitter {
         }
         if (queueItem.cachedAudio) {
             queueItem.cachedAudio.user = this.usersStore.byId(queueItem.cachedAudio.user.id);
+        }
+        if (queueItem.playlist) {
+            queueItem.playlist = await this.playlistsStore.byId(queueItem.playlist.id);
         }
         this.queue.push(queueItem);
         this.maxDurationSinceLastClear = Math.max(this.maxDurationSinceLastClear, this.totalSeconds);

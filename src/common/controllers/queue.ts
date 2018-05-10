@@ -44,10 +44,10 @@ export class Queue {
                 }
                 break;
             case "playlist":
-                if (!queueItem.sound) {
+                if (!queueItem.playlist) {
                     return badRequest<QueueItem>(`Must specify "playlist" if type is set to "playlist".`);
                 }
-                const playlist = await this.db.getRepository(Sound).findOne(queueItem.playlist.id);
+                const playlist = await this.db.getRepository(Playlist).findOne(queueItem.playlist.id);
                 if (!playlist) {
                     return badRequest<QueueItem>(`No playlist with id "${queueItem.playlist.id}".`);
                 }

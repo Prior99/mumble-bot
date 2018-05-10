@@ -3,10 +3,11 @@ import { external, inject } from "tsdi";
 import { observer } from "mobx-react";
 import { computed } from "mobx";
 import { distanceInWordsStrict, addSeconds } from "date-fns";
-import { Grid, Header, Icon } from "semantic-ui-react";
+import { Grid, Header, Icon, Dimmer, Loader } from "semantic-ui-react";
 import { requireLogin } from "../../utils";
-import { Content } from "../../components";
+import { Content, PlaylistCard } from "../../components";
 import { PlaylistsStore } from "../../store";
+import * as css from "./playlists.scss";
 
 @requireLogin @observer @external
 export class PagePlaylists extends React.Component {
@@ -14,7 +15,10 @@ export class PagePlaylists extends React.Component {
 
     public render() {
         return (
-            <Content>
+            <Dimmer.Dimmable as={Content} dimmed={this.playlists.loading}>
+                <Dimmer active={this.playlists.loading} inverted>
+                    <Loader />
+                </Dimmer>
                 <Grid>
                     <Grid.Row>
                         <Grid.Column>
@@ -26,9 +30,18 @@ export class PagePlaylists extends React.Component {
                         </Grid.Column>
                     </Grid.Row>
                     <Grid.Row>
+                        <div className={css.grid}>
+                        {
+                            !this.playlists.loading && this.playlists.all.map(playlist => (
+                                <div className={css.column} key={playlist.id}>
+                                    <PlaylistCard playlist={playlist} />
+                                </div>
+                            ))
+                        }
+                        </div>
                     </Grid.Row>
                 </Grid>
-            </Content>
+            </Dimmer.Dimmable>
         );
     }
 }

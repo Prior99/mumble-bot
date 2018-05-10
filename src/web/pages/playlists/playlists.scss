@@ -1,0 +1,24 @@
+@import "../../breakpoints.scss";
+
+.grid {
+    width: 100%;
+    column-count: 1;
+
+    @media (min-width: $breakpoint-s) {
+        column-count: 2;
+    }
+
+    @media (min-width: $breakpoint-m) {
+        column-count: 3;
+    }
+
+    @media (min-width: $breakpoint-l) {
+        column-count: 4;
+    }
+}
+
+.column {
+    padding: 10px 5px !important;
+    display: inline-block;
+    width: 100%;
+}
