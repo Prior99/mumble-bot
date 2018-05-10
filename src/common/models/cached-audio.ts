@@ -8,19 +8,6 @@ import { User } from ".";
  * A cached audio.
  */
 export class CachedAudio {
-    constructor(id?: string, user?: User, duration?: number, date?: Date) {
-        if (id && user && duration) {
-            this.user = user;
-            this.duration = duration;
-            this.id = id;
-        }
-        if (date) {
-            this.date = date;
-        } else {
-            this.date = new Date();
-        }
-    }
-
     /**
      * The date the audio was recorded.
      */
@@ -44,4 +31,7 @@ export class CachedAudio {
      */
     @is(DataType.float) @scope(world, live)
     public duration?: number;
+
+    @is(DataType.float) @scope(world, live)
+    public amplitude?: number;
 }

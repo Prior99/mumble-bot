@@ -30,9 +30,16 @@ export class AudioCache extends EventEmitter {
         if (!existsSync(this.cachedAudioIndexFilePath)) { return; }
         try {
             const json = JSON.parse(await readFile(this.cachedAudioIndexFilePath, "utf8"));
-            json.map(async ({ id, userId, duration, date }) => {
+            json.map(async ({ id, userId, duration, date, amplitude }) => {
                 const user = await this.db.getRepository(User).findOne(userId);
-                this.cachedAudios.set(id, new CachedAudio(id, user, duration, new Date(date)));
+                const cachedAudio = Object.assign(new CachedAudio(), {
+                    id,
+                    user,
+                    duration,
+                    date: new Date(date),
+                    amplitude,
+                });
+                this.cachedAudios.set(id, cachedAudio);
             });
         } catch (err) {
             if (err.code !== "ENOENT") { throw err; }
@@ -46,6 +53,7 @@ export class AudioCache extends EventEmitter {
             userId: cachedAudio.user.id,
             duration: cachedAudio.duration,
             date: cachedAudio.date,
+            amplitude: cachedAudio.amplitude,
         }));
         await writeFile(this.cachedAudioIndexFilePath, JSON.stringify(exported));
     }
@@ -59,13 +67,8 @@ export class AudioCache extends EventEmitter {
 
     /**
      * Add an audio file to the list of cached audios.
-     * @param id Id of the cached audio file.
-     * @param user User that emitted the audio.
-     * @param duration Duration of the audio.
      */
-    public async add(id: string, userId: string, duration: number) {
-        const user = await this.db.getRepository(User).findOne(userId);
-        const cachedAudio: CachedAudio = new CachedAudio(id, user, duration);
+    public async add(cachedAudio: CachedAudio) {
         this.cachedAudios.set(cachedAudio.id, cachedAudio);
         this.emit("add", cachedAudio);
         this.cleanUp();

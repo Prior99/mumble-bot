@@ -1,10 +1,7 @@
-import { observable, computed, action } from "mobx";
+import { observable, computed } from "mobx";
 import { bind } from "decko";
 import { component, inject, initialize } from "tsdi";
-import { CachedAudio, Sounds, Sound, Tag, Queue, QueueItem, Playlists, Playlist } from "../../common";
-import { TagsStore } from "./tags";
-import { CachedAudioStore } from "./cached-audio";
-import { SoundsQuery } from "../../common/controllers/sounds";
+import { Playlists, Playlist } from "../../common";
 import { SoundsStore } from "./sounds";
 
 @component

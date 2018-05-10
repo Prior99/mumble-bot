@@ -75,6 +75,22 @@ export class CachedAudioStore {
         return selectionEnd.getTime() - selectionStart.getTime();
     }
 
+    @computed public get amplitudeTotalMin() {
+        return this.all
+            .map(cachedAudio => cachedAudio.amplitude)
+            .reduce((result, current) => Math.min(result, current));
+    }
+
+    @computed public get amplitudeTotalMax() {
+        return this.all
+            .map(cachedAudio => cachedAudio.amplitude)
+            .reduce((result, current) => Math.max(result, current));
+    }
+
+    @computed public get amplitudeTotalRange() {
+        return this.amplitudeTotalMax - this.amplitudeTotalMin;
+    }
+
     public byUser(user: User) {
         return this.all.filter(cachedAudio => cachedAudio.user.id === user.id);
     }

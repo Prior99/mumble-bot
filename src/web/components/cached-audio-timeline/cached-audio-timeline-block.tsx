@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as classNames from "classnames";
+import * as Color from "color";
 import { external, inject } from "tsdi";
 import { Popup, Form, Image, Icon } from "semantic-ui-react";
 import { observer } from "mobx-react";
@@ -10,6 +11,8 @@ import { CachedAudioStore, SoundsStore } from "../../store";
 import * as css from "./cached-audio-timeline-block.scss";
 
 declare const baseUrl: string;
+
+const amplitudeThreshold = 40.6;
 
 @external @observer
 export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: CachedAudio }> {
@@ -62,6 +65,7 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
 
     @bind @action private handleClose() {
         this.isOpen = false;
+        this.audio.pause();
     }
 
     @bind @action private handlePlay(event: React.MouseEvent<HTMLButtonElement>) {
@@ -85,6 +89,8 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
     private get audioUrl() { return `${baseUrl}/cached/${this.props.cachedAudio.id}/download`; }
 
     public render() {
+        const { amplitude, date, duration } = this.props.cachedAudio;
+        const { amplitudeTotalRange, amplitudeTotalMin } = this.cachedAudio;
         const classes = classNames(
             css.block,
             "inverted",
@@ -94,11 +100,14 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
         );
         const left = `${100 * this.left}%`;
         const width = `${100 * this.width}%`;
+        const normalizedAmplitude = (amplitude - amplitudeTotalMin) / amplitudeTotalRange;
+        const saturation = amplitude < amplitudeThreshold ? 0 : normalizedAmplitude;
+        const backgroundColor = Color.hsl(250, 100 * saturation, 77).string();
         return (
             <Popup
                 on="click"
                 trigger={
-                    <div className={classes} style={{ left, width }} />
+                    <div className={classes} style={{ backgroundColor, left, width }} />
                 }
                 onOpen={this.handleOpen}
                 onClose={this.handleClose}
@@ -113,7 +122,7 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
                         <Form.Group unstackable>
                             <Form.Input
                                 label="Description"
-                                placeholder={`Recording from ${this.props.cachedAudio.date.toISOString()}`}
+                                placeholder={`Recording from ${date.toISOString()}`}
                                 value={this.description}
                                 onChange={this.handleDescriptionChange}
                                 autoFocus
@@ -139,8 +148,9 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
                         </Form.Group>
                     </Form>
                     <div className={css.info}>
-                        <div><Icon name="time" /> {this.props.cachedAudio.duration}s</div>
-                        <div><Icon name="calendar" /> {this.props.cachedAudio.date.toLocaleString()}</div>
+                        <div><Icon name="time" /> {duration}s</div>
+                        <div><Icon name="calendar" /> {date.toLocaleString()}</div>
+                        <div><Icon name="volume up" /> {amplitude.toFixed(2)}db</div>
                     </div>
                 </Popup.Content>
             </Popup>

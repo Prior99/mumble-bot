@@ -7,12 +7,16 @@ import { PassThrough as PassThroughStream } from "stream";
 import { external, inject, initialize } from "tsdi";
 import { User as MumbleUser } from "mumble";
 import { ServerConfig } from "../../config";
-import { User } from "../../common";
+import { User, CachedAudio } from "../../common";
 import { AudioCache } from "..";
 
 const TIMEOUT_THRESHOLD = 300;
-const msInS = 1000;
 const audioFreq = 48000;
+const lowPassAlpha = 0.001;
+
+function toDecibel(input: number) {
+    return 20 * Math.log10(input);
+}
 
 /**
  * This class belongs to the VoiceInput and handles the speech recognition for a
@@ -31,6 +35,10 @@ export class VoiceInputUser extends Stream.Writable {
     private speakStartTime: Date;
     private currentId: string;
     private encoder: any;
+
+    private amplitudeSamples = 0;
+    private amplitudeSum = 0;
+    private lowPassCache = 0;
 
     /**
      * @constructor
@@ -110,12 +118,18 @@ export class VoiceInputUser extends Stream.Writable {
     private speechStopped() {
         this.speaking = false;
         this.passthrough.end();
-        this.cache.add(
-            this.currentId,
-            this.databaseUser.id,
-            (Date.now() - this.speakStartTime.getTime()) / msInS,
-        );
+        const cachedAudio = Object.assign(new CachedAudio(), {
+            id: this.currentId,
+            user: this.databaseUser,
+            duration: (Date.now() - this.speakStartTime.getTime()) / 1000,
+            date: new Date(),
+            amplitude: toDecibel(this.amplitudeSum / this.amplitudeSamples),
+        });
+        this.cache.add(cachedAudio);
         this.createNewRecordingFile();
+        this.amplitudeSum = 0;
+        this.amplitudeSamples = 0;
+        this.lowPassCache = 0;
     }
 
     /**
@@ -124,6 +138,13 @@ export class VoiceInputUser extends Stream.Writable {
      * @param chunk - The user's speech buffer.
      */
     private speechContinued(chunk: Buffer) {
+        this.amplitudeSamples += chunk.length;
+        for (let i = 0; i < chunk.length; ++i) {
+            const value = Math.abs(chunk[i]);
+            const amplitude = lowPassAlpha * value + (1.0 - lowPassAlpha) * this.lowPassCache;
+            this.lowPassCache = value;
+            this.amplitudeSum += amplitude;
+        }
         this.passthrough.write(chunk);
         this.refreshTimeout();
     }
