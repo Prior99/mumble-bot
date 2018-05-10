@@ -37,7 +37,7 @@ export class CachedAudioBrush extends React.Component<CachedAudioBrushProps> {
         if (!this.parent) { return; }
         const { left, right } = this.props;
         const rect = this.parent.getBoundingClientRect();
-        const x = (event.screenX - rect.left) / rect.width;
+        const x = (event.pageX - rect.left) / rect.width;
         if (this.rightDragging) {
             this.props.onChange(left, clamp(x, left, 1));
         }

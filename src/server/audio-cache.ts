@@ -89,12 +89,18 @@ export class AudioCache extends EventEmitter {
             this.cachedAudios.delete(cachedAudio.id);
             try {
                 await unlink(`${this.config.tmpDir}/${cachedAudio.id}`);
-                await unlink(`${this.config.tmpDir}/${cachedAudio.id}.png`);
-                this.emit("remove", cachedAudio);
-                info(`Deleted files for cached audio"${cachedAudio.id}".`);
             } catch (err) {
-                error("Error when cleaning up cached audios!", err);
+                error(`Error when cleaning up sound file for sound ${cachedAudio.id}`, err);
             }
+            try {
+                await unlink(`${this.config.tmpDir}/${cachedAudio.id}.png`);
+            } catch (err) {
+                if (err.code !== "ENOENT") {
+                    error(`Error when cleaning up visualization file for sound ${cachedAudio.id}`, err);
+                }
+            }
+            this.emit("remove", cachedAudio);
+            info(`Deleted files for cached audio ${cachedAudio.id}.`);
         }));
     }
     /**

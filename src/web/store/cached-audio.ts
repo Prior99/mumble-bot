@@ -36,7 +36,8 @@ export class CachedAudioStore {
 
     @computed public get newest() {
         return this.all.reduce((newest, cachedAudio) => {
-            if (!newest || cachedAudio.date > newest.date) {
+            if (!newest) { return cachedAudio; }
+            if (addSeconds(cachedAudio.date, cachedAudio.duration) > addSeconds(newest.date, newest.duration)) {
                 return cachedAudio;
             }
             return newest;
@@ -99,12 +100,12 @@ export class CachedAudioStore {
     @bind @action public add(cachedAudio: CachedAudio) {
         const { selectionFollowing } = this;
         cachedAudio.user = this.usersStore.byId(cachedAudio.user.id);
-        this.cachedAudios.set(cachedAudio.id, cachedAudio);
         if (selectionFollowing) {
             const distance = addSeconds(cachedAudio.date, cachedAudio.duration).getTime() - this.newestTime;
             this.selectionEnd = addSeconds(this.selectionEnd, distance / 1000);
             this.selectionStart = addSeconds(this.selectionStart, distance / 1000);
         }
+        this.cachedAudios.set(cachedAudio.id, cachedAudio);
     }
 
     @bind @action public remove({ id }: CachedAudio) {

@@ -36,7 +36,7 @@ export class CachedAudioSlider extends React.Component {
 
     @bind private handleMouseDown(event: React.MouseEvent<HTMLDivElement>) {
         const rect = this.container.getBoundingClientRect();
-        this.originX = (event.screenX - rect.left) / rect.width;
+        this.originX = (event.pageX - rect.left) / rect.width;
         this.brushing = true;
         event.stopPropagation();
     }
@@ -45,7 +45,7 @@ export class CachedAudioSlider extends React.Component {
         if (!this.container || !this.brushing) { return; }
         const { totalRange, oldestTime } = this.cachedAudio;
         const rect = this.container.getBoundingClientRect();
-        const x = (event.screenX - rect.left) / rect.width;
+        const x = (event.pageX - rect.left) / rect.width;
         this.cachedAudio.selectionStart = new Date(Math.min(x, this.originX) * totalRange + oldestTime);
         this.cachedAudio.selectionEnd = new Date(Math.max(x, this.originX) * totalRange + oldestTime);
         event.stopPropagation();
@@ -105,6 +105,7 @@ export class CachedAudioSlider extends React.Component {
                 <div
                     className={css.tick}
                     style={{ left: tick * tickWidth }}
+                    key={tick}
                 >
                     <div className={css.tickLine} />
                     <div className={css.tickLabel}>{this.tickLabel(tick)}</div>

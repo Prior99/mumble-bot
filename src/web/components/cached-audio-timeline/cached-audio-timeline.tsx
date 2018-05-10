@@ -61,6 +61,7 @@ export class CachedAudioTimeline extends React.Component<{ user: User }> {
                 <div
                     className={css.tick}
                     style={{ left: tick * tickWidth }}
+                    key={tick}
                 >
                     <div className={css.tickLine} />
                     <div className={css.tickLabel}>{this.tickLabel(tick)}</div>

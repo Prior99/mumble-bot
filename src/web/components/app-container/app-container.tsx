@@ -22,7 +22,7 @@ export class AppContainer extends React.Component<{}, undefined> {
         const pageClasses = cx({
             pageSidebarActive: this.sidebar.alwaysOpen && this.login.loggedIn,
         });
-        if (this.users.loading) {
+        if (this.login.loggedIn && this.users.loading) {
             return (
                 <Dimmer active>
                     <Loader />
