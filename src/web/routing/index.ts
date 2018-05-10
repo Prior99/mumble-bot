@@ -78,3 +78,11 @@ export const routeCached: Route = {
     title: "Cached Audios",
     icon: "history",
 };
+
+export const routePlaylists: Route = {
+    path: () => "/playlists",
+    pattern: "/playlists",
+    navbar: true,
+    title: "Playlists",
+    icon: "list",
+};

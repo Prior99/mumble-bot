@@ -6,3 +6,4 @@ export { PageSettings } from "./settings";
 export { PageUsers } from "./users";
 export { PageSounds } from "./sounds";
 export { PageCached } from "./cached";
+export { PagePlaylists } from "./playlists";

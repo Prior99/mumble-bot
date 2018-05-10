@@ -11,7 +11,7 @@ export class Playlists {
     @inject private db: Connection;
 
     @route("GET", "/playlists").dump(Playlist, world)
-    public async listPlaylists(@param("id") @is().validate(uuid) id: string): Promise<Playlist[]> {
+    public async listPlaylists(): Promise<Playlist[]> {
         const playlists = await this.db.getRepository(Playlist).find();
         return ok(playlists);
     }

@@ -43,7 +43,7 @@ export class CachedAudioTimeline extends React.Component<{ user: User }> {
     }
 
     @bind private tickLabel(tick: number) {
-        const { selectionStart, selectionEnd, selectedRange } = this.cachedAudio;
+        const { selectionStart, selectedRange } = this.cachedAudio;
         const secondsPerTick = (selectedRange / this.width) * tickWidth / 1000;
         const tickTime = addSeconds(selectionStart, secondsPerTick * tick);
         if (selectedRange > 60 * 60 * 24) {

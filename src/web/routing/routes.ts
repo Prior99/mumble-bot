@@ -7,6 +7,7 @@ import {
     PageUsers,
     PageSounds,
     PageCached,
+    PagePlaylists,
 } from "../pages";
 import {
     routeLogin,
@@ -17,6 +18,7 @@ import {
     routeUsers,
     routeSounds,
     routeCached,
+    routePlaylists,
 } from ".";
 
 export const routes = [
@@ -44,5 +46,8 @@ export const routes = [
     }, {
         component: PageCached,
         route: routeCached,
+    }, {
+        component: PagePlaylists,
+        route: routePlaylists,
     },
 ];
