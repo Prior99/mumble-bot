@@ -13,14 +13,14 @@ export class PlaylistEntryComponent extends React.Component<{ playlistEntry: Pla
         const { description, user } = sound;
         return (
             <List.Item>
-                <Image avatar src={sound.user.avatarUrl} />
+                <Image avatar src={user.avatarUrl} />
                 <List.Content>
                     <List.Header>
-                        <Link to={routeUser.path(sound.user.id)}>
-                            {sound.user.name}
+                        <Link to={routeUser.path(user.id)}>
+                            {user.name}
                         </Link>
                     </List.Header>
-                    <List.Description>{sound.description}</List.Description>
+                    <List.Description>{description}</List.Description>
                 </List.Content>
             </List.Item>
         );

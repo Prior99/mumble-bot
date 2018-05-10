@@ -19,7 +19,7 @@ export class PlaylistsStore {
     protected async initialize() {
         const playlists = await this.playlistsController.listPlaylists();
         await Promise.all(playlists.map(async playlist => {
-            playlist.creator = await this.usersStore.byId(playlist.creator.id);
+            playlist.creator = this.usersStore.byId(playlist.creator.id);
             // Needs to be performed sequentially.
             for (let entry of playlist.entries) {
                 entry.sound = await this.soundsStore.byId(entry.sound.id);

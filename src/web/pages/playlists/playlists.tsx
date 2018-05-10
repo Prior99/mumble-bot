@@ -1,7 +1,6 @@
 import * as React from "react";
 import { external, inject } from "tsdi";
 import { observer } from "mobx-react";
-import { computed } from "mobx";
 import { distanceInWordsStrict, addSeconds } from "date-fns";
 import { Grid, Header, Icon, Dimmer, Loader } from "semantic-ui-react";
 import { requireLogin } from "../../utils";

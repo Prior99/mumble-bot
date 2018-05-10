@@ -2,7 +2,7 @@ import * as React from "react";
 import { external, inject } from "tsdi";
 import { bind } from "decko";
 import { action, observable } from "mobx";
-import { Image, Card, Button, List, Icon } from "semantic-ui-react";
+import { Card, Button, List } from "semantic-ui-react";
 import { observer } from "mobx-react";
 import { Playlist } from "../../../common";
 import { PlaylistEntryComponent } from "./playlist-entry";
@@ -58,7 +58,7 @@ export class PlaylistCard extends React.Component<{ playlist: Playlist }> {
     }
 
     public render() {
-        const { used, entries } = this.props.playlist;
+        const { used } = this.props.playlist;
         return (
             <Card fluid>
                 <Card.Content>{this.renderEntries()}</Card.Content>
