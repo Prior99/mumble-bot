@@ -4,7 +4,7 @@ import { observable, action, computed } from "mobx";
 import { observer } from "mobx-react";
 import { inject, external } from "tsdi";
 import bind from "bind-decorator";
-import { Input, Button, Form } from "semantic-ui-react";
+import { Input, Button, Form, Modal, Icon } from "semantic-ui-react";
 import { SignupStore } from "../../store";
 import { routeLogin } from "../../routing";
 import { Content } from "../../components";
@@ -89,6 +89,24 @@ export class PageSignup extends React.Component {
                     <Button disabled={!this.allValid} type="submit" fluid color="violet">Signup</Button>
                 </Form>
                 <p>Already have an account? Login <Link to={routeLogin.path()}>here</Link>.</p>
+                {
+                    this.signup.signupResult && (
+                        <Modal open>
+                            <Modal.Header>
+                                <Icon color="green" name="check" /> Successfully Signed Up!
+                            </Modal.Header>
+                            <Modal.Content>
+                                <Modal.Description>
+                                    <p>
+                                        Your account was successfully created,
+                                        however it still needs to be enabled by an administrator.
+                                    </p>
+                                    <p>Please contact an administrator and ask them to enable your account.</p>
+                                </Modal.Description>
+                            </Modal.Content>
+                        </Modal>
+                    )
+                }
             </Content>
         );
     }

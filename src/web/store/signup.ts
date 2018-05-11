@@ -17,8 +17,7 @@ export class SignupStore {
     public async signup(email: string, password: string, name: string) {
         const response = await this.users.createUser({ email, password, name } as User);
         if (response) {
-            await this.login.login(email, password);
-            await this.ownUser.loadUser();
+            this.signupResult = true;
         }
         return response;
     }
