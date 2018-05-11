@@ -10,17 +10,15 @@ import {
     ok,
     notFound,
     created,
-    DataType,
     noauth,
 } from "hyrest";
 import { component, inject } from "tsdi";
-import { Connection, Transaction, EntityManager, TransactionManager } from "typeorm";
-import { verbose, warn, info } from "winston";
+import { Connection } from "typeorm";
+import { verbose, warn } from "winston";
 import { User } from "../models";
 import { signup, world, owner } from "../scopes";
 import { Context } from "../context";
 import { updateUser } from "../scopes";
-import { Token } from "../";
 
 export interface Settings {
     [key: string]: string;
@@ -62,7 +60,7 @@ export class Users {
         @body(updateUser) user: User,
         @context ctx?: Context,
     ): Promise<User> {
-        const { admin: currentAdmin, enabled: currentEnabled, id: currentId } = await ctx.currentUser();
+        const { admin: currentAdmin, id: currentId } = await ctx.currentUser();
         if (!await this.db.getRepository(User).findOne(id)) {
             return notFound<User>(`No sound with id "${id}"`);
         }

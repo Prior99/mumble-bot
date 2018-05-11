@@ -1,18 +1,20 @@
 import * as React from "react";
 import { Sidebar, Menu, Icon } from "semantic-ui-react";
+import { Slider } from "react-semantic-ui-range";
 import { observer } from "mobx-react";
 import { inject, external } from "tsdi";
 import { History } from "history";
 import { bind } from "decko";
 import { action } from "mobx";
 import { Utilities } from "../../../common";
-import { SidebarStore, LoginStore, LiveWebsocket } from "../../store";
+import { SidebarStore, LoginStore, LiveWebsocket, SoundsStore } from "../../store";
 import { routes } from "../../routing/routes";
 
 @observer @external
 export class AppSidebar extends React.Component {
     @inject private sidebar: SidebarStore;
     @inject private login: LoginStore;
+    @inject private sounds: SoundsStore;
     @inject("history") private history: History;
     @inject private liveWebsocket: LiveWebsocket;
     @inject private utilities: Utilities;
@@ -71,6 +73,20 @@ export class AppSidebar extends React.Component {
                     content={this.liveWebsocket.loading ? "Websocket connecting ..." : "Websocket connected"}
                     icon={this.liveWebsocket.loading ? <Icon loading name="spinner" /> : <Icon name="check" />}
                 />
+                <Menu.Item>
+                    <p>Pitch</p>
+                    <Slider
+                        color="violet"
+                        inverted
+                        value={this.sounds.pitch}
+                        settings={{
+                            min: -600,
+                            max: 600,
+                            step: 10,
+                            onChange: value => this.sounds.pitch = value,
+                        }}
+                    />
+                </Menu.Item>
             </Sidebar>
         );
     }

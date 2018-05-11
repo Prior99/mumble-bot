@@ -62,11 +62,6 @@ interface SourceRecordingLabelRelation {
     label: number;
 }
 
-interface SourcePermission {
-    user: number;
-    permission: string;
-}
-
 interface SourceDialog {
     id: number;
     submitted: Date;

@@ -7,9 +7,7 @@ import { LoginStore, OwnUserStore } from ".";
 
 @component
 export class SignupStore {
-    @inject private login: LoginStore;
     @inject private users: Users;
-    @inject private ownUser: OwnUserStore;
 
     @observable public signupResult: Boolean;
 

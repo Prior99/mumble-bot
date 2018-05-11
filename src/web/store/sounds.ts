@@ -14,6 +14,7 @@ export class SoundsStore {
     @inject private cachedAudio: CachedAudioStore;
 
     @observable public sounds = new Map<string, Sound>();
+    @observable public pitch = 0;
 
     @computed public get all() {
         return Array.from(this.sounds.values());
@@ -40,6 +41,7 @@ export class SoundsStore {
         await this.queue.enqueue({
             type: "sound",
             sound: { id: sound.id },
+            pitch: this.pitch,
         } as QueueItem);
         sound.used++;
         this.sounds.set(sound.id, sound);
