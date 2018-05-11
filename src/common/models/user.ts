@@ -21,6 +21,7 @@ export class User {
     @is()
         .validate(length(3, 100), only(signup, required))
         .validateCtx(ctx => only(signup, value => ctx.validation.nameAvailable(value)))
+        .validateCtx(ctx => only(updateUser, value => ctx.validation.nameAvailable(value)))
     @scope(world, signup, updateUser)
     public name?: string;
 
@@ -36,6 +37,7 @@ export class User {
     @is()
         .validate(length(8, 200), only(login, required))
         .validateCtx(ctx => only(signup, value => ctx.validation.emailAvailable(value)))
+        .validateCtx(ctx => only(updateUser, value => ctx.validation.emailAvailable(value)))
     @scope(owner, login, updateUser)
     public email?: string;
 

@@ -42,14 +42,15 @@ export class Description extends React.Component<DescriptionProps> {
     }
 
     @bind @action private handleDescriptionKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-        if (event.key === "Enter") {
-            this.handleFinishEditDescription();
-        }
-        if (event.key === "Escape") {
-            this.handleAbortEditDescription();
-        }
-        if (event.key === "Tab") {
-            this.handleAbortEditDescription();
+        switch (event.key) {
+            case "Enter":
+                this.handleFinishEditDescription(); break;
+            case "Esc":
+            case "Escape":
+                this.handleAbortEditDescription(); break;
+            case "Tab":
+                this.handleAbortEditDescription(); break;
+            default: break;
         }
     }
 

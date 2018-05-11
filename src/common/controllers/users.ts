@@ -70,14 +70,14 @@ export class Users {
             warn(`User ${id} tried to change admin status of user ${user.id}.`);
             return forbidden<User>("Can't update admin status without being admin");
         }
-        if (id !== user.id && !currentAdmin) {
-            warn(`User ${id} tried to change foreign user ${user.id}.`);
+        if (id !== currentId && !currentAdmin) {
+            warn(`User ${currentId} tried to change foreign user ${user.id}.`);
             return forbidden<User>("Can't update foreign user without being admin");
         }
-        if (id === user.id && currentAdmin && !user.admin) {
+        if (id === currentId && currentAdmin && user.admin === false) {
             return forbidden<User>("Can't revoke admin status from yourself");
         }
-        if (id === user.id && !user.enabled) {
+        if (id === currentId && user.enabled === false) {
             return forbidden<User>("Can't disable yourself");
         }
         await this.db.getRepository(User).update(id, user);
