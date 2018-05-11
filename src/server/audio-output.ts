@@ -29,6 +29,8 @@ export class AudioOutput extends EventEmitter {
     private mumbleStream: MumbleInputStream;
     private stopped = false;
     private ffmpeg: any;
+    private passThrough: Stream.PassThrough;
+    private sox: Sox;
 
     private transcodeTimeout: NodeJS.Timer;
 
@@ -60,27 +62,27 @@ export class AudioOutput extends EventEmitter {
                         error(`Error decoding file ${filename}`, err);
                         reject();
                     });
-                const sox = new Sox()
+                this.sox = new Sox()
                     .input(this.ffmpeg.stream())
                     .inputSampleRate("48k")
                     .inputBits(16)
                     .inputChannels(1)
                     .inputFileType("raw")
                     .inputEncoding("signed");
-                const passThrough = new Stream.PassThrough();
-                const output = sox.output(passThrough)
+                this.passThrough = new Stream.PassThrough();
+                const output = this.sox.output(this.passThrough)
                     .outputSampleRate("48k")
                     .outputEncoding("signed")
                     .outputBits(16)
                     .outputChannels(1)
                     .outputFileType("raw");
                 output.addEffect("pitch", [pitch]);
-                sox.on("error", (err) => {
+                this.sox.on("error", (err) => {
                         error(`Error processing file "${filename}" with sox.`, err);
                         reject();
                     });
-                sox.run();
-                passThrough
+                this.sox.run();
+                this.passThrough
                     .on("data", (chunk: Buffer) => {
                         samplesTotal += chunk.length / 2;
                         this.mumbleStream.write(chunk);
@@ -105,6 +107,10 @@ export class AudioOutput extends EventEmitter {
         if (this.transcodeTimeout) { clearTimeout(this.transcodeTimeout); }
         if (this.ffmpeg) { this.ffmpeg.kill(); }
         this.queue = [];
+        this.busy = false;
+        this.mumbleStream.close();
+        this.passThrough.destroy();
+        this.mumbleStream = this.mumble.inputStream();
         this.emit("clear");
     }
 

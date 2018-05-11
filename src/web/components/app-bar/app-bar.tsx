@@ -1,9 +1,12 @@
 import * as React from "react";
-import { Menu, Dropdown, Image } from "semantic-ui-react";
+import { Menu, Dropdown, Image, Icon } from "semantic-ui-react";
 import { inject, external } from "tsdi";
+import { bind } from "decko";
+import { action } from "mobx";
 import { observer } from "mobx-react";
 import { computed } from "mobx";
 import { History } from "history";
+import { Utilities } from "../../../common";
 import {
     SidebarStore,
     OwnUserStore,
@@ -23,6 +26,11 @@ export class AppBar extends React.Component {
     @inject private ownUser: OwnUserStore;
     @inject private login: LoginStore;
     @inject("history") private browserHistory: History;
+    @inject private utilities: Utilities;
+
+    @bind @action private async handleShutUp() {
+        await this.utilities.shutUp();
+    }
 
     @computed private get sidebarButtonVisible() { return !this.sidebar.alwaysOpen && this.login.loggedIn; }
     @computed private get avatar() { return this.ownUser.user && this.ownUser.user.avatarUrl; }
@@ -45,6 +53,9 @@ export class AppBar extends React.Component {
                     }
                 </Menu.Menu>
                 <Menu.Menu position="right">
+                    <Menu.Item onClick={this.handleShutUp}>
+                        <Icon name="alarm mute" />
+                    </Menu.Item>
                     {
                         user && [
                             <Dropdown
