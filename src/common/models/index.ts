@@ -22,6 +22,7 @@ export { ForkOptions } from "./fork-options";
 export { SoundsQueryResult } from "./sounds-query-result";
 import { SoundsQueryResult } from "./sounds-query-result";
 export { LiveEvent } from "./live-event";
+export { Upload } from "./upload";
 
 export const allDatabaseModels = [
     User,

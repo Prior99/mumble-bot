@@ -28,6 +28,7 @@ export default class WorkerCommand extends Command { // tslint:disable-line
     private shouldGenerateVisualization(path: string) {
         return !path.endsWith("png") &&
             !path.endsWith("json") &&
+            !path.startsWith("upload-") &&
             !statSync(path).isDirectory() &&
             !existsSync(this.getVisualizationFilename(path));
     }

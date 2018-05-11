@@ -1,5 +1,5 @@
-import { ForkOptions } from "../models";
 import mkdirp = require("mkdirp-promise");
+import * as Uuid from "uuid";
 import {
     context,
     body,
@@ -18,14 +18,14 @@ import {
     badRequest,
     conflict,
 } from "hyrest";
-import { rename } from "fs-extra";
+import { rename, unlink, writeFile } from "fs-extra";
 import { component, inject } from "tsdi";
 import { Connection, Brackets } from "typeorm";
-import { verbose } from "winston";
+import { verbose, error } from "winston";
 import * as FFMpeg from "fluent-ffmpeg";
 import { ServerConfig } from "../../config";
-import { CachedAudio, SoundsQueryResult, Sound, Tag, SoundTagRelation } from "../models";
-import { createSound, updateSound, world, tagSound } from "../scopes";
+import { ForkOptions, CachedAudio, SoundsQueryResult, Sound, Tag, SoundTagRelation, Upload } from "../models";
+import { createSound, updateSound, world, tagSound, upload } from "../scopes";
 import { AudioCache } from "../../server";
 import { Context } from "../context";
 
@@ -286,6 +286,55 @@ export class Sounds {
                 .save(`${this.config.soundsDir}/${newId}`)
                 .on("end", () => resolve());
         });
+    }
+
+    @route("POST", "/sounds/upload").dump(Sound, world)
+    public async upload(@body(upload) { content, filename }: Upload, @context ctx?: Context): Promise<Sound> {
+        try {
+            await mkdirp(this.config.soundsDir);
+        } catch (e) {
+            if (e.code !== "EEXIST") { throw e; }
+        }
+        const currentUser = await ctx.currentUser();
+        const tmpPath = `${this.config.tmpDir}/upload-${Uuid.v4()}`;
+        await writeFile(tmpPath, Buffer.from(content, "base64"));
+        let soundMeta: any;
+        try {
+            soundMeta = await new Promise((resolve, reject) => {
+                FFMpeg.ffprobe(tmpPath, (err, result) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    resolve(result);
+                });
+            });
+        } catch (err) {
+            error(`Error processing meta information for upload "${tmpPath}"`, err);
+            await unlink(tmpPath);
+            return badRequest<Sound>("Unable to process meta information for upload");
+        }
+        if (typeof soundMeta.format.duration !== "number") {
+            await unlink(tmpPath);
+            return badRequest<Sound>("Invalid audio file");
+        }
+        if (!soundMeta.streams.some(stream => stream.codec_type === "audio")) {
+            await unlink(tmpPath);
+            return badRequest<Sound>("Media file did not contain an audio stream");
+        }
+        const sound = Object.assign(new Sound(), {
+            duration: soundMeta.format.duration,
+            created: new Date(),
+            creator: currentUser,
+            description: filename,
+            source: "upload",
+        });
+        await this.db.getRepository(Sound).save(sound);
+        await rename(tmpPath, `${this.config.soundsDir}/${sound.id}`);
+
+        verbose(`${currentUser.name} added new uploaded sound #${sound.id}`);
+
+        return created(sound);
     }
 
     @route("POST", "/sounds").dump(Sound, world)

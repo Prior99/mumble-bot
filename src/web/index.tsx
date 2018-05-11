@@ -52,6 +52,7 @@ const controllerOptions: ControllerOptions = {
     errorHandler: err => {
         errors.report({
             message: err.answer ? err.answer.message : err.message ? err.message : "Unknown error.",
+            fatal: err.statusCode === 401,
         });
         if (err.statusCode === 401) {
             tsdi.get(LoginStore).logout();

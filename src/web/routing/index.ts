@@ -86,3 +86,11 @@ export const routePlaylists: Route = {
     title: "Playlists",
     icon: "list",
 };
+
+export const routeUpload: Route = {
+    path: () => "/upload",
+    pattern: "/upload",
+    navbar: true,
+    title: "Upload",
+    icon: "upload",
+};

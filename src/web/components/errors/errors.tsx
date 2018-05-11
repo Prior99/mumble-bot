@@ -15,7 +15,7 @@ export class Errors extends React.Component {
             return null;
         }
         return (
-            <Modal onClose={dismiss} open basic size="small">
+            <Modal onClose={dismiss} open size="small">
                 <Header
                     icon="warning sign"
                     content="An error occured"
@@ -24,9 +24,17 @@ export class Errors extends React.Component {
                     {latestError.message}
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button basic color="red" invert onClick={() => window.location.href = "/"}>
-                        <Icon name="remove" /> Reload Page
-                    </Button>
+                    {
+                        latestError.fatal ? (
+                            <Button color="red" invert onClick={() => window.location.href = "/"}>
+                                <Icon name="remove" /> Reload Page
+                            </Button>
+                        ) : (
+                            <Button color="red" invert onClick={this.errors.dismiss}>
+                                <Icon name="remove" /> OK
+                            </Button>
+                        )
+                    }
                 </Modal.Actions>
             </Modal>
         );

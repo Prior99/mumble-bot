@@ -4,6 +4,7 @@ import { component } from "tsdi";
 
 interface ApiError {
     message: string;
+    fatal?: boolean;
 }
 
 @component
