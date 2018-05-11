@@ -18,14 +18,24 @@ import {
     badRequest,
     conflict,
 } from "hyrest";
-import { rename, unlink, writeFile } from "fs-extra";
+import { rename, unlink, writeFile, createWriteStream, existsSync } from "fs-extra";
 import { component, inject } from "tsdi";
 import { Connection, Brackets } from "typeorm";
 import { verbose, error } from "winston";
 import * as FFMpeg from "fluent-ffmpeg";
+import * as YoutubeDl from "youtube-dl";
 import { ServerConfig } from "../../config";
-import { ForkOptions, CachedAudio, SoundsQueryResult, Sound, Tag, SoundTagRelation, Upload } from "../models";
-import { createSound, updateSound, world, tagSound, upload } from "../scopes";
+import {
+    ForkOptions,
+    CachedAudio,
+    SoundsQueryResult,
+    Sound,
+    Tag,
+    SoundTagRelation,
+    Upload,
+    YoutubeImport,
+} from "../models";
+import { createSound, updateSound, world, tagSound, upload, youtubeImport } from "../scopes";
 import { AudioCache } from "../../server";
 import { Context } from "../context";
 
@@ -66,7 +76,7 @@ export interface SoundsQuery {
      * Limit the returned sounds to sounds from the specified source.
      * Sources are: `upload` and `recording`.
      */
-    source?: "upload" | "recording";
+    source?: "upload" | "recording" | "youtube";
     /**
      * Sort the returned list by the given column, before limiting.
      * Accepted column names are:
@@ -227,7 +237,7 @@ export class Sounds {
         @query("creator") @is().validate(uuid) creator?: string,
         @query("user") @is().validate(uuid) user?: string,
         @query("tags") @is() tags?: string,
-        @query("source") @is().validate(oneOf("upload", "recording")) source?: string,
+        @query("source") @is().validate(oneOf("upload", "recording", "youtube")) source?: string,
         @query("sort") @is().validate(oneOf("created", "updated", "used", "duration", "description")) sort?: string,
         @query("sortDirection") @is().validate(oneOf("asc", "desc")) sortDirection?: string,
     ): Promise<SoundsQueryResult> {
@@ -288,6 +298,88 @@ export class Sounds {
         });
     }
 
+    private async getMetaInfo(path: string) {
+        return new Promise((resolve, reject) => {
+            FFMpeg.ffprobe(path, (err, result) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(result);
+            });
+        });
+    }
+
+    private async getYoutubeDlInfo(url: string) {
+        return new Promise<YoutubeDl.Info>((resolve, reject) => {
+            YoutubeDl.getInfo(url, [], (err, videoInfo) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(videoInfo);
+            });
+        });
+    }
+
+    @route("POST", "/sounds/youtube").dump(Sound, world)
+    public async importYoutube(@body(youtubeImport) { url }: YoutubeImport, @context ctx?: Context): Promise<Sound> {
+        try {
+            await mkdirp(this.config.soundsDir);
+        } catch (e) {
+            if (e.code !== "EEXIST") { throw e; }
+        }
+
+        const currentUser = await ctx.currentUser();
+        let info: YoutubeDl.Info;
+        try {
+            info = await this.getYoutubeDlInfo(url);
+        } catch (err) {
+            return badRequest<Sound>("Could not gather meta information about provided URL.");
+        }
+        const tmpPath = `${this.config.tmpDir}/youtube-${Uuid.v4()}`;
+        try {
+            await new Promise(resolve => {
+                YoutubeDl(url, ["--extract-audio", "--audio-format=mp3"], {})
+                    .on("end", resolve)
+                    .pipe(createWriteStream(tmpPath));
+            });
+        } catch (err) {
+            if (existsSync(tmpPath)) { await unlink(tmpPath); }
+            error(`Error downloading youtube video for url "${url}"`);
+            return badRequest<Sound>("Connection to YouTube interrupted.");
+        }
+        let soundMeta: any;
+        try {
+            soundMeta = await this.getMetaInfo(tmpPath);
+        } catch (err) {
+            error(`Error processing meta information for downloaded file from url "${tmpPath}"`, err);
+            await unlink(tmpPath);
+            return badRequest<Sound>("Unable to process meta information for downloaded file.");
+        }
+        if (typeof soundMeta.format.duration !== "number") {
+            await unlink(tmpPath);
+            return badRequest<Sound>("Invalid audio file extracted from youtube download.");
+        }
+        if (!soundMeta.streams.some(stream => stream.codec_type === "audio")) {
+            await unlink(tmpPath);
+            return badRequest<Sound>("Media file extracted from youtube download did not contain an audio stream.");
+        }
+        const sound = Object.assign(new Sound(), {
+            duration: soundMeta.format.duration,
+            created: new Date(),
+            creator: currentUser,
+            description: info.title,
+            source: "youtube",
+        });
+        await this.db.getRepository(Sound).save(sound);
+        await rename(tmpPath, `${this.config.soundsDir}/${sound.id}`);
+
+        verbose(`${currentUser.name} added new sound imported from youtube with id #${sound.id}.`);
+
+        return created(sound);
+    }
+
     @route("POST", "/sounds/upload").dump(Sound, world)
     public async upload(@body(upload) { content, filename }: Upload, @context ctx?: Context): Promise<Sound> {
         try {
@@ -300,15 +392,7 @@ export class Sounds {
         await writeFile(tmpPath, Buffer.from(content, "base64"));
         let soundMeta: any;
         try {
-            soundMeta = await new Promise((resolve, reject) => {
-                FFMpeg.ffprobe(tmpPath, (err, result) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-                    resolve(result);
-                });
-            });
+            soundMeta = await this.getMetaInfo(tmpPath);
         } catch (err) {
             error(`Error processing meta information for upload "${tmpPath}"`, err);
             await unlink(tmpPath);

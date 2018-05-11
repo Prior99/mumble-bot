@@ -94,3 +94,12 @@ export const routeUpload: Route = {
     title: "Upload",
     icon: "upload",
 };
+
+export const routeYoutube: Route = {
+    path: () => "/youtube",
+    pattern: "/youtube",
+    navbar: true,
+    title: "YouTube",
+    icon: "youtube play",
+};
+

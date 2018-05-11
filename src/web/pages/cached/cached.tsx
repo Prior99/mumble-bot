@@ -1,9 +1,10 @@
 import * as React from "react";
 import { external, inject } from "tsdi";
 import { observer } from "mobx-react";
-import { computed } from "mobx";
-import { distanceInWordsStrict, addSeconds } from "date-fns";
-import { Grid, Header, Icon, Dimmer, Loader } from "semantic-ui-react";
+import { computed, action } from "mobx";
+import { bind } from "decko";
+import { distanceInWordsStrict, addSeconds, subMinutes } from "date-fns";
+import { Button, Grid, Header, Icon, Dimmer, Loader } from "semantic-ui-react";
 import { requireLogin } from "../../utils";
 import { Content, CachedAudioSlider, CachedAudioTimeline } from "../../components";
 import { UsersStore, CachedAudioStore, LiveWebsocket } from "../../store";
@@ -32,6 +33,16 @@ export class PageCached extends React.Component {
         return `${distanceInWordsStrict(selectionStart, selectionEnd)} selected.`;
     }
 
+    @bind @action private handleFiveClick() {
+        this.cachedAudio.selectionEnd = addSeconds(new Date(), 45);
+        this.cachedAudio.selectionStart = subMinutes(new Date(), 5);
+    }
+
+    @bind @action private handleTenClick() {
+        this.cachedAudio.selectionEnd = addSeconds(new Date(), 45);
+        this.cachedAudio.selectionStart = subMinutes(new Date(), 10);
+    }
+
     public render() {
         return (
             <Dimmer.Dimmable as={Content} dimmed={this.liveWebsocket.loading}>
@@ -46,6 +57,12 @@ export class PageCached extends React.Component {
                                 <Header.Content>Cached Audios</Header.Content>
                                 <Header.Subheader>Save recordings from linked users.</Header.Subheader>
                             </Header>
+                        </Grid.Column>
+                    </Grid.Row>
+                    <Grid.Row>
+                        <Grid.Column>
+                            <Button content="Last 5 minutes" icon="time" color="blue" onClick={this.handleFiveClick} />
+                            <Button content="Last 10 minutes" icon="time" color="blue" onClick={this.handleTenClick} />
                         </Grid.Column>
                     </Grid.Row>
                     <Grid.Row>

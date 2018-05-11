@@ -29,6 +29,7 @@ export default class WorkerCommand extends Command { // tslint:disable-line
         return !path.endsWith("png") &&
             !path.endsWith("json") &&
             !path.startsWith("upload-") &&
+            !path.startsWith("youtube-") &&
             !statSync(path).isDirectory() &&
             !existsSync(this.getVisualizationFilename(path));
     }

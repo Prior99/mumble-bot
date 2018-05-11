@@ -14,25 +14,32 @@ export interface MetaProps {
 
 @external @observer
 export class Meta extends React.Component<MetaProps> {
+    private renderSource() {
+        const { source, user } = this.props.sound;
+        switch (source) {
+            case "recording":
+                return (
+                    <Link to={routeUser.path(user.id)}>
+                        <Icon name="microphone" />
+                        <Image className={css.avatar} size="mini" avatar src={user.avatarUrl} />
+                        {user.name}
+                    </Link>
+                );
+            case "youtube":
+                return <span><Icon name="youtube play" /> YouTube</span>;
+            default:
+            case "upload":
+                return <span><Icon name="upload" /> Uploaded</span>;
+        }
+    }
+
     public render() {
         const { user, creator, source, created, duration } = this.props.sound;
         return (
             <>
                 <Card.Meta>
                     <div className={css.flexContainer}>
-                        {
-                            source === "recording" ? (
-                                    <Link to={routeUser.path(user.id)}>
-                                        <Icon name="microphone" />
-                                        <Image className={css.avatar} size="mini" avatar src={user.avatarUrl} />
-                                        {user.name}
-                                    </Link>
-                            ) : (
-                                <span>
-                                    <Icon name="upload" /> Uploaded
-                                </span>
-                            )
-                        }
+                        { this.renderSource() }
                         <Link to={routeUser.path(creator.id)}>
                             <Icon name="user" />
                             <Image className={css.avatar} size="mini" avatar src={creator.avatarUrl} />

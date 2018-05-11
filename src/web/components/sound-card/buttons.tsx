@@ -25,16 +25,19 @@ export class Buttons extends React.Component<ButtonsProps> {
 
     private get audioUrl() { return `${baseUrl}/sound/${this.props.sound.id}/download`; }
 
-    public componentDidMount() {
+    public componentWillUnmount() {
+        if (typeof this.audio !== "undefined") {
+            this.audio.pause();
+            delete this.audio;
+        }
+    }
+
+    @bind private initializeAudio() {
+        if (typeof this.audio !== "undefined") { return; }
         this.audio = new Audio(this.audioUrl);
         this.audio.addEventListener("pause", () => this.paused = true);
         this.audio.addEventListener("ended", () => this.paused = true);
         this.audio.addEventListener("play", () => this.paused = false);
-    }
-
-    public componentWillUnmount() {
-        this.audio.pause();
-        delete this.audio;
     }
 
     @bind @action private async handlePlayClick() {
@@ -44,6 +47,7 @@ export class Buttons extends React.Component<ButtonsProps> {
     }
 
     @bind @action private async handlePreviewClick() {
+        this.initializeAudio();
         if (this.audio.paused) {
             this.audio.currentTime = 0;
             this.audio.play();

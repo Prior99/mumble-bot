@@ -79,15 +79,14 @@ export class AudioCache extends EventEmitter {
 
     public get sorted() {
         return this.all.sort((a, b) => {
-            if (a.date > b.date) { return -1; }
-            if (a.date < b.date) { return 1; }
+            if (a.date < b.date) { return -1; }
+            if (a.date > b.date) { return 1; }
             return 0;
         });
     }
 
     private async cleanUp() {
-        const list = this.sorted;
-        await Promise.all(list.map(async cachedAudio => {
+        await Promise.all(this.sorted.map(async cachedAudio => {
             if (this.cachedAudios.size <= this.cacheAmount) { return; }
             this.cachedAudios.delete(cachedAudio.id);
             try {

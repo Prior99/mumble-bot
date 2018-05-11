@@ -9,6 +9,7 @@ import {
     PageCached,
     PagePlaylists,
     PageUpload,
+    PageYoutube,
 } from "../pages";
 import {
     routeLogin,
@@ -21,6 +22,7 @@ import {
     routeCached,
     routePlaylists,
     routeUpload,
+    routeYoutube,
 } from ".";
 
 export const routes = [
@@ -54,5 +56,8 @@ export const routes = [
     }, {
         component: PageUpload,
         route: routeUpload,
+    }, {
+        component: PageYoutube,
+        route: routeYoutube,
     },
 ];

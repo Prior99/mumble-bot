@@ -8,3 +8,4 @@ export { PageSounds } from "./sounds";
 export { PageCached } from "./cached";
 export { PagePlaylists } from "./playlists";
 export { PageUpload } from "./upload";
+export { PageYoutube } from "./youtube";

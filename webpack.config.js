@@ -102,7 +102,10 @@ module.exports = {
         "readline": "{}",
         "winston": "{}",
         "graceful-fs": "{}",
-        "react-native-sqlite-storage": "{}"
+        "react-native-sqlite-storage": "{}",
+        "forever-agent": "{}",
+        "tls": "{}",
+        "youtube-dl": "{}",
     },
     devtool: "source-map",
     devServer: {

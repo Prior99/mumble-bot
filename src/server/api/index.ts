@@ -140,8 +140,7 @@ export class RestApi {
                     res.status(500).send();
                     error(`Error sending visualization of ${sound.id} to client.`, err);
                 }).pipe(res);
-            }
-            catch (err) {
+            } catch (err) {
                 error("Error occured during request of sound visualization.", err);
                 return res.status(500).send();
             }
@@ -161,16 +160,15 @@ export class RestApi {
             res.status(404).send();
             return;
         }
-
-        res.setHeader("Content-disposition", `attachment; filename='${sound.description}.mp3'`);
+        const attachmentName = sound.description.toLowerCase().replace(/[^a-z0-9]/gi, "-");
+        res.setHeader("Content-disposition", `attachment; filename='${attachmentName}.mp3'`);
         try {
             res.status(200);
             createReadStream(fileName).on("error", (err) => {
                 error(`Error sending audio file ${fileName} to client.`, err);
                 res.status(500).send();
             }).pipe(res);
-        }
-        catch (err) {
+        } catch (err) {
             error("Error occured during request of sound visualization.", err);
             return res.status(500).send();
         }
@@ -193,8 +191,7 @@ export class RestApi {
                 error(`Error sending visualization of ${fileName} to client.`, err);
                 res.status(500).send();
             }).pipe(res);
-        }
-        catch (err) {
+        } catch (err) {
             error("Error occured during request of sound visualization.", err);
             return res.status(500).send();
         }

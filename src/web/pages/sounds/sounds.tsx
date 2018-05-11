@@ -50,6 +50,12 @@ const sourceOptions = [
         text: "Upload",
         icon: "upload",
     },
+    {
+        key: "youtube",
+        value: "youtube",
+        text: "YouTube",
+        icon: "youtube play",
+    },
 ];
 
 const sortOptions = [

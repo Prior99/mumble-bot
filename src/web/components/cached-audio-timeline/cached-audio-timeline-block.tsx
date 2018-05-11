@@ -26,16 +26,19 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
 
     private audio: HTMLAudioElement;
 
-    public componentDidMount() {
+    public componentWillUnmount() {
+        if (typeof this.audio !== "undefined") {
+            this.audio.pause();
+            delete this.audio;
+        }
+    }
+
+    @bind private initializeAudio() {
+        if (typeof this.audio !== "undefined") { return; }
         this.audio = new Audio(this.audioUrl);
         this.audio.addEventListener("pause", () => this.paused = true);
         this.audio.addEventListener("ended", () => this.paused = true);
         this.audio.addEventListener("play", () => this.paused = false);
-    }
-
-    public componentWillUnmount() {
-        this.audio.pause();
-        delete this.audio;
     }
 
     @computed private get left() {
@@ -59,6 +62,7 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
     }
 
     @bind @action private handleOpen() {
+        this.initializeAudio();
         this.isOpen = true;
         this.audio.play();
     }
@@ -69,6 +73,7 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
     }
 
     @bind @action private handlePlay(event: React.MouseEvent<HTMLButtonElement>) {
+        this.initializeAudio();
         event.preventDefault();
         if (this.audio.paused) {
             this.audio.currentTime = 0;
