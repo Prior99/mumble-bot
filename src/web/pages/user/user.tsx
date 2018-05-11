@@ -177,10 +177,10 @@ export class PageUser extends React.Component<PageUserProps> {
                         </Table.Cell>
                     </Table.Row>
                 </Table>
-                <h3>Change Password</h3>
                 {
                     this.canEdit && (
                         <Form loading={this.passwordLoading} size="large" onSubmit={this.handleChangePasswordSubmit}>
+                            <h3>Change Password</h3>
                             <Form.Field error={!this.passwordValid}>
                                 <Input
                                     icon="lock"
