@@ -49,9 +49,14 @@ function App() {
 const errors = tsdi.get(ErrorStore);
 const controllerOptions: ControllerOptions = {
     baseUrl,
-    errorHandler: (err) => errors.report({
-        message: err.answer ? err.answer.message : err.message ? err.message : "Unknown error.",
-    }),
+    errorHandler: err => {
+        errors.report({
+            message: err.answer ? err.answer.message : err.message ? err.message : "Unknown error.",
+        });
+        if (err.statusCode === 401) {
+            tsdi.get(LoginStore).logout();
+        }
+    },
     authorizationProvider: (headers: Headers) => {
         const loginStore = tsdi.get(LoginStore);
         if (loginStore.loggedIn) {

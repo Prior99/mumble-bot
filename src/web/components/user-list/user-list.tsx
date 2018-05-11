@@ -2,7 +2,7 @@ import * as React from "react";
 import { observer } from "mobx-react";
 import { external, inject } from "tsdi";
 import { bind } from "decko";
-import { List, Image } from "semantic-ui-react";
+import { List, Image, Icon } from "semantic-ui-react";
 import { UsersStore } from "../../store";
 import { User } from "../../../common";
 import { History } from "history";
@@ -18,12 +18,16 @@ export class UserList extends React.Component {
     }
 
     @bind private renderUser(user: User) {
-        const { id, name, avatarUrl } = user;
+        const { id, name, avatarUrl, enabled, admin } = user;
         return (
             <List.Item onClick={() => this.handleClick(id)}>
                 <Image avatar src={avatarUrl} size="mini" />
                 <List.Content>
-                    <List.Header>{name}</List.Header>
+                    <List.Header>
+                        {name}
+                        { !enabled && <Icon color="red" name="lock" /> }
+                        { admin && <Icon color="green" name="wizard" /> }
+                    </List.Header>
                 </List.Content>
             </List.Item>
         );

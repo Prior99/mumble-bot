@@ -78,7 +78,13 @@ export class AppBar extends React.Component {
                                         content="Settings"
                                         onClick={() => this.browserHistory.push(routeSettings.path())}
                                     />
-                                    <Dropdown.Item content="Logout" onClick={this.login.logout} />
+                                    <Dropdown.Item
+                                        content="Logout"
+                                        onClick={() => {
+                                            this.login.logout();
+                                            window.location.href = "/";
+                                        }}
+                                    />
                                 </Dropdown.Menu>
                             </Dropdown>,
                         ]

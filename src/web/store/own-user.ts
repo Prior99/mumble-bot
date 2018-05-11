@@ -1,4 +1,4 @@
-import { observable, action } from "mobx";
+import { observable, action, computed } from "mobx";
 import { bind } from "decko";
 import { component, initialize, inject } from "tsdi";
 
@@ -18,5 +18,10 @@ export class OwnUserStore {
         if (this.login.loggedIn) {
             this.user = await this.users.getUser(this.login.userId);
         }
+    }
+
+    @computed public get admin() {
+        if (!this.user) { return false; }
+        return this.user.admin;
     }
 }

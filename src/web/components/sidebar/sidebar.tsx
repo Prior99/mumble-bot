@@ -62,7 +62,7 @@ export class AppSidebar extends React.Component {
                     content="Logout"
                     onClick={() => {
                         this.login.logout();
-                        this.sidebar.visibilityToggled = false;
+                        window.location.href = "/";
                     }}
                     icon="sign out"
                 />

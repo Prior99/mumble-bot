@@ -54,7 +54,6 @@ export class LoginStore {
         this.clearStorage();
         this.authToken = undefined;
         this.userId = undefined;
-        window.location.reload();
     }
 
     @bind

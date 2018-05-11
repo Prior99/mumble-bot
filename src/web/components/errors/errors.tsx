@@ -24,8 +24,8 @@ export class Errors extends React.Component {
                     {latestError.message}
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button basic color="red" invert onClick={dismiss}>
-                        <Icon name="remove" /> Dismiss
+                    <Button basic color="red" invert onClick={() => window.location.href = "/"}>
+                        <Icon name="remove" /> Reload Page
                     </Button>
                 </Modal.Actions>
             </Modal>

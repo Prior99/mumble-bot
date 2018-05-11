@@ -41,6 +41,10 @@ export class UsersStore {
         return this.users.get(id);
     }
 
+    @bind @action public async updateUser(id: string, user: User) {
+        this.users.set(id, await this.usersController.updateUser(id, user));
+    }
+
     @computed public get dropdownOptions() {
         return this.all.map(user => ({
             key: user.id,

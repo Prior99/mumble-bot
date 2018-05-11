@@ -184,6 +184,9 @@ export class Sounds {
         @body(updateSound) sound: Sound,
         @context ctx?: Context,
     ): Promise<Sound>{
+        if (!await this.db.getRepository(Sound).findOne(id)) {
+            return notFound<Sound>(`No sound with id "${id}"`);
+        }
         await this.db.getRepository(Sound).update(id, sound);
 
         const { name } = await ctx.currentUser();

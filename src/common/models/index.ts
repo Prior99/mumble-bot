@@ -13,17 +13,12 @@ export { PlaylistEntry } from "./playlist-entry";
 import { PlaylistEntry } from "./playlist-entry";
 export { MumbleLink } from "./mumble-link";
 import { MumbleLink } from "./mumble-link";
-export { Permission } from "./permission";
-export { PermissionAssociation } from "./permission-association";
-import { PermissionAssociation } from "./permission-association";
 export { Token } from "./token";
 import { Token } from "./token";
 export { MumbleUser } from "./mumble-user";
 export { Channel } from "./channel";
 export { QueueItem } from "./queue-item";
 export { ForkOptions } from "./fork-options";
-export { Setting } from "./setting";
-import { Setting } from "./setting";
 export { SoundsQueryResult } from "./sounds-query-result";
 import { SoundsQueryResult } from "./sounds-query-result";
 export { LiveEvent } from "./live-event";
@@ -36,8 +31,6 @@ export const allDatabaseModels = [
     Playlist,
     PlaylistEntry,
     MumbleLink,
-    PermissionAssociation,
     Token,
-    Setting,
     SoundsQueryResult,
 ];

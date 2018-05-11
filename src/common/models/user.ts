@@ -1,8 +1,8 @@
 import { Column, PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
 import { is, scope, specify, length, uuid, transform, only, required, precompute } from "hyrest";
-import { live, world, login, owner, signup, createMumbleLink, listPlaylists } from "../scopes";
+import { live, world, login, owner, signup, createMumbleLink, listPlaylists, updateUser } from "../scopes";
 import { hash } from "../utils";
-import { Sound, PermissionAssociation, Token, Setting, MumbleLink, Playlist } from ".";
+import { Sound, Token, MumbleLink, Playlist } from ".";
 import * as gravatar from "gravatar-url";
 
 /**
@@ -21,7 +21,7 @@ export class User {
     @is()
         .validate(length(3, 100), only(signup, required))
         .validateCtx(ctx => only(signup, value => ctx.validation.nameAvailable(value)))
-    @scope(world, signup)
+    @scope(world, signup, updateUser)
     public name?: string;
 
     /**
@@ -29,14 +29,14 @@ export class User {
      */
     @Column("varchar", { length: 200 })
     @transform(hash)
-    @is().validate(length(8, 255)) @scope(login)
+    @is().validate(length(8, 255)) @scope(login, updateUser)
     public password?: string;
 
     @Column("varchar", { length: 200 })
     @is()
-        .validate(length(8, 200), required)
+        .validate(length(8, 200), only(login, required))
         .validateCtx(ctx => only(signup, value => ctx.validation.emailAvailable(value)))
-    @scope(owner, login)
+    @scope(owner, login, updateUser)
     public email?: string;
 
     @Column("integer", { default: 0 })
@@ -50,22 +50,10 @@ export class User {
     @is() @scope(world) @specify(() => Sound)
     public reported?: Sound[];
 
-    @OneToMany(() => PermissionAssociation, permissionAssociation => permissionAssociation.user)
-    @is() @scope(world) @specify(() => PermissionAssociation)
-    public permissionAssociations?: PermissionAssociation[];
-
     @OneToMany(() => Token, token => token.user)
     @is() @specify(() => Token)
     @scope(owner)
     public tokens?: Token[];
-
-    /**
-     * The custom settings of the user are stored key-value-wise in this object.
-     */
-    @OneToMany(() => Setting, setting => setting.user)
-    @is() @specify(() => Setting)
-    @scope(owner)
-    public settings?: Setting[];
 
     @OneToMany(() => MumbleLink, mumbleLink => mumbleLink.user)
     @is() @specify(() => MumbleLink)
@@ -81,4 +69,12 @@ export class User {
         }
         return gravatar(this.email, { size: 200, default: "identicon" });
     }
+
+    @Column("boolean", { default: false })
+    @is() @scope(world, updateUser)
+    public enabled?: boolean;
+
+    @Column("boolean", { default: false })
+    @is() @scope(world, updateUser)
+    public admin?: boolean;
 }

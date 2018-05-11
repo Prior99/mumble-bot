@@ -12,7 +12,6 @@ import {
     Sound,
     Tag,
     SoundTagRelation,
-    PermissionAssociation,
     Playlist,
     PlaylistEntry,
 } from "../common";
@@ -255,40 +254,6 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         info("All recording label relations migrated.");
     }
 
-    private async migratePermission(sourcePermission: SourcePermission) {
-        info(`Migrating permission ${sourcePermission.user} -> ${sourcePermission.permission} ...`);
-        const targetPermission = new PermissionAssociation();
-        Object.assign(targetPermission, {
-            user: this.userIdMapping.get(sourcePermission.user),
-            permission: sourcePermission.permission,
-        });
-        await this.targetDb.getRepository(PermissionAssociation).save(targetPermission);
-    }
-
-    private async migratePermissions() {
-        info("Migrating permissions ...");
-        const rows = await this.sourceDb.query(`
-            SELECT
-                user,
-                permission
-            FROM UserPermissions
-            WHERE
-                permission = "login" OR
-                permission = "grant" OR
-                permission = "be-quiet"
-        `);
-        info(`Found ${rows.length} permissions to migrate.`);
-        for (let row of rows) {
-            try {
-                await this.migratePermission(row);
-            } catch (err) {
-                error(`Unable to migrate permission ${row.user} -> ${row.permission}: ${err.message}`);
-                console.error(err);
-            }
-        }
-        info("All permissions migrated.");
-    }
-
     private async migrateDialogPart(sourceDialogPart: SourceDialogPart) {
         info(`Migrating dialog part ${sourceDialogPart.id} ...`);
         const targetPlaylistEntry = new PlaylistEntry();
@@ -364,6 +329,7 @@ export default class MigrateCommand extends Command { // tslint:disable-line
             password: sourceUser.password,
             email: sourceUser.email,
             score: sourceUser.money,
+            enabled: true,
         });
         await this.targetDb.getRepository(User).save(targetUser);
         this.userIdMapping.set(sourceUser.id, targetUser.id);
@@ -501,7 +467,6 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         mkdirp.sync(this.config.targetSoundsDir);
 
         await this.migrateUsers();
-        await this.migratePermissions();
         await this.migrateMumbleLinks();
         await this.migrateRecordings();
         await this.migrateDialogs();

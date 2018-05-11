@@ -53,9 +53,13 @@ export class RestApi {
                 .authorization(async req => {
                     const id = getAuthTokenId(req);
                     if (!id) { return false; }
-                    const token = await this.tsdi.get(Connection).getRepository(Token).findOne(id);
+                    const token = await this.tsdi.get(Connection).getRepository(Token).findOne({
+                        where: { id },
+                        relations: ["user"],
+                    });
                     if (!token) { return false; }
                     if (token.deleted) { return false; }
+                    if (!token.user.enabled) { return false; }
                     return true;
                 }),
         );
