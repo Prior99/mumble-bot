@@ -57,7 +57,7 @@ export class Buttons extends React.Component<ButtonsProps> {
         return (
             <div className={css.buttonContainer}>
                 <Button
-                    content="Play"
+                    className={css.button}
                     icon="volume up"
                     label={{ as: "a", basic: true, pointing: "right", content: used }}
                     labelPosition="left"
@@ -67,7 +67,7 @@ export class Buttons extends React.Component<ButtonsProps> {
                     color="green"
                 />
                 <Button
-                    content="Preview"
+                    className={css.button}
                     icon={this.paused ? "headphone" : "stop"}
                     onClick={this.handlePreviewClick}
                     color="blue"

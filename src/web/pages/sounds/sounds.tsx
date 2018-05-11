@@ -257,7 +257,7 @@ export class PageSounds extends React.Component {
                                     computer={4}
                                     key={sound.id}
                                 >
-                                    <SoundCard sound={sound} />
+                                    <SoundCard id={sound.id} />
                                 </Grid.Column>
                             ))
                         }

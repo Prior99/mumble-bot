@@ -1,21 +1,21 @@
 import * as React from "react";
 import { Image, Card  } from "semantic-ui-react";
 import { observer } from "mobx-react";
-import { Sound } from "../../../common";
+import { computed } from "mobx";
+import { external, inject } from "tsdi";
+import { SoundsStore } from "../../store";
 import { Description } from "./description";
 import { Tags } from "./tags";
 import { Meta } from "./meta";
 import { Buttons } from "./buttons";
 
-export interface SoundCardProps {
-    sound: Sound;
-}
-
 declare const baseUrl: string;
 
-@observer
-export class SoundCard extends React.Component<SoundCardProps> {
-    private get sound() { return this.props.sound; }
+@observer @external
+export class SoundCard extends React.Component<{ id: string }> {
+    @inject private sounds: SoundsStore;
+
+    @computed private get sound() { return this.sounds.sounds.get(this.props.id); }
 
     private get visualizationUrl() { return `${baseUrl}/sound/${this.sound.id}/visualized`; }
 

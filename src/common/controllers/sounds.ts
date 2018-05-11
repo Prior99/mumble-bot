@@ -16,6 +16,7 @@ import {
     notFound,
     populate,
     badRequest,
+    conflict,
 } from "hyrest";
 import { rename } from "fs-extra";
 import { component, inject } from "tsdi";
@@ -154,11 +155,18 @@ export class Sounds {
         @body(tagSound) tag: Tag,
         @context ctx?: Context,
     ): Promise<Sound>{
-        if (!await this.db.getRepository(Sound).findOne(id)) {
+        const sound = await this.db.getRepository(Sound).findOne({
+            where: { id },
+            relations: ["soundTagRelations", "soundTagRelations.tag"],
+        });
+        if (!sound) {
             return notFound<Sound>(`No sound with id "${id}"`);
         }
         if (!await this.db.getRepository(Tag).findOne(tag.id)) {
             return notFound<Sound>(`No tag with id "${tag.id}"`);
+        }
+        if (sound.soundTagRelations.some(relation => relation.tag.id === tag.id)) {
+            return conflict<Sound>(`Sound was already tagged with tag "${tag.id}"`);
         }
         await this.db.getRepository(SoundTagRelation).save({
             sound: { id },

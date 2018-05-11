@@ -1,5 +1,4 @@
 import * as React from "react";
-import { action } from "mobx";
 import { bind } from "decko";
 import { Label, Icon } from "semantic-ui-react";
 import { Tag } from "../../../common";
@@ -11,11 +10,12 @@ export interface TagLabelProps {
 }
 
 export class TagLabel extends React.Component<TagLabelProps> {
-    private handleClick() {
+    @bind private handleClick() {
         if (this.props.onClick) { this.props.onClick(); }
     }
 
-    @bind @action private handleRemove() {
+    @bind private handleRemove(event: React.MouseEvent<HTMLDivElement>) {
+        event.stopPropagation();
         if (this.props.onRemove) { this.props.onRemove(); }
     }
 

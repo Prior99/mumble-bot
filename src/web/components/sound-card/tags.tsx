@@ -1,6 +1,6 @@
 import * as React from "react";
 import { observer } from "mobx-react";
-import { action, observable } from "mobx";
+import { action, observable, computed } from "mobx";
 import { bind } from "decko";
 import { external, inject } from "tsdi";
 import { Icon, Label, Dropdown } from "semantic-ui-react";
@@ -13,7 +13,7 @@ export interface TagsProps {
     sound: Sound;
 }
 
-@external @observer
+@observer @external
 export class Tags extends React.Component<TagsProps> {
     @inject private sounds: SoundsStore;
     @inject private tags: TagsStore;
@@ -21,7 +21,9 @@ export class Tags extends React.Component<TagsProps> {
     @observable private editTags = false;
     @observable private tagsLoading = false;
 
-    @bind @action private handleUntag(tag: Tag) { this.sounds.untag(this.props.sound, tag); }
+    @bind @action private async handleUntag(tag: Tag) {
+        await this.sounds.untag(this.props.sound, tag);
+    }
 
     @bind @action private handleStartEditTags() { this.editTags = true; }
 
@@ -33,13 +35,23 @@ export class Tags extends React.Component<TagsProps> {
         this.tagsLoading = false;
     }
 
+    @computed private get tagList() {
+        return this.props.sound.soundTagRelations.map(relation => relation.tag);
+    }
+
+    @computed private get dropdownOptions() {
+        return this.tags.dropdownOptions.filter(option => {
+            return !this.props.sound.soundTagRelations.some(relation => relation.tag.id === option.value);
+        });
+    }
+
     public render() {
         return (
             <>
                 <Label.Group className={css.tagGroup}>
                     {
-                        this.props.sound.soundTagRelations.map(({ id, tag }) => (
-                            <TagLabel key={id} tag={tag} onRemove={this.editTags && (() => this.handleUntag(tag))}/>
+                        this.tagList.map(tag => (
+                            <TagLabel key={tag.id} tag={tag} onRemove={this.editTags && (() => this.handleUntag(tag))}/>
                         ))
                     }
                     {
@@ -59,7 +71,7 @@ export class Tags extends React.Component<TagsProps> {
                             selection
                             selectOnNavigation={false}
                             selectOnBlur={false}
-                            options={this.tags.dropdownOptions}
+                            options={this.dropdownOptions}
                             onChange={this.handleAddTagChange}
                             loading={this.tagsLoading}
                             disabled={this.tagsLoading}

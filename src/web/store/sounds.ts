@@ -20,8 +20,7 @@ export class SoundsStore {
     }
 
     @bind @action public async untag(sound: Sound, tag: Tag) {
-        const updatedSound = await this.soundsController.untagSound(sound.id, tag.id);
-        Object.assign(this.sounds.get(sound.id), updatedSound);
+        this.sounds.set(sound.id, await this.soundsController.untagSound(sound.id, tag.id));
     }
 
     @bind @action public async tag(sound: Sound, tagIdOrName: string) {
@@ -30,12 +29,11 @@ export class SoundsStore {
             this.sounds.set(sound.id, await this.soundsController.tagSound(sound.id, { id: tag.id }));
             return;
         }
-        const updatedSound = await this.soundsController.tagSound(sound.id, { id: tagIdOrName });
-        Object.assign(this.sounds.get(sound.id), updatedSound);
+        this.sounds.set(sound.id, await this.soundsController.tagSound(sound.id, { id: tagIdOrName }));
     }
 
     @bind @action public async update(id: string, sound: Sound) {
-        Object.assign(this.sounds.get(id), await this.soundsController.updateSound(id, sound));
+        this.sounds.set(id, await this.soundsController.updateSound(id, sound));
     }
 
     @bind @action public async play(sound: Sound) {
@@ -44,13 +42,12 @@ export class SoundsStore {
             sound: { id: sound.id },
         } as QueueItem);
         sound.used++;
+        this.sounds.set(sound.id, sound);
     }
 
     @bind @action public async query(query: SoundsQuery) {
         const result = await this.soundsController.querySounds(query);
-        result.sounds.forEach(sound => {
-            this.sounds.set(sound.id, sound);
-        });
+        result.sounds.forEach(sound => this.sounds.set(sound.id, sound));
         return result;
     }
 
