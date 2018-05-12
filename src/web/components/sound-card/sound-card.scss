@@ -1,6 +1,7 @@
 .flexContainer {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
 
     a {
         color: inherit;
@@ -10,13 +11,10 @@
     }
 
     > * {
-        display: block;
+        display: inline-block;
+        white-space: nowrap;
+        padding-right: 10px;
     }
-}
-
-.avatar {
-    margin-right: 5px;
-    transform: scale(0.7, 0.7);
 }
 
 .tagGroup  {

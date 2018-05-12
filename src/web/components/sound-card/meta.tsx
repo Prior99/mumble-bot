@@ -6,6 +6,8 @@ import { Image, Icon, Card } from "semantic-ui-react";
 import { distanceInWordsToNow } from "date-fns";
 import { Sound } from "../../../common";
 import { routeUser } from "../../routing";
+import { SoundSource } from "../sound-source";
+import { MiniUserBadge } from "../mini-user-badge";
 import * as css from "./sound-card.scss";
 
 export interface MetaProps {
@@ -14,24 +16,6 @@ export interface MetaProps {
 
 @external @observer
 export class Meta extends React.Component<MetaProps> {
-    private renderSource() {
-        const { source, user } = this.props.sound;
-        switch (source) {
-            case "recording":
-                return (
-                    <Link to={routeUser.path(user.id)}>
-                        <Icon name="microphone" />
-                        <Image className={css.avatar} size="mini" avatar src={user.avatarUrl} />
-                        {user.name}
-                    </Link>
-                );
-            case "youtube":
-                return <span><Icon name="youtube play" /> YouTube</span>;
-            default:
-            case "upload":
-                return <span><Icon name="upload" /> Uploaded</span>;
-        }
-    }
 
     public render() {
         const { user, creator, source, created, duration } = this.props.sound;
@@ -39,19 +23,11 @@ export class Meta extends React.Component<MetaProps> {
             <>
                 <Card.Meta>
                     <div className={css.flexContainer}>
-                        { this.renderSource() }
-                        <Link to={routeUser.path(creator.id)}>
-                            <Icon name="user" />
-                            <Image className={css.avatar} size="mini" avatar src={creator.avatarUrl} />
-                            {creator.name}
-                        </Link>
+                        <span><SoundSource sound={this.props.sound} /></span>
+                        <span><Icon name="add user" /> <MiniUserBadge user={creator} /></span>
+                        <span><Icon name="add to calendar" /> {distanceInWordsToNow(created)} ago</span>
+                        <span><Icon name="time" /> {duration.toFixed(2)}s</span>
                     </div>
-                </Card.Meta>
-                <Card.Meta>
-                    <Icon name="add to calendar" /> {distanceInWordsToNow(created)} ago
-                </Card.Meta>
-                <Card.Meta>
-                    <Icon name="time" /> {duration.toFixed(2)}s
                 </Card.Meta>
             </>
         );

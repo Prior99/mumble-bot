@@ -51,7 +51,7 @@ export class PageYoutube extends React.Component {
             return (
                 <Message key={index} positive={okay} negative={!okay} onDismiss={onDismiss}>
                     <Message.Header>
-                        <Icon name={okay ? "check" : "cancel"} /> Import Failed
+                        <Icon name={okay ? "check" : "cancel"} /> {okay ? "Success" : "Import Failed"}
                     </Message.Header>
                     {
                         okay ? (
@@ -81,9 +81,9 @@ export class PageYoutube extends React.Component {
                     </Grid.Row>
                     <Grid.Row>
                         <Header as="h2" icon textAlign="center">
-                            <Icon name="upload" />
-                            <Header.Content>Upload Sounds</Header.Content>
-                            <Header.Subheader>Upload sounds from your disk.</Header.Subheader>
+                            <Icon name="youtube play" />
+                            <Header.Content>YouTube Importer</Header.Content>
+                            <Header.Subheader>Add sounds by importing them from YouTube.</Header.Subheader>
                         </Header>
                     </Grid.Row>
                     <Grid.Row>

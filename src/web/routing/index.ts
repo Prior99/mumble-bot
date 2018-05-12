@@ -47,6 +47,11 @@ export const routeUser: Route = {
     pattern: "/user/:id",
 };
 
+export const routeSound: Route = {
+    path: (id: string) => `/sound/${id}`,
+    pattern: "/sound/:id",
+};
+
 export const routeSettings: Route = {
     path: () => "/settings",
     pattern: "/settings",

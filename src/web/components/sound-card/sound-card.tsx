@@ -1,9 +1,11 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 import { Image, Card  } from "semantic-ui-react";
 import { observer } from "mobx-react";
 import { computed } from "mobx";
 import { external, inject } from "tsdi";
 import { SoundsStore } from "../../store";
+import { routeSound } from "../../routing";
 import { Description } from "./description";
 import { Tags } from "./tags";
 import { Meta } from "./meta";
@@ -23,7 +25,9 @@ export class SoundCard extends React.Component<{ id: string }> {
         const { sound, visualizationUrl } = this;
         return (
             <Card fluid>
-                <Image height={80} src={visualizationUrl} />
+                <Link to={routeSound.path(this.sound.id)}>
+                    <Image height={80} src={visualizationUrl} />
+                </Link>
                 <Card.Content>
                     <Card.Description><Description sound={sound} /></Card.Description>
                 </Card.Content>

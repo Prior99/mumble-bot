@@ -10,6 +10,7 @@ import {
     PagePlaylists,
     PageUpload,
     PageYoutube,
+    PageSound,
 } from "../pages";
 import {
     routeLogin,
@@ -23,6 +24,7 @@ import {
     routePlaylists,
     routeUpload,
     routeYoutube,
+    routeSound,
 } from ".";
 
 export const routes = [
@@ -59,5 +61,8 @@ export const routes = [
     }, {
         component: PageYoutube,
         route: routeYoutube,
+    }, {
+        component: PageSound,
+        route: routeSound,
     },
 ];
