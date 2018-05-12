@@ -115,6 +115,10 @@ export class Sounds {
             .leftJoinAndSelect("sound.user", "user")
             .leftJoinAndSelect("sound.soundTagRelations", "soundTagRelation")
             .leftJoinAndSelect("soundTagRelation.tag", "tag")
+            .leftJoin("sound.parent", "parent")
+            .leftJoin("sound.children", "children")
+            .addSelect("parent.id")
+            .addSelect("children.id")
             .getOne();
         if (!sound) {
             return notFound<Sound>(`No sound with id "${id}"`);
@@ -245,7 +249,11 @@ export class Sounds {
             .leftJoinAndSelect("sound.soundTagRelations", "soundTagRelation")
             .leftJoinAndSelect("soundTagRelation.tag", "tag")
             .leftJoinAndSelect("sound.creator", "creator")
-            .leftJoinAndSelect("sound.user", "user");
+            .leftJoinAndSelect("sound.user", "user")
+            .leftJoin("sound.parent", "parent")
+            .leftJoin("sound.children", "children")
+            .addSelect("parent.id")
+            .addSelect("children.id");
         if (startDate) { queryBuilder.andWhere("created > :startDate", { startDate: new Date(startDate) }); }
         if (endDate) { queryBuilder.andWhere("created < :endDate", { endDate: new Date(endDate) }); }
         if (search) {
