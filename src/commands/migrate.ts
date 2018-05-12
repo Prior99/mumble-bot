@@ -86,6 +86,8 @@ export default class MigrateCommand extends Command { // tslint:disable-line
     private userIdMapping: Map<number, string> = new Map();
     private labelIdMapping: Map<number, string> = new Map();
     private recordingIdMapping: Map<number, string> = new Map();
+    private recordingIdReverseMapping: Map<string, number> = new Map();
+    private recordingParentIdMapping: Map<number, number> = new Map();
     private playlistIdMapping: Map<number, string> = new Map();
 
     private async confirm() {
@@ -399,6 +401,21 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         info("All uploaded sounds migrated.");
     }
 
+    private async migrateRecordingParents() {
+        const allSounds = await this.targetDb.getRepository(Sound).find();
+        for (let i = 0; i < allSounds.length; ++i) {
+            const sound = allSounds[i];
+            const sourceId = this.recordingIdReverseMapping.get(sound.id);
+            const sourceParentId = this.recordingParentIdMapping.get(sourceId);
+            if (typeof sourceParentId !== "number") { continue; }
+            const targetParentId = this.recordingIdMapping.get(sourceParentId);
+            info(`Migrating parent relationship for ${sound.id} -> ${targetParentId}.`);
+            await this.targetDb.getRepository(Sound).update(sound.id, {
+                parent: { id: targetParentId },
+            });
+        }
+    }
+
     private async migrateRecording(sourceRecording: SourceRecording) {
         info(`Migrating recording (${sourceRecording.id}) ...`);
         const targetSound = new Sound();
@@ -423,6 +440,10 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         const targetPath = `${this.config.targetSoundsDir}/${targetSound.id}`;
         writeFileSync(targetPath, readFileSync(sourcePath));
         this.recordingIdMapping.set(sourceRecording.id, targetSound.id);
+        this.recordingIdReverseMapping.set(targetSound.id, sourceRecording.id);
+        if (typeof sourceRecording.parent === "number") {
+            this.recordingParentIdMapping.set(sourceRecording.id, sourceRecording.parent);
+        }
     }
 
     private async migrateRecordings() {
@@ -437,7 +458,8 @@ export default class MigrateCommand extends Command { // tslint:disable-line
                 overwrite,
                 submitted,
                 duration,
-                changed
+                changed,
+                parent
             FROM Records
         `);
         info(`Found ${rows.length} recordings to migrate.`);
@@ -449,6 +471,7 @@ export default class MigrateCommand extends Command { // tslint:disable-line
                 console.error(err);
             }
         }
+        await this.migrateRecordingParents();
         info("All recordings migrated.");
     }
 
