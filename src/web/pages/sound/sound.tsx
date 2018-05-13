@@ -1,16 +1,14 @@
 import * as React from "react";
-import * as uuid from "uuid";
 import { Link } from "react-router-dom";
-import { ApiError } from "hyrest";
-import { action, observable, computed } from "mobx";
+import { observable, computed, action } from "mobx";
+import { bind } from "decko";
 import { distanceInWordsToNow } from "date-fns";
 import { observer } from "mobx-react";
-import { bind } from "decko";
-import { initialize, external, inject } from "tsdi";
-import { List, Card, Image, Dimmer, Loader, Icon, Grid, Header, Table } from "semantic-ui-react";
-import { SoundCard, Content, SoundSource, MiniUserBadge } from "../../components";
-import { Sounds } from "../../../common";
-import { routeSound } from "../../routing";
+import { external, inject } from "tsdi";
+import { History } from "history";
+import { List, Card, Image, Dimmer, Loader, Icon, Grid, Table, Button } from "semantic-ui-react";
+import { Content, SoundSource, MiniUserBadge } from "../../components";
+import { routeSound, routeFork } from "../../routing";
 import { SoundsStore } from "../../store";
 import { requireLogin } from "../../utils";
 import * as css from "./sound.scss";
@@ -28,8 +26,14 @@ declare const baseUrl: string;
 @requireLogin @external @observer
 export class PageSound extends React.Component<PageSoundProps> {
     @inject private sounds: SoundsStore;
+    @inject("history") private history: History;
 
     @observable private loading = true;
+    @observable private paused = true;
+
+    private audio: HTMLAudioElement;
+
+    private get audioUrl() { return `${baseUrl}/sound/${this.sound.id}/download`; }
 
     public componentWillMount() {
         this.load(this.props.match.params.id);
@@ -39,7 +43,22 @@ export class PageSound extends React.Component<PageSoundProps> {
         this.load(props.match.params.id);
     }
 
-    private async load(id: string) {
+    public componentWillUnmount() {
+        if (typeof this.audio !== "undefined") {
+            this.audio.pause();
+            delete this.audio;
+        }
+    }
+
+    @bind private initializeAudio() {
+        if (typeof this.audio !== "undefined") { return; }
+        this.audio = new Audio(this.audioUrl);
+        this.audio.addEventListener("pause", () => this.paused = true);
+        this.audio.addEventListener("ended", () => this.paused = true);
+        this.audio.addEventListener("play", () => this.paused = false);
+    }
+
+    @bind private async load(id: string) {
         this.loading = true;
         const sound = await this.sounds.byId(id);
         if (sound.parent) {
@@ -65,6 +84,26 @@ export class PageSound extends React.Component<PageSoundProps> {
         return this.sound.children.map(child => this.sounds.sounds.get(child.id));
     }
 
+    @bind @action private async handlePlayClick() {
+        this.loading = true;
+        await this.sounds.play(this.sound);
+        this.loading = false;
+    }
+
+    @bind @action private async handlePreviewClick() {
+        this.initializeAudio();
+        if (this.audio.paused) {
+            this.audio.currentTime = 0;
+            this.audio.play();
+            return;
+        }
+        this.audio.pause();
+    }
+
+    @bind @action private handleForkClick() {
+        this.history.push(routeFork.path(this.sound.id));
+    }
+
     private get visualizationUrl() { return `${baseUrl}/sound/${this.sound.id}/visualized`; }
 
     public render() {
@@ -78,7 +117,7 @@ export class PageSound extends React.Component<PageSoundProps> {
             );
         }
         const { sound, visualizationUrl } = this;
-        const { description, created, updated, source, creator, user, used, parent, children } = sound;
+        const { description, created, updated, creator, used } = sound;
         return (
             <Content>
                 <Grid>
@@ -162,6 +201,32 @@ export class PageSound extends React.Component<PageSoundProps> {
                                     )
                                 }
                             </Table>
+                        </Grid.Column>
+                    </Grid.Row>
+                    <Grid.Row>
+                        <Grid.Column width={16}>
+                            <Button
+                                content="Play"
+                                icon="volume up"
+                                label={{ as: "a", basic: true, pointing: "right", content: used }}
+                                labelPosition="left"
+                                onClick={this.handlePlayClick}
+                                loading={this.loading}
+                                disabled={this.loading}
+                                color="green"
+                            />
+                            <Button
+                                content="Preview"
+                                icon={this.paused ? "headphone" : "stop"}
+                                onClick={this.handlePreviewClick}
+                                color="blue"
+                            />
+                            <Button
+                                content="Fork"
+                                icon="fork"
+                                onClick={this.handleForkClick}
+                                color="orange"
+                            />
                         </Grid.Column>
                     </Grid.Row>
                 </Grid>

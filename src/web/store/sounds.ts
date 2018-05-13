@@ -71,4 +71,19 @@ export class SoundsStore {
         this.cachedAudio.remove({ id });
         return sound;
     }
+
+    @bind public async fork({ id }: Sound, overwrite: boolean, description: string, start: number, end: number) {
+        const forkedSound = await this.soundsController.forkSound(id, {
+            description,
+            overwrite,
+            actions: [
+                { action: "crop", start, end },
+            ],
+        });
+        this.sounds.set(forkedSound.id, forkedSound);
+        const original = this.sounds.get(id);
+        original.children.push({ id: forkedSound.id });
+        this.sounds.set(id, original);
+        return forkedSound;
+    }
 }

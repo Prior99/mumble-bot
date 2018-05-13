@@ -1,13 +1,12 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
 import { observer } from "mobx-react";
 import { external } from "tsdi";
-import { Image, Icon, Card } from "semantic-ui-react";
+import { Icon, Card } from "semantic-ui-react";
 import { distanceInWordsToNow } from "date-fns";
 import { Sound } from "../../../common";
 import { routeUser } from "../../routing";
-import { SoundSource } from "../sound-source";
 import { MiniUserBadge } from "../mini-user-badge";
+import { SoundSource } from "../sound-source";
 import * as css from "./sound-card.scss";
 
 export interface MetaProps {
@@ -18,7 +17,7 @@ export interface MetaProps {
 export class Meta extends React.Component<MetaProps> {
 
     public render() {
-        const { user, creator, source, created, duration } = this.props.sound;
+        const { creator, created, duration } = this.props.sound;
         return (
             <>
                 <Card.Meta>

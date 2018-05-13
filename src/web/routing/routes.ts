@@ -11,6 +11,7 @@ import {
     PageUpload,
     PageYoutube,
     PageSound,
+    PageFork,
 } from "../pages";
 import {
     routeLogin,
@@ -25,6 +26,7 @@ import {
     routeUpload,
     routeYoutube,
     routeSound,
+    routeFork,
 } from ".";
 
 export const routes = [
@@ -61,6 +63,9 @@ export const routes = [
     }, {
         component: PageYoutube,
         route: routeYoutube,
+    }, {
+        component: PageFork,
+        route: routeFork,
     }, {
         component: PageSound,
         route: routeSound,

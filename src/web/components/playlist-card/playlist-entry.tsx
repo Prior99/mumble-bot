@@ -4,13 +4,13 @@ import { observer } from "mobx-react";
 import { Link } from "react-router-dom";
 import { List, Image } from "semantic-ui-react";
 import { PlaylistEntry } from "../../../common";
-import { routeUser } from "../../routing";
+import { routeUser, routeSound } from "../../routing";
 
 @external @observer
 export class PlaylistEntryComponent extends React.Component<{ playlistEntry: PlaylistEntry }> {
     public render() {
         const { sound } = this.props.playlistEntry;
-        const { description, user } = sound;
+        const { description, user, id } = sound;
         return (
             <List.Item>
                 <Image avatar src={user.avatarUrl} />
@@ -20,7 +20,11 @@ export class PlaylistEntryComponent extends React.Component<{ playlistEntry: Pla
                             {user.name}
                         </Link>
                     </List.Header>
-                    <List.Description>{description}</List.Description>
+                    <List.Description>
+                        <Link to={routeSound.path(id)}>
+                            {description}
+                        </Link>
+                    </List.Description>
                 </List.Content>
             </List.Item>
         );

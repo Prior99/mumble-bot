@@ -1,21 +1,22 @@
-import { is, DataType, specify } from "hyrest";
+import { is, DataType, specify, required, scope } from "hyrest";
+import { fork } from "../scopes";
 
 export class Action {
-    @is(DataType.str)
+    @is(DataType.str).validate(required) @scope(fork)
     public action: "crop";
 
-    @is(DataType.float)
-    public begin: number;
+    @is(DataType.float).validate(required) @scope(fork)
+    public start: number;
 
-    @is(DataType.float)
+    @is(DataType.float).validate(required) @scope(fork)
     public end: number;
 }
 
 export class ForkOptions {
-    @is()
-    public quote?: string;
+    @is().validate(required) @scope(fork)
+    public description?: string;
 
-    @is()
+    @is().validate(required) @scope(fork)
     public overwrite?: boolean;
 
     @is() @specify(() => Action)

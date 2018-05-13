@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
-import { Image, SemanticICONS } from "semantic-ui-react";
+import { Image } from "semantic-ui-react";
 import { User } from "../../../common";
 import { routeUser } from "../../routing";
 import * as css from "./mini-user-badge.scss";

@@ -1,6 +1,5 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
-import { Icon, Image } from "semantic-ui-react";
+import { Icon } from "semantic-ui-react";
 import { Sound } from "../../../common";
 import { routeUser } from "../../routing";
 import { MiniUserBadge } from "../mini-user-badge";

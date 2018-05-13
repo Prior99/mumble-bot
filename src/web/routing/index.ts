@@ -47,6 +47,11 @@ export const routeUser: Route = {
     pattern: "/user/:id",
 };
 
+export const routeFork: Route = {
+    path: (id: string) => `/sound/${id}/fork`,
+    pattern: "/sound/:id/fork",
+};
+
 export const routeSound: Route = {
     path: (id: string) => `/sound/${id}`,
     pattern: "/sound/:id",
@@ -107,4 +112,3 @@ export const routeYoutube: Route = {
     title: "YouTube",
     icon: "youtube play",
 };
-

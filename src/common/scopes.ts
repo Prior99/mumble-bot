@@ -17,3 +17,4 @@ export const listPlaylists = createScope();
 export const updateUser = createScope();
 export const upload = createScope();
 export const youtubeImport = createScope();
+export const fork = createScope();

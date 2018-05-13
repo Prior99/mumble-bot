@@ -3,7 +3,7 @@ import * as classNames from "classnames";
 import { bind } from "decko";
 import { observer } from "mobx-react";
 import { observable } from "mobx";
-import * as css from "./cached-audio-brush.scss";
+import * as css from "./brush.scss";
 
 export interface CachedAudioBrushProps {
     left: number;
@@ -16,7 +16,7 @@ function clamp(i: number, min: number, max: number) {
 }
 
 @observer
-export class CachedAudioBrush extends React.Component<CachedAudioBrushProps> {
+export class Brush extends React.Component<CachedAudioBrushProps> {
     @observable private leftDragging = false;
     @observable private rightDragging = false;
     @observable private brushDragging = false;

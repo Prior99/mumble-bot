@@ -10,3 +10,4 @@ export { PagePlaylists } from "./playlists";
 export { PageUpload } from "./upload";
 export { PageYoutube } from "./youtube";
 export { PageSound } from "./sound";
+export { PageFork } from "./fork";

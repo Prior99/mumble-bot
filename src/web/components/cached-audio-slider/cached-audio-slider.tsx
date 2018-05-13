@@ -5,10 +5,10 @@ import { external, inject } from "tsdi";
 import { observer } from "mobx-react";
 import { observable, computed } from "mobx";
 import { format, addSeconds } from "date-fns";
-import * as css from "./cached-audio-slider.scss";
 import { CachedAudioStore } from "../../store";
+import { Brush } from "../brush";
 import { CachedAudioBlock } from "./cached-audio-block";
-import { CachedAudioBrush } from "./cached-audio-brush";
+import * as css from "./cached-audio-slider.scss";
 
 const tickWidth = 100;
 
@@ -132,7 +132,7 @@ export class CachedAudioSlider extends React.Component {
                     }
                     {
                         this.cachedAudio.selectionDefined && (
-                            <CachedAudioBrush
+                            <Brush
                                 left={this.brushLeft}
                                 right={this.brushRight}
                                 onChange={this.handleBrushChange}

@@ -18,6 +18,7 @@ import {
     badRequest,
     conflict,
 } from "hyrest";
+import { omit } from "ramda";
 import { rename, unlink, writeFile, createWriteStream, existsSync } from "fs-extra";
 import { component, inject } from "tsdi";
 import { Connection, Brackets } from "typeorm";
@@ -258,8 +259,8 @@ export class Sounds {
         if (endDate) { queryBuilder.andWhere("created < :endDate", { endDate: new Date(endDate) }); }
         if (search) {
             queryBuilder.andWhere(new Brackets(subQuery => {
-                subQuery.where("to_tsvector(description) @@ to_tsquery(:search)", { search })
-                    .orWhere("description ILIKE :escapedSearch", { escapedSearch: `%${search}%` });
+                subQuery.where("to_tsvector(sound.description) @@ to_tsquery(:search)", { search })
+                    .orWhere("sound.description ILIKE :escapedSearch", { escapedSearch: `%${search}%` });
             }));
         }
         if (creator) { queryBuilder.andWhere("creator.id = :creator", { creator }); }
@@ -274,7 +275,7 @@ export class Sounds {
                 ) @> :tags
             `, { tags: tags.split(",") });
         }
-        if (source) { queryBuilder.andWhere("source = :source", { source }); }
+        if (source) { queryBuilder.andWhere("sound.source = :source", { source }); }
         const totalSounds = await queryBuilder.getCount();
         const direction = sortDirection === "desc" ? "DESC" : "ASC";
         switch (sort) {
@@ -470,30 +471,42 @@ export class Sounds {
         @param("id") @is().validate(uuid) id: string,
         @body() options: ForkOptions,
         @context ctx?: Context,
-    ): Promise<{}> {
-        const { actions, quote, overwrite } = options;
-        const original = await this.getSound(id);
+    ): Promise<Sound> {
+        const original = await this.db.getRepository(Sound).findOne({
+            where: { id },
+            relations: ["parent", "children", "user", "creator"],
+        });
+        if (!original) {
+            return notFound<Sound>(`No sound with id ${id}`);
+        }
+
+        const { actions, description, overwrite } = options;
+        if (actions.length === 0) {
+            return badRequest<Sound>("No actions specified");
+        }
+        const invalidAction = actions.some(({ start, end }) => {
+            return start < 0 || start > original.duration || end < start || end > original.duration;
+        });
+        if (invalidAction) {
+            return badRequest<Sound>("Invalid action");
+        }
 
         const currentUser = await ctx.currentUser();
-        const { name } = currentUser;
-        const newDuration = actions.reduce((result, action) =>
-            action.action === "crop" ? action.begin - action.end + result : result,
-            0,
-        );
-
-        const newSound = await this.db.getRepository(Sound).save({
-            ...original,
-            quote,
+        const newDuration = actions.reduce((result, { action, start, end }) => {
+            return action === "crop" ? end - start + result : result;
+        }, 0);
+        const newSound: Sound = await this.db.getRepository(Sound).save({
+            ...omit(["id"], original),
+            description,
             overwrite,
             duration: newDuration,
             creator: currentUser,
+            parent: original,
         });
 
-        verbose(`${name} is forking record #${id}`);
-        await Promise.all(actions.map(async action => {
-            await this.crop(action.begin, action.end, original.id, newSound.id);
-        }));
+        await Promise.all(actions.map(action => this.crop(action.start, action.end, original.id, newSound.id)));
 
-        return created(newSound);
+        verbose(`User ${currentUser.id} is forked sound ${id} to ${newSound.id}`);
+        return created(await this.getSound(newSound.id));
     }
 }
