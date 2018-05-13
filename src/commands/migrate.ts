@@ -110,6 +110,7 @@ export default class MigrateCommand extends Command { // tslint:disable-line
             targetDbPort: port,
             targetDbUsername: username,
             targetDbHost: host,
+            targetDbSSL: ssl,
         } = this.config;
         info(`Connecting to target database: ${driver}://${username}:${password}@${host}:${port}/${database} ...`);
         try {
@@ -123,6 +124,7 @@ export default class MigrateCommand extends Command { // tslint:disable-line
                 port,
                 username,
                 host,
+                extra: { ssl },
             });
             info("Connected to target database.");
             return true;
@@ -140,15 +142,17 @@ export default class MigrateCommand extends Command { // tslint:disable-line
             sourceDbPort: port,
             sourceDbUsername: user,
             sourceDbHost: host,
+            sourceDbSocketPath: socketPath,
         } = this.config;
         info(`Connecting to source database: mysql://${user}:${password}@${host}:${port}/${database} ...`);
         try {
             this.sourceDb = await MySQL.createConnection({
-                database: this.config.sourceDbName,
-                password: this.config.sourceDbPassword,
-                port: this.config.sourceDbPort,
-                user: this.config.sourceDbUsername,
-                host: this.config.sourceDbHost,
+                database,
+                password,
+                port,
+                user,
+                host,
+                socketPath,
             });
             info("Connected to target database.");
             return true;

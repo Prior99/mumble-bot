@@ -4,12 +4,11 @@ After=network.target
 
 [Service]
 TimeoutStartSec=5
-#User=prior
 WorkingDirectory=/home/prior/applications/mumble-bot/
-ExecStart=/home/prior/applications/mumble-bot/node-v7.10.0-linux-x64/bin/node server worker
+ExecStart=/home/prior/applications/mumble-bot/node-v{{ node_version }}-linux-x64/bin/node server worker --config-file config.yml
 TimeoutStopSec=10
 Restart=always
-RestartSec=10
+RestartSec=5
 
 [Install]
 WantedBy=multi.target

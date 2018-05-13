@@ -23,6 +23,7 @@ export class DatabaseFactory {
             username: this.config.dbUsername,
             host: this.config.dbHost,
             dropSchema,
+            extra: { ssl: this.config.dbSSL },
         });
         info("Connected to database.");
     }

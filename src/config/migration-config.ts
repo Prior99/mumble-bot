@@ -28,6 +28,9 @@ export class MigrationConfig extends Options {
     })
     public targetDbDriver: string;
 
+    @option({ description: "Whether SSL should be used to connect to the target database." })
+    public targetDbSSL: boolean;
+
     @option({ required: true, description: "Path to the directory to store the migrated sounds in." })
     public targetSoundsDir: string;
 
@@ -45,6 +48,9 @@ export class MigrationConfig extends Options {
 
     @option({ description: "Port the source 0.2.1 database runs on." })
     public sourceDbPort: number;
+
+    @option({ description: "Socket path to use to connect to the source 0.2.1 database" })
+    public sourceDbSocketPath: string;
 
     @option({
         description: "Hostname of the server hosting the source 0.2.1 database.",

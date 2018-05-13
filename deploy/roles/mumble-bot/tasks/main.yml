@@ -1,27 +1,38 @@
 ---
 
+- name: create database
+  postgresql_db:
+    name: jenny
+    login_password: "{{ database_password }}"
+    login_user: "prior"
+    state: present
+
+- name: install extensions in database
+  postgresql_ext:
+    db: jenny
+    name: uuid-ossp
+    login_password: "{{ database_password }}"
+    login_user: "prior"
+    state: present
+
 - name: create directory
   file: path=/home/prior/applications/mumble-bot state=directory
 
 - name: copy files
-  copy:
+  synchronize:
     src: "{{ item }}"
     dest: /home/prior/applications/mumble-bot
   with_items:
-    - ../dist
-    - ../src
+    - ../server
     - ../package.json
     - ../yarn.lock
-    - ../scripts
-    - ../schema.sql
-    - ../CHANGELOG.md
     - ../typings
     - ../README.md
 
 - name: configure
   template:
-    src: config.json.j2
-    dest: '/home/prior/applications/mumble-bot/config.json'
+    src: config.yml.j2
+    dest: '/home/prior/applications/mumble-bot/config.yml'
 
 - name: add private key
   copy: content="{{ bot_key }}" dest=/home/prior/applications/mumble-bot/bot.key
@@ -33,14 +44,16 @@
 
 - name: install node
   unarchive:
-    src: https://nodejs.org/dist/v7.10.0/node-v7.10.0-linux-x64.tar.xz
+    src: https://nodejs.org/dist/v{{ node_version }}/node-v{{ node_version }}-linux-x64.tar.xz
     dest: /home/prior/applications/mumble-bot
     remote_src: yes
 
 - name: install dependencies
-  shell: './node-v7.10.0-linux-x64/bin/npm install'
+  shell: 'npm install yarn && ./node_modules/.bin/yarn'
   args:
     chdir: /home/prior/applications/mumble-bot
+  environment:
+    PATH: "/home/prior/applications/mumble-bot/node-v{{ node_version }}-linux-x64/bin:{{ ansible_env.PATH }}"
 
 - name: add systemd unit files
   template:

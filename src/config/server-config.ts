@@ -39,6 +39,9 @@ export class ServerConfig extends Options {
     @option({ description: "Whether to log all SQL queries executed." })
     public dbLogging: boolean;
 
+    @option({ description: "Whether SSL should be used to connect to the database." })
+    public dbSSL: boolean;
+
     @option({ name: "mumbleKeyFile", description: "Path to the SSL key file used to connect to mumble." })
     public keyFile: string;
 
@@ -73,7 +76,6 @@ export class ServerConfig extends Options {
                 port: 23278,
                 audioCacheAmount: 100,
                 dbPort: 5432,
-                dbHost: "localhost",
                 dbDriver: "postgres",
                 dbLogging: false,
                 language: "english",

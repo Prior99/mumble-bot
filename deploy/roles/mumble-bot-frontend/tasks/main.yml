@@ -1,0 +1,20 @@
+---
+
+- name: create directory
+  file: path=/storage/prior/applications/mumble-bot-frontend state=directory
+
+- name: copy files
+  synchronize:
+    src: "{{ item }}"
+    dest: /storage/prior/applications/mumble-bot-frontend/
+  with_items:
+    - ../dist/bundle.css
+    - ../dist/bundle.css.map
+    - ../dist/bundle.js
+    - ../dist/bundle.js.map
+    - ../dist/index.html
+
+- name: configure
+  template:
+    src: config.js.j2
+    dest: '/storage/prior/applications/mumble-bot-frontend/config.js'

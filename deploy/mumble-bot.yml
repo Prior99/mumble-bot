@@ -3,5 +3,8 @@
 - name: Mumble Bot
   hosts: 92k.de
   remote_user: prior
+  vars:
+    node_version: "8.11.1"
   roles:
     - mumble-bot
+    - mumble-bot-frontend
