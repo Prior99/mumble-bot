@@ -31,7 +31,7 @@ export class PageFork extends React.Component<PageForkProps> {
 
     private async load(id: string) {
         this.loading = true;
-        const sound = await this.sounds.byId(id);
+        await this.sounds.byId(id);
         this.loading = false;
     }
 

@@ -4,7 +4,6 @@ import { external } from "tsdi";
 import { Icon, Card } from "semantic-ui-react";
 import { distanceInWordsToNow } from "date-fns";
 import { Sound } from "../../../common";
-import { routeUser } from "../../routing";
 import { MiniUserBadge } from "../mini-user-badge";
 import { SoundSource } from "../sound-source";
 import * as css from "./sound-card.scss";

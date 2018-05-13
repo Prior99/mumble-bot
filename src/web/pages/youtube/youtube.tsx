@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as uuid from "uuid";
 import { ApiError } from "hyrest";
 import { action, observable } from "mobx";
 import { observer } from "mobx-react";
@@ -10,7 +9,6 @@ import { Content } from "../../components";
 import { Sounds } from "../../../common";
 import { UsersStore, OwnUserStore } from "../../store";
 import { requireLogin } from "../../utils";
-import * as css from "./upload.scss";
 
 interface ImportStatus {
     url: string;

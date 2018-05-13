@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Icon } from "semantic-ui-react";
 import { Sound } from "../../../common";
-import { routeUser } from "../../routing";
 import { MiniUserBadge } from "../mini-user-badge";
 
 export function SoundSource({ sound }: { sound: Sound }) {

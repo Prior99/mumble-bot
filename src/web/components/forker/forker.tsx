@@ -18,7 +18,6 @@ export class Forker extends React.Component<{ id: string }> {
     @inject private sounds: SoundsStore;
     @inject("history") private history: History;
 
-    @observable private width = 0;
     @observable private selectionStart: number;
     @observable private selectionEnd: number;
     @observable private currentTime: number;
@@ -176,7 +175,7 @@ export class Forker extends React.Component<{ id: string }> {
     private get visualizationUrl() { return `${baseUrl}/sound/${this.sound.id}/visualized`; }
 
     public render() {
-        const { sound, visualizationUrl } = this;
+        const { visualizationUrl } = this;
         const classes = classNames("ui", "card", "fluid", css.container);
         return (
             <>
