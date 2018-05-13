@@ -54,6 +54,9 @@ export class ServerConfig extends Options {
     @option({ flag: "n", description: "Name of the bot in Mumble." })
     public name: string;
 
+    @option({ flag: "l", description: "Language used for fulltext search." })
+    public language: string;
+
     @option({ flag: "P", description: "Password used to connect to Mumble. "})
     public mumblePassword: string;
 
@@ -73,6 +76,7 @@ export class ServerConfig extends Options {
                 dbHost: "localhost",
                 dbDriver: "postgres",
                 dbLogging: false,
+                language: "english",
             },
             pickBy(val => val !== undefined, loadConfigFile(this.configFile)),
             pickBy(val => val !== undefined, this),

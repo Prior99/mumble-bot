@@ -258,9 +258,14 @@ export class Sounds {
         if (startDate) { queryBuilder.andWhere("created > :startDate", { startDate: new Date(startDate) }); }
         if (endDate) { queryBuilder.andWhere("created < :endDate", { endDate: new Date(endDate) }); }
         if (search) {
+            const vectorSearch = search.replace(/\s/, " & ");
+            const { language } = this.config;
             queryBuilder.andWhere(new Brackets(subQuery => {
-                subQuery.where("to_tsvector(sound.description) @@ to_tsquery(:search)", { search })
-                    .orWhere("sound.description ILIKE :escapedSearch", { escapedSearch: `%${search}%` });
+                subQuery.where("to_tsvector(:language, sound.description) @@ to_tsquery(:language, :vectorSearch)", {
+                    language,
+                    vectorSearch,
+                })
+                .orWhere("sound.description ILIKE :escapedSearch", { escapedSearch: `%${search}%` });
             }));
         }
         if (creator) { queryBuilder.andWhere("creator.id = :creator", { creator }); }
