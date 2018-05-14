@@ -47,10 +47,10 @@ run-worker: node_modules db build-server
 
 .PHONY: run-server-integration
 run-server-integration: node_modules build-server
-	dropdb $${POSTGRES_DB:-bot-test}
-	createdb $${POSTGRES_DB:-bot-test}
-	rm -rf /tmp/bot-test/tmp
-	rm -rf /tmp/bot-test/sounds
+	dropdb $${POSTGRES_DB:-bot-test} || true
+	createdb $${POSTGRES_DB:-bot-test} || true
+	rm -rf /tmp/bot-test/tmp || true
+	rm -rf /tmp/bot-test/sounds || true
 	node server serve\
 		--url $${MUMBLE_URL:-localhost}\
 		--name test-bot\
