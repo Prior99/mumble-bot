@@ -1,3 +1,4 @@
+import { Connection } from "typeorm";
 import { api } from "./api";
 import { User } from "../common";
 
@@ -7,7 +8,14 @@ const defaultUser = {
     password: "some secure password",
 };
 
-export async function createUser(data?: User) {
+export async function createUser(data?: User, enable = true, admin = false) {
     const response = await api().post("/user").send({ ...defaultUser, ...data });
-    return response.body.data;
+    const user = response.body.data;
+    if (enable) {
+        await tsdi.get(Connection).getRepository(User).update(user.id, { enabled: true });
+    }
+    if (admin) {
+        await tsdi.get(Connection).getRepository(User).update(user.id, { admin: true });
+    }
+    return user;
 }

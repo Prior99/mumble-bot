@@ -62,6 +62,8 @@ describe("sounds controller", () => {
                         avatarUrl: speaker.avatarUrl,
                         id: speaker.id,
                         name: speaker.name,
+                        enabled: true,
+                        admin: false,
                     },
                 },
             });
@@ -234,8 +236,16 @@ describe("sounds controller", () => {
                 ...sound,
                 created: sound.created.toISOString(),
                 updated: sound.updated.toISOString(),
-                creator: omit(["email"], sound.creator),
-                user: omit(["email"], sound.user),
+                creator: {
+                    ...omit(["email"], sound.creator),
+                    enabled: true,
+                    admin: false,
+                },
+                user: {
+                    ...omit(["email"], sound.user),
+                    enabled: true,
+                    admin: false,
+                },
             }));
         });
 

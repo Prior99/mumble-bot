@@ -14,27 +14,35 @@ describe("users controller", () => {
             const { user, token } = await createUserWithToken();
             const users = [
                 {
-                    ...user,
-                    avatarUrl:
-                        "https://gravatar.com/avatar/146d377bd4771d03c8a6cd18bf26964c?size=200&default=identicon",
-                }, {
-                    ...(await createUser({ name: "2nd-user", email: "2nd@example.com" } as User)),
+                    ...(await createUser({ name: "2nd-user", email: "2nd@example.com" } as User, false)),
                     avatarUrl:
                         "https://gravatar.com/avatar/ded0c14e09f3c07d977ed341f38164eb?size=200&default=identicon",
+                    enabled: false,
+                    admin: false,
                 }, {
-                    ...(await await createUser({ name: "3rd-user", email: "3rd@example.com" } as User)),
+                    ...(await await createUser({ name: "3rd-user", email: "3rd@example.com" } as User, true, true)),
                     avatarUrl:
                         "https://gravatar.com/avatar/40b80c89af474114102231e71bbebdda?size=200&default=identicon",
+                    enabled: true,
+                    admin: true,
                 }, {
                     ...(await createUser({ name: "4th-user", email: "4th@example.com" } as User)),
                     avatarUrl:
                         "https://gravatar.com/avatar/07a03b338ba7d1eb4ab1959546334d80?size=200&default=identicon",
+                    enabled: true,
+                    admin: false,
+                }, {
+                    ...user,
+                    avatarUrl:
+                        "https://gravatar.com/avatar/146d377bd4771d03c8a6cd18bf26964c?size=200&default=identicon",
+                    enabled: true,
+                    admin: false,
                 },
             ];
             const response = await api().get("/users")
                 .set("authorization", `Bearer ${token.id}`);
             expect(response.body).toEqual({
-                data: users.map(current => pick(["name", "id", "avatarUrl"], current)),
+                data: users.map(current => pick(["name", "id", "avatarUrl", "enabled", "admin"], current)),
             });
             expect(response.status).toBe(200);
         });
@@ -71,6 +79,8 @@ describe("users controller", () => {
                     ...pick(["name", "id"], user),
                     avatarUrl:
                         "https://gravatar.com/avatar/146d377bd4771d03c8a6cd18bf26964c?size=200&default=identicon",
+                    enabled: true,
+                    admin: false,
                 },
             });
             expect(response.status).toBe(200);
@@ -92,15 +102,6 @@ describe("users controller", () => {
                 },
             });
             expect(response.status).toBe(201);
-        });
-    });
-
-    describe("GET /user/:id/permissions", () => {
-        it("responds 401 without a valid token", async () => {
-            const user = await createUser();
-            const response = await api().get(`/user/${user.id}/permissions`);
-            expect(response.body).toEqual({ message: "Unauthorized." });
-            expect(response.status).toBe(401);
         });
     });
 });

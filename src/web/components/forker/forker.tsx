@@ -61,13 +61,11 @@ export class Forker extends React.Component<{ id: string }> {
         this.loading = false;
         window.addEventListener("mousemove", this.handleMouseMove);
         window.addEventListener("mouseup", this.handleMouseUp);
-        window.addEventListener("resize", this.setWidth);
     }
 
     public componentWillUnmount() {
         window.removeEventListener("mousemove", this.handleMouseMove);
         window.removeEventListener("mouseup", this.handleMouseUp);
-        window.removeEventListener("resize", this.setWidth);
     }
 
     @computed private get brushLeft() {
@@ -90,17 +88,9 @@ export class Forker extends React.Component<{ id: string }> {
 
     @bind private refContainer(div: HTMLDivElement) {
         this.container = div;
-        this.setWidth();
-    }
-
-    @bind private setWidth() {
-        if (!this.container) { return; }
-        this.width = this.container.getBoundingClientRect().width;
     }
 
     @bind private handleMouseDown(event: React.MouseEvent<HTMLDivElement>) {
-        const rect = this.container.getBoundingClientRect();
-        this.originX = (event.pageX - rect.left) / rect.width;
         this.brushing = true;
         event.stopPropagation();
         event.preventDefault();

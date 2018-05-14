@@ -255,8 +255,8 @@ export class Sounds {
             .leftJoin("sound.children", "children")
             .addSelect("parent.id")
             .addSelect("children.id");
-        if (startDate) { queryBuilder.andWhere("created > :startDate", { startDate: new Date(startDate) }); }
-        if (endDate) { queryBuilder.andWhere("created < :endDate", { endDate: new Date(endDate) }); }
+        if (startDate) { queryBuilder.andWhere("sound.created > :startDate", { startDate: new Date(startDate) }); }
+        if (endDate) { queryBuilder.andWhere("sound.created < :endDate", { endDate: new Date(endDate) }); }
         if (search) {
             const vectorSearch = search.replace(/\s/, " & ");
             const { language } = this.config;
