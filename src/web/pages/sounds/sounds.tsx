@@ -245,7 +245,7 @@ export class PageSounds extends React.Component {
                                             selection
                                             fluid
                                             onChange={this.handleSortChange}
-                                            defaultValue={0}
+                                            defaultValue={1}
                                             options={sortOptions}
                                         />
                                         <Form.Button fluid width={3} icon labelPosition="left" label="Search">
