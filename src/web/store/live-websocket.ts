@@ -12,7 +12,7 @@ declare const baseUrl: string;
 
 @component("LiveWebsocket")
 export class LiveWebsocket extends EventEmitter {
-    @inject private loginStore: LoginStore;
+    @inject("LoginStore") private loginStore: LoginStore;
     @inject private cachedAudio: CachedAudioStore;
     @inject private queue: QueueStore;
 

@@ -1,4 +1,4 @@
-import { api, createUserWithToken, createUser, linkMumbleUser } from "../../../__tests__";
+import { api, createUserWithToken, createUser, linkMumbleUser } from "../../../test-utils";
 
 describe("mumble-links controller", () => {
     describe("POST /mumble-link", () => {

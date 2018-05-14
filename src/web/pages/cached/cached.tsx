@@ -34,12 +34,12 @@ export class PageCached extends React.Component {
     }
 
     @bind @action private handleFiveClick() {
-        this.cachedAudio.selectionEnd = addSeconds(new Date(), 45);
+        this.cachedAudio.selectionEnd = addSeconds(new Date(), 5);
         this.cachedAudio.selectionStart = subMinutes(new Date(), 5);
     }
 
     @bind @action private handleTenClick() {
-        this.cachedAudio.selectionEnd = addSeconds(new Date(), 45);
+        this.cachedAudio.selectionEnd = addSeconds(new Date(), 5);
         this.cachedAudio.selectionStart = subMinutes(new Date(), 10);
     }
 

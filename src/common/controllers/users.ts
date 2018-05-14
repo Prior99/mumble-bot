@@ -14,7 +14,7 @@ import {
 } from "hyrest";
 import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
-import { verbose, warn } from "winston";
+import { verbose, warn, info } from "winston";
 import { User } from "../models";
 import { signup, world, owner } from "../scopes";
 import { Context } from "../context";
@@ -49,7 +49,7 @@ export class Users {
      */
     @route("GET", "/user/:id").dump(User, world)
     public async getUser(@param("id") @is().validate(uuid) id: string): Promise<User> {
-        const user = await this.db.getRepository(User).findOne(id);
+        const user = await this.db.getRepository(User).findOne({ id });
         if (!user) { return notFound<User>(`No user with id "${id}"`); }
         return ok(user);
     }
@@ -61,7 +61,7 @@ export class Users {
         @context ctx?: Context,
     ): Promise<User> {
         const { admin: currentAdmin, id: currentId } = await ctx.currentUser();
-        if (!await this.db.getRepository(User).findOne(id)) {
+        if (!await this.db.getRepository(User).findOne({ id })) {
             return notFound<User>(`No sound with id "${id}"`);
         }
         if (user.admin && !currentAdmin) {
@@ -91,8 +91,16 @@ export class Users {
      */
     @route("POST", "/user").dump(User, owner) @noauth
     public async createUser(@body(signup) user: User): Promise<User> {
-        await this.db.getRepository(User).save(user);
-        verbose(`New user ${user.name} with id ${user.id} just signed up`);
-        return created(user);
+        const userCount = await this.db.getRepository(User).count();
+        const { id, name } = await this.db.getRepository(User).save({
+            ...user,
+            enabled: userCount === 0,
+            admin: userCount === 0,
+        });
+        if (userCount === 0) {
+            info(`Promoted user new ${id} to administrator as it's the first user in the system.`);
+        }
+        verbose(`New user ${name} with id ${id} just signed up`);
+        return created(await this.getUser(id));
     }
 }

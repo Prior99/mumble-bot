@@ -1,5 +1,5 @@
 import { pick } from "ramda";
-import { api, createUserWithToken, createUser } from "../../../__tests__";
+import { api, createUserWithToken, createUser } from "../../../test-utils/";
 import { User } from "../..";
 
 describe("users controller", () => {
@@ -36,7 +36,7 @@ describe("users controller", () => {
                     avatarUrl:
                         "https://gravatar.com/avatar/146d377bd4771d03c8a6cd18bf26964c?size=200&default=identicon",
                     enabled: true,
-                    admin: false,
+                    admin: true,
                 },
             ];
             const response = await api().get("/users")
@@ -80,7 +80,7 @@ describe("users controller", () => {
                     avatarUrl:
                         "https://gravatar.com/avatar/146d377bd4771d03c8a6cd18bf26964c?size=200&default=identicon",
                     enabled: true,
-                    admin: false,
+                    admin: true,
                 },
             });
             expect(response.status).toBe(200);
@@ -88,20 +88,52 @@ describe("users controller", () => {
     });
 
     describe("POST /user", () => {
-        it("creates a new user with a good request", async () => {
-            const response = await api().post("/user")
-                .send({
-                    email: "some@example.com",
-                    name: "someone",
-                    password: "some secure password",
-                });
+        it("creates a first user being an enabled admin with a good request", async () => {
+            const response = await api().post("/user").send({
+                email: "some@example.com",
+                name: "someone",
+                password: "some secure password",
+            });
             expect(response.body).toMatchObject({
                 data: {
                     email: "some@example.com",
                     name: "someone",
+                    admin: true,
+                    enabled: true,
                 },
             });
             expect(response.status).toBe(201);
+        });
+
+        it("creates a second user not being an enabled admin", async () => {
+            const response1 = await api().post("/user").send({
+                email: "first@example.com",
+                name: "first-one",
+                password: "some secure password",
+            });
+            expect(response1.body).toMatchObject({
+                data: {
+                    email: "first@example.com",
+                    name: "first-one",
+                    admin: true,
+                    enabled: true,
+                },
+            });
+            expect(response1.status).toBe(201);
+            const response2 = await api().post("/user").send({
+                email: "second@example.com",
+                name: "second-one",
+                password: "some secure password",
+            });
+            expect(response2.body).toMatchObject({
+                data: {
+                    email: "second@example.com",
+                    name: "second-one",
+                    admin: false,
+                    enabled: false,
+                },
+            });
+            expect(response2.status).toBe(201);
         });
     });
 });

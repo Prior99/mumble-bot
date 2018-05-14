@@ -4,7 +4,8 @@ import { History } from "history";
 import { component, inject, initialize } from "tsdi";
 import { Tokens, User } from "../../common";
 import { routeDashboard } from "../routing";
-import { OwnUserStore  } from "./own-user";
+import { OwnUserStore } from "./own-user";
+import { LiveWebsocket } from "./live-websocket";
 
 const softwareVersion = 2;
 const localStorageIdentifier = "software-login";
@@ -21,6 +22,7 @@ export class LoginStore {
     @inject private tokens: Tokens;
     @inject("OwnUserStore") private ownUser: OwnUserStore;
     @inject("history") private browserHistory: History;
+    @inject("LiveWebsocket") private liveWebsocket: LiveWebsocket;
 
     @observable public authToken: string;
     @observable public userId: string;
@@ -44,6 +46,7 @@ export class LoginStore {
             this.userId = user.id;
             this.save();
             await this.ownUser.loadUser();
+            this.liveWebsocket.initialize();
             this.browserHistory.replace(routeDashboard.path());
         }
         return response;

@@ -27,7 +27,20 @@ test("Signing up", async () => {
     await screenshot();
     // Click on submit.
     await (await page.$("button[type='submit']")).click();
-    await page.waitFor(5000);
+    await page.waitForSelector(".dimmer");
+    await screenshot();
+});
+
+test("Logging in", async() => {
+    await browse("/");
+    await (await page.$("input[placeholder='Email']")).type(email);
+    await (await page.$("input[placeholder='Password']")).type(password);
+    await page.waitFor(100);
+    await screenshot();
+    await (await page.$("button[type='submit']")).click();
+    await page.waitForSelector(".dimmer");
+    await screenshot();
+    await page.waitForSelector(".sidebar");
     await screenshot();
 });
 
@@ -39,8 +52,10 @@ test("Linking a user", async () => {
     // Click on the "Settings" page.
     await (await dropdown.$$("div[role='option']"))[2].click();
     await screenshot();
-    const superUserCheckbox = (await page.$x("//label[contains(text(), 'Someone')]"))[0];
-    await superUserCheckbox.click();
+    const someoneCheckbox = (await page.$x("//label[contains(text(), 'Someone')]"))[0];
+    await someoneCheckbox.click();
+    await page.waitFor(200);
+    await screenshot();
 });
 
 test("Listing all users", async () => {
@@ -51,5 +66,22 @@ test("Listing all users", async () => {
 });
 
 test("Recording", async () => {
+    await page.waitForSelector(".sidebar i.check");
+
+    const cachedPage = (await page.$x("//a[contains(text(), 'Cached Audio')]"))[0];
+    await cachedPage.click();
+    await page.waitFor(200);
+    await screenshot();
+
+    await (await page.$x("//button[contains(text(), 'Last 5 minutes')]"))[0].click();
+    await screenshot();
+
     await mumbleAgent.play();
+    await page.waitFor(1000);
+    await screenshot();
+
+    await page.waitFor(10000);
+    await mumbleAgent.play();
+    await page.waitFor(1000);
+    await screenshot();
 });

@@ -7,7 +7,7 @@
     },
     "setupTestFrameworkScriptFile": "<rootDir>/jest/jest-integration-setups.ts",
     "testMatch": [
-        "<rootDir>/**/__tests__/integration-*.(ts|tsx)"
+        "<rootDir>/integration-test/journey.ts"
     ],
     "reporters": [
         "default",

@@ -95,7 +95,7 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
 
     public render() {
         const { amplitude, date, duration } = this.props.cachedAudio;
-        const { amplitudeTotalRange, amplitudeTotalMin } = this.cachedAudio;
+        const { amplitudeTotalRange: totalRange, amplitudeTotalMin: totalMin } = this.cachedAudio;
         const classes = classNames(
             css.block,
             "inverted",
@@ -105,7 +105,7 @@ export class CachedAudioTimelineBlock extends React.Component<{ cachedAudio: Cac
         );
         const left = `${100 * this.left}%`;
         const width = `${100 * this.width}%`;
-        const normalizedAmplitude = (amplitude - amplitudeTotalMin) / amplitudeTotalRange;
+        const normalizedAmplitude = totalRange === 0 ? 1 : (amplitude - totalMin) / totalRange;
         const saturation = amplitude < amplitudeThreshold ? 0 : normalizedAmplitude;
         const backgroundColor = Color.hsl(250, 100 * saturation, 77).string();
         return (

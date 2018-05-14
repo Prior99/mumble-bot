@@ -1,4 +1,4 @@
-import { api, createUserWithToken } from "../../../__tests__";
+import { api, createUserWithToken } from "../../../test-utils";
 
 describe("utilities controller", () => {
     describe("GET /channel-tree", () => {

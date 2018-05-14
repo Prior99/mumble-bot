@@ -6,7 +6,7 @@ import {
     createTag,
     tagSound,
     createSound,
-} from "../../../__tests__";
+} from "../../../test-utils";
 import { Token, Sound, Tag, User } from "../..";
 
 describe("sounds controller", () => {
@@ -239,12 +239,12 @@ describe("sounds controller", () => {
                 creator: {
                     ...omit(["email"], sound.creator),
                     enabled: true,
-                    admin: false,
+                    admin: sound.creator.id === userA.user.id,
                 },
                 user: {
                     ...omit(["email"], sound.user),
                     enabled: true,
-                    admin: false,
+                    admin: sound.user.id === userA.user.id,
                 },
             }));
         });
