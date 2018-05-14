@@ -1,4 +1,5 @@
 import { createReadStream } from "fs";
+import { bind } from "decko";
 import { connect, Connection, Options } from "mumble";
 
 jest.unmock("mumble");
@@ -17,7 +18,7 @@ export class MumbleAgent {
         this.url = url;
     }
 
-    public connect() {
+    @bind public connect() {
         return new Promise((resolve, reject) => {
             connect(`mumble://${this.url}`, this.keyCert, (err, connection) => {
                 if (err) { reject(err); }
@@ -29,14 +30,14 @@ export class MumbleAgent {
         });
     }
 
-    public disconnect() {
+    @bind public disconnect() {
         return new Promise(resolve => {
             this.connection.on("disconnect", () => resolve());
             this.connection.disconnect();
         });
     }
 
-    public play() {
+    @bind public play() {
         const input = createReadStream(`${__dirname}/sin.pcm`);
         input.pipe(this.connection.inputStream());
         return new Promise(resolve => {
@@ -44,7 +45,7 @@ export class MumbleAgent {
         });
     }
 
-    public async reconnect() {
+    @bind public async reconnect() {
         await this.disconnect();
         await this.connect();
     }
