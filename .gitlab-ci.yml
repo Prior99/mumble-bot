@@ -24,6 +24,7 @@ integration-test:
     - apt-get -qq install -y gconf-service libasound2 libgconf-2-4 libgtk-3-0 libnspr4 libx11-xcb1
       libxss1 libxtst6 fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont
       fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils libpango1.0-dev libgif-dev build-essential
+      ffmpeg sox
   script:
     - make integration-test
   stage: test
