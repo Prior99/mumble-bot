@@ -2,7 +2,7 @@ import { api } from "./api";
 import { Tag, Sound, Token } from "../common";
 
 export async function createTag(name: string, token: Token) {
-    const response = await api().post("/tag")
+    const response = await api().post("/tags")
         .set("authorization", `Bearer ${token.id}`)
         .send({ name });
     return response.body.data;

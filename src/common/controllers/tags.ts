@@ -13,14 +13,19 @@ export class Tags {
 
     @route("GET", "/tags").dump(Tag, world)
     public async listTags(): Promise<Tag[]> {
-        return ok(await this.db.getRepository(Tag).find());
+        const tags = await this.db.getRepository(Tag).createQueryBuilder("tag")
+            .leftJoinAndSelect("tag.soundTagRelations", "soundTagRelation")
+            .leftJoin("soundTagRelation.sound", "sound")
+            .addSelect("sound.id")
+            .getMany();
+        return ok(tags);
     }
 
-    @route("POST", "/tag").dump(Tag, world)
+    @route("POST", "/tags").dump(Tag, world)
     public async createTag(@body(createTag) tag: Tag, @context ctx?: Context): Promise<Tag> {
-        await this.db.getRepository(Tag).save(tag);
+        const newTag = await this.db.getRepository(Tag).save(tag);
         const currentUser = await ctx.currentUser();
         verbose(`${currentUser.name} added new tag: "${tag.name}"`);
-        return created(tag);
+        return created(newTag);
     }
 }
