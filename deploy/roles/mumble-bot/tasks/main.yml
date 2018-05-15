@@ -61,7 +61,6 @@
     dest: '/home/prior/.config/systemd/user/{{ item }}'
   with_items:
     - mumble-bot.service
-    - mumble-bot-worker.service
 
 - name: enable and start the services
   service:
@@ -72,4 +71,3 @@
     user: yes
   with_items:
     - mumble-bot
-    - mumble-bot-worker
