@@ -6,11 +6,13 @@ import { error, info } from "winston";
 import { EventEmitter } from "events";
 import { ServerConfig } from "../config";
 import { CachedAudio, User } from "../common";
+import { VisualizerExecutor } from "../visualizer";
 
 @component
 export class AudioCache extends EventEmitter {
     @inject private db: Connection;
     @inject private config: ServerConfig;
+    @inject private visualizer: VisualizerExecutor;
 
     public cachedAudios = new Map<string, CachedAudio>();
     public cacheAmount = 4;
@@ -70,6 +72,7 @@ export class AudioCache extends EventEmitter {
      */
     public async add(cachedAudio: CachedAudio) {
         this.cachedAudios.set(cachedAudio.id, cachedAudio);
+        await this.visualizer.visualizeCached(cachedAudio.id);
         this.emit("add", cachedAudio);
         this.cleanUp();
         this.exportCache();

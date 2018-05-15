@@ -106,6 +106,7 @@ module.exports = {
         "forever-agent": "{}",
         "tls": "{}",
         "youtube-dl": "{}",
+        "canvas": "{}",
     },
     devtool: "source-map",
     devServer: {

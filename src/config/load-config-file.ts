@@ -1,11 +1,8 @@
 import * as Yaml from "yamljs";
-import { error, warn } from "winston";
+import { error } from "winston";
 
 export function loadConfigFile(filename: string): any {
-    if (!filename) {
-        warn("No config file set.");
-        return {};
-    }
+    if (!filename) { return {}; }
     try {
         const file = Yaml.load(filename);
         return file;

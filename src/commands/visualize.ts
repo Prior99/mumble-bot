@@ -1,18 +1,17 @@
 import { mkdirp, readdir, existsSync, writeFile, statSync } from "fs-extra";
+import { join } from "path";
 import { warn, error, info } from  "winston";
 import { metadata, command, Command } from "clime";
-import { watch, FSWatcher } from "chokidar";
-import { WorkerConfig } from "../config";
+import { VisualizerConfig } from "../config";
 import { AudioCache, RestApi } from "../server";
 import { setupWinston } from "../common";
-import { visualizeAudioFile } from "../worker";
+import { visualizeAudioFile } from "../visualizer";
 
 setupWinston();
 
 @command({ description: "Start the worker." })
-export default class WorkerCommand extends Command { // tslint:disable-line
+export default class VisualizerCommand extends Command { // tslint:disable-line
     private getVisualizationFilename = file => `${file}.png`;
-    private watcher: FSWatcher;
     private killed = false;
 
     private async generateVisualization(file: string) {
@@ -51,19 +50,8 @@ export default class WorkerCommand extends Command { // tslint:disable-line
         info(`All missing visualizations generated.`);
     }
 
-    private watchDirectory(path: string) {
-        info(`Watching directory ${path} for changes...`);
-        this.generateMissingVisualizations(path);
-        this.watcher = watch(`${path}/*`, { ignoreInitial: true })
-            .on("add", (file) => {
-                if (!this.shouldGenerateVisualization(file)) { return; }
-                info(`New file detected: ${file}.`);
-                this.generateVisualization(file);
-            });
-    }
-
     @metadata
-    public async execute(config: WorkerConfig) {
+    public async execute(config: VisualizerConfig) {
         if (!config.load()) { return; }
 
         try {
@@ -77,8 +65,20 @@ export default class WorkerCommand extends Command { // tslint:disable-line
             }
         }
 
-        this.generateMissingVisualizations(config.soundsDir);
-        this.watchDirectory(config.tmpDir);
+        if (config.recheck) {
+            this.generateMissingVisualizations(config.soundsDir);
+        }
+        if (config.cachedId || config.soundId) {
+            const path = config.cachedId ?
+                join(config.tmpDir, config.cachedId) :
+                join(config.soundsDir, config.soundId);
+            if (!existsSync(path)) {
+                error(`File not found: ${path}`);
+            } else {
+                info(`Visualizing file ${path}`);
+                this.generateVisualization(path);
+            }
+        }
 
         process.on("SIGINT", () => {
             if (this.killed) {
@@ -89,7 +89,6 @@ export default class WorkerCommand extends Command { // tslint:disable-line
             this.killed = true;
             warn("CTRL^C detected. Secure shutdown initiated.");
             warn("Press CTRL^C again to terminate at your own risk.");
-            this.watcher.close();
         });
     }
 }

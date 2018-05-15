@@ -1,9 +1,9 @@
 import { metadata, command, Command } from "clime";
 import { TSDI } from "tsdi";
 import { error, warn } from "winston";
-
 import { ServerConfig, ServerConfigFactory } from "../config";
 import { AudioInput, AudioOutput, AudioCache, RestApi, DatabaseFactory, MumbleFactory } from "../server";
+import { VisualizerExecutor } from "../visualizer";
 
 @command({ description: "Start the API and the bot." })
 export default class ServeCommand extends Command { // tslint:disable-line
@@ -34,6 +34,7 @@ export default class ServeCommand extends Command { // tslint:disable-line
         tsdi.get(AudioCache);
         tsdi.get(AudioInput);
         tsdi.get(AudioOutput);
+        tsdi.get(VisualizerExecutor).recheck();
 
         let killed = false;
         const kill = async () => {

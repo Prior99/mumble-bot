@@ -41,19 +41,9 @@ run-web: node_modules
 run-server: node_modules db
 	yarn start:server
 
-.PHONY: run-worker
-run-worker: node_modules db build-server
-	yarn start:worker
-
 .PHONY: test-integration
 test-integration: 
 	yarn test:integration
-
-.PHONY: run-worker-integration
-run-worker-integration: node_modules build-server
-	yarn start:worker\
-		--tmp-dir /tmp/bot-test/tmp\
-		--sounds-dir /tmp/bot-test/sounds
 
 .PHONY: run-server-integration
 run-server-integration: node_modules build-server
@@ -95,9 +85,8 @@ integration-test: node_modules
 		--success first\
 		--kill-others\
 		--prefix " {name} "\
-		--names "jest,webpack,worker,server"\
-		--prefix-colors "yellow.bold,blue.bold,red.bold,green.bold"\
+		--names "jest,webpack,server"\
+		--prefix-colors "yellow.bold,blue.bold,green.bold"\
 		"sleep 10 && make test-integration"\
 		"make run-web"\
-		"make run-worker-integration"\
 		"make run-server-integration"
