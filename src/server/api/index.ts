@@ -7,7 +7,7 @@ import { Server } from "http";
 import { Connection } from "typeorm";
 import { component, inject, initialize, TSDI, destroy } from "tsdi";
 import { info, error } from "winston";
-import { bind } from "bind-decorator";
+import { bind } from "decko";
 import { createReadStream, existsSync } from "fs-extra";
 import { hyrest } from "hyrest/middleware";
 import { AuthorizationMode, configureController, ControllerMode } from "hyrest";

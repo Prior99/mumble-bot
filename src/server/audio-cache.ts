@@ -1,5 +1,5 @@
 import { component, inject, initialize } from "tsdi";
-import mkdirp = require("mkdirp-promise");
+import { mkdirp } from "fs-extra";
 import { Connection } from "typeorm";
 import { existsSync, writeFile, unlink, readFile } from "fs-extra";
 import { error, info } from "winston";

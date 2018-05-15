@@ -2,7 +2,7 @@ import { metadata, command, Command } from "clime";
 import { createConnection, Connection as PostgresConnection } from "typeorm";
 import * as FFMpeg from "fluent-ffmpeg";
 import * as MySQL from "promise-mysql";
-import * as mkdirp from "mkdirp";
+import { mkdirp } from "fs-extra";
 import { info, error } from "winston";
 import { MigrationConfig } from "../config";
 import {
@@ -486,7 +486,7 @@ export default class MigrateCommand extends Command { // tslint:disable-line
         if (!await this.connectTargetDatabase()) { return; }
         if (!await this.connectSourceDatabase()) { return; }
 
-        mkdirp.sync(this.config.targetSoundsDir);
+        await mkdirp(this.config.targetSoundsDir);
 
         await this.migrateUsers();
         await this.migrateMumbleLinks();

@@ -1,6 +1,6 @@
 import { fft, util } from "fft-js";
 import { chunkSize } from "./visualizer";
-import * as Color from "onecolor";
+import * as Color from "color";
 
 const minHumanFreq = 125;
 const maxHumanFreq = 10000;
@@ -72,7 +72,9 @@ export class AudioAnalyzer {
         for (let i = 1; i < values.length; i++) {
             const { freq } = values[i];
             const relFreq = (freq - minHumanFreq) / (maxHumanFreq - minHumanFreq);
-            const color = Color("#FFFFFF").hue(0.05 + relFreq * 0.95, true).saturation(1).lightness(0.5).hex();
+            const color = Color
+                .hsl(360 * (0.05 + relFreq * 0.95), 100, 50)
+                .toString();
             gradient.addColorStop(i / values.length, color);
         }
         ctx.fillStyle = gradient;

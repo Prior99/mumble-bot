@@ -1,4 +1,4 @@
-import mkdirp = require("mkdirp-promise");
+import { mkdirp } from "fs-extra";
 import * as Uuid from "uuid";
 import {
     context,

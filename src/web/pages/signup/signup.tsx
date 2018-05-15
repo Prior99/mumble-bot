@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { observable, action, computed } from "mobx";
 import { observer } from "mobx-react";
 import { inject, external } from "tsdi";
-import bind from "bind-decorator";
+import { bind } from "decko";
 import { Input, Button, Form, Modal, Icon } from "semantic-ui-react";
 import { SignupStore } from "../../store";
 import { routeLogin } from "../../routing";

@@ -1,6 +1,6 @@
 import { controller, route, ok, populate } from "hyrest";
 import { component, inject } from "tsdi";
-import { bind } from "bind-decorator";
+import { bind } from "decko";
 import { Connection as MumbleConnection } from "mumble";
 import { Channel, MumbleUser } from "../models";
 import { world } from "../scopes";
