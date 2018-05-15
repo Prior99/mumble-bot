@@ -8,7 +8,7 @@ import { ServerConfig } from "../config";
 import { CachedAudio, User } from "../common";
 import { VisualizerExecutor } from "../visualizer";
 
-@component
+@component("AudioCache")
 export class AudioCache extends EventEmitter {
     @inject private db: Connection;
     @inject private config: ServerConfig;
@@ -81,11 +81,13 @@ export class AudioCache extends EventEmitter {
     public get all() { return Array.from(this.cachedAudios.values()); }
 
     public get sorted() {
-        return this.all.sort((a, b) => {
+        const sorted = this.all;
+        sorted.sort((a, b) => {
             if (a.date < b.date) { return -1; }
             if (a.date > b.date) { return 1; }
             return 0;
         });
+        return sorted;
     }
 
     private async cleanUp() {

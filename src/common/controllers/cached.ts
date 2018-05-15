@@ -6,7 +6,7 @@ import { world } from "../scopes";
 
 @controller @component
 export class Cached {
-    @inject private cache: AudioCache;
+    @inject("AudioCache") private cache: AudioCache;
 
     /**
      * Fetch a list of all cached audios.

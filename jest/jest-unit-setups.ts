@@ -15,8 +15,9 @@ process.on("uncaughtException", err => {
 Winston.remove(Winston.transports.Console);
 
 // Mock modules.
-jest.mock("../src/config/server-config-factory");
 jest.mock("mumble");
+jest.mock("../src/config/server-config-factory");
+jest.mock("../src/visualizer/executor");
 
 // Mock the local storage.
 class LocalStorageMock {
