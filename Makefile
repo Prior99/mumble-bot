@@ -52,20 +52,20 @@ test-integration:
 .PHONY: run-worker-integration
 run-worker-integration: node_modules build-server
 	yarn start:worker\
-		--tmp-dir /tmp/bot-test/tmp\
-		--sounds-dir /tmp/bot-test/sounds
+		--tmp-dir tmp/bot-test/tmp\
+		--sounds-dir tmp/bot-test/sounds
 
 .PHONY: run-server-integration
 run-server-integration: node_modules build-server
 	dropdb $${POSTGRES_DB:-bot-test} || true
 	createdb $${POSTGRES_DB:-bot-test} || true
-	rm -rf /tmp/bot-test/tmp || true
-	rm -rf /tmp/bot-test/sounds || true
+	rm -rf tmp/bot-test/tmp || true
+	rm -rf tmp/bot-test/sounds || true
 	node server serve\
 		--url $${MUMBLE_URL:-localhost}\
 		--name test-bot\
-		--tmp-dir /tmp/bot-test/tmp\
-		--sounds-dir /tmp/bot-test/sounds\
+		--tmp-dir tmp/bot-test/tmp\
+		--sounds-dir tmp/bot-test/sounds\
 		--port 23278\
 		--db-name $${POSTGRES_DB:-bot-test}\
 		--db-username $${POSTGRES_USER:-$$USER}\
