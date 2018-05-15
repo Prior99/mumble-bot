@@ -1,16 +1,9 @@
 import { omit } from "ramda";
 import { populate } from "hyrest";
-import {
-    api,
-    createSoundWithCreatorAndSpeaker,
-    createUserWithToken,
-    createTag,
-    tagSound,
-    createSound,
-} from "../../../test-utils";
+import { api, createUserWithToken } from "../../../test-utils";
 import { world } from "../../scopes";
 import { AudioCache } from "../../../server";
-import { Token, Sound, Tag, User, CachedAudio } from "../../models";
+import { Token, User, CachedAudio } from "../../models";
 
 describe("cached controller", () => {
     let user: User;
