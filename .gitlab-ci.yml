@@ -65,7 +65,7 @@ lint:
 deploy:
   image: "alpine:3.5"
   before_script:
-    - apk --update add ansible git openssh python py2-pip
+    - apk --update add ansible git openssh python py2-pip rsync
     - mkdir ~/.ssh
     - echo "$SSH_KEY" > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
