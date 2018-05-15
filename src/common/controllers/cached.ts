@@ -8,6 +8,9 @@ import { world } from "../scopes";
 export class Cached {
     @inject private cache: AudioCache;
 
+    /**
+     * Fetch a list of all cached audios.
+     */
     @route("GET", "/cached").dump(CachedAudio, world)
     public async listCached(): Promise<CachedAudio[]> {
         return ok(this.cache.sorted);
