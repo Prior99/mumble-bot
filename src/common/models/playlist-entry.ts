@@ -16,7 +16,7 @@ export class PlaylistEntry {
     public sound?: Sound;
 
     @ManyToOne(() => Playlist, playlist => playlist.entries)
-    @is() @scope(world, createPlaylist)
+    @is() @scope(world)
     public playlist?: Playlist;
 
     @Column("integer")

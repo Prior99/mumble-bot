@@ -1,8 +1,8 @@
-import { context, body, controller, route, ok, created } from "hyrest";
+import { notFound, context, body, controller, route, ok, created, param, uuid, is } from "hyrest";
 import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { verbose } from "winston";
-import { Playlist } from "../models";
+import { Playlist, PlaylistEntry } from "../models";
 import { createPlaylist, listPlaylists } from "../scopes";
 import { Context } from "../context";
 
@@ -12,19 +12,36 @@ export class Playlists {
 
     @route("GET", "/playlists").dump(Playlist, listPlaylists)
     public async listPlaylists(): Promise<Playlist[]> {
-        const playlists = await this.db.getRepository(Playlist).find({
-            relations: ["creator", "entries", "entries.sound"],
-        });
+        const playlists = await this.db.getRepository(Playlist).createQueryBuilder("playlist")
+            .leftJoinAndSelect("playlist.creator", "creator")
+            .leftJoinAndSelect("playlist.entries", "entry")
+            .leftJoinAndSelect("entry.sound", "sound")
+            .orderBy("playlist.created", "DESC")
+            .addOrderBy("entry.position", "ASC")
+            .getMany();
         return ok(playlists);
     }
 
-    @route("POST", "/playlist").dump(Playlist, listPlaylists)
-    public async createPlaylist(@body(createPlaylist) playlist: Playlist, @context ctx?: Context): Promise<Playlist> {
-        await this.db.getRepository(Playlist).save(playlist);
+    @route("GET", "/playlist/:id").dump(Playlist, listPlaylists)
+    public async getPlaylist(@param("id") @is().validate(uuid) id: string): Promise<Playlist> {
+        const playlist = await this.db.getRepository(Playlist).createQueryBuilder("playlist")
+            .where("playlist.id = :id", { id })
+            .leftJoinAndSelect("playlist.creator", "creator")
+            .leftJoinAndSelect("playlist.entries", "entry")
+            .leftJoinAndSelect("entry.sound", "sound")
+            .orderBy("playlist.created", "DESC")
+            .addOrderBy("entry.position", "ASC")
+            .getOne();
+        if (!playlist) { return notFound<Playlist>(`No playlist with id ${id}`); }
+        return ok(playlist);
+    }
 
+    @route("POST", "/playlists").dump(Playlist, listPlaylists)
+    public async createPlaylist(@body(createPlaylist) data: Playlist, @context ctx?: Context): Promise<Playlist> {
         const { name } = await ctx.currentUser();
+        const playlist = await this.db.getRepository(Playlist).save(data);
+        await this.db.getRepository(PlaylistEntry).save(data.entries.map(entry => ({ ...entry, playlist })));
         verbose(`${name} created a new playlist ${playlist.id}`);
-
-        return created(playlist);
+        return created(await this.getPlaylist(playlist.id));
     }
 }
