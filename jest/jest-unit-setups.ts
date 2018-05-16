@@ -53,16 +53,10 @@ class LocalStorageMock {
     setTimeout(() => callback(10), 10);
 };
 
-// Setup TSDI.
-let tsdi: TSDI;
-beforeEach(() => {
-    tsdi = new TSDI();
+beforeEach(async () => {
+    const tsdi = new TSDI();
     tsdi.enableComponentScanner();
     (global as any).tsdi = tsdi;
-});
-
-// Prepare database.
-beforeEach(async () => {
     const databaseFactory = tsdi.get(DatabaseFactory);
     await databaseFactory.connect(true);
     await tsdi.get(MumbleFactory).connect();
@@ -70,5 +64,7 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
-    tsdi.close();
+    if ((global as any).tsdi) {
+        (global as any).tsdi.close();
+    }
 });
