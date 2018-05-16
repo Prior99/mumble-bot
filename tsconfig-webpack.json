@@ -3,16 +3,12 @@
         "target": "es6",
         "module": "commonjs",
         "declaration": false,
-        "noImplicitAny": false,
-        "removeComments": true,
         "experimentalDecorators": true,
         "noLib": false,
         "jsx": "react",
         "outDir": "dist",
-        "lib": ["es2016", "webworker", "dom"],
+        "lib": ["es2016", "dom"],
         "emitDecoratorMetadata": true,
-        "allowSyntheticDefaultImports": true,
-        "skipLibCheck": true,
         "sourceMap": true
     },
     "include": [
