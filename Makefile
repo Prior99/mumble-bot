@@ -90,3 +90,11 @@ integration-test: node_modules
 		"sleep 10 && make test-integration"\
 		"make run-web"\
 		"make run-server-integration"
+
+.PHONY: coverage-report
+coverage-report:
+	$$BROWSER coverage/lcov-report/index.html
+
+.PHONY: jest-screenshot-report
+jest-screenshot-report:
+	$$BROWSER jest-screenshot-report/index.html
