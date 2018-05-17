@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`queue controller POST /queue with type="cached audio" enqueues a cached audio 1`] = `111958`;
+
+exports[`queue controller POST /queue with type="playlist" enqueues a playlist 1`] = `223916`;
+
+exports[`queue controller POST /queue with type="sound" enqueues a sound 1`] = `111958`;

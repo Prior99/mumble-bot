@@ -26,7 +26,7 @@ export class MumbleFactory {
         info("Connected to mumble.");
     }
 
-    @factory
+    @factory({ name: "MumbleConnection" })
     public getConnection(): Connection { return this.conn; }
 
     @destroy

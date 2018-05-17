@@ -65,6 +65,11 @@ export class MockMumbleConnection {
     public mockInput = new PassThrough();
     public mockOutput = new PassThrough();
 
+    constructor() {
+        (this.mockInput as any).close = () => this.mockInput.destroy();
+        (this.mockOutput as any).close = () => this.mockInput.destroy();
+    }
+
     public mockUsers = [
         userStrangerOne,
         userStrangerTwo,
@@ -90,6 +95,8 @@ export class MockMumbleConnection {
     }
 
     public disconnect() {
+        this.inputStream().end();
+        this.outputStream().end();
         if (this.disconnectCallback) {
             this.disconnectCallback();
         }

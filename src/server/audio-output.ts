@@ -17,9 +17,9 @@ const msInS = 1000;
  * Audio output for the bot. This class handles the whole audio output,
  * including both TTS and sounds.
  */
-@component
+@component("AudioOutput")
 export class AudioOutput extends EventEmitter {
-    @inject private mumble: MumbleConnection;
+    @inject("MumbleConnection") private mumble: MumbleConnection;
     @inject private config: ServerConfig;
     @inject private db: Connection;
 
@@ -88,6 +88,7 @@ export class AudioOutput extends EventEmitter {
                         this.mumbleStream.write(chunk);
                     })
                     .on("end", () => {
+                        if (this.stopped) { return; }
                         const timeAlreadyTaken = Date.now() - startTime;
                         const totalTime = (samplesTotal / audioFreq) * msInS;
                         const waitTime = totalTime - timeAlreadyTaken;
@@ -109,7 +110,9 @@ export class AudioOutput extends EventEmitter {
         this.queue = [];
         this.busy = false;
         this.mumbleStream.close();
-        this.passThrough.destroy();
+        if (this.passThrough) {
+            this.passThrough.destroy();
+        }
         this.mumbleStream = this.mumble.inputStream();
         this.emit("clear");
     }
@@ -172,6 +175,15 @@ export class AudioOutput extends EventEmitter {
         this.stopped = true;
         this.mumbleStream.close();
         this.mumbleStream.end();
+        if (this.passThrough) { this.passThrough.end(); }
+        if (this.ffmpeg) {
+            try {
+                this.ffmpeg.kill();
+            } catch (err) {} //tslint:disable-line
+        }
+        if (this.transcodeTimeout) {
+            clearTimeout(this.transcodeTimeout);
+        }
         this.clear();
         info("Output stopped.");
     }

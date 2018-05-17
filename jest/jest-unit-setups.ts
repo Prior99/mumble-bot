@@ -3,11 +3,11 @@ import * as Winston from "winston";
 import { DatabaseFactory, MumbleFactory, AudioInput } from "../src/server";
 
 process.on("unhandledRejection", err => {
-    console.error(`Unhandled Promise rejection: ${err.message}`);
+    console.error(`Unhandled Promise rejection: ${err && err.message}`);
     console.error(err);
 });
 process.on("uncaughtException", err => {
-    console.error(`Unhandled Promise rejection: ${err.message}`);
+    console.error(`Unhandled Promise rejection: ${err && err.message}`);
     console.error(err);
 });
 

@@ -3,7 +3,7 @@ import {
     body,
     controller,
     route,
-    ok,
+    created,
     internalServerError,
     badRequest,
 } from "hyrest";
@@ -17,8 +17,8 @@ import { Context } from "../context";
 
 @controller @component
 export class Queue {
-    @inject private audioOutput: AudioOutput;
-    @inject private audioCache: AudioCache;
+    @inject("AudioOutput") private audioOutput: AudioOutput;
+    @inject("AudioCache") private audioCache: AudioCache;
     @inject private db: Connection;
 
     @route("POST", "/queue").dump(QueueItem, world)
@@ -64,6 +64,6 @@ export class Queue {
         this.audioOutput.enqueue(queueItem);
         verbose(`User ${currentUser.name} enqueued ${queueItem.type} #${queueItem.relevantId}.`);
 
-        return ok(queueItem);
+        return created(queueItem);
     }
 }
