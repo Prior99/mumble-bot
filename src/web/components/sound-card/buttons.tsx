@@ -5,7 +5,7 @@ import { bind } from "decko";
 import { external, inject } from "tsdi";
 import { Button  } from "semantic-ui-react";
 import { Sound } from "../../../common";
-import { SoundsStore } from "../../store";
+import { SoundsStore, PlaylistsStore } from "../../store";
 import * as css from "./sound-card.scss";
 
 export interface ButtonsProps {
@@ -17,6 +17,7 @@ declare const baseUrl: string;
 @observer @external
 export class Buttons extends React.Component<ButtonsProps> {
     @inject private sounds: SoundsStore;
+    @inject private playlists: PlaylistsStore;
 
     @observable private loading = false;
     @observable private paused = true;
@@ -56,6 +57,10 @@ export class Buttons extends React.Component<ButtonsProps> {
         this.audio.pause();
     }
 
+    @bind @action private handleAddQuickListClick() {
+        this.playlists.addQuickEntry(this.props.sound);
+    }
+
     public render() {
         const { used } = this.props.sound;
         return (
@@ -75,6 +80,12 @@ export class Buttons extends React.Component<ButtonsProps> {
                     icon={this.paused ? "headphone" : "stop"}
                     onClick={this.handlePreviewClick}
                     color="blue"
+                />
+                <Button
+                    className={css.button}
+                    icon="add"
+                    onClick={this.handleAddQuickListClick}
+                    color="yellow"
                 />
             </div>
         );

@@ -4,7 +4,10 @@ import { Sidebar, Dimmer, Loader } from "semantic-ui-react";
 import * as classNames from "classnames/bind";
 import { inject, external } from "tsdi";
 import { SidebarStore, LoginStore, UsersStore } from "../../store";
-import { Errors, AppBar, AppSidebar  } from "..";
+import { Errors } from "../errors";
+import { AppBar } from "../app-bar";
+import { AppSidebar } from "../sidebar";
+import { QuickList } from "./quick-list";
 import * as css from "./app-container.scss";
 import { isProductionEnvironment } from "../../../common";
 
@@ -31,6 +34,7 @@ export class AppContainer extends React.Component<{}, undefined> {
         }
         return (
             <div>
+                <QuickList />
                 <Errors />
                 <Sidebar.Pushable className={css.content}>
                     <AppSidebar />

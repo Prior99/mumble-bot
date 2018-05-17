@@ -22,4 +22,8 @@ export class PlaylistEntry {
     @Column("integer")
     @is() @scope(world, createPlaylist, listPlaylists)
     public position?: number;
+
+    @Column("integer", { default: 0 })
+    @is() @scope(world, createPlaylist, listPlaylists)
+    public pitch?: number;
 }

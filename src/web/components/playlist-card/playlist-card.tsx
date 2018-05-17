@@ -7,6 +7,7 @@ import { observer } from "mobx-react";
 import { Playlist } from "../../../common";
 import { PlaylistEntryComponent } from "./playlist-entry";
 import { PlaylistsStore } from "../../store";
+import { Description } from "./description";
 import * as css from "./playlist-card.scss";
 
 @external @observer
@@ -61,6 +62,9 @@ export class PlaylistCard extends React.Component<{ playlist: Playlist }> {
         const { used } = this.props.playlist;
         return (
             <Card fluid>
+                <Card.Content>
+                    <Card.Description><Description playlist={this.props.playlist} /></Card.Description>
+                </Card.Content>
                 <Card.Content>{this.renderEntries()}</Card.Content>
                 <Card.Content extra>
                     <Button

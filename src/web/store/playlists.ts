@@ -1,7 +1,7 @@
 import { observable, computed, action } from "mobx";
 import { bind } from "decko";
 import { component, inject, initialize } from "tsdi";
-import { Playlists, Playlist, Queue, QueueItem } from "../../common";
+import { Sound, Playlists, Playlist, Queue, QueueItem, PlaylistEntry } from "../../common";
 import { SoundsStore } from "./sounds";
 import { UsersStore } from "./users";
 
@@ -14,6 +14,7 @@ export class PlaylistsStore {
 
     @observable public playlists = new Map<string, Playlist>();
     @observable public loading = true;
+    @observable public quickList: PlaylistEntry[] = [];
 
     @initialize
     protected async initialize() {
@@ -45,5 +46,44 @@ export class PlaylistsStore {
             playlist: { id: playlist.id },
         } as QueueItem);
         playlist.used++;
+    }
+
+    @bind @action public addQuickEntry(sound: Sound) {
+        const { pitch } = this.soundsStore;
+        this.quickList.push({
+            sound,
+            pitch,
+        });
+    }
+
+    @bind @action public async playQuickList() {
+        await Promise.all(this.quickList.map(async ({ sound, pitch }) => {
+            await this.queue.enqueue({
+                type: "sound",
+                sound: { id: sound.id },
+                pitch,
+            } as QueueItem);
+        }));
+    }
+
+    @bind @action public clearQuickList() {
+        this.quickList = [];
+    }
+
+    @bind @action public removeQuickListEntry(index: number) {
+        this.quickList.splice(index, 1);
+    }
+
+    @bind @action public async saveQuickList() {
+        const playlist = await this.playlistsController.createPlaylist({
+            name: `Playlist from ${new Date().toDateString()}`,
+            entries: this.quickList,
+        } as Playlist);
+        this.playlists.set(playlist.id, playlist);
+        this.quickList = [];
+    }
+
+    @bind @action public async update(id: string, playlist: Playlist) {
+        this.playlists.set(id, await this.playlistsController.updatePlaylist(id, playlist));
     }
 }

@@ -3,8 +3,9 @@ import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
 import { verbose } from "winston";
 import { Playlist, PlaylistEntry } from "../models";
-import { createPlaylist, listPlaylists } from "../scopes";
+import { createPlaylist, listPlaylists, updatePlaylist } from "../scopes";
 import { Context } from "../context";
+import { world } from "../";
 
 @controller @component
 export class Playlists {
@@ -43,5 +44,23 @@ export class Playlists {
         await this.db.getRepository(PlaylistEntry).save(data.entries.map(entry => ({ ...entry, playlist })));
         verbose(`${name} created a new playlist ${playlist.id}`);
         return created(await this.getPlaylist(playlist.id));
+    }
+
+    @route("POST", "/playlist/:id").dump(Playlist, world)
+    public async updateSound(
+        @param("id") @is().validate(uuid) id: string,
+        @body(updatePlaylist) playlist: Playlist,
+        @context ctx?: Context,
+    ): Promise<Playlist>{
+        if (!await this.db.getRepository(Playlist).findOne(id)) {
+            return notFound<Playlist>(`No playlist with id "${id}"`);
+        }
+        await this.db.getRepository(Playlist).update(id, playlist);
+
+        const { name } = await ctx.currentUser();
+        verbose(`${name} edited playlist #${id}`);
+
+        const updated = await this.getPlaylist(id);
+        return ok(updated);
     }
 }

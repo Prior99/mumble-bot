@@ -1,7 +1,7 @@
 import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, CreateDateColumn, OneToMany } from "typeorm";
 import { is, scope, specify, uuid, DataType } from "hyrest";
-import { world, createPlaylist, enqueue, live, listPlaylists } from "../scopes";
-import { PlaylistEntry } from ".";
+import { world, createPlaylist, enqueue, live, listPlaylists, updatePlaylist } from "../scopes";
+import { PlaylistEntry } from "./playlist-entry";
 import { User } from "./";
 
 /**
@@ -28,7 +28,7 @@ export class Playlist {
     public created?: Date;
 
     @Column("text")
-    @scope(world, createPlaylist, listPlaylists) @is()
+    @scope(world, createPlaylist, listPlaylists, updatePlaylist) @is()
     public name?: string;
 
     /**

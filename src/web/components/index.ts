@@ -16,3 +16,4 @@ export * from "./sound-source";
 export * from "./mini-user-badge";
 export * from "./forker";
 export * from "./brush";
+export * from "./quick-list";

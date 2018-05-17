@@ -37,6 +37,7 @@ export class AppBar extends React.Component {
 
     public render() {
         const { user } = this.ownUser;
+        if (!this.login.loggedIn) { return null; }
         return (
             <Menu color="violet" inverted className={css.appBar} attached>
                 <Menu.Menu position={"left" as "right"}>
