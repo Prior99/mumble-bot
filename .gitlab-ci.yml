@@ -16,7 +16,7 @@ variables:
 image: "node:9-stretch"
 before_script:
   - apt-get -qq update
-  - apt-get -qq install -y build-essential
+  - apt-get -qq install -y build-essential ffmpeg sox
 
 integration-test:
   before_script:
