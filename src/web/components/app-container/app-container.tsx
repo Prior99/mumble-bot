@@ -7,7 +7,7 @@ import { SidebarStore, LoginStore, UsersStore } from "../../store";
 import { Errors } from "../errors";
 import { AppBar } from "../app-bar";
 import { AppSidebar } from "../sidebar";
-import { QuickList } from "./quick-list";
+import { QuickList } from "../quick-list";
 import * as css from "./app-container.scss";
 import { isProductionEnvironment } from "../../../common";
 
@@ -34,7 +34,7 @@ export class AppContainer extends React.Component<{}, undefined> {
         }
         return (
             <div>
-                <QuickList />
+                { this.login.loggedIn && <QuickList /> }
                 <Errors />
                 <Sidebar.Pushable className={css.content}>
                     <AppSidebar />

@@ -29,9 +29,9 @@ export class Description extends React.Component<DescriptionProps> {
 
     @bind @action private async handleFinishEditDescription() {
         const { description } = this;
-        if (description !== this.props.playlist.description) {
+        if (description !== this.props.playlist.name) {
             this.descriptionLoading = true;
-            await this.playlists.update(this.props.playlist.id, { name: description });
+            await this.playlists.update(this.props.playlist.id, { name: description } as Playlist);
             this.descriptionLoading = false;
         }
         this.editDescription = false;
@@ -88,4 +88,3 @@ export class Description extends React.Component<DescriptionProps> {
         );
     }
 }
-

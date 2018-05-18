@@ -1,5 +1,24 @@
 .container {
     position: fixed;
     bottom: 0;
-    right: 10px;
+    right: 0;
+    z-index: 100;
+
+    .quickList {
+        border-radius: .28571429rem .28571429rem 0 0;
+        margin-right: 20px;
+
+        .item {
+            cursor: default !important;
+        }
+
+        .dropdownContent {
+            margin-right: 30px;
+        }
+
+        .icon {
+            cursor: pointer;
+            margin-top: 5px !important;
+        }
+    }
 }

@@ -39,15 +39,18 @@ export class Playlists {
 
     @route("POST", "/playlists").dump(Playlist, listPlaylists)
     public async createPlaylist(@body(createPlaylist) data: Playlist, @context ctx?: Context): Promise<Playlist> {
-        const { name } = await ctx.currentUser();
-        const playlist = await this.db.getRepository(Playlist).save(data);
+        const { name, id: creatorId } = await ctx.currentUser();
+        const playlist = await this.db.getRepository(Playlist).save({
+            ...data,
+            creator: { id: creatorId },
+        });
         await this.db.getRepository(PlaylistEntry).save(data.entries.map(entry => ({ ...entry, playlist })));
         verbose(`${name} created a new playlist ${playlist.id}`);
         return created(await this.getPlaylist(playlist.id));
     }
 
     @route("POST", "/playlist/:id").dump(Playlist, world)
-    public async updateSound(
+    public async updatePlaylist(
         @param("id") @is().validate(uuid) id: string,
         @body(updatePlaylist) playlist: Playlist,
         @context ctx?: Context,

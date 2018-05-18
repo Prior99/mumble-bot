@@ -17,7 +17,7 @@ export class PlaylistsStore {
     @observable public quickList: PlaylistEntry[] = [];
 
     @initialize
-    protected async initialize() {
+    public async initialize() {
         const playlists = await this.playlistsController.listPlaylists();
         await Promise.all(playlists.map(async playlist => {
             playlist.creator = this.usersStore.byId(playlist.creator.id);
@@ -74,11 +74,19 @@ export class PlaylistsStore {
         this.quickList.splice(index, 1);
     }
 
-    @bind @action public async saveQuickList() {
+    @bind @action public async saveQuickList(description: string) {
         const playlist = await this.playlistsController.createPlaylist({
-            name: `Playlist from ${new Date().toDateString()}`,
-            entries: this.quickList,
+            name: description,
+            entries: this.quickList.map(({ pitch, sound }, position) => ({
+                position,
+                sound: { id: sound.id },
+                pitch,
+            })),
         } as Playlist);
+        playlist.entries = await Promise.all(playlist.entries.map(async entry => ({
+            ...entry,
+            sound: await this.soundsStore.byId(entry.sound.id),
+        })));
         this.playlists.set(playlist.id, playlist);
         this.quickList = [];
     }

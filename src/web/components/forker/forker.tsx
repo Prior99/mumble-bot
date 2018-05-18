@@ -91,6 +91,8 @@ export class Forker extends React.Component<{ id: string }> {
     }
 
     @bind private handleMouseDown(event: React.MouseEvent<HTMLDivElement>) {
+        const rect = this.container.getBoundingClientRect();
+        this.originX = (event.pageX - rect.left) / rect.width;
         this.brushing = true;
         event.stopPropagation();
         event.preventDefault();
@@ -167,6 +169,7 @@ export class Forker extends React.Component<{ id: string }> {
     public render() {
         const { visualizationUrl } = this;
         const classes = classNames("ui", "card", "fluid", css.container);
+        console.log(this.sound)
         return (
             <>
                 <Dimmer.Dimmable dimmed={this.loading}>
