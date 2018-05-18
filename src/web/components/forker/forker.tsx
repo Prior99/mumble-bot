@@ -169,7 +169,6 @@ export class Forker extends React.Component<{ id: string }> {
     public render() {
         const { visualizationUrl } = this;
         const classes = classNames("ui", "card", "fluid", css.container);
-        console.log(this.sound)
         return (
             <>
                 <Dimmer.Dimmable dimmed={this.loading}>

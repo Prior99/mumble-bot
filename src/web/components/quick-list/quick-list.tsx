@@ -57,7 +57,7 @@ export class QuickList extends React.Component {
         if (!this.visible) { return null; }
         return (
             <div className={css.container}>
-                <Menu inverted className={css.quickList}>
+                <Menu className={css.quickList}>
                     <Dropdown
                         floating
                         item
@@ -94,7 +94,6 @@ export class QuickList extends React.Component {
                     </Dropdown>
                     <Input
                         onChange={this.handleDescription}
-                        inverted
                         icon="file"
                         placeholder={this.descriptionPlaceholder}
                     />
