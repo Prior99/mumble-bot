@@ -9,9 +9,12 @@ const password = "some secure password";
 test("Signing up", async () => {
     // Browse to login page.
     await browse("/");
+    await page.waitForSelector("a[href='/signup']");
     await screenshot();
     // Click on link for signup.
+    console.log("CLICK NON APGE")
     await (await page.$("a[href='/signup']")).click();
+    console.log("CLICK NON APGE DONE")
     await screenshot();
     // Type in username, email, password, but repeat wrong password.
     await (await page.$("input[placeholder='Username']")).type(username);
