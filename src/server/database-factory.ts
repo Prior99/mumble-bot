@@ -33,7 +33,9 @@ export class DatabaseFactory {
 
     @destroy
     public async stop() {
-        await this.conn.close();
-        info("Disconnected from database.");
+        if (this.conn) {
+            await this.conn.close();
+            info("Disconnected from database.");
+        }
     }
 }
