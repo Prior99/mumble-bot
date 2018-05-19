@@ -186,6 +186,13 @@ export class PageSounds extends React.Component {
                         <Grid.Column width={16}>
                             <Form onSubmit={this.handleSearchSubmit}>
                                     <Form.Group>
+                                        <Form.Input
+                                            icon="search"
+                                            label="Search in description"
+                                            width={4}
+                                            placeholder="Fulltext search"
+                                            onChange={this.handleSearchChange}
+                                        />
                                         <Form.Dropdown
                                             label="Search for Tag"
                                             width={4}
@@ -199,13 +206,6 @@ export class PageSounds extends React.Component {
                                             onChange={this.handleTagChange}
                                             closeOnChange={false}
                                             multiple
-                                        />
-                                        <Form.Input
-                                            icon="search"
-                                            label="Search in description"
-                                            width={4}
-                                            placeholder="Fulltext search"
-                                            onChange={this.handleSearchChange}
                                         />
                                         <Form.Dropdown
                                             label="Search for User"

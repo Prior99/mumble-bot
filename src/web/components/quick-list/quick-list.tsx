@@ -12,9 +12,9 @@ import * as css from "./quick-list.scss";
 export class QuickList extends React.Component {
     @inject private playlists: PlaylistsStore;
 
-    @observable private open = false;
     @observable private loading = false;
     @observable private description = "";
+    @observable private open = false;
 
     @computed private get visible() {
         return this.playlists.quickList.length > 0;
@@ -22,6 +22,12 @@ export class QuickList extends React.Component {
 
     @computed private get descriptionPlaceholder() {
         return `Playlist from ${new Date().toLocaleString()}`;
+    }
+
+    @computed private get dropdownText() {
+        const { quickList } = this.playlists;
+        if (quickList.length === 1) { return `1 item`; }
+        return `${quickList.length} items`;
     }
 
     @bind @action public async handlePlay() {
@@ -45,30 +51,40 @@ export class QuickList extends React.Component {
         this.playlists.removeQuickListEntry(index);
     }
 
-    @bind @action public handleDropdownToggle() {
-        this.open = !this.open;
-    }
-
     @bind @action public handleDescription(event: React.SyntheticInputEvent) {
         this.description = event.currentTarget.value;
+    }
+
+    @bind @action public handleDropdownClick() {
+        this.open = !this.open;
     }
 
     public render() {
         if (!this.visible) { return null; }
         return (
             <div className={css.container}>
-                <Menu className={css.quickList}>
+                <Menu inverted color="violet" className={css.quickList}>
+                    <Menu.Item>
+                        <Input
+                            onChange={this.handleDescription}
+                            inverted
+                            icon="file"
+                            transparent
+                            placeholder="Enter name..."
+                        />
+                    </Menu.Item>
                     <Dropdown
-                        floating
                         item
-                        text="Quicklist"
+                        text={this.dropdownText}
                         upward
-                        closeOnChange={false}
-                        closeOnBlur={false}
+                        onClick={this.handleDropdownClick}
                         open={this.open}
-                        onClick={this.handleDropdownToggle}
                     >
-                        <Dropdown.Menu direction="left" disabled={this.loading}>
+                        <Dropdown.Menu
+                            direction={this.open ? "left" : undefined}
+                            disabled={this.loading}
+                            open={this.open}
+                        >
                             {
                                 this.playlists.quickList.map((entry, index) => {
                                     return (
@@ -92,11 +108,6 @@ export class QuickList extends React.Component {
                             }
                         </Dropdown.Menu>
                     </Dropdown>
-                    <Input
-                        onChange={this.handleDescription}
-                        icon="file"
-                        placeholder={this.descriptionPlaceholder}
-                    />
                     <Menu.Item icon="play" color="blue" onClick={this.handlePlay} disabled={this.loading} />
                     <Menu.Item icon="remove" color="red" onClick={this.handleClear} disabled={this.loading} />
                     <Menu.Item icon="save" color="red" onClick={this.handleSave} disabled={this.loading} />
