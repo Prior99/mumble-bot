@@ -57,13 +57,13 @@ export class PlaylistsStore {
     }
 
     @bind @action public async playQuickList() {
-        await Promise.all(this.quickList.map(async ({ sound, pitch }) => {
+        for (let { sound, pitch } of this.quickList) {
             await this.queue.enqueue({
                 type: "sound",
                 sound: { id: sound.id },
                 pitch,
             } as QueueItem);
-        }));
+        }
     }
 
     @bind @action public clearQuickList() {
