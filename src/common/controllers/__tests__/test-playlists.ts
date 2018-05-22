@@ -22,8 +22,8 @@ describe("playlists controller", () => {
                 user,
             });
         }));
-        playlist1 = await createPlaylist(user, sounds[0], sounds[1], sounds[3]);
-        playlist2 = await createPlaylist(user, sounds[2], sounds[1], sounds[0]);
+        playlist1 = await createPlaylist(user, 0, sounds[0], sounds[1], sounds[3]);
+        playlist2 = await createPlaylist(user, 0, sounds[2], sounds[1], sounds[0]);
         playlist1Response = {
             id: playlist1.id,
             created: playlist1.created.toISOString(),

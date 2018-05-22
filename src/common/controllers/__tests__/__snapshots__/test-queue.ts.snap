@@ -1,7 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`queue controller POST /queue with type="cached audio" enqueues a cached audio 1`] = `111958`;
+exports[`queue controller POST /queue with type="cached audio" enqueues a cached audio 1`] = `48033`;
 
-exports[`queue controller POST /queue with type="playlist" enqueues a playlist 1`] = `223916`;
+exports[`queue controller POST /queue with type="playlist" enqueues a playlist 1`] = `96066`;
 
-exports[`queue controller POST /queue with type="sound" enqueues a sound 1`] = `111958`;
+exports[`queue controller POST /queue with type="playlist" enqueues a playlist with pitch -200 1`] = `96066`;
+
+exports[`queue controller POST /queue with type="playlist" enqueues a playlist with pitch -200 2`] = `
+Object {
+  "frequency": 201,
+  "magnitude": 5657,
+}
+`;
+
+exports[`queue controller POST /queue with type="playlist" enqueues a playlist with pitch 600 1`] = `96066`;
+
+exports[`queue controller POST /queue with type="playlist" enqueues a playlist with pitch 600 2`] = `
+Object {
+  "frequency": 319,
+  "magnitude": 7658,
+}
+`;
+
+exports[`queue controller POST /queue with type="sound" enqueues a sound 1`] = `48033`;
