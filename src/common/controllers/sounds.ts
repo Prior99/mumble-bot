@@ -38,6 +38,7 @@ import {
 } from "../models";
 import { createSound, updateSound, world, tagSound, upload, youtubeImport } from "../scopes";
 import { AudioCache } from "../../server";
+import { VisualizerExecutor } from "../../visualizer";
 import { Context } from "../context";
 
 export interface SoundsQuery {
@@ -100,6 +101,7 @@ export class Sounds {
     @inject private db: Connection;
     @inject private config: ServerConfig;
     @inject private cache: AudioCache;
+    @inject private visualizer: VisualizerExecutor;
 
     /**
      * Fetch a single sound with a specified id.
@@ -388,10 +390,11 @@ export class Sounds {
         });
         await this.db.getRepository(Sound).save(sound);
         await rename(tmpPath, `${this.config.soundsDir}/${sound.id}`);
+        await this.visualizer.visualizeSound(sound.id);
 
         verbose(`${currentUser.name} added new sound imported from youtube with id #${sound.id}.`);
 
-        return created(sound);
+        return created(await this.getSound(sound.id));
     }
 
     @route("POST", "/sounds/upload").dump(Sound, world)
@@ -429,10 +432,11 @@ export class Sounds {
         });
         await this.db.getRepository(Sound).save(sound);
         await rename(tmpPath, `${this.config.soundsDir}/${sound.id}`);
+        await this.visualizer.visualizeSound(sound.id);
 
         verbose(`${currentUser.name} added new uploaded sound #${sound.id}`);
 
-        return created(sound);
+        return created(await this.getSound(sound.id));
     }
 
     @route("POST", "/sounds").dump(Sound, world)
@@ -510,6 +514,7 @@ export class Sounds {
         });
 
         await Promise.all(actions.map(action => this.crop(action.start, action.end, original.id, newSound.id)));
+        await this.visualizer.visualizeSound(newSound.id);
 
         verbose(`User ${currentUser.id} is forked sound ${id} to ${newSound.id}`);
         return created(await this.getSound(newSound.id));
