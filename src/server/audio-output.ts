@@ -13,6 +13,11 @@ import { ServerConfig } from "../config";
 const audioFreq = 48000;
 const msInS = 1000;
 
+interface PlaybackInfo {
+    filename: string;
+    pitch: number;
+}
+
 /**
  * Audio output for the bot. This class handles the whole audio output,
  * including both TTS and sounds.
@@ -44,7 +49,7 @@ export class AudioOutput extends EventEmitter {
      * @param filename The filename of the file to be played.
      * @param pitch The pitch to which the audio should be transformed.
      */
-    private play(filename: string, pitch = 0): Promise<undefined> {
+    private play({ filename, pitch }: PlaybackInfo): Promise<undefined> {
         return new Promise(async (resolve, reject) => {
             let samplesTotal = 0;
             const startTime = Date.now();
@@ -117,12 +122,22 @@ export class AudioOutput extends EventEmitter {
         this.emit("clear");
     }
 
-    private async getFiles(queueItem: QueueItem) {
+    private async playbackInfos(queueItem: QueueItem): Promise<PlaybackInfo[]> {
         switch (queueItem.type) {
             case "sound":
-                return [`${this.config.soundsDir}/${queueItem.sound.id}`];
+                return [
+                    {
+                        filename: `${this.config.soundsDir}/${queueItem.sound.id}`,
+                        pitch: queueItem.pitch,
+                    },
+                ];
             case "cached audio":
-                return [`${this.config.tmpDir}/${queueItem.cachedAudio.id}`];
+                return [
+                    {
+                        filename: `${this.config.tmpDir}/${queueItem.cachedAudio.id}`,
+                        pitch: queueItem.pitch,
+                    },
+                ];
             case "playlist":
                 const playlist = await this.db.getRepository(Playlist).createQueryBuilder("playlist")
                     .where("playlist.id = :id", { id: queueItem.playlist.id })
@@ -130,7 +145,10 @@ export class AudioOutput extends EventEmitter {
                     .leftJoinAndSelect("entry.sound", "sound")
                     .orderBy("entry.position", "ASC")
                     .getOne();
-                return playlist.entries.map(entry => `${this.config.soundsDir}/${entry.sound.id}`);
+                return playlist.entries.map(({ sound, pitch }) => ({
+                    filename: `${this.config.soundsDir}/${sound.id}`,
+                    pitch,
+                }));
             default:
                 return [];
         }
@@ -144,8 +162,8 @@ export class AudioOutput extends EventEmitter {
         this.busy = true;
         while (this.queue.length > 0 && !this.stopped) {
             const current = this.queue.shift();
-            for (let file of await this.getFiles(current)) {
-                await this.play(file, current.pitch);
+            for (let playbackInfo of await this.playbackInfos(current)) {
+                await this.play(playbackInfo);
             }
             this.emit("shift", current);
         }
