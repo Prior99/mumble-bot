@@ -8,11 +8,12 @@
     src: "{{ item }}"
     dest: /storage/prior/applications/mumble-bot-frontend/
   with_items:
-    - ../dist/bundle.css
-    - ../dist/bundle.css.map
-    - ../dist/bundle.js
-    - ../dist/bundle.js.map
-    - ../dist/index.html
+    - ../dist/*.css
+    - ../dist/*.css.map
+    - ../dist/*.html
+    - ../dist/*.js
+    - ../dist/*.js.map
+    - ../dist/*.png
 
 - name: configure
   template:
