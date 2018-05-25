@@ -6,6 +6,7 @@ import { external, inject } from "tsdi";
 import { Button, Input, Icon } from "semantic-ui-react";
 import { Sound } from "../../../common";
 import { SoundsStore } from "../../store";
+import * as css from "./sound-card.scss";
 
 export interface DescriptionProps {
     sound: Sound;
@@ -79,10 +80,10 @@ export class Description extends React.Component<DescriptionProps> {
                             onChange={this.handleDescriptionChange}
                             onKeyDown={this.handleDescriptionKeyDown}
                         />
-                    </> : <>
+                    </> : <div className={css.descriptionContainer}>
                         {`${description} `}
                         <Icon name="pencil" color="grey" link onClick={this.handleStartEditDescription} />
-                    </>
+                    </div>
                 }
             </>
         );
