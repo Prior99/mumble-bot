@@ -102,8 +102,8 @@ export class Forker extends React.Component<{ id: string }> {
         if (!this.container || !this.brushing) { return; }
         const rect = this.container.getBoundingClientRect();
         const x = (event.pageX - rect.left) / rect.width;
-        this.selectionStart = Math.min(x, this.originX) * this.sound.duration;
-        this.selectionEnd = Math.max(x, this.originX) * this.sound.duration;
+        this.selectionStart = Math.max(0, Math.min(x, this.originX) * this.sound.duration);
+        this.selectionEnd = Math.min(this.sound.duration, Math.max(x, this.originX) * this.sound.duration);
         event.stopPropagation();
         event.preventDefault();
     }
@@ -114,8 +114,8 @@ export class Forker extends React.Component<{ id: string }> {
     }
 
     @bind private handleBrushChange(left: number, right: number) {
-        this.selectionStart = this.sound.duration * left;
-        this.selectionEnd = this.sound.duration * right;
+        this.selectionStart = Math.max(0, this.sound.duration * left);
+        this.selectionEnd = Math.min(this.sound.duration, this.sound.duration * right);
     }
 
     @bind private handlePlay(event: React.SyntheticEvent<HTMLButtonElement>) {
