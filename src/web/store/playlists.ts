@@ -83,15 +83,20 @@ export class PlaylistsStore {
                 pitch,
             })),
         } as Playlist);
+        this.playlists.set(playlist.id, await this.mapSounds(playlist));
+        this.quickList = [];
+    }
+
+    private async mapSounds(playlist: Playlist) {
         playlist.entries = await Promise.all(playlist.entries.map(async entry => ({
             ...entry,
             sound: await this.soundsStore.byId(entry.sound.id),
         })));
-        this.playlists.set(playlist.id, playlist);
-        this.quickList = [];
+        return playlist;
     }
 
     @bind @action public async update(id: string, playlist: Playlist) {
-        this.playlists.set(id, await this.playlistsController.updatePlaylist(id, playlist));
+        const newPlaylist =  await this.mapSounds(await this.playlistsController.updatePlaylist(id, playlist));
+        this.playlists.set(id, newPlaylist);
     }
 }
