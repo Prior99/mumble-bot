@@ -86,13 +86,24 @@ export class PageSounds extends React.Component {
     @observable private filterSource: "upload" | "recording";
     @observable private loading = false;
     @observable private queryResult: SoundsQueryResult;
-    @observable private sort = sortOptionValues[1];
+    @observable private sort = 1;
 
     @initialize
     protected async initialize() {
         this.loading = true;
         await this.query();
         this.loading = false;
+    }
+
+    @bind @action private async handleClear(event: React.MouseEvent<HTMLButtonElement>) {
+        event.preventDefault();
+        this.filterTags = [];
+        this.filterSearch = "";
+        this.filterUser = undefined;
+        this.filterCreator = undefined;
+        this.filterSource = undefined;
+        this.sort = 1;
+        await this.query();
     }
 
     @bind @action private async query(offset?: number) {
@@ -103,7 +114,7 @@ export class PageSounds extends React.Component {
             creator: this.filterCreator && this.filterCreator.id,
             user: this.filterUser && this.filterUser.id,
             source: this.filterSource,
-            ...this.sort,
+            ...sortOptionValues[this.sort],
             limit,
             offset,
         });
@@ -127,7 +138,7 @@ export class PageSounds extends React.Component {
     }
 
     @bind @action private handleSortChange(_, { value }: DropdownProps) {
-        this.sort = sortOptionValues[value as number];
+        this.sort = Number(value);
     }
 
     @bind @action private handleSourceChange(_, { value }: DropdownProps) {
@@ -191,6 +202,7 @@ export class PageSounds extends React.Component {
                                             label="Search in description"
                                             width={4}
                                             placeholder="Fulltext search"
+                                            value={this.filterSearch}
                                             onChange={this.handleSearchChange}
                                         />
                                         <Form.Dropdown
@@ -204,6 +216,7 @@ export class PageSounds extends React.Component {
                                             selectOnBlur={false}
                                             options={this.tags.dropdownOptions}
                                             onChange={this.handleTagChange}
+                                            value={this.filterTags.map(tag => tag.id)}
                                             closeOnChange={false}
                                             multiple
                                         />
@@ -215,6 +228,7 @@ export class PageSounds extends React.Component {
                                             fluid
                                             selection
                                             options={[ { text: "Anyone" }, ...this.users.dropdownOptions ]}
+                                            value={this.filterUser && this.filterUser.id}
                                             onChange={this.handleUserChange}
                                         />
                                         <Form.Dropdown
@@ -225,6 +239,7 @@ export class PageSounds extends React.Component {
                                             fluid
                                             selection
                                             options={[ { text: "Anyone" }, ...this.users.dropdownOptions ]}
+                                            value={this.filterCreator && this.filterCreator.id}
                                             onChange={this.handleCreatorChange}
                                         />
                                     </Form.Group>
@@ -236,21 +251,37 @@ export class PageSounds extends React.Component {
                                             selection
                                             fluid
                                             options={sourceOptions}
+                                            value={this.filterSource}
                                             onChange={this.handleSourceChange}
                                         />
                                         <Form.Dropdown
                                             label="Sort"
-                                            width={5}
+                                            width={4}
                                             placeholder="Sort"
                                             selection
                                             fluid
                                             onChange={this.handleSortChange}
                                             defaultValue={1}
+                                            value={this.sort}
                                             options={sortOptions}
                                         />
-                                        <Form.Button fluid width={3} icon labelPosition="left" label="Search">
+                                        <Form.Button
+                                            fluid
+                                            width={3}
+                                            icon
+                                            labelPosition="left"
+                                            label="Search"
+                                            color="green"
+                                        >
                                             Search <Icon name="search" />
                                         </Form.Button>
+                                        <Form.Button
+                                            fluid
+                                            width={2}
+                                            label="Clear"
+                                            icon="close"
+                                            onClick={this.handleClear}
+                                        />
                                     </Form.Group>
                             </Form>
                         </Grid.Column>
