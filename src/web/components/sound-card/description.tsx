@@ -32,7 +32,7 @@ export class Description extends React.Component<DescriptionProps> {
         const { description } = this;
         if (description !== this.props.sound.description) {
             this.descriptionLoading = true;
-            await this.sounds.update(this.props.sound.id, { description });
+            await this.sounds.update(this.props.sound.id, { description } as Sound);
             this.descriptionLoading = false;
         }
         this.editDescription = false;

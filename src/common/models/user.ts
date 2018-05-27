@@ -1,8 +1,19 @@
 import { Column, PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
 import { is, scope, specify, length, uuid, transform, only, required, precompute } from "hyrest";
-import { live, world, login, owner, signup, createMumbleLink, listPlaylists, updateUser } from "../scopes";
+import {
+    listRatings,
+    rateSound,
+    live,
+    world,
+    login,
+    owner,
+    signup,
+    createMumbleLink,
+    listPlaylists,
+    updateUser,
+} from "../scopes";
 import { hash } from "../utils";
-import { Sound, Token, MumbleLink, Playlist } from ".";
+import { Sound, Token, MumbleLink, Playlist, SoundRating } from ".";
 import * as gravatar from "gravatar-url";
 
 /**
@@ -11,7 +22,7 @@ import * as gravatar from "gravatar-url";
 @Entity()
 export class User {
     @PrimaryGeneratedColumn("uuid")
-    @scope(world, createMumbleLink, live, listPlaylists) @is().validate(uuid)
+    @scope(listRatings, rateSound, world, createMumbleLink, live, listPlaylists) @is().validate(uuid)
     public id?: string;
 
     /**
@@ -79,4 +90,8 @@ export class User {
     @Column("boolean", { default: false })
     @is() @scope(world, updateUser)
     public admin?: boolean;
+
+    @OneToMany(() => SoundRating, soundRating => soundRating.user)
+    @is() @specify(() => SoundRating)
+    public soundRatings?: SoundRating[];
 }

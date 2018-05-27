@@ -7,11 +7,19 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
 } from "typeorm";
-import { oneOf, is, scope, DataType, specify, uuid } from "hyrest";
-
-import { live, world, createSound, updateSound, enqueue, listPlaylists, createPlaylist } from "../scopes";
-
-import { User, PlaylistEntry, SoundTagRelation } from ".";
+import { precompute, oneOf, is, scope, DataType, specify, uuid } from "hyrest";
+import {
+    listRatings,
+    rateSound,
+    live,
+    world,
+    createSound,
+    updateSound,
+    enqueue,
+    listPlaylists,
+    createPlaylist,
+} from "../scopes";
+import { User, PlaylistEntry, SoundTagRelation, SoundRating } from ".";
 
 /**
  * A single record as represented in the database.
@@ -22,7 +30,7 @@ export class Sound {
      * Unique id of this record which is used as the mapping to the audio file.
      */
     @PrimaryGeneratedColumn("uuid")
-    @scope(world, enqueue, live, listPlaylists, createPlaylist) @is().validate(uuid)
+    @scope(world, enqueue, live, listPlaylists, createPlaylist, listRatings, rateSound) @is().validate(uuid)
     public id?: string;
 
     /**
@@ -68,7 +76,7 @@ export class Sound {
      * Id of the record this record is forked from or null if its an original one.
      */
     @ManyToOne(() => Sound, sound => sound.children, { nullable: true })
-    @is() @scope(world)
+    @is() @scope(world) @specify(() => Sound)
     public parent?: Sound;
 
     @OneToMany(() => Sound, sound => sound.parent)
@@ -103,4 +111,15 @@ export class Sound {
     @OneToMany(() => PlaylistEntry, playlistEntry => playlistEntry.sound)
     @scope(world) @is() @specify(() => PlaylistEntry)
     public playlistEntrys?: PlaylistEntry[];
+
+    @OneToMany(() => SoundRating, rating => rating.sound)
+    @is() @specify(() => SoundRating)
+    public ratings?: SoundRating[];
+
+    @precompute @scope(world)
+    public get rating() {
+        const { ratings } = this;
+        if (!ratings || ratings.length === 0) { return 0; }
+        return ratings.reduce((sum, { stars }) => sum + stars, 0) / ratings.length;
+    }
 }

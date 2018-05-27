@@ -26,3 +26,6 @@ export const live = createScope();
 export const createPlaylist = createScope();
 export const listPlaylists = createScope();
 export const updatePlaylist = createScope();
+// Ratings.
+export const rateSound = createScope();
+export const listRatings = createScope();
