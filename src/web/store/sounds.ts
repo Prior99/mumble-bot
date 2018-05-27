@@ -65,7 +65,7 @@ export class SoundsStore {
     @bind public async save({ id }: CachedAudio, description?: string) {
         const sound = await this.soundsController.save({ id });
         if (description) {
-            await this.soundsController.updateSound(sound.id, { description });
+            await this.soundsController.updateSound(sound.id, { description } as Sound);
         }
         this.sounds.set(sound.id, sound);
         this.cachedAudio.remove({ id });
@@ -82,8 +82,14 @@ export class SoundsStore {
         });
         this.sounds.set(forkedSound.id, forkedSound);
         const original = this.sounds.get(id);
-        original.children.push({ id: forkedSound.id });
+        original.children.push({ id: forkedSound.id } as Sound);
         this.sounds.set(id, original);
         return forkedSound;
+    }
+
+    @bind public async rate(id: string, stars: number) {
+        const ratedSound = await this.soundsController.rateSound(id, { stars });
+        this.sounds.set(id, ratedSound);
+        return ratedSound;
     }
 }

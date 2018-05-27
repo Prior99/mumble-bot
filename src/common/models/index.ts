@@ -24,6 +24,8 @@ import { SoundsQueryResult } from "./sounds-query-result";
 export { LiveEvent } from "./live-event";
 export { Upload } from "./upload";
 export { YoutubeImport } from "./youtube-import";
+import { SoundRating } from "./sound-rating";
+export { SoundRating } from "./sound-rating";
 
 export const allDatabaseModels = [
     User,
@@ -35,4 +37,5 @@ export const allDatabaseModels = [
     MumbleLink,
     Token,
     SoundsQueryResult,
+    SoundRating,
 ];

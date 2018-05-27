@@ -1,8 +1,7 @@
-import { is, DataType, oneOf, required, scope } from "hyrest";
+import { is, DataType, oneOf, required, scope, specify } from "hyrest";
 import { Sound } from "./sound";
 import { CachedAudio } from "./cached-audio";
-import { Playlist } from "./playlist";
-import { User } from "./user";
+import { Playlist, User } from ".";
 import { enqueue, world, live } from "../scopes";
 
 export class QueueItem {
@@ -12,16 +11,16 @@ export class QueueItem {
     @is(DataType.str).validate(required, oneOf("sound", "cached audio", "playlist")) @scope(enqueue, world, live)
     public type: "sound" | "cached audio" | "playlist";
 
-    @is() @scope(enqueue, world, live)
+    @is() @scope(enqueue, world, live) @specify(() => Sound)
     public sound?: Sound;
 
     @is() @scope(enqueue, world, live)
     public cachedAudio?: CachedAudio;
 
-    @is() @scope(enqueue, world, live)
+    @is() @scope(enqueue, world, live) @specify(() => Playlist)
     public playlist?: Playlist;
 
-    @is() @scope(world, live)
+    @is() @scope(world, live) @specify(() => User)
     public user?: User;
 
     @is() @scope(world, live)

@@ -22,7 +22,7 @@ export class Queue {
     @inject private db: Connection;
 
     @route("POST", "/queue").dump(QueueItem, world)
-    public async enqueue(@body(enqueue) queueItem: QueueItem, @context ctx?: Context): Promise<{}> {
+    public async enqueue(@body(enqueue) queueItem: QueueItem, @context ctx?: Context): Promise<QueueItem> {
         switch (queueItem.type) {
             case "sound":
                 if (!queueItem.sound) {

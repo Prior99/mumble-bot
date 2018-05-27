@@ -6,6 +6,8 @@ import {
     createTag,
     tagSound,
     createSound,
+    rateSound,
+    getSound,
 } from "../../../test-utils";
 import { Token, Sound, Tag, User } from "../..";
 
@@ -448,6 +450,59 @@ describe("sounds controller", () => {
                 sounds: [ responseSounds[0] ],
             });
             expect(response.status).toBe(200);
+        });
+    });
+
+    describe("POST /sound/:id/ratings", () => {
+        let users: { user: User, token: Token }[];
+        let sound: Sound;
+        beforeEach(async () => {
+            users = [];
+            const soundAndCreator = await createSoundWithCreatorAndSpeaker();
+            sound = soundAndCreator.sound;
+            for (let i = 0; i < 5; ++i) {
+                users.push(await createUserWithToken({
+                    name: `Rater ${i}`,
+                    email: `rater-${i}@example.com`,
+                } as User));
+            }
+        });
+
+        it("rating a sound", async () => {
+            expect((await getSound(sound.id, users[0].token.id)).rating).toBe(0);
+            // Initial rating.
+            const response = await rateSound(sound.id, users[0].token.id, 2);
+            expect(response.status).toBe(201);
+            expect(response.body.data).toMatchObject({ id: sound.id, rating: 2 });
+            expect((await getSound(sound.id, users[0].token.id)).rating).toBe(2);
+            // Second rating.
+            await rateSound(sound.id, users[1].token.id, 4);
+            expect((await getSound(sound.id, users[1].token.id)).rating).toBe(3);
+            // Third rating.
+            await rateSound(sound.id, users[2].token.id, 3);
+            expect((await getSound(sound.id, users[2].token.id)).rating).toBe(3);
+            // Fourth rating.
+            await rateSound(sound.id, users[3].token.id, 5);
+            expect((await getSound(sound.id, users[3].token.id)).rating).toBe(3.5);
+            // Fifth rating.
+            await rateSound(sound.id, users[4].token.id, 1);
+            expect((await getSound(sound.id, users[4].token.id)).rating).toBe(3);
+        });
+
+        it("updating a rating", async () => {
+            // Initial rating.
+            const firstRating = await rateSound(sound.id, users[0].token.id, 2);
+            expect(firstRating.status).toBe(201);
+            expect(firstRating.body.data).toMatchObject({ id: sound.id, rating: 2 });
+            expect((await getSound(sound.id, users[0].token.id)).rating).toBe(2);
+            // Second rating.
+            await rateSound(sound.id, users[1].token.id, 4);
+            expect((await getSound(sound.id, users[1].token.id)).rating).toBe(3);
+            // Update first rating.
+            const secondRating = await rateSound(sound.id, users[0].token.id, 5);
+            expect(secondRating.status).toBe(200);
+            expect(secondRating.body.data).toMatchObject({ id: sound.id, rating: 4.5 });
+            expect((await getSound(sound.id, users[0].token.id)).rating).toBe(4.5);
         });
     });
 });

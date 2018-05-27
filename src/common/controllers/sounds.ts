@@ -35,8 +35,9 @@ import {
     SoundTagRelation,
     Upload,
     YoutubeImport,
+    SoundRating,
 } from "../models";
-import { createSound, updateSound, world, tagSound, upload, youtubeImport } from "../scopes";
+import { rateSound, createSound, updateSound, world, tagSound, upload, youtubeImport } from "../scopes";
 import { AudioCache } from "../../server";
 import { VisualizerExecutor } from "../../visualizer";
 import { Context } from "../context";
@@ -118,6 +119,7 @@ export class Sounds {
             .leftJoinAndSelect("sound.user", "user")
             .leftJoinAndSelect("sound.soundTagRelations", "soundTagRelation")
             .leftJoinAndSelect("soundTagRelation.tag", "tag")
+            .leftJoinAndSelect("sound.ratings", "rating")
             .leftJoin("sound.parent", "parent")
             .leftJoin("sound.children", "children")
             .addSelect("parent.id")
@@ -253,6 +255,7 @@ export class Sounds {
             .leftJoinAndSelect("soundTagRelation.tag", "tag")
             .leftJoinAndSelect("sound.creator", "creator")
             .leftJoinAndSelect("sound.user", "user")
+            .leftJoinAndSelect("sound.ratings", "rating")
             .leftJoin("sound.parent", "parent")
             .leftJoin("sound.children", "children")
             .addSelect("parent.id")
@@ -518,5 +521,33 @@ export class Sounds {
 
         verbose(`User ${currentUser.id} is forked sound ${id} to ${newSound.id}`);
         return created(await this.getSound(newSound.id));
+    }
+
+    @route("POST", "/sound/:id/ratings").dump(Sound, world)
+    public async rateSound(
+        @param("id") @is().validate(uuid) id: string,
+        @body(rateSound) { stars }: SoundRating,
+        @context ctx?: Context,
+    ): Promise<Sound> {
+        const sound = await this.db.getRepository(Sound).findOne(id);
+        if (!sound) {
+            return notFound<Sound>(`No sound with id ${id}`);
+        }
+        const user = await ctx.currentUser();
+        const existingRating = await this.db.getRepository(SoundRating).findOne({
+            user: { id: user.id },
+            sound: { id: sound.id },
+        });
+        if (existingRating) {
+            existingRating.stars = stars;
+            await this.db.getRepository(SoundRating).save(existingRating);
+            return ok(await this.getSound(sound.id));
+        }
+        await this.db.getRepository(SoundRating).save({
+            user: { id: user.id },
+            sound: { id: sound.id },
+            stars,
+        });
+        return created(await this.getSound(sound.id));
     }
 }
