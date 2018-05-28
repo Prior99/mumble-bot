@@ -23,7 +23,7 @@ export class DatabaseFactory {
             host: this.config.dbHost,
             dropSchema,
             extra: { ssl: this.config.dbSSL },
-            migrations: [`${__dirname}/../migrations`],
+            migrations: [`${__dirname}/../migrations/*`],
         });
         info("Connected to database.");
     }
