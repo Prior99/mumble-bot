@@ -13,7 +13,6 @@ export class DatabaseFactory {
 
     public async connect(dropSchema = false) {
         this.conn = await createConnection({
-            synchronize: true,
             entities: allDatabaseModels,
             database: this.config.dbName,
             type: this.config.dbDriver as any,
@@ -24,6 +23,7 @@ export class DatabaseFactory {
             host: this.config.dbHost,
             dropSchema,
             extra: { ssl: this.config.dbSSL },
+            migrations: [`${__dirname}/../migrations`],
         });
         info("Connected to database.");
     }
