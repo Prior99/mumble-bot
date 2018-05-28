@@ -50,7 +50,6 @@ describe("sounds controller", () => {
                     },
                     description: "Some sound",
                     duration: 13,
-                    overwrite: false,
                     soundTagRelations: [
                         {
                             tag: {

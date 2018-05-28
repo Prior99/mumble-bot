@@ -95,6 +95,10 @@ export interface SoundsQuery {
      * The direction of the sorting. Ascending or Descending.
      */
     sortDirection?: string;
+    /**
+     * Whether deleted sounds should be included.
+     */
+    includeDeleted?: boolean;
 }
 
 @controller @component
@@ -233,6 +237,7 @@ export class Sounds {
             soundQuery.source,
             soundQuery.sort,
             soundQuery.sortDirection,
+            soundQuery.includeDeleted,
         );
     }
 
@@ -249,6 +254,7 @@ export class Sounds {
         @query("source") @is().validate(oneOf("upload", "recording", "youtube")) source?: string,
         @query("sort") @is().validate(oneOf("created", "updated", "used", "duration", "description")) sort?: string,
         @query("sortDirection") @is().validate(oneOf("asc", "desc")) sortDirection?: string,
+        @query("includeDeleted") @is().validate(oneOf("asc", "desc")) includeDeleted?: boolean,
     ): Promise<SoundsQueryResult> {
         const queryBuilder = this.db.getRepository(Sound).createQueryBuilder("sound")
             .leftJoinAndSelect("sound.soundTagRelations", "soundTagRelation")
@@ -284,6 +290,9 @@ export class Sounds {
                     WHERE innerSound.id = sound.id
                 ) @> :tags
             `, { tags: tags.split(",") });
+        }
+        if (!includeDeleted) {
+            queryBuilder.andWhere("sound.deleted IS NULL");
         }
         if (source) { queryBuilder.andWhere("sound.source = :source", { source }); }
         const totalSounds = await queryBuilder.getCount();
@@ -510,11 +519,18 @@ export class Sounds {
         const newSound: Sound = await this.db.getRepository(Sound).save({
             ...omit(["id"], original),
             description,
-            overwrite,
             duration: newDuration,
             creator: currentUser,
             parent: original,
         });
+
+        if (overwrite) {
+            await this.db.getRepository(Sound).createQueryBuilder("sound")
+                .update()
+                .set({ deleted: new Date() })
+                .where({ id: original.id })
+                .execute();
+        }
 
         await Promise.all(actions.map(action => this.crop(action.start, action.end, original.id, newSound.id)));
         await this.visualizer.visualizeSound(newSound.id);
