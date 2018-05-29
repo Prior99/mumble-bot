@@ -89,21 +89,6 @@
   tags:
     - backup
 
-- name: Create backup of the sounds
-  archive:
-    path: /home/prior/applications/mumble-bot/data/sounds
-    dest: /tmp/jenny.tar.gz
-  tags:
-    - backup
-
-- name: Fetch backup of the sounds
-  fetch:
-    src: /tmp/jenny.tar.gz
-    dest: /tmp/backup/sounds.tar.gz
-    flat: yes
-  tags:
-    - backup
-
 - name: Migrate the database
   shell: /home/prior/applications/mumble-bot/node-v{{ node_version }}-linux-x64/bin/node server migrate --config-file config.yml
   args:
