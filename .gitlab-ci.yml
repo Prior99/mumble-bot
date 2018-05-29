@@ -74,7 +74,9 @@ deploy:
     - cd deploy
     - mkdir /tmp/backup
     - ansible-playbook mumble-bot.yml --extra-vars "database_password='$DATABASE_PASSWORD' bot_key='$BOT_KEY'"
-    - tar c /tmp/backup | gpg --symmetric --batch --passphrase $BACKUP_ENCRYPTION_KEY --output /tmp/backup.tar.gpg
+  after_script:
+    - tar c /tmp/backup | gpg --symmetric --batch --passphrase $BACKUP_ENCRYPTION_KEY --output backup.tar.gpg
+    - ls -lAh backup.tar.gpg
   dependencies:
     - build
   stage: deploy
@@ -84,4 +86,4 @@ deploy:
   artifacts:
     when: always
     paths:
-      - /tmp/backup.tar.gpg
+      - backup.tar.gpg
