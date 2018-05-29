@@ -82,5 +82,6 @@ deploy:
   only:
     - master
   artifacts:
+    when: always
     paths:
       - /tmp/backup.tar.gpg
