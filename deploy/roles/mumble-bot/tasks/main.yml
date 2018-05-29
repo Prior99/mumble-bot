@@ -84,7 +84,7 @@
 - name: Fetch backup of the database
   fetch:
     src: /tmp/jenny.sql
-    dest: /tmp/backup/
+    dest: /tmp/
     flat: yes
   tags:
     - backup
