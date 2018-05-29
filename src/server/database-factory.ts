@@ -1,7 +1,7 @@
 import { component, factory, inject, destroy } from "tsdi";
 import { createConnection, Connection } from "typeorm";
 import { info } from "winston";
-
+import { migrations } from "../migrations";
 import { allDatabaseModels } from "../common";
 import { ServerConfig } from "../config";
 
@@ -23,7 +23,7 @@ export class DatabaseFactory {
             host: this.config.dbHost,
             dropSchema,
             extra: { ssl: this.config.dbSSL },
-            migrations: [`${__dirname}/../migrations`],
+            migrations,
         });
         info("Connected to database.");
     }

@@ -213,14 +213,14 @@ describe("sounds controller", () => {
                     user: userA.user,
                     used: 100,
                     duration: 3.5,
-                }),
+                } as Sound),
                 await createSound({
                     description: "A Second sound someone",
                     creator: userB.user,
                     user: userB.user,
                     used: 15,
                     duration: 3.2,
-                }),
+                } as Sound),
                 await createSound({
                     description: "B Third sound anyone",
                     creator: userA.user,
@@ -228,7 +228,7 @@ describe("sounds controller", () => {
                     used: 30,
                     source: "upload",
                     duration: 0.5,
-                }),
+                } as Sound),
             ];
             await tagSound(sounds[0], tags[0], userA.token);
             await tagSound(sounds[1], tags[0], userA.token);
