@@ -219,6 +219,21 @@ export class Sounds {
         return ok(updated);
     }
 
+    @route("DELETE", "/sound/:id").dump(Sound, world)
+    public async deleteSound(@param("id") @is().validate(uuid) id: string, @context ctx?: Context): Promise<Sound>{
+        const sound = await this.db.getRepository(Sound).findOne(id)
+        if (!sound) { return notFound<Sound>(`No sound with id "${id}"`); }
+        if (sound.deleted) { return badRequest<Sound>(); }
+
+        await this.db.getRepository(Sound).update(id, { deleted: new Date() } as Sound);
+
+        const { name } = await ctx.currentUser();
+        verbose(`User ${name} deleted sound #${id}`);
+
+        const updated = await this.getSound(id);
+        return ok(updated);
+    }
+
     /**
      * Query the sounds from the database using a `SoundsQuery`.
      *

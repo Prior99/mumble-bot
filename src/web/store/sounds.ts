@@ -37,6 +37,10 @@ export class SoundsStore {
         this.sounds.set(id, await this.soundsController.updateSound(id, sound));
     }
 
+    @bind @action public async delete(id: string) {
+        this.sounds.set(id, await this.soundsController.deleteSound(id));
+    }
+
     @bind @action public async play(sound: Sound) {
         await this.queue.enqueue({
             type: "sound",

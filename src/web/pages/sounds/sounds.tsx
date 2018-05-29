@@ -287,6 +287,7 @@ export class PageSounds extends React.Component {
                         </Grid.Column>
                         {
                             this.hasLoaded && this.queryResult.sounds
+                                .map(sound => this.sounds.sounds.get(sound.id))
                                 .filter(sound => !Boolean(sound.deleted))
                                 .map(sound => (
                                     <Grid.Column
