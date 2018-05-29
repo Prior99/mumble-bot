@@ -66,13 +66,6 @@ export class Sound {
     public creator?: User;
 
     /**
-     * Whether this forked record overwrites the original one.
-     */
-    @Column("bool", { default: false })
-    @is() @scope(world)
-    public overwrite?: boolean;
-
-    /**
      * Id of the record this record is forked from or null if its an original one.
      */
     @ManyToOne(() => Sound, sound => sound.children, { nullable: true })
@@ -93,6 +86,10 @@ export class Sound {
     @UpdateDateColumn()
     @scope(world) @is() @specify(() => Date)
     public updated?: Date;
+
+    @Column("timestamp without time zone", { nullable: true })
+    @scope(world) @is() @specify(() => Date)
+    public deleted?: Date;
 
     /**
      * A list of all labels with which this record was tagged.

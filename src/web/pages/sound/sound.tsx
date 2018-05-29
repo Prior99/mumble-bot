@@ -117,7 +117,7 @@ export class PageSound extends React.Component<PageSoundProps> {
             );
         }
         const { sound, visualizationUrl } = this;
-        const { description, created, updated, creator, used } = sound;
+        const { description, created, updated, creator, used, deleted } = sound;
         return (
             <Content>
                 <Grid>
@@ -154,6 +154,17 @@ export class PageSound extends React.Component<PageSoundProps> {
                                         ({updated.toLocaleString()})
                                     </Table.Cell>
                                 </Table.Row>
+                                {
+                                    Boolean(deleted) && (
+                                        <Table.Row>
+                                            <Table.Cell><Icon name="remove from calendar" /> Modified</Table.Cell>
+                                            <Table.Cell>
+                                                {distanceInWordsToNow(deleted)} ago
+                                                ({deleted.toLocaleString()})
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    )
+                                }
                                 <Table.Row>
                                     <Table.Cell><Icon name="add user" /> Creator</Table.Cell>
                                     <Table.Cell><MiniUserBadge user={creator}/></Table.Cell>

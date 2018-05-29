@@ -37,6 +37,10 @@ export class SoundsStore {
         this.sounds.set(id, await this.soundsController.updateSound(id, sound));
     }
 
+    @bind @action public async delete(id: string) {
+        this.sounds.set(id, await this.soundsController.deleteSound(id));
+    }
+
     @bind @action public async play(sound: Sound) {
         await this.queue.enqueue({
             type: "sound",
@@ -82,8 +86,7 @@ export class SoundsStore {
         });
         this.sounds.set(forkedSound.id, forkedSound);
         const original = this.sounds.get(id);
-        original.children.push({ id: forkedSound.id } as Sound);
-        this.sounds.set(id, original);
+        this.sounds.set(id, await this.soundsController.getSound(original.id));
         return forkedSound;
     }
 

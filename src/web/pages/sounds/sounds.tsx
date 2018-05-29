@@ -286,17 +286,20 @@ export class PageSounds extends React.Component {
                             </Form>
                         </Grid.Column>
                         {
-                            this.hasLoaded && this.queryResult.sounds.map(sound => (
-                                <Grid.Column
-                                    className={css.column}
-                                    mobile={16}
-                                    tablet={8}
-                                    computer={4}
-                                    key={sound.id}
-                                >
-                                    <SoundCard id={sound.id} />
-                                </Grid.Column>
-                            ))
+                            this.hasLoaded && this.queryResult.sounds
+                                .map(sound => this.sounds.sounds.get(sound.id))
+                                .filter(sound => !Boolean(sound.deleted))
+                                .map(sound => (
+                                    <Grid.Column
+                                        className={css.column}
+                                        mobile={16}
+                                        tablet={8}
+                                        computer={4}
+                                        key={sound.id}
+                                    >
+                                        <SoundCard id={sound.id} />
+                                    </Grid.Column>
+                                ))
                         }
                         <Grid.Column width={16}>
                             <Pagination
