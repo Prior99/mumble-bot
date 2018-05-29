@@ -63,7 +63,7 @@ lint:
   stage: test
 
 deploy:
-  image: "alpine:3.5"
+  image: "alpine:3.7"
   before_script:
     - apk --update add ansible git openssh python py2-pip rsync gnupg
     - mkdir ~/.ssh
