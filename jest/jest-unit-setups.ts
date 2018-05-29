@@ -1,4 +1,5 @@
 import { TSDI } from "tsdi";
+import { Connection } from "typeorm";
 import * as Winston from "winston";
 import { DatabaseFactory, MumbleFactory, AudioInput } from "../src/server";
 
@@ -59,6 +60,16 @@ beforeEach(async () => {
     (global as any).tsdi = tsdi;
     const databaseFactory = tsdi.get(DatabaseFactory);
     await databaseFactory.connect(true);
+    const db = await tsdi.get(Connection);
+    const tables = await db.query(`
+        SELECT table_name AS "tableName"
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+    `);
+    for (const table of tables) {
+        await db.query(`DROP TABLE "${table.tableName}"`);
+    }
+    await db.runMigrations();
     await tsdi.get(MumbleFactory).connect();
     await tsdi.get(AudioInput).initialize();
 });

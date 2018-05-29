@@ -49,6 +49,16 @@ test-integration:
 run-server-integration: node_modules build-server
 	dropdb $${POSTGRES_DB:-bot-test} || true
 	createdb $${POSTGRES_DB:-bot-test} || true
+	node server migrate\
+		--url $${MUMBLE_URL:-localhost}\
+		--name test-bot\
+		--tmp-dir /tmp/bot-test/tmp\
+		--sounds-dir /tmp/bot-test/sounds\
+		--port 23278\
+		--db-name $${POSTGRES_DB:-bot-test}\
+		--db-username $${POSTGRES_USER:-$$USER}\
+		--db-host $${POSTGRES_HOST:-localhost}\
+		--db-password $${POSTGRES_PASSWORD:-""}
 	rm -rf /tmp/bot-test/tmp || true
 	rm -rf /tmp/bot-test/sounds || true
 	node server serve\

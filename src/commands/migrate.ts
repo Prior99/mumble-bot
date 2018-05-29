@@ -4,7 +4,7 @@ import { info, error } from "winston";
 import { ServerConfig, ServerConfigFactory } from "../config";
 import { setupWinston } from "../common";
 import { DatabaseFactory } from "../server";
-import { TSDI, inject } from "tsdi";
+import { TSDI } from "tsdi";
 
 setupWinston();
 @command({ description: "Perform necessary database migrations" })
