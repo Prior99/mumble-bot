@@ -221,7 +221,7 @@ export class Sounds {
 
     @route("DELETE", "/sound/:id").dump(Sound, world)
     public async deleteSound(@param("id") @is().validate(uuid) id: string, @context ctx?: Context): Promise<Sound>{
-        const sound = await this.db.getRepository(Sound).findOne(id)
+        const sound = await this.db.getRepository(Sound).findOne(id);
         if (!sound) { return notFound<Sound>(`No sound with id "${id}"`); }
         if (sound.deleted) { return badRequest<Sound>(); }
 

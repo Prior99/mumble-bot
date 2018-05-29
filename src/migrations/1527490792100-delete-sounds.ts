@@ -1,5 +1,4 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
-import { Sound } from "../common";
 import { info } from "winston";
 
 export class DeleteSounds1527490792100 implements MigrationInterface {
