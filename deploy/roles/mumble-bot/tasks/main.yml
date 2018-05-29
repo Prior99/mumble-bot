@@ -104,6 +104,9 @@
   tags:
     - backup
 
+- name: Migrate the database
+  shell: /home/prior/applications/mumble-bot/node-v{{ node_version }}-linux-x64/bin/node server migrate --config-file config.yml
+
 - name: enable and start the services
   service:
     name: '{{ item }}'
