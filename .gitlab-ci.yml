@@ -65,17 +65,22 @@ lint:
 deploy:
   image: "alpine:3.5"
   before_script:
-    - apk --update add ansible git openssh python py2-pip rsync
+    - apk --update add ansible git openssh python py2-pip rsync gpg
     - mkdir ~/.ssh
     - echo "$SSH_KEY" > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
   script:
     - cd deploy
+    - mkdir /tmp/backup
     - ansible-playbook mumble-bot.yml --extra-vars "database_password='$DATABASE_PASSWORD' bot_key='$BOT_KEY'"
+    - tar c /tmp/backup | gpg --symmetric --batch --passphrase $BACKUP_ENCRYPTION_KEY --output /tmp/backup.tar.gpg 
   dependencies:
     - build
   stage: deploy
   when: manual
   only:
     - master
+  artifacts:
+    paths:
+      - /tmp/backup.tar.gpg

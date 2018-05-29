@@ -62,12 +62,53 @@
   with_items:
     - mumble-bot.service
 
+- name: stop the services
+  service:
+    name: '{{ item }}'
+    state: stopped
+    daemon-reload: yes
+    user: yes
+  with_items:
+    - mumble-bot
+
+- name: Create backup of the database
+  postgresql_db:
+    name: jenny
+    login_password: "{{ database_password }}"
+    login_user: "prior"
+    state: dump
+    target: /tmp/jenny.sql
+  tags:
+    - backup
+
+- name: Fetch backup of the database
+  fetch:
+    src: /tmp/jenny.sql
+    dest: /tmp/backup/
+    flat: yes
+  tags:
+    - backup
+
+- name: Create backup of the sounds
+  archive:
+    path: /home/prior/applications/mumble-bot/data/sounds
+    dest: /tmp/jenny.tar.gz
+  tags:
+    - backup
+
+- name: Fetch backup of the sounds
+  fetch:
+    src: /tmp/jenny.tar.gz
+    dest: /tmp/backup/sounds.tar.gz
+    flat: yes
+  tags:
+    - backup
+
 - name: enable and start the services
   service:
     name: '{{ item }}'
-    state: restarted
+    state: started
     enabled: yes
-    daemon-reload: yes
     user: yes
   with_items:
     - mumble-bot
