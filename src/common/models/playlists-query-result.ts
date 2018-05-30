@@ -1,17 +1,17 @@
 import { is, DataType, scope, specify } from "hyrest";
 import { Playlist } from "./playlist";
-import { world } from "../scopes";
+import { world, listPlaylists } from "../scopes";
 
 export class PlaylistsQueryResult {
-    @is(DataType.int) @scope(world)
+    @is(DataType.int) @scope(world, listPlaylists)
     public totalPlaylists: number;
 
-    @is(DataType.int) @scope(world)
+    @is(DataType.int) @scope(world, listPlaylists)
     public limit: number;
 
-    @is(DataType.int) @scope(world)
+    @is(DataType.int) @scope(world, listPlaylists)
     public offset: number;
 
-    @is() @scope(world) @specify(() => Playlist)
+    @is() @scope(world, listPlaylists) @specify(() => Playlist)
     public playlists: Playlist[];
 }

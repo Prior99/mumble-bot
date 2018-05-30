@@ -1,6 +1,6 @@
 import { observable, computed, action } from "mobx";
 import { bind } from "decko";
-import { component, inject, initialize } from "tsdi";
+import { component, inject } from "tsdi";
 import { Sound, Playlists, Playlist, Queue, QueueItem, PlaylistEntry } from "../../common";
 import { SoundsStore } from "./sounds";
 import { UsersStore } from "./users";

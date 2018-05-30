@@ -76,7 +76,7 @@ export class Playlists {
         );
     }
 
-    @route("GET", "/playlists").dump(Playlist, listPlaylists)
+    @route("GET", "/playlists").dump(PlaylistsQueryResult, listPlaylists)
     public async listPlaylists(
         @query("search") @is() search?: string,
         @query("limit") @is(DataType.int) limit?: number,
@@ -104,15 +104,20 @@ export class Playlists {
         const totalPlaylists = await queryBuilder.getCount();
         const direction = sortDirection === "desc" ? "DESC" : "ASC";
         switch (sort) {
-            case "used": queryBuilder.orderBy("playlist.used", direction); break;
-            case "description": queryBuilder.orderBy("playlist.description", direction); break;
-            case "created": default: queryBuilder.orderBy("playlist.created", direction); break;
+            case "used": queryBuilder.addOrderBy("playlist.used", direction); break;
+            case "description": queryBuilder.addOrderBy("playlist.description", direction); break;
+            case "created": default: queryBuilder.addOrderBy("playlist.created", direction); break;
         }
-        queryBuilder.addOrderBy("entry.position", "ASC");
         if (offset) { queryBuilder.skip(offset); }
         if (limit) { queryBuilder.take(limit); }
+        else { queryBuilder.take(100); }
 
         const playlists = await queryBuilder.getMany();
+        playlists.forEach(playlist => playlist.entries.sort((a, b) => {
+            if (a.position > b.position) { return -1; }
+            if (a.position < b.position) { return 1; }
+            return 0;
+        }));
         return ok(populate(world, PlaylistsQueryResult, { totalPlaylists, limit, offset, playlists }));
     }
 
