@@ -1,6 +1,6 @@
 export { Cached } from "./cached";
 import { Cached } from "./cached";
-export { Playlists } from "./playlists";
+export { PlaylistsQuery, Playlists } from "./playlists";
 import { Playlists } from "./playlists";
 export { Tags } from "./tags";
 import { Tags } from "./tags";

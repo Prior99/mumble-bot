@@ -7,6 +7,16 @@ import { requireLogin } from "../../utils";
 import { Content, PlaylistCard } from "../../components";
 import { PlaylistsStore } from "../../store";
 import * as css from "./playlists.scss";
+import { PlaylistsQuery } from "../../../common";
+
+const sortOptionValues: PlaylistsQuery[] = [
+    { sort: "created", sortDirection: "asc" },
+    { sort: "created", sortDirection: "desc" },
+    { sort: "used", sortDirection: "asc" },
+    { sort: "used", sortDirection: "desc" },
+    { sort: "description", sortDirection: "asc" },
+    { sort: "description", sortDirection: "desc" },
+];
 
 @requireLogin @observer @external
 export class PagePlaylists extends React.Component {

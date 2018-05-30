@@ -94,7 +94,7 @@ export interface SoundsQuery {
     /**
      * The direction of the sorting. Ascending or Descending.
      */
-    sortDirection?: string;
+    sortDirection?: "asc" | "desc";
     /**
      * Whether deleted sounds should be included.
      */

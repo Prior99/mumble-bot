@@ -20,12 +20,12 @@ export { Channel } from "./channel";
 export { QueueItem } from "./queue-item";
 export { ForkOptions } from "./fork-options";
 export { SoundsQueryResult } from "./sounds-query-result";
-import { SoundsQueryResult } from "./sounds-query-result";
 export { LiveEvent } from "./live-event";
 export { Upload } from "./upload";
 export { YoutubeImport } from "./youtube-import";
 import { SoundRating } from "./sound-rating";
 export { SoundRating } from "./sound-rating";
+export { PlaylistsQueryResult } from "./playlists-query-result";
 
 export const allDatabaseModels = [
     User,
@@ -36,6 +36,5 @@ export const allDatabaseModels = [
     PlaylistEntry,
     MumbleLink,
     Token,
-    SoundsQueryResult,
     SoundRating,
 ];
