@@ -20,7 +20,7 @@ describe("playlists controller", () => {
                 description,
                 creator: user,
                 user,
-            });
+            } as Sound);
         }));
         playlist1 = await createPlaylist(user, 0, sounds[0], sounds[1], sounds[3]);
         playlist2 = await createPlaylist(user, 0, sounds[2], sounds[1], sounds[0]);
@@ -28,7 +28,7 @@ describe("playlists controller", () => {
             id: playlist1.id,
             created: playlist1.created.toISOString(),
             creator: { id: user.id },
-            name: "A Playlist",
+            description: "A Playlist",
             entries: [
                 { sound: { id: sounds[0].id }, position: 0 },
                 { sound: { id: sounds[1].id }, position: 1 },
@@ -39,7 +39,7 @@ describe("playlists controller", () => {
             id: playlist2.id,
             created: playlist2.created.toISOString(),
             creator: { id: user.id },
-            name: "A Playlist",
+            description: "A Playlist",
             entries: [
                 { sound: { id: sounds[2].id }, position: 0 },
                 { sound: { id: sounds[1].id }, position: 1 },
@@ -105,7 +105,7 @@ describe("playlists controller", () => {
 
         it("creates a new playlist", async () => {
             const newPlaylist = {
-                name: "My fancy Playlist",
+                description: "My fancy Playlist",
                 entries: [
                     { sound: { id: sounds[0].id }, position: 0 },
                     { sound: { id: sounds[0].id }, position: 1 },

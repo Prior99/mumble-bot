@@ -2,7 +2,7 @@ import { Sound, User, Playlist, PlaylistEntry } from "../common";
 import { Connection } from "typeorm";
 
 const defaultPlaylist = {
-    name: "A Playlist",
+    description: "A Playlist",
 };
 
 export async function createPlaylist(creator: User, pitch: number, ...sounds: Sound[]) {

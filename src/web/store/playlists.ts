@@ -76,7 +76,7 @@ export class PlaylistsStore {
 
     @bind @action public async saveQuickList(description: string) {
         const playlist = await this.playlistsController.createPlaylist({
-            name: description,
+            description,
             entries: this.quickList.map(({ pitch, sound }, position) => ({
                 position,
                 sound: { id: sound.id },
