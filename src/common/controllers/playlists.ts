@@ -114,8 +114,8 @@ export class Playlists {
 
         const playlists = await queryBuilder.getMany();
         playlists.forEach(playlist => playlist.entries.sort((a, b) => {
-            if (a.position > b.position) { return -1; }
-            if (a.position < b.position) { return 1; }
+            if (a.position > b.position) { return 1; }
+            if (a.position < b.position) { return -1; }
             return 0;
         }));
         return ok(populate(world, PlaylistsQueryResult, { totalPlaylists, limit, offset, playlists }));

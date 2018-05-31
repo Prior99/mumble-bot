@@ -56,11 +56,14 @@ describe("playlists controller", () => {
         });
 
         it("fetches a list of all playlists", async () => {
-            const response = await api().get(`/playlists`)
+            const response = await api().get(`/playlists?sort=created&sortDirection=desc`)
                 .set("authorization", `Bearer ${token.id}`);
             expect(response.status).toBe(200);
             expect(response.body).toMatchObject({
-                data: [ playlist2Response, playlist1Response ],
+                data: {
+                    totalPlaylists: 2,
+                    playlists: [ playlist2Response, playlist1Response ],
+                },
             });
         });
     });
@@ -123,19 +126,21 @@ describe("playlists controller", () => {
                 },
             });
             expect(createResponse.status).toBe(201);
-            const listResponse = await api().get(`/playlists`)
+            const listResponse = await api().get(`/playlists?sort=created&sortDirection=desc`)
                 .set("authorization", `Bearer ${token.id}`);
             expect(listResponse.body).toMatchObject({
-                data: [
-                    {
-                        ...newPlaylist,
-                        used: 0,
-                        id: createResponse.body.data.id,
-                        created: createResponse.body.data.created,
-                    },
-                    playlist2Response,
-                    playlist1Response,
-                ],
+                data: {
+                    playlists: [
+                        {
+                            ...newPlaylist,
+                            used: 0,
+                            id: createResponse.body.data.id,
+                            created: createResponse.body.data.created,
+                        },
+                        playlist2Response,
+                        playlist1Response,
+                    ],
+                },
             });
             expect(listResponse.status).toBe(200);
         });
