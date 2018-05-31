@@ -31,6 +31,8 @@ const sortOptionValues: SoundsQuery[] = [
     { sort: "duration", sortDirection: "desc" },
     { sort: "description", sortDirection: "asc" },
     { sort: "description", sortDirection: "desc" },
+    { sort: "rating", sortDirection: "asc" },
+    { sort: "rating", sortDirection: "desc" },
 ];
 
 const sourceOptions = [
@@ -69,6 +71,8 @@ const sortOptions = [
     { key: 7, value: 7, text: "Longest", icon: "sort content descending" },
     { key: 8, value: 8, text: "A-Z", icon: "sort alphabet ascending" },
     { key: 9, value: 9, text: "Z-A", icon: "sort alphabet descending" },
+    { key: 10, value: 10, text: "Worst rated", icon: "sort numeric ascending" },
+    { key: 11, value: 11, text: "Best rated", icon: "sort numeric descending" },
 ];
 
 const limit = 48;
