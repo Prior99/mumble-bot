@@ -94,7 +94,7 @@ export interface SoundsQuery {
     /**
      * The direction of the sorting. Ascending or Descending.
      */
-    sortDirection?: string;
+    sortDirection?: "asc" | "desc";
     /**
      * Whether deleted sounds should be included.
      */
@@ -159,8 +159,8 @@ export class Sounds {
             sound: { id: soundId },
             tag: { id: tagId },
         });
-        const { name } = await ctx.currentUser();
-        verbose(`${name} removed tag #${tagId} from sound #${soundId}`);
+        const currentUser = await ctx.currentUser();
+        verbose(`User ${currentUser.id} removed tag #${tagId} from sound #${soundId}`);
         return ok(await this.getSound(soundId));
     }
 
@@ -196,8 +196,8 @@ export class Sounds {
             tag,
         });
 
-        const { name } = await ctx.currentUser();
-        verbose(`${name} tagged sound #${id} with ${tag.id}`);
+        const currentUser = await ctx.currentUser();
+        verbose(`${currentUser.id} tagged sound #${id} with ${tag.id}`);
         return created(await this.getSound(id));
     }
 
@@ -212,8 +212,8 @@ export class Sounds {
         }
         await this.db.getRepository(Sound).update(id, sound);
 
-        const { name } = await ctx.currentUser();
-        verbose(`${name} edited sound #${id}`);
+        const currentUser = await ctx.currentUser();
+        verbose(`${currentUser.id} edited sound #${id}`);
 
         const updated = await this.getSound(id);
         return ok(updated);
@@ -227,8 +227,8 @@ export class Sounds {
 
         await this.db.getRepository(Sound).update(id, { deleted: new Date() } as Sound);
 
-        const { name } = await ctx.currentUser();
-        verbose(`User ${name} deleted sound #${id}`);
+        const currentUser = await ctx.currentUser();
+        verbose(`User ${currentUser.id} deleted sound #${id}`);
 
         const updated = await this.getSound(id);
         return ok(updated);
@@ -419,7 +419,7 @@ export class Sounds {
         await rename(tmpPath, `${this.config.soundsDir}/${sound.id}`);
         await this.visualizer.visualizeSound(sound.id);
 
-        verbose(`${currentUser.name} added new sound imported from youtube with id #${sound.id}.`);
+        verbose(`${currentUser.id} added new sound imported from youtube with id #${sound.id}.`);
 
         return created(await this.getSound(sound.id));
     }
@@ -461,7 +461,7 @@ export class Sounds {
         await rename(tmpPath, `${this.config.soundsDir}/${sound.id}`);
         await this.visualizer.visualizeSound(sound.id);
 
-        verbose(`${currentUser.name} added new uploaded sound #${sound.id}`);
+        verbose(`User ${currentUser.id} added new uploaded sound #${sound.id}`);
 
         return created(await this.getSound(sound.id));
     }
@@ -497,7 +497,7 @@ export class Sounds {
         }
 
         this.cache.remove(id);
-        verbose(`${currentUser.name} added new recording #${sound.id}`);
+        verbose(`User ${currentUser.id} added new recording #${sound.id}`);
 
         return created(sound);
     }

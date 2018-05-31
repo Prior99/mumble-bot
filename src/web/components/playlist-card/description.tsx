@@ -15,7 +15,7 @@ export interface DescriptionProps {
 export class Description extends React.Component<DescriptionProps> {
     @inject private playlists: PlaylistsStore;
 
-    @observable private description = this.props.playlist.name;
+    @observable private description = this.props.playlist.description;
     @observable private editDescription = false;
     @observable private descriptionLoading = false;
 
@@ -23,15 +23,15 @@ export class Description extends React.Component<DescriptionProps> {
 
     @bind @action private async handleAbortEditDescription() {
         const { playlist } = this.props;
-        this.description = playlist.name;
+        this.description = playlist.description;
         this.editDescription = false;
     }
 
     @bind @action private async handleFinishEditDescription() {
         const { description } = this;
-        if (description !== this.props.playlist.name) {
+        if (description !== this.props.playlist.description) {
             this.descriptionLoading = true;
-            await this.playlists.update(this.props.playlist.id, { name: description } as Playlist);
+            await this.playlists.update(this.props.playlist.id, { description } as Playlist);
             this.descriptionLoading = false;
         }
         this.editDescription = false;
@@ -56,7 +56,7 @@ export class Description extends React.Component<DescriptionProps> {
 
     public render() {
         const { playlist } = this.props;
-        const { name } = playlist;
+        const { description } = playlist;
         return (
             <>
                 {
@@ -80,7 +80,7 @@ export class Description extends React.Component<DescriptionProps> {
                             onKeyDown={this.handleDescriptionKeyDown}
                         />
                     </> : <>
-                        {`${name} `}
+                        {`${description} `}
                         <Icon name="pencil" color="grey" link onClick={this.handleStartEditDescription} />
                     </>
                 }

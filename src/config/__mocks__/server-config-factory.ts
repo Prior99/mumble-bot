@@ -17,7 +17,7 @@ export class ServerConfigFactory {
             dbName: process.env["POSTGRES_DB"] || "bot-test",
             dbUsername: process.env["POSTGRES_USER"],
             dbPassword: process.env["POSTGRES_PASSWORD"],
-            dbHost:  process.env["POSTGRES_HOST"] || "localhost",
+            dbHost: process.env["POSTGRES_HOST"] || "localhost",
             tmpDir: path.join(baseTmpDir, "tmp"),
             soundsDir: path.join(baseTmpDir, "sound"),
             name: "test-bot",
