@@ -89,8 +89,9 @@ export interface SoundsQuery {
      *  - `used`
      *  - `duration`
      *  - `description`
+     *  - `rating`
      */
-    sort?: "created" | "updated" | "used" | "duration" | "description";
+    sort?: "created" | "updated" | "used" | "duration" | "description" | "rating";
     /**
      * The direction of the sorting. Ascending or Descending.
      */
@@ -100,6 +101,15 @@ export interface SoundsQuery {
      */
     includeDeleted?: boolean;
 }
+
+const sortOptions = [
+    "created",
+    "updated",
+    "used",
+    "duration",
+    "description",
+    "rating",
+];
 
 @controller @component
 export class Sounds {
@@ -267,7 +277,7 @@ export class Sounds {
         @query("user") @is().validate(uuid) user?: string,
         @query("tags") @is() tags?: string,
         @query("source") @is().validate(oneOf("upload", "recording", "youtube")) source?: string,
-        @query("sort") @is().validate(oneOf("created", "updated", "used", "duration", "description")) sort?: string,
+        @query("sort") @is().validate(oneOf(...sortOptions)) sort?: string,
         @query("sortDirection") @is().validate(oneOf("asc", "desc")) sortDirection?: string,
         @query("includeDeleted") @is().validate(oneOf("asc", "desc")) includeDeleted?: boolean,
     ): Promise<SoundsQueryResult> {
@@ -280,7 +290,13 @@ export class Sounds {
             .leftJoin("sound.parent", "parent")
             .leftJoin("sound.children", "children")
             .addSelect("parent.id")
-            .addSelect("children.id");
+            .addSelect("children.id")
+            .addSelect(subQuery => {
+                return subQuery
+                    .select("COALESCE(AVG(rating.stars), 0) AS rating")
+                    .from(SoundRating, "rating")
+                    .where(`rating."soundId" = sound.id`);
+            }, "stars");
         if (startDate) { queryBuilder.andWhere("sound.created > :startDate", { startDate: new Date(startDate) }); }
         if (endDate) { queryBuilder.andWhere("sound.created < :endDate", { endDate: new Date(endDate) }); }
         if (search) {
@@ -318,6 +334,10 @@ export class Sounds {
             case "duration": queryBuilder.orderBy("sound.duration", direction); break;
             case "description": queryBuilder.orderBy("sound.description", direction); break;
             case "created": default: queryBuilder.orderBy("sound.created", direction); break;
+            case "rating": {
+                queryBuilder.orderBy("stars", direction);
+                break;
+            }
         }
 
         if (offset) { queryBuilder.skip(offset); }
