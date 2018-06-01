@@ -1,7 +1,6 @@
 import { info, error } from "winston";
 import { Connection } from "typeorm";
 import { Connection as MumbleConnection, InputStream as MumbleInputStream } from "mumble";
-import * as Stream from "stream";
 import * as FFMpeg from "fluent-ffmpeg";
 import * as Sox from "sox-audio";
 import { inject, component, initialize, destroy } from "tsdi";
