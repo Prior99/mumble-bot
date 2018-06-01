@@ -3,7 +3,7 @@ import { Connection } from "typeorm";
 import { Connection as MumbleConnection, InputStream as MumbleInputStream } from "mumble";
 import * as Stream from "stream";
 import * as FFMpeg from "fluent-ffmpeg";
-import * as Sox from "sox-audio";
+import * as Sox from "sox-stream";
 import { inject, component, initialize, destroy } from "tsdi";
 import { stat } from "fs-extra";
 import { EventEmitter } from "events";
@@ -34,8 +34,7 @@ export class AudioOutput extends EventEmitter {
     private mumbleStream: MumbleInputStream;
     private stopped = false;
     private ffmpeg: any;
-    private passThrough: Stream.PassThrough;
-    private sox: Sox;
+    private sox: NodeJS.ReadWriteStream;
 
     private transcodeTimeout: NodeJS.Timer;
 
@@ -67,27 +66,32 @@ export class AudioOutput extends EventEmitter {
                         error(`Error decoding file ${filename}`, err);
                         reject();
                     });
-                this.sox = new Sox()
-                    .input(this.ffmpeg.stream())
-                    .inputSampleRate("48k")
-                    .inputBits(16)
-                    .inputChannels(1)
-                    .inputFileType("raw")
-                    .inputEncoding("signed");
-                this.passThrough = new Stream.PassThrough();
-                const output = this.sox.output(this.passThrough)
-                    .outputSampleRate("48k")
-                    .outputEncoding("signed")
-                    .outputBits(16)
-                    .outputChannels(1)
-                    .outputFileType("raw");
-                output.addEffect("pitch", [pitch]);
-                this.sox.on("error", (err) => {
+                this.sox = Sox({
+                    input: {
+                        endian: "little",
+                        bits: 16,
+                        channels: 1,
+                        rate: 48000,
+                        type: "raw",
+                        encoding: "signed-integer",
+                    },
+                    output: {
+                        endian: "little",
+                        bits: 16,
+                        channels: 1,
+                        rate: 48000,
+                        type: "raw",
+                        encoding: "signed-integer",
+                    },
+                    effects: [
+                        ["pitch", `${pitch}`],
+                    ],
+                });
+                this.sox
+                    .on("error", (err) => {
                         error(`Error processing file "${filename}" with sox.`, err);
                         reject();
-                    });
-                this.sox.run();
-                this.passThrough
+                    })
                     .on("data", (chunk: Buffer) => {
                         samplesTotal += chunk.length / 2;
                         this.mumbleStream.write(chunk);
@@ -99,6 +103,7 @@ export class AudioOutput extends EventEmitter {
                         const waitTime = totalTime - timeAlreadyTaken;
                         this.transcodeTimeout = global.setTimeout(resolve, waitTime);
                     });
+                this.ffmpeg.stream().pipe(this.sox);
             } catch (err) {
                 error(`Error reading file ${filename}`, err);
                 reject();
@@ -115,9 +120,6 @@ export class AudioOutput extends EventEmitter {
         this.queue = [];
         this.busy = false;
         this.mumbleStream.close();
-        if (this.passThrough) {
-            this.passThrough.destroy();
-        }
         this.mumbleStream = this.mumble.inputStream();
         this.emit("clear");
     }
@@ -193,7 +195,6 @@ export class AudioOutput extends EventEmitter {
         this.stopped = true;
         this.mumbleStream.close();
         this.mumbleStream.end();
-        if (this.passThrough) { this.passThrough.end(); }
         if (this.ffmpeg) {
             try {
                 this.ffmpeg.kill();
