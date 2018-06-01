@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LiveEvent model the constructor constructs the expected object with arguments "["cache add",{"id":"some-id"}]" 1`] = `
+LiveEvent {
+  "cachedAudio": Object {
+    "id": "some-id",
+  },
+  "event": "cache add",
+}
+`;
+
+exports[`LiveEvent model the constructor constructs the expected object with arguments "["cache remove",{"id":"some-id"}]" 1`] = `
+LiveEvent {
+  "cachedAudio": Object {
+    "id": "some-id",
+  },
+  "event": "cache remove",
+}
+`;
+
+exports[`LiveEvent model the constructor constructs the expected object with arguments "["init",[{"id":"some-id-1"},{"id":"some-id-2"}],[{"id":"some-id-1"},{"id":"some-id-2"}]]" 1`] = `
+LiveEvent {
+  "cachedAudios": undefined,
+  "event": "init",
+  "queue": Array [
+    Object {
+      "id": "some-id-1",
+    },
+    Object {
+      "id": "some-id-2",
+    },
+  ],
+}
+`;
+
+exports[`LiveEvent model the constructor constructs the expected object with arguments "["queue clear"]" 1`] = `
+LiveEvent {
+  "event": "queue clear",
+}
+`;
+
+exports[`LiveEvent model the constructor constructs the expected object with arguments "["queue push",{"id":"some-id"}]" 1`] = `
+LiveEvent {
+  "event": "queue push",
+  "queueItem": Object {
+    "id": "some-id",
+  },
+}
+`;
+
+exports[`LiveEvent model the constructor constructs the expected object with arguments "["queue shift",{"id":"some-id"}]" 1`] = `
+LiveEvent {
+  "event": "queue shift",
+  "queueItem": Object {
+    "id": "some-id",
+  },
+}
+`;
+
+exports[`LiveEvent model the constructor constructs the expected object with arguments "[]" 1`] = `LiveEvent {}`;
