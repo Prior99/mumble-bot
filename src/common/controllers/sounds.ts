@@ -89,17 +89,27 @@ export interface SoundsQuery {
      *  - `used`
      *  - `duration`
      *  - `description`
+     *  - `rating`
      */
-    sort?: "created" | "updated" | "used" | "duration" | "description";
+    sort?: "created" | "updated" | "used" | "duration" | "description" | "rating";
     /**
      * The direction of the sorting. Ascending or Descending.
      */
-    sortDirection?: string;
+    sortDirection?: "asc" | "desc";
     /**
      * Whether deleted sounds should be included.
      */
     includeDeleted?: boolean;
 }
+
+const sortOptions = [
+    "created",
+    "updated",
+    "used",
+    "duration",
+    "description",
+    "rating",
+];
 
 @controller @component
 export class Sounds {
@@ -159,8 +169,8 @@ export class Sounds {
             sound: { id: soundId },
             tag: { id: tagId },
         });
-        const { name } = await ctx.currentUser();
-        verbose(`${name} removed tag #${tagId} from sound #${soundId}`);
+        const currentUser = await ctx.currentUser();
+        verbose(`User ${currentUser.id} removed tag #${tagId} from sound #${soundId}`);
         return ok(await this.getSound(soundId));
     }
 
@@ -196,8 +206,8 @@ export class Sounds {
             tag,
         });
 
-        const { name } = await ctx.currentUser();
-        verbose(`${name} tagged sound #${id} with ${tag.id}`);
+        const currentUser = await ctx.currentUser();
+        verbose(`${currentUser.id} tagged sound #${id} with ${tag.id}`);
         return created(await this.getSound(id));
     }
 
@@ -212,8 +222,8 @@ export class Sounds {
         }
         await this.db.getRepository(Sound).update(id, sound);
 
-        const { name } = await ctx.currentUser();
-        verbose(`${name} edited sound #${id}`);
+        const currentUser = await ctx.currentUser();
+        verbose(`${currentUser.id} edited sound #${id}`);
 
         const updated = await this.getSound(id);
         return ok(updated);
@@ -227,8 +237,8 @@ export class Sounds {
 
         await this.db.getRepository(Sound).update(id, { deleted: new Date() } as Sound);
 
-        const { name } = await ctx.currentUser();
-        verbose(`User ${name} deleted sound #${id}`);
+        const currentUser = await ctx.currentUser();
+        verbose(`User ${currentUser.id} deleted sound #${id}`);
 
         const updated = await this.getSound(id);
         return ok(updated);
@@ -267,7 +277,7 @@ export class Sounds {
         @query("user") @is().validate(uuid) user?: string,
         @query("tags") @is() tags?: string,
         @query("source") @is().validate(oneOf("upload", "recording", "youtube")) source?: string,
-        @query("sort") @is().validate(oneOf("created", "updated", "used", "duration", "description")) sort?: string,
+        @query("sort") @is().validate(oneOf(...sortOptions)) sort?: string,
         @query("sortDirection") @is().validate(oneOf("asc", "desc")) sortDirection?: string,
         @query("includeDeleted") @is().validate(oneOf("asc", "desc")) includeDeleted?: boolean,
     ): Promise<SoundsQueryResult> {
@@ -280,7 +290,13 @@ export class Sounds {
             .leftJoin("sound.parent", "parent")
             .leftJoin("sound.children", "children")
             .addSelect("parent.id")
-            .addSelect("children.id");
+            .addSelect("children.id")
+            .addSelect(subQuery => {
+                return subQuery
+                    .select("COALESCE(AVG(rating.stars), 0) AS rating")
+                    .from(SoundRating, "rating")
+                    .where(`rating."soundId" = sound.id`);
+            }, "stars");
         if (startDate) { queryBuilder.andWhere("sound.created > :startDate", { startDate: new Date(startDate) }); }
         if (endDate) { queryBuilder.andWhere("sound.created < :endDate", { endDate: new Date(endDate) }); }
         if (search) {
@@ -318,6 +334,10 @@ export class Sounds {
             case "duration": queryBuilder.orderBy("sound.duration", direction); break;
             case "description": queryBuilder.orderBy("sound.description", direction); break;
             case "created": default: queryBuilder.orderBy("sound.created", direction); break;
+            case "rating": {
+                queryBuilder.orderBy("stars", direction);
+                break;
+            }
         }
 
         if (offset) { queryBuilder.skip(offset); }
@@ -419,7 +439,7 @@ export class Sounds {
         await rename(tmpPath, `${this.config.soundsDir}/${sound.id}`);
         await this.visualizer.visualizeSound(sound.id);
 
-        verbose(`${currentUser.name} added new sound imported from youtube with id #${sound.id}.`);
+        verbose(`${currentUser.id} added new sound imported from youtube with id #${sound.id}.`);
 
         return created(await this.getSound(sound.id));
     }
@@ -461,7 +481,7 @@ export class Sounds {
         await rename(tmpPath, `${this.config.soundsDir}/${sound.id}`);
         await this.visualizer.visualizeSound(sound.id);
 
-        verbose(`${currentUser.name} added new uploaded sound #${sound.id}`);
+        verbose(`User ${currentUser.id} added new uploaded sound #${sound.id}`);
 
         return created(await this.getSound(sound.id));
     }
@@ -497,7 +517,7 @@ export class Sounds {
         }
 
         this.cache.remove(id);
-        verbose(`${currentUser.name} added new recording #${sound.id}`);
+        verbose(`User ${currentUser.id} added new recording #${sound.id}`);
 
         return created(sound);
     }

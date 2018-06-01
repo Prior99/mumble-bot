@@ -1,9 +1,10 @@
 import { observable, computed, action } from "mobx";
 import { bind } from "decko";
-import { component, inject, initialize } from "tsdi";
+import { component, inject } from "tsdi";
 import { Sound, Playlists, Playlist, Queue, QueueItem, PlaylistEntry } from "../../common";
 import { SoundsStore } from "./sounds";
 import { UsersStore } from "./users";
+import { PlaylistsQuery } from "../../common/controllers/playlists";
 
 @component
 export class PlaylistsStore {
@@ -16,18 +17,16 @@ export class PlaylistsStore {
     @observable public loading = true;
     @observable public quickList: PlaylistEntry[] = [];
 
-    @initialize
-    public async initialize() {
-        const playlists = await this.playlistsController.listPlaylists();
-        await Promise.all(playlists.map(async playlist => {
+    @bind @action public async query(query: PlaylistsQuery) {
+        const result = await this.playlistsController.queryPlaylists(query);
+        await Promise.all(result.playlists.map(async playlist => {
             playlist.creator = this.usersStore.byId(playlist.creator.id);
-            // Needs to be performed sequentially.
             for (let entry of playlist.entries) {
                 entry.sound = await this.soundsStore.byId(entry.sound.id);
             }
-            this.playlists.set(playlist.id, playlist);
         }));
-        this.loading = false;
+        result.playlists.forEach(playlist => this.playlists.set(playlist.id, playlist));
+        return result;
     }
 
     @computed public get all() {
@@ -76,7 +75,7 @@ export class PlaylistsStore {
 
     @bind @action public async saveQuickList(description: string) {
         const playlist = await this.playlistsController.createPlaylist({
-            name: description,
+            description,
             entries: this.quickList.map(({ pitch, sound }, position) => ({
                 position,
                 sound: { id: sound.id },

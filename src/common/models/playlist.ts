@@ -29,7 +29,7 @@ export class Playlist {
 
     @Column("text")
     @scope(world, createPlaylist, listPlaylists, updatePlaylist) @is()
-    public name?: string;
+    public description?: string;
 
     /**
      * How often this playlist was used.

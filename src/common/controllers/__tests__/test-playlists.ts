@@ -20,7 +20,7 @@ describe("playlists controller", () => {
                 description,
                 creator: user,
                 user,
-            });
+            } as Sound);
         }));
         playlist1 = await createPlaylist(user, 0, sounds[0], sounds[1], sounds[3]);
         playlist2 = await createPlaylist(user, 0, sounds[2], sounds[1], sounds[0]);
@@ -28,7 +28,7 @@ describe("playlists controller", () => {
             id: playlist1.id,
             created: playlist1.created.toISOString(),
             creator: { id: user.id },
-            name: "A Playlist",
+            description: "A Playlist",
             entries: [
                 { sound: { id: sounds[0].id }, position: 0 },
                 { sound: { id: sounds[1].id }, position: 1 },
@@ -39,7 +39,7 @@ describe("playlists controller", () => {
             id: playlist2.id,
             created: playlist2.created.toISOString(),
             creator: { id: user.id },
-            name: "A Playlist",
+            description: "A Playlist",
             entries: [
                 { sound: { id: sounds[2].id }, position: 0 },
                 { sound: { id: sounds[1].id }, position: 1 },
@@ -56,11 +56,14 @@ describe("playlists controller", () => {
         });
 
         it("fetches a list of all playlists", async () => {
-            const response = await api().get(`/playlists`)
+            const response = await api().get(`/playlists?sort=created&sortDirection=desc`)
                 .set("authorization", `Bearer ${token.id}`);
             expect(response.status).toBe(200);
             expect(response.body).toMatchObject({
-                data: [ playlist2Response, playlist1Response ],
+                data: {
+                    totalPlaylists: 2,
+                    playlists: [ playlist2Response, playlist1Response ],
+                },
             });
         });
     });
@@ -105,7 +108,7 @@ describe("playlists controller", () => {
 
         it("creates a new playlist", async () => {
             const newPlaylist = {
-                name: "My fancy Playlist",
+                description: "My fancy Playlist",
                 entries: [
                     { sound: { id: sounds[0].id }, position: 0 },
                     { sound: { id: sounds[0].id }, position: 1 },
@@ -123,19 +126,21 @@ describe("playlists controller", () => {
                 },
             });
             expect(createResponse.status).toBe(201);
-            const listResponse = await api().get(`/playlists`)
+            const listResponse = await api().get(`/playlists?sort=created&sortDirection=desc`)
                 .set("authorization", `Bearer ${token.id}`);
             expect(listResponse.body).toMatchObject({
-                data: [
-                    {
-                        ...newPlaylist,
-                        used: 0,
-                        id: createResponse.body.data.id,
-                        created: createResponse.body.data.created,
-                    },
-                    playlist2Response,
-                    playlist1Response,
-                ],
+                data: {
+                    playlists: [
+                        {
+                            ...newPlaylist,
+                            used: 0,
+                            id: createResponse.body.data.id,
+                            created: createResponse.body.data.created,
+                        },
+                        playlist2Response,
+                        playlist1Response,
+                    ],
+                },
             });
             expect(listResponse.status).toBe(200);
         });

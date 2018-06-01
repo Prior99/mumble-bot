@@ -31,6 +31,8 @@ const sortOptionValues: SoundsQuery[] = [
     { sort: "duration", sortDirection: "desc" },
     { sort: "description", sortDirection: "asc" },
     { sort: "description", sortDirection: "desc" },
+    { sort: "rating", sortDirection: "asc" },
+    { sort: "rating", sortDirection: "desc" },
 ];
 
 const sourceOptions = [
@@ -59,16 +61,18 @@ const sourceOptions = [
 ];
 
 const sortOptions = [
-    { key: 0, value: 0, text: "Created (oldest first)", icon: "sort content ascending" },
-    { key: 1, value: 1, text: "Created (newest first)", icon: "sort content descending" },
-    { key: 2, value: 2, text: "Modified (oldest first)", icon: "sort content ascending" },
-    { key: 3, value: 3, text: "Modified (newest first)", icon: "sort content descending" },
-    { key: 4, value: 4, text: "Usages (ascending)", icon: "sort numeric ascending" },
-    { key: 5, value: 5, text: "Usages (descending)", icon: "sort numeric descending" },
-    { key: 6, value: 6, text: "Duration (shortest first)", icon: "sort content ascending" },
-    { key: 7, value: 7, text: "Duration (longest first)", icon: "sort content descending" },
-    { key: 8, value: 8, text: "Name (A-Z)", icon: "sort alphabet ascending" },
-    { key: 9, value: 9, text: "Name (Z-A)", icon: "sort alphabet descending" },
+    { key: 0, value: 0, text: "Oldest", icon: "sort content ascending" },
+    { key: 1, value: 1, text: "Newest", icon: "sort content descending" },
+    { key: 2, value: 2, text: "Not played", icon: "sort content ascending" },
+    { key: 3, value: 3, text: "Last played", icon: "sort content descending" },
+    { key: 4, value: 4, text: "Least used", icon: "sort numeric ascending" },
+    { key: 5, value: 5, text: "Most used", icon: "sort numeric descending" },
+    { key: 6, value: 6, text: "Shortest", icon: "sort content ascending" },
+    { key: 7, value: 7, text: "Longest", icon: "sort content descending" },
+    { key: 8, value: 8, text: "A-Z", icon: "sort alphabet ascending" },
+    { key: 9, value: 9, text: "Z-A", icon: "sort alphabet descending" },
+    { key: 10, value: 10, text: "Worst rated", icon: "sort numeric ascending" },
+    { key: 11, value: 11, text: "Best rated", icon: "sort numeric descending" },
 ];
 
 const limit = 48;
