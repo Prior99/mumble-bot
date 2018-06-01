@@ -1,6 +1,6 @@
 import { component, factory, inject, destroy } from "tsdi";
 import { createConnection, Connection } from "typeorm";
-import { info } from "winston";
+import { info, error } from "winston";
 import { migrations } from "../migrations";
 import { allDatabaseModels } from "../common";
 import { ServerConfig } from "../config";
@@ -34,7 +34,11 @@ export class DatabaseFactory {
     @destroy
     public async stop() {
         if (this.conn) {
-            await this.conn.close();
+            try {
+                await this.conn.close();
+            } catch (err) {
+                error(`Error occured when closing databsae connection: ${err.message}`);
+            }
             info("Disconnected from database.");
         }
     }

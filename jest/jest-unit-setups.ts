@@ -12,6 +12,11 @@ process.on("uncaughtException", err => {
     console.error(err);
 });
 
+declare namespace global {
+    let tsdi: TSDI;
+}
+declare let tsdi: TSDI;
+
 // Setup winston.
 Winston.remove(Winston.transports.Console);
 
@@ -55,27 +60,31 @@ class LocalStorageMock {
 };
 
 beforeEach(async () => {
-    const tsdi = new TSDI();
+    global.tsdi = new TSDI();
     tsdi.enableComponentScanner();
-    (global as any).tsdi = tsdi;
     const databaseFactory = tsdi.get(DatabaseFactory);
     await databaseFactory.connect(true);
     const db = await tsdi.get(Connection);
-    const tables = await db.query(`
-        SELECT table_name AS "tableName"
-        FROM information_schema.tables
-        WHERE table_schema = 'public'
+    await db.query(`
+        DROP SCHEMA public CASCADE;
+        CREATE SCHEMA public;
+        CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
     `);
-    for (const table of tables) {
-        await db.query(`DROP TABLE "${table.tableName}"`);
-    }
     await db.runMigrations();
     await tsdi.get(MumbleFactory).connect();
     await tsdi.get(AudioInput).initialize();
 });
 
-afterEach(() => {
-    if ((global as any).tsdi) {
-        (global as any).tsdi.close();
+afterEach(async () => {
+    if (tsdi) {
+        const db = tsdi.get(Connection);
+        tsdi.close();
+        await new Promise(resolve => {
+            const check = () => {
+                if (db.isConnected) { setTimeout(check, 10); }
+                else { resolve(); }
+            };
+            check();
+        });
     }
 });
