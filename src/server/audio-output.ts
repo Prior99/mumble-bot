@@ -52,7 +52,10 @@ export class AudioOutput extends EventEmitter {
         return new Promise(async (resolve, reject) => {
             let samplesTotal = 0;
             const startTime = Date.now();
+            const effects: Sox.Effect[] = [];
             try {
+                if (echo !== 0) { effects.push(["echo", "0.8", "0.7", `${echo}`, "0.4"]); }
+                if (pitch !== 0) { effects.push(["pitch", `${pitch}`]); }
                 const result = await stat(filename);
                 if (!result.isFile()) {
                     error(`File ${filename} is not a regular file.`);
@@ -83,10 +86,7 @@ export class AudioOutput extends EventEmitter {
                         type: "raw",
                         encoding: "signed-integer",
                     },
-                    effects: [
-                        ["pitch", `${pitch}`],
-                        ["echo", "0.8", "0.7", ${echo}, "0.4"],
-                    ],
+                    effects,
                 });
                 this.sox
                     .on("error", err => error(`Error processing file "${filename}" with sox.`, err))
