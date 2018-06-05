@@ -15,6 +15,7 @@ const msInS = 1000;
 interface PlaybackInfo {
     filename: string;
     pitch: number;
+    echo: number;
 }
 
 /**
@@ -47,7 +48,7 @@ export class AudioOutput extends EventEmitter {
      * @param filename The filename of the file to be played.
      * @param pitch The pitch to which the audio should be transformed.
      */
-    private play({ filename, pitch }: PlaybackInfo): Promise<undefined> {
+    private play({ filename, pitch, echo }: PlaybackInfo): Promise<undefined> {
         return new Promise(async (resolve, reject) => {
             let samplesTotal = 0;
             const startTime = Date.now();
@@ -84,13 +85,11 @@ export class AudioOutput extends EventEmitter {
                     },
                     effects: [
                         ["pitch", `${pitch}`],
+                        ["echo", "0.8", "0.7", ${echo}, "0.4"],
                     ],
                 });
                 this.sox
-                    .on("error", (err) => {
-                        error(`Error processing file "${filename}" with sox.`, err);
-                        reject();
-                    })
+                    .on("error", err => error(`Error processing file "${filename}" with sox.`, err))
                     .on("data", (chunk: Buffer) => {
                         samplesTotal += chunk.length / 2;
                         this.mumbleStream.write(chunk);
@@ -130,6 +129,7 @@ export class AudioOutput extends EventEmitter {
                     {
                         filename: `${this.config.soundsDir}/${queueItem.sound.id}`,
                         pitch: queueItem.pitch,
+                        echo: queueItem.echo,
                     },
                 ];
             case "cached audio":
@@ -137,6 +137,7 @@ export class AudioOutput extends EventEmitter {
                     {
                         filename: `${this.config.tmpDir}/${queueItem.cachedAudio.id}`,
                         pitch: queueItem.pitch,
+                        echo: queueItem.echo,
                     },
                 ];
             case "playlist":
@@ -146,9 +147,10 @@ export class AudioOutput extends EventEmitter {
                     .leftJoinAndSelect("entry.sound", "sound")
                     .orderBy("entry.position", "ASC")
                     .getOne();
-                return playlist.entries.map(({ sound, pitch }) => ({
+                return playlist.entries.map(({ sound, pitch, echo }) => ({
                     filename: `${this.config.soundsDir}/${sound.id}`,
                     pitch,
+                    echo,
                 }));
             default:
                 return [];
