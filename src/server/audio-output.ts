@@ -1,4 +1,5 @@
 import { info, error } from "winston";
+import { PassThrough } from "stream";
 import { Connection } from "typeorm";
 import { Connection as MumbleConnection, InputStream as MumbleInputStream } from "mumble";
 import * as FFMpeg from "fluent-ffmpeg";
@@ -33,7 +34,7 @@ export class AudioOutput extends EventEmitter {
     private mumbleStream: MumbleInputStream;
     private stopped = false;
     private ffmpeg: any;
-    private passThrough: Stream.PassThrough;
+    private passThrough: PassThrough;
     private sox: Sox;
 
     private transcodeTimeout: NodeJS.Timer;
@@ -73,7 +74,7 @@ export class AudioOutput extends EventEmitter {
                     .inputChannels(1)
                     .inputFileType("raw")
                     .inputEncoding("signed");
-                this.passThrough = new Stream.PassThrough();
+                this.passThrough = new PassThrough();
                 const output = this.sox.output(this.passThrough)
                     .outputSampleRate("48k")
                     .outputEncoding("signed")

@@ -20,7 +20,7 @@ describe("queue controller", () => {
         const userAndToken = await createUserWithToken();
         token = userAndToken.token;
         user = userAndToken.user;
-        sound = (await createSoundWithCreatorAndSpeaker({ duration: 1 })).sound;
+        sound = (await createSoundWithCreatorAndSpeaker({ duration: 1 } as Sound)).sound;
         await copy(`${__dirname}/__fixtures__/sin-short.mp3`, `${tsdi.get(ServerConfig).soundsDir}/${sound.id}`);
         mumble = tsdi.get("MumbleConnection");
         audioOutput = tsdi.get(AudioOutput);

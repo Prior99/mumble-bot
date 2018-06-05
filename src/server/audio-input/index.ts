@@ -50,10 +50,7 @@ export class AudioInput extends EventEmitter {
             where: { mumbleId: user.id },
             relations: ["user"],
         });
-        if (!link) {
-            info(`Did not register input for user ${user.name} as this user is not linked to any database user.`);
-            return;
-        }
+        if (!link) { return; }
         this.addRegisteredUser(user, link.user);
     }
 

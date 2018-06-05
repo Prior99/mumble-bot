@@ -1,7 +1,7 @@
 import * as puppeteer from "puppeteer";
 import { readFileSync } from "fs";
 import { setupJestScreenshot } from "jest-screenshot";
-import { MumbleAgent, mumbleAgent } from "./mumble-agent";
+import { mumbleAgent } from "./mumble-agent";
 
 setupJestScreenshot();
 

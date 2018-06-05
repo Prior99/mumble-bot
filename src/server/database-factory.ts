@@ -1,3 +1,4 @@
+import * as uuid from "uuid";
 import { component, factory, inject, destroy } from "tsdi";
 import { createConnection, Connection } from "typeorm";
 import { info, error } from "winston";
@@ -11,8 +12,9 @@ export class DatabaseFactory {
 
     public conn: Connection;
 
-    public async connect(dropSchema = false) {
+    public async connect() {
         this.conn = await createConnection({
+            name: uuid.v4(),
             entities: allDatabaseModels,
             database: this.config.dbName,
             type: this.config.dbDriver as any,
@@ -21,19 +23,18 @@ export class DatabaseFactory {
             port: this.config.dbPort,
             username: this.config.dbUsername,
             host: this.config.dbHost,
-            dropSchema,
             extra: { ssl: this.config.dbSSL },
             migrations,
         });
         info("Connected to database.");
     }
 
-    @factory
+    @factory({ name: "db" })
     public getConnection(): Connection { return this.conn; }
 
     @destroy
     public async stop() {
-        if (this.conn) {
+        if (this.conn && this.conn.isConnected) {
             try {
                 await this.conn.close();
             } catch (err) {

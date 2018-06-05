@@ -1,4 +1,5 @@
 import { api, createUserWithToken, createUser, linkMumbleUser } from "../../../test-utils";
+import { User } from "../../models";
 
 describe("mumble-links controller", () => {
     describe("POST /mumble-link", () => {
@@ -73,11 +74,11 @@ describe("mumble-links controller", () => {
             expect(response.status).toBe(401);
         });
 
-        it("fetches a list of all mumble links", async () => {
+        it.only("fetches a list of all mumble links", async () => {
             const { user: otherUser1, token: otherUser1Token } =
-                await createUserWithToken({ name: "user1", email: "user1@example.com" });
+                await createUserWithToken({ name: "user1", email: "user1@example.com" } as User);
             const { user: otherUser2, token: otherUser2Token } =
-                await createUserWithToken({ name: "user2", email: "user2@example.com" });
+                await createUserWithToken({ name: "user2", email: "user2@example.com" } as User);
             await linkMumbleUser(otherUser1.id, otherUser1Token.id, 4);
             await linkMumbleUser(otherUser2.id, otherUser2Token.id, 7);
             const { token } = await createUserWithToken();
