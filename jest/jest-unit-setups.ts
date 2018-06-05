@@ -45,7 +45,12 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-    const databaseFactory = tsdi.get(DatabaseFactory);
-    await databaseFactory.conn.close();
+    const db = tsdi.get(Connection);
+    // This needs to be performed in order to flush all active queries.
+    // There might be queries ongoing which, on termination will fail all tests.
+    // By executing this dummy query it is ensured that the database driver waits for
+    // all queries before closing.
+    await db.query("SELECT 1");
+    await db.close();
     tsdi.close();
 });
