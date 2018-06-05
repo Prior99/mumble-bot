@@ -15,6 +15,7 @@ export class SoundsStore {
 
     @observable public sounds = new Map<string, Sound>();
     @observable public pitch = 0;
+    @observable public echo = 0;
 
     @computed public get all() {
         return Array.from(this.sounds.values());
@@ -46,6 +47,7 @@ export class SoundsStore {
             type: "sound",
             sound: { id: sound.id },
             pitch: this.pitch,
+            echo: this.echo,
         } as QueueItem);
         sound.used++;
         this.sounds.set(sound.id, sound);
