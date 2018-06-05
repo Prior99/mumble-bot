@@ -61,7 +61,7 @@
     "react-router-dom": "^4.2.2",
     "react-semantic-ui-range": "^0.6.1",
     "semantic-ui-react": "^0.80.0",
-    "sox-audio": "^0.3.0",
+    "sox-stream": "^2.0.1",
     "tsdi": "^0.20.2",
     "typeorm": "^0.2.5",
     "uuid": "^3.2.1",
