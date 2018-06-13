@@ -285,6 +285,50 @@ describe("sounds controller", () => {
         });
     });
 
+    describe("DELETE /sound/:id", () => {
+        let token: Token, sound: Sound;
+
+        beforeEach(async () => {
+            token = (await createUserWithToken()).token;
+            sound = (await createSoundWithCreatorAndSpeaker()).sound;
+        });
+
+        it("responds 401 without a valid token", async () => {
+            const response = await api().delete(`/sound/${sound.id}`);
+            expect(response.status).toBe(401);
+        });
+
+        it("responds 401 for unknown sound without a valid token", async () => {
+            const response = await api().delete(`/sound/65888dad-7250-4756-bd8d-ed3375007405`);
+            expect(response.status).toBe(401);
+        });
+
+        it("responds 404 for unknown sound", async () => {
+            const response = await api().delete(`/sound/65888dad-7250-4756-bd8d-ed3375007405`)
+                .set("authorization", `Bearer ${token.id}`);
+            expect(response.body).toEqual({ message: `No sound with id "65888dad-7250-4756-bd8d-ed3375007405"` });
+            expect(response.status).toBe(404);
+        });
+
+        it("responds 400 if deleting a deleted sound", async () => {
+            await api().delete(`/sound/${sound.id}`)
+                .set("authorization", `Bearer ${token.id}`);
+            const response = await api().delete(`/sound/${sound.id}`)
+                .set("authorization", `Bearer ${token.id}`);
+            expect(response.status).toBe(400);
+        });
+
+        it("sets the deleted timestamp on the sound", async () => {
+            const response = await api().delete(`/sound/${sound.id}`)
+                .set("authorization", `Bearer ${token.id}`);
+            expect(response.status).toBe(200);
+            const updatedSoundResponse = await api().get(`/sound/${sound.id}`)
+                .set("authorization", `Bearer ${token.id}`);
+            const updateSound = updatedSoundResponse.body.data;
+            expect(updateSound.deleted).toBeTruthy();
+        });
+    });
+
     describe("GET /sounds", () => {
         let sounds: Sound[];
         let responseSounds: any[];
