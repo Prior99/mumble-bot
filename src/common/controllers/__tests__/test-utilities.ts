@@ -1,6 +1,9 @@
-import { api, createUserWithToken } from "../../../test-utils";
+import { api, createUserWithToken, startDb, stopDb } from "../../../test-utils";
 
 describe("utilities controller", () => {
+    beforeEach(startDb);
+    afterEach(stopDb);
+
     describe("GET /channel-tree", () => {
         it("responds 401 without a valid token", async () => {
             const response = await api().get("/channel-tree");

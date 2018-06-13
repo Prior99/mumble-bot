@@ -1,7 +1,11 @@
-import { api, createUserWithToken, createUser, linkMumbleUser } from "../../../test-utils";
+import { api, createUserWithToken, createUser, linkMumbleUser, startDb, stopDb } from "../../../test-utils";
 import { User } from "../../models";
 
 describe("mumble-links controller", () => {
+
+    beforeEach(startDb);
+    afterEach(stopDb);
+
     describe("POST /mumble-link", () => {
         it("responds 401 without a valid token", async () => {
             const user = await createUser();

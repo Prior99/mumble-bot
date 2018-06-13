@@ -1,8 +1,11 @@
 import { pick } from "ramda";
-import { api, createUserWithToken, createUser } from "../../../test-utils/";
+import { api, createUserWithToken, createUser, startDb, stopDb } from "../../../test-utils/";
 import { User } from "../..";
 
 describe("users controller", () => {
+    beforeEach(startDb);
+    afterEach(stopDb);
+
     describe("GET /users", () => {
         it("responds 401 without a valid token", async () => {
             const response = await api().get("/users");

@@ -1,8 +1,19 @@
-import { api, createUserWithToken, createTag, tagSound, createSoundWithCreatorAndSpeaker } from "../../../test-utils";
+import {
+    api,
+    createUserWithToken,
+    createTag,
+    tagSound,
+    createSoundWithCreatorAndSpeaker,
+    startDb,
+    stopDb,
+} from "../../../test-utils";
 import { Token } from "../../models";
 
 describe("tags controller", () => {
     let token: Token;
+
+    beforeEach(startDb);
+    afterEach(stopDb);
 
     beforeEach(async () => {
         const userAndToken = await createUserWithToken();

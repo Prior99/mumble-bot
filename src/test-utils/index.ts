@@ -5,3 +5,4 @@ export * from "./user";
 export * from "./sound";
 export * from "./tag";
 export * from "./playlist";
+export * from "./db";

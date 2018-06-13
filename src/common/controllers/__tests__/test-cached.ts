@@ -1,6 +1,6 @@
 import { omit } from "ramda";
 import { populate } from "hyrest";
-import { api, createUserWithToken } from "../../../test-utils";
+import { startDb, stopDb, api, createUserWithToken } from "../../../test-utils";
 import { world } from "../../scopes";
 import { AudioCache } from "../../../server";
 import { Token, User, CachedAudio } from "../../models";
@@ -9,6 +9,9 @@ describe("cached controller", () => {
     let user: User;
     let token: Token;
     let cachedAudio1: CachedAudio, cachedAudio2: CachedAudio;
+
+    beforeEach(startDb);
+    afterEach(stopDb);
 
     beforeEach(async () => {
         const userAndToken = await createUserWithToken();

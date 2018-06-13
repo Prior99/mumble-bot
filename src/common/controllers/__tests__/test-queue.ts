@@ -2,7 +2,14 @@ import { copy } from "fs-extra";
 import { fft, util } from "fft-js";
 import { populate } from "hyrest";
 import { Connection } from "mumble";
-import { api, createPlaylist, createUserWithToken, createSoundWithCreatorAndSpeaker } from "../../../test-utils";
+import {
+    api,
+    createPlaylist,
+    createUserWithToken,
+    createSoundWithCreatorAndSpeaker,
+    startDb,
+    stopDb,
+} from "../../../test-utils";
 import { world } from "../../scopes";
 import { Token, User, Sound, CachedAudio } from "../../models";
 import { AudioOutput, AudioCache } from "../../../server";
@@ -15,6 +22,9 @@ describe("queue controller", () => {
     let mumble: Connection;
     let audioOutput: AudioOutput;
     let voice: number[];
+
+    beforeEach(startDb);
+    afterEach(stopDb);
 
     beforeEach(async () => {
         const userAndToken = await createUserWithToken();

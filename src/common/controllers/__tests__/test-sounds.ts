@@ -8,10 +8,15 @@ import {
     createSound,
     rateSound,
     getSound,
+    startDb,
+    stopDb,
 } from "../../../test-utils";
 import { Token, Sound, Tag, User } from "../..";
 
 describe("sounds controller", () => {
+    beforeEach(startDb);
+    afterEach(stopDb);
+
     describe("GET /sound/:id", () => {
         it("responds 401 without a valid token", async () => {
             const { sound } = await createSoundWithCreatorAndSpeaker();

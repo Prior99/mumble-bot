@@ -1,4 +1,4 @@
-import { api, createUserWithToken, createSound, createPlaylist } from "../../../test-utils";
+import { api, createUserWithToken, createSound, createPlaylist, startDb, stopDb } from "../../../test-utils";
 import { User, Token, Sound, Playlist } from "../../models";
 
 describe("playlists controller", () => {
@@ -9,6 +9,9 @@ describe("playlists controller", () => {
     let playlist2: Playlist;
     let playlist1Response: any;
     let playlist2Response: any;
+
+    beforeEach(startDb);
+    afterEach(stopDb);
 
     beforeEach(async () => {
         const userAndToken = await createUserWithToken();
