@@ -121,6 +121,18 @@ describe("sounds controller", () => {
             expect(response.status).toBe(404);
         });
 
+        it("responds 409 if already tagged with a tag", async () => {
+            await tagSound(sound, tag, token);
+            await api().post(`/sound/${sound.id}/tags`)
+                .set("authorization", `Bearer ${token.id}`)
+                .send({ id: tag.id });
+            const response = await api().post(`/sound/${sound.id}/tags`)
+                .set("authorization", `Bearer ${token.id}`)
+                .send({ id: tag.id });
+            expect(response.status).toBe(409);
+            expect(response.body).toEqual({ message: `Sound was already tagged with tag "${tag.id}"` });
+        });
+
         it("tags the sound with the specified tag", async () => {
             const tag1 = await createTag("Some tag", token);
             const tag2 = await createTag("Another tag", token);
