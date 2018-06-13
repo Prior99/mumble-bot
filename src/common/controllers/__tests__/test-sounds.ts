@@ -1,4 +1,4 @@
-import { omit } from "ramda";
+import { omit, pick } from "ramda";
 import {
     api,
     createSoundWithCreatorAndSpeaker,
@@ -193,6 +193,83 @@ describe("sounds controller", () => {
                 .set("authorization", `Bearer ${token.id}`);
             expect(response.body.data.soundTagRelations).toEqual([]);
             expect(response.status).toBe(200);
+        });
+    });
+
+    describe("POST /sound/:id", () => {
+        let token: Token, sound: Sound;
+
+        beforeEach(async () => {
+            token = (await createUserWithToken()).token;
+            sound = (await createSoundWithCreatorAndSpeaker()).sound;
+        });
+
+        it("responds 401 without a valid token", async () => {
+            const response = await api().post(`/sound/${sound.id}`);
+            expect(response.status).toBe(401);
+        });
+
+        it("responds 401 for unknown sound without a valid token", async () => {
+            const response = await api().post(`/sound/65888dad-7250-4756-bd8d-ed3375007405`);
+            expect(response.status).toBe(401);
+        });
+
+        it("responds 404 for unknown sound", async () => {
+            const response = await api().post(`/sound/65888dad-7250-4756-bd8d-ed3375007405`)
+                .set("authorization", `Bearer ${token.id}`);
+            expect(response.body).toEqual({ message: `No sound with id "65888dad-7250-4756-bd8d-ed3375007405"` });
+            expect(response.status).toBe(404);
+        });
+
+        it("updates the description of the sound", async () => {
+            const response = await api().post(`/sound/${sound.id}`)
+                .set("authorization", `Bearer ${token.id}`)
+                .send({ description: "Updated description" });
+            expect(response.status).toBe(200);
+            expect(response.body.data).toMatchObject({ description: "Updated description" });
+            const updatedSoundResponse = await api().get(`/sound/${sound.id}`)
+                .set("authorization", `Bearer ${token.id}`);
+            const updateSound = updatedSoundResponse.body.data;
+            expect(new Date(updateSound.updated) > new Date(sound.updated)).toBe(true);
+            expect(updateSound.description).toBe("Updated description");
+        });
+
+        [
+            "id",
+            "used",
+            "user",
+            "source",
+            "creator",
+            "parent",
+            "children",
+            "created",
+            "updated",
+            "deleted",
+            "soundTagRelations",
+            "duration",
+            "playlistEntrys",
+            "ratings",
+            "rating",
+        ].forEach(field => {
+            it(`responds 422 and does not update field "${field}"`, async () => {
+                const response = await api().post(`/sound/${sound.id}`)
+                    .set("authorization", `Bearer ${token.id}`)
+                    .send({ [field]: "Something" });
+                expect(response.status).toBe(422);
+                const updatedSoundResponse = await api().get(`/sound/${sound.id}`)
+                    .set("authorization", `Bearer ${token.id}`);
+                const updateSound = updatedSoundResponse.body.data;
+                expect(new Date(updateSound.updated)).toEqual(sound.updated);
+                expect({
+                    ...updateSound,
+                    created: new Date(updateSound.created),
+                    updated: new Date(updateSound.updated),
+                }).toMatchObject({
+                    ...sound,
+                    user: pick(["admin", "avatarUrl", "enabled", "id", "name"], sound.user),
+                    creator: pick(["admin", "avatarUrl", "enabled", "id", "name"], sound.creator),
+                });
+            });
         });
     });
 

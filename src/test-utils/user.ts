@@ -13,9 +13,11 @@ export async function createUser(data?: User, enable = true, admin = false) {
     const user = response.body.data;
     if (enable) {
         await tsdi.get(Connection).getRepository(User).update(user.id, { enabled: true });
+        user.enabled = true;
     }
     if (admin) {
         await tsdi.get(Connection).getRepository(User).update(user.id, { admin: true });
+        user.admin = true;
     }
     return user;
 }
