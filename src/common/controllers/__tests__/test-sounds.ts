@@ -1,5 +1,7 @@
 import { omit, pick } from "ramda";
+import { populate } from "hyrest";
 import { readFileSync } from "fs";
+import { copy } from "fs-extra";
 import {
     api,
     createSoundWithCreatorAndSpeaker,
@@ -12,7 +14,10 @@ import {
     startDb,
     stopDb,
 } from "../../../test-utils";
-import { Token, Sound, Tag, User } from "../..";
+import { world } from "../../scopes";
+import { AudioCache } from "../../../server";
+import { Token, Sound, Tag, User, CachedAudio } from "../../models";
+import { ServerConfig } from "../../../config";
 
 describe("sounds controller", () => {
     beforeEach(startDb);
@@ -712,6 +717,63 @@ describe("sounds controller", () => {
                 duration: 1.201633,
                 creator: { id: user.id },
                 user: null,
+                soundTagRelations: [],
+                parent: null,
+                children: [],
+                rating: 0,
+            });
+        });
+    });
+
+    describe("POST /sounds", () => {
+        let user: User, token: Token, cachedAudio: CachedAudio;
+
+        beforeEach(async () => {
+            const userAndToken = await createUserWithToken();
+            user = userAndToken.user;
+            token = userAndToken.token;
+            cachedAudio = populate(world, CachedAudio, {
+                date: new Date("2018-11-15Z10:00:00"),
+                user,
+                id: "0edf2ba3-d372-4ccf-8b85-f475423747cb",
+                duration: 15,
+                amplitude: 38,
+            });
+            await copy(
+                `${__dirname}/../../../__fixtures__/test.mp3`,
+                `${tsdi.get(ServerConfig).tmpDir}/${cachedAudio.id}`,
+            );
+            await tsdi.get(AudioCache).add(cachedAudio);
+        });
+
+        it("returns 401 without a valid token", async () => {
+            const response = await api().post("/sounds");
+            expect(response.body).toEqual({ message: "Unauthorized." });
+            expect(response.status).toBe(401);
+        });
+
+        it("returns 400 with an unkown cached audio", async () => {
+            const response = await api().post("/sounds")
+                .set("authorization", `Bearer ${token.id}`)
+                .send({ id: "f2a0abc7-0afe-4553-9d12-f675f95a9ab0" });
+            expect(response.status).toBe(400);
+            expect(response.body).toEqual({
+                message: `No cached sound with id "f2a0abc7-0afe-4553-9d12-f675f95a9ab0" found.`,
+            });
+        });
+
+        it("creates a new sound", async () => {
+            const response = await api().post("/sounds")
+                .set("authorization", `Bearer ${token.id}`)
+                .send({ id: cachedAudio.id });
+            expect(response.status).toBe(201);
+            expect(response.body.data).toMatchObject({
+                used: 0,
+                source: "recording",
+                deleted: null,
+                duration: 15,
+                creator: { id: user.id },
+                user: { id: user.id },
                 soundTagRelations: [],
                 parent: null,
                 children: [],

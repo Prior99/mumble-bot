@@ -115,7 +115,7 @@ const sortOptions = [
 export class Sounds {
     @inject private db: Connection;
     @inject private config: ServerConfig;
-    @inject private cache: AudioCache;
+    @inject("AudioCache") private cache: AudioCache;
     @inject private visualizer: VisualizerExecutor;
 
     /**
@@ -491,7 +491,7 @@ export class Sounds {
     public async save(@body(createSound) { id }: CachedAudio, @context ctx?: Context): Promise<Sound> {
         const cachedAudio = this.cache.byId(id);
         if (!cachedAudio) {
-            return badRequest<undefined>(`No cached sound with id "${id}" found.`);
+            return badRequest<Sound>(`No cached sound with id "${id}" found.`);
         }
         const { date, duration, user } = cachedAudio;
         try {
@@ -520,7 +520,7 @@ export class Sounds {
         this.cache.remove(id);
         verbose(`User ${currentUser.id} added new recording #${sound.id}`);
 
-        return created(sound);
+        return created(await this.getSound(sound.id));
     }
 
     @route("POST", "/sound/:id/fork").dump(Sound, world)
