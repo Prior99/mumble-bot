@@ -1,4 +1,5 @@
 import { omit, pick } from "ramda";
+import { readFileSync } from "fs";
 import {
     api,
     createSoundWithCreatorAndSpeaker,
@@ -646,6 +647,67 @@ describe("sounds controller", () => {
                 description: "Some video",
                 used: 0,
                 source: "youtube",
+                deleted: null,
+                duration: 1.201633,
+                creator: { id: user.id },
+                user: null,
+                soundTagRelations: [],
+                parent: null,
+                children: [],
+                rating: 0,
+            });
+        });
+    });
+
+    describe("POST /sounds/upload", () => {
+        let user: User, token: Token;
+
+        beforeEach(async () => {
+            const userAndToken = await createUserWithToken();
+            user = userAndToken.user;
+            token = userAndToken.token;
+        });
+
+        it("returns 401 without a valid token", async () => {
+            const response = await api().post("/sounds/upload");
+            expect(response.body).toEqual({ message: "Unauthorized." });
+            expect(response.status).toBe(401);
+        });
+
+        it("returns 400 with a bad audio file", async () => {
+            const response = await api().post("/sounds/upload")
+                .set("authorization", `Bearer ${token.id}`)
+                .send({
+                    filename: "some-file.mp3",
+                    content: readFileSync(`${__dirname}/../../../__fixtures__/garbage`).toString("base64"),
+                });
+            expect(response.body).toEqual({ message: "Unable to process meta information for upload" });
+            expect(response.status).toBe(400);
+        });
+
+        it("returns 400 with invalid base64", async () => {
+            const response = await api().post("/sounds/upload")
+                .set("authorization", `Bearer ${token.id}`)
+                .send({
+                    filename: "some-file.mp3",
+                    content: "this is not valid base64 :-(",
+                });
+            expect(response.body).toEqual({ message: "Unable to process meta information for upload" });
+            expect(response.status).toBe(400);
+        });
+
+        it("creates a new sound", async () => {
+            const response = await api().post("/sounds/upload")
+                .set("authorization", `Bearer ${token.id}`)
+                .send({
+                    filename: "some-file.mp3",
+                    content: readFileSync(`${__dirname}/../../../__fixtures__/test.mp3`).toString("base64"),
+                });
+            expect(response.status).toBe(201);
+            expect(response.body.data).toMatchObject({
+                description: "some-file.mp3",
+                used: 0,
+                source: "upload",
                 deleted: null,
                 duration: 1.201633,
                 creator: { id: user.id },
