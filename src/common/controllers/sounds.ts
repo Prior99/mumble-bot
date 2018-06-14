@@ -375,7 +375,7 @@ export class Sounds {
 
     private async getYoutubeDlInfo(url: string) {
         return new Promise<YoutubeDl.Info>((resolve, reject) => {
-            YoutubeDl.getInfo(url, [], (err, videoInfo) => {
+            YoutubeDl.getInfo(url, [], (err, videoInfo: YoutubeDl.Info) => {
                 if (err) {
                     reject(err);
                     return;
@@ -402,9 +402,10 @@ export class Sounds {
         }
         const tmpPath = `${this.config.tmpDir}/youtube-${Uuid.v4()}`;
         try {
-            await new Promise(resolve => {
+            await new Promise((resolve, reject) => {
                 YoutubeDl(url, ["--extract-audio", "--audio-format=mp3"], {})
                     .on("end", resolve)
+                    .on("error", reject)
                     .pipe(createWriteStream(tmpPath));
             });
         } catch (err) {

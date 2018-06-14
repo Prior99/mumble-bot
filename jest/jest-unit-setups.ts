@@ -20,6 +20,7 @@ if (!process.env["DEBUG"]) { Winston.remove(Winston.transports.Console); }
 
 // Mock modules.
 jest.mock("mumble");
+jest.mock("youtube-dl");
 jest.mock("../src/config/server-config-factory");
 jest.mock("../src/visualizer/executor");
 

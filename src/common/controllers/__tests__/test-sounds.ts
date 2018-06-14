@@ -590,6 +590,74 @@ describe("sounds controller", () => {
         });
     });
 
+    describe("POST /sounds/youtube", () => {
+        let user: User, token: Token;
+
+        beforeEach(async () => {
+            const userAndToken = await createUserWithToken();
+            user = userAndToken.user;
+            token = userAndToken.token;
+        });
+
+        it("returns 401 without a valid token", async () => {
+            const response = await api().post("/sounds/youtube");
+            expect(response.body).toEqual({ message: "Unauthorized." });
+            expect(response.status).toBe(401);
+        });
+
+        it("returns 400 with an invalid youtube url", async () => {
+            const response = await api().post("/sounds/youtube")
+                .set("authorization", `Bearer ${token.id}`)
+                .send({
+                    url: "https://example.com/broken",
+                });
+            expect(response.body).toEqual({ message: "Could not gather meta information about provided URL." });
+            expect(response.status).toBe(400);
+        });
+
+        it("returns 400 if an error occurs while downloading the video", async () => {
+            const response = await api().post("/sounds/youtube")
+                .set("authorization", `Bearer ${token.id}`)
+                .send({
+                    url: "https://example.com/error",
+                });
+            expect(response.body).toEqual({ message: "Connection to YouTube interrupted." });
+            expect(response.status).toBe(400);
+        });
+
+        it("returns 400 if a broken file was downloaded", async () => {
+            const response = await api().post("/sounds/youtube")
+                .set("authorization", `Bearer ${token.id}`)
+                .send({
+                    url: "https://example.com/garbage",
+                });
+            expect(response.body).toEqual({ message: "Unable to process meta information for downloaded file." });
+            expect(response.status).toBe(400);
+        });
+
+        it("downloads the video and creates a new sound", async () => {
+            const response = await api().post("/sounds/youtube")
+                .set("authorization", `Bearer ${token.id}`)
+                .send({
+                    url: "https://example.com/working",
+                });
+            expect(response.status).toBe(201);
+            expect(response.body.data).toMatchObject({
+                description: "Some video",
+                used: 0,
+                source: "youtube",
+                deleted: null,
+                duration: 1.201633,
+                creator: { id: user.id },
+                user: null,
+                soundTagRelations: [],
+                parent: null,
+                children: [],
+                rating: 0,
+            });
+        });
+    });
+
     describe("POST /sound/:id/ratings", () => {
         let users: { user: User, token: Token }[];
         let sound: Sound;
