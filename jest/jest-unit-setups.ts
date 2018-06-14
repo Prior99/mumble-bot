@@ -35,3 +35,5 @@ beforeEach(async () => {
 afterEach(async () => {
     tsdi.close();
 });
+
+jest.setTimeout(30000);
