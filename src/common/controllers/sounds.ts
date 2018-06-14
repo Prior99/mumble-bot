@@ -534,18 +534,22 @@ export class Sounds {
             relations: ["parent", "children", "user", "creator"],
         });
         if (!original) {
-            return notFound<Sound>(`No sound with id ${id}`);
+            return notFound<Sound>(`No sound with id "${id}".`);
         }
 
         const { actions, description, overwrite } = options;
         if (actions.length === 0) {
-            return badRequest<Sound>("No actions specified");
+            return badRequest<Sound>("No actions specified.");
         }
-        const invalidAction = actions.some(({ start, end }) => {
-            return start < 0 || start > original.duration || end < start || end > original.duration;
+        const invalidAction = actions.some(({ action, start, end }) => {
+            return action !== "crop" ||
+                start < 0 ||
+                start > original.duration ||
+                end < start ||
+                end > original.duration;
         });
         if (invalidAction) {
-            return badRequest<Sound>("Invalid action");
+            return badRequest<Sound>("Invalid action.");
         }
 
         const currentUser = await ctx.currentUser();
@@ -555,6 +559,7 @@ export class Sounds {
         const newSound: Sound = await this.db.getRepository(Sound).save({
             ...omit(["id"], original),
             description,
+            used: 0,
             duration: newDuration,
             creator: currentUser,
             parent: original,

@@ -782,6 +782,81 @@ describe("sounds controller", () => {
         });
     });
 
+    describe("POST /sound/:id/fork", () => {
+        let token: Token, sound: Sound, user: User, speaker: User;
+
+        beforeEach(async () => {
+            const userAndToken = await createUserWithToken();
+            token = userAndToken.token;
+            user = userAndToken.user;
+            const soundAndSpeaker = await createSoundWithCreatorAndSpeaker();
+            sound = soundAndSpeaker.sound;
+            speaker = soundAndSpeaker.speaker;
+            await copy(
+                `${__dirname}/../../../__fixtures__/test.mp3`,
+                `${tsdi.get(ServerConfig).soundsDir}/${sound.id}`,
+            );
+        });
+
+        it("returns 401 without a valid token", async () => {
+            const response = await api().post(`/sound/${sound.id}/fork`);
+            expect(response.body).toEqual({ message: "Unauthorized." });
+            expect(response.status).toBe(401);
+        });
+
+        it("returns 404 with an unknown sound and no valid token", async () => {
+            const response = await api().post(`/sound/953fac26-f2a2-484d-9743-79779be7ec14/fork`);
+            expect(response.body).toEqual({ message: "Unauthorized." });
+            expect(response.status).toBe(401);
+        });
+
+        it("returns 404 with an unknown sound", async () => {
+            const response = await api().post(`/sound/953fac26-f2a2-484d-9743-79779be7ec14/fork`)
+                .set("authorization", `Bearer ${token.id}`)
+                .send({
+                    description: "New description",
+                    actions: [
+                        { action: "crop", start: 1, end: 2 },
+                    ],
+                    overwrite: true,
+                });
+            expect(response.body).toEqual({ message: `No sound with id "953fac26-f2a2-484d-9743-79779be7ec14".` });
+            expect(response.status).toBe(404);
+        });
+
+        [true, false].forEach(overwrite => {
+            it(`creates a new sound and ${overwrite ? "deletes" : "doesn't delete"} the old sound`, async () => {
+                const response = await api().post(`/sound/${sound.id}/fork`)
+                    .set("authorization", `Bearer ${token.id}`)
+                    .send({
+                        description: "New description",
+                        actions: [ { action: "crop", start: 0.2, end: 0.4 } ],
+                        overwrite,
+                    });
+                expect(response.status).toBe(201);
+                expect(response.body.data).toMatchObject({
+                    description: "New description",
+                    used: 0,
+                    source: "recording",
+                    deleted: null,
+                    duration: 0.2,
+                    creator: { id: user.id },
+                    user: { id: speaker.id },
+                    soundTagRelations: [],
+                    parent: { id: sound.id },
+                    children: [],
+                    rating: 0,
+                });
+                const oldSoundResponse = await api().get(`/sound/${sound.id}`)
+                    .set("authorization", `Bearer ${token.id}`);
+                expect(oldSoundResponse.body.data).toMatchObject({
+                    children: [ { id: response.body.data.id } ],
+                });
+                expect(Boolean(oldSoundResponse.body.data.deleted)).toBe(overwrite);
+            });
+        });
+    });
+
     describe("POST /sound/:id/ratings", () => {
         let users: { user: User, token: Token }[];
         let sound: Sound;
