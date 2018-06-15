@@ -36,7 +36,7 @@ export class RestApi {
             { mode: ControllerMode.SERVER },
         );
         this.app = Express();
-        this.app.use(BodyParser.json({ limit: "100mb" }));
+        this.app.use(BodyParser.json({ limit: "100mb", strict: false }));
         this.app.use(BodyParser.urlencoded({ limit: "100mb", extended: true }));
         this.app.use(morgan("tiny", { stream: { write: msg => info(msg.trim()) } }));
         this.app.use(cors);
