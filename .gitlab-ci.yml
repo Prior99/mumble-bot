@@ -1,10 +1,7 @@
 stages:
+  - build
   - test
   - deploy
-
-services:
-  - postgres:latest
-  - dcshock/docker-mumble-server:latest
 
 variables:
   POSTGRES_DB: bot-test
@@ -12,19 +9,28 @@ variables:
   POSTGRES_PASSWORD: ""
   POSTGRES_HOST: "postgres"
   MUMBLE_URL: dcshock-docker-mumble-server
+  DOCKER_DRIVER: overlay2
+  DOCKER_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH
 
-image: "node:9-stretch"
-before_script:
-  - apt-get -qq update
-  - apt-get -qq install -y build-essential ffmpeg sox
+build:
+  stage: build
+  services:
+    - docker:dind
+  image: docker:stable
+  before_script:
+    - docker info
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+  script:
+    - docker pull $DOCKER_IMAGE:latest || true
+    - docker build --cache-from $DOCKER_IMAGE:latest --tag $DOCKER_IMAGE:$CI_BUILD_REF --tag $DOCKER_IMAGE:latest .
+    - docker push $DOCKER_IMAGE:$CI_BUILD_REF
+    - docker push $DOCKER_IMAGE:latest
 
 integration-test:
-  before_script:
-    - apt-get -qq update
-    - apt-get -qq install -y gconf-service libasound2 libgconf-2-4 libgtk-3-0 libnspr4 libx11-xcb1
-      libxss1 libxtst6 fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont
-      fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils libpango1.0-dev libgif-dev build-essential
-      ffmpeg sox
+  services:
+    - postgres:latest
+    - dcshock/docker-mumble-server:latest
+  image: $DOCKER_IMAGE:$CI_BUILD_REF
   script:
     - make integration-test
   stage: test
@@ -35,6 +41,9 @@ integration-test:
   allow_failure: true
 
 test:
+  services:
+    - postgres:latest
+  image: $DOCKER_IMAGE:$CI_BUILD_REF
   script:
     - make test
   stage: test
@@ -43,21 +52,8 @@ test:
     paths:
       - coverage/
 
-build:
-  script:
-    - make release
-  stage: test
-  artifacts:
-    paths:
-      - dist/
-      - server/
-      - src/
-      - package.json
-      - yarn.lock
-      - typings/
-      - README.md
-
 lint:
+  image: $DOCKER_IMAGE:$CI_BUILD_REF
   script:
     - make lint
   stage: test
