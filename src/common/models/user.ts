@@ -11,6 +11,7 @@ import {
     createMumbleLink,
     listPlaylists,
     updateUser,
+    statistics,
 } from "../scopes";
 import { hash } from "../utils";
 import { Sound, Token, MumbleLink, Playlist, SoundRating } from ".";
@@ -22,7 +23,7 @@ import * as gravatar from "gravatar-url";
 @Entity()
 export class User {
     @PrimaryGeneratedColumn("uuid")
-    @scope(listRatings, rateSound, world, createMumbleLink, live, listPlaylists) @is().validate(uuid)
+    @scope(listRatings, rateSound, world, createMumbleLink, live, listPlaylists, statistics) @is().validate(uuid)
     public id?: string;
 
     /**

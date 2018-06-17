@@ -21,6 +21,8 @@ import {
 } from "../scopes";
 import { User, PlaylistEntry, SoundTagRelation, SoundRating } from ".";
 
+export type Source = "upload" | "recording" | "youtube";
+
 /**
  * A single record as represented in the database.
  */
@@ -56,7 +58,7 @@ export class Sound {
 
     @Column("varchar", { length: 16 })
     @is().validate(oneOf("upload", "sound", "youtube")) @scope(world)
-    public source?: "upload" | "recording" | "youtube";
+    public source?: Source;
 
     /**
      * The user who reported the record.

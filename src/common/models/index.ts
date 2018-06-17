@@ -26,6 +26,7 @@ export { YoutubeImport } from "./youtube-import";
 import { SoundRating } from "./sound-rating";
 export { SoundRating } from "./sound-rating";
 export { PlaylistsQueryResult } from "./playlists-query-result";
+export * from "./statistics";
 
 export const allDatabaseModels = [
     User,

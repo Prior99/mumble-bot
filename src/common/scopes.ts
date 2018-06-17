@@ -29,3 +29,5 @@ export const updatePlaylist = createScope();
 // Ratings.
 export const rateSound = createScope();
 export const listRatings = createScope();
+// Statistics.
+export const statistics = createScope();

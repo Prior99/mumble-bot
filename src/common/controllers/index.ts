@@ -18,6 +18,8 @@ export { Validation } from "./validation";
 import { Validation } from "./validation";
 export { Queue } from "./queue";
 import { Queue } from "./queue";
+export { Statistics } from "./statistics";
+import { Statistics } from "./statistics";
 
 export const allControllers = [
     Cached,
@@ -31,4 +33,5 @@ export const allControllers = [
     Utilities,
     Validation,
     Queue,
+    Statistics,
 ];
