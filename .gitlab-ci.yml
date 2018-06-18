@@ -59,6 +59,7 @@ lint:
   stage: test
 
 build:
+  image: $DOCKER_IMAGE:$CI_BUILD_REF
   script:
     - make release
   stage: test
