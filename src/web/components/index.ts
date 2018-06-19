@@ -17,3 +17,7 @@ export * from "./mini-user-badge";
 export * from "./forker";
 export * from "./brush";
 export * from "./quick-list";
+export * from "./chart-sounds-per-source";
+export * from "./chart-recordings-per-user";
+export * from "./chart-overview";
+export * from "./chart-sounds-per-month";

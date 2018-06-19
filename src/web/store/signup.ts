@@ -3,7 +3,6 @@ import { bind } from "decko";
 import { component, inject } from "tsdi";
 
 import { Users, User } from "../../common";
-import { LoginStore, OwnUserStore } from ".";
 
 @component
 export class SignupStore {

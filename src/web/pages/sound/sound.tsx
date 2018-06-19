@@ -174,7 +174,7 @@ export class PageSound extends React.Component<PageSoundProps> {
                                     <Table.Cell><SoundSource sound={sound} /></Table.Cell>
                                 </Table.Row>
                                 <Table.Row>
-                                    <Table.Cell><Icon name="bar chart" /> Used</Table.Cell>
+                                    <Table.Cell><Icon name="chart bar" /> Used</Table.Cell>
                                     <Table.Cell>{used}</Table.Cell>
                                 </Table.Row>
                                 {

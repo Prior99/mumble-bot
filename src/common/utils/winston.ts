@@ -1,18 +1,13 @@
 import * as Winston from "winston";
 
-/**
- * Returns the timestamp formatted as yyyy-mm-dd hh:mm:ss
- * @return The formatted timestamp.
- */
-function timestampFunction () {
-    return new Date().toISOString();
-}
-
 export function setupWinston() {
     Winston.remove(Winston.transports.Console);
-    Winston.add(Winston.transports.Console, {
-        colorize: true,
-        timestamp: timestampFunction,
+    Winston.add(new Winston.transports.Console({
+        format: Winston.format.combine(
+            Winston.format.timestamp({ format: "YYYY-MM-DDTHH:mm:ss" }),
+            Winston.format.colorize(),
+            Winston.format.printf(info => `${info.timestamp} - ${info.level}: ${info.message}`),
+        ),
         level: "verbose",
-    });
+    }));
 }

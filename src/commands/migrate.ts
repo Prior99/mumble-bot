@@ -1,6 +1,5 @@
 import { metadata, command, Command } from "clime";
 import { Connection } from "typeorm";
-import { info, error } from "winston";
 import { ServerConfig, ServerConfigFactory } from "../config";
 import { setupWinston } from "../common";
 import { DatabaseFactory } from "../server";

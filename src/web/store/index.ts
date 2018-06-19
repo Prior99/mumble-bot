@@ -11,3 +11,4 @@ export * from "./live-websocket";
 export * from "./cached-audio";
 export * from "./queue";
 export * from "./playlists";
+export * from "./statistics";

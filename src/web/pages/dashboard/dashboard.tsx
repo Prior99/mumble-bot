@@ -4,7 +4,13 @@ import { observer } from "mobx-react";
 import { Grid, Card, Header, Icon } from "semantic-ui-react";
 import { requireLogin } from "../../utils";
 import { Content } from "../../components";
-import { ChannelTree } from "../../components";
+import {
+    ChannelTree,
+    ChartSoundsPerMonth,
+    ChartOverview,
+    ChartSoundsPerSource,
+    ChartRecordingsPerUser,
+} from "../../components";
 
 @requireLogin @observer @external
 export class PageDashboard extends React.Component {
@@ -21,6 +27,10 @@ export class PageDashboard extends React.Component {
                     </Grid.Row>
                     <Grid.Row>
                         <Grid.Column mobile={16} computer={10} tablet={10}>
+                            <ChartOverview />
+                            <ChartSoundsPerMonth />
+                            <ChartSoundsPerSource />
+                            <ChartRecordingsPerUser />
                         </Grid.Column>
                         <Grid.Column mobile={16} computer={6} tablet={6}>
                             <Card fluid>

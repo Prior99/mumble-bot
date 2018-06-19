@@ -7,6 +7,7 @@ import {
     StatisticRecordingsPerUser,
     StatisticCreationsPerUser,
     StatisticPlaybacksPerUser,
+    StatisticSoundsPerMonth,
     Sound,
     User,
     Tag,
@@ -52,7 +53,7 @@ export class Statistics {
             order: {
                 created: "ASC",
             },
-        })).created;
+        }));
         const totalTags = await tagRepository.count();
         const totalTagged = await soundTagRelationRepository.count();
         const { totalPlaybacks } = await soundRepository.createQueryBuilder("sound")
@@ -61,12 +62,12 @@ export class Statistics {
         return ok(populate(statistics, StatisticOverview, {
             totalSounds,
             totalUsers,
-            totalUnrated,
-            totalUntagged,
-            oldestSound,
+            totalUnrated: Number(totalUnrated),
+            totalUntagged: Number(totalUntagged),
+            oldestSound: oldestSound && oldestSound.created,
             totalTags,
             totalTagged,
-            totalPlaybacks,
+            totalPlaybacks: Number(totalPlaybacks),
         }));
     }
 
@@ -83,7 +84,7 @@ export class Statistics {
             creationsPerUser: creationsPerUser.map(({ userId, creations }) => {
                 return {
                     user: { id: userId },
-                    creations,
+                    creations: Number(creations),
                 };
             }),
         }));
@@ -102,7 +103,7 @@ export class Statistics {
             playbacksPerUser: playbacksPerUser.map(({ userId, playbacks }) => {
                 return {
                     user: { id: userId },
-                    playbacks,
+                    playbacks: Number(playbacks),
                 };
             }),
         }));
@@ -121,7 +122,7 @@ export class Statistics {
             recordingsPerUser: recordingsPerUser.map(({ userId, recordings }) => {
                 return {
                     user: { id: userId },
-                    recordings,
+                    recordings: Number(recordings),
                 };
             }),
         }));
@@ -135,6 +136,32 @@ export class Statistics {
             .from(Sound, "sound")
             .groupBy("sound.source")
             .getRawMany();
-        return ok(populate(statistics, StatisticSoundsPerSource, { soundsPerSource }));
+        return ok(populate(statistics, StatisticSoundsPerSource, {
+            soundsPerSource: soundsPerSource.map(({ source, sounds }) => {
+                return {
+                    source,
+                    sounds: Number(sounds),
+                };
+            }),
+        }));
+    }
+
+    @route("GET", "/statistics/sounds-per-month").dump(StatisticSoundsPerMonth, statistics)
+    public async getSoundsPerMonth(): Promise<StatisticSoundsPerMonth> {
+        const soundsPerMonth = await this.db.createQueryBuilder()
+            .select(`MIN(DATE_TRUNC('month', created))`, "month")
+            .addSelect("COUNT(sound.id)", "sounds")
+            .from(Sound, "sound")
+            .groupBy("DATE_TRUNC('month', created)")
+            .orderBy("MIN(created)")
+            .getRawMany();
+        return ok(populate(statistics, StatisticSoundsPerMonth, {
+            soundsPerMonth: soundsPerMonth.map(({ month, sounds }) => {
+                return {
+                    month,
+                    sounds: Number(sounds),
+                };
+            }),
+        }));
     }
 }

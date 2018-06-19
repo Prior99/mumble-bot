@@ -68,7 +68,7 @@ export class PageCached extends React.Component {
                     <Grid.Row>
                         <Grid.Column>
                             <div className={css.info}>
-                                <div><Icon name="bar graph" /> {this.statsString}</div>
+                                <div><Icon name="chart bar" /> {this.statsString}</div>
                                 {
                                     this.cachedAudio.selectionDefined && (
                                         <div><Icon name="time" /> {this.rangeString}</div>

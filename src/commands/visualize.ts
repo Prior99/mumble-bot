@@ -3,7 +3,6 @@ import { join } from "path";
 import { warn, error, info } from  "winston";
 import { metadata, command, Command } from "clime";
 import { VisualizerConfig } from "../config";
-import { AudioCache, RestApi } from "../server";
 import { setupWinston } from "../common";
 import { visualizeAudioFile } from "../visualizer";
 

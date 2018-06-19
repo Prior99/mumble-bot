@@ -4,8 +4,6 @@ import { component, inject, initialize } from "tsdi";
 
 import { User, Users } from "../../common";
 
-import { LoginStore, OwnUserStore } from ".";
-
 @component({ name: "UsersStore" })
 export class UsersStore {
     @inject private usersController: Users;

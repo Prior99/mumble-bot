@@ -1,10 +1,9 @@
 import { observable, computed, action } from "mobx";
 import { bind } from "decko";
 import { component, inject } from "tsdi";
-import { CachedAudio, Sounds, Sound, Tag, Queue, QueueItem } from "../../common";
+import { SoundsQuery, CachedAudio, Sounds, Sound, Tag, Queue, QueueItem } from "../../common";
 import { TagsStore } from "./tags";
 import { CachedAudioStore } from "./cached-audio";
-import { SoundsQuery } from "../../common/controllers/sounds";
 
 @component
 export class SoundsStore {
@@ -66,7 +65,7 @@ export class SoundsStore {
         return sound;
     }
 
-    @bind public async save({ id }: CachedAudio, description?: string) {
+    @bind @action public async save({ id }: CachedAudio, description?: string) {
         const sound = await this.soundsController.save({ id });
         if (description) {
             await this.soundsController.updateSound(sound.id, { description } as Sound);

@@ -7,7 +7,6 @@ import { external, inject } from "tsdi";
 import { Icon, Grid, Header, Table } from "semantic-ui-react";
 import { Content } from "../../components";
 import { Sounds } from "../../../common";
-import { UsersStore, OwnUserStore } from "../../store";
 import { requireLogin } from "../../utils";
 import * as css from "./upload.scss";
 

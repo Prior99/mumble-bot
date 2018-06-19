@@ -16,7 +16,17 @@ declare namespace global {
 declare let tsdi: TSDI;
 
 // Setup winston.
-if (!process.env["DEBUG"]) { Winston.remove(Winston.transports.Console); }
+if (!process.env["DEBUG"]) {
+    Winston.remove(Winston.transports.Console);
+    Winston.add(new Winston.transports.Console({
+        format: Winston.format.combine(
+            Winston.format.timestamp({ format: "YYYY-MM-DDTHH:mm:ss" }),
+            Winston.format.colorize(),
+            Winston.format.printf(info => `${info.timestamp} - ${info.level}: ${info.message}`),
+        ),
+        level: "error",
+    }));
+}
 
 // Mock modules.
 jest.mock("mumble");
