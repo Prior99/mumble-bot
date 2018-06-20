@@ -1,0 +1,178 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`statistics controller GET /statistics/creations-per-user responds 200 and the expected result with an empty database 1`] = `
+Object {
+  "creationsPerUser": Array [
+    Object {
+      "creations": 0,
+      "user": Object {
+        "id": "bc919169-6e7a-4ad8-a5c9-7e0b4f932b1e",
+      },
+    },
+  ],
+}
+`;
+
+exports[`statistics controller GET /statistics/creations-per-user responds 200 and the expected result with data in the database 1`] = `
+Object {
+  "creationsPerUser": Array [
+    Object {
+      "creations": 0,
+      "user": Object {
+        "id": "bc919169-6e7a-4ad8-a5c9-7e0b4f932b1e",
+      },
+    },
+    Object {
+      "creations": 1,
+      "user": Object {
+        "id": "2ce5e078-b52e-4d50-90cc-1703ec08ef2f",
+      },
+    },
+    Object {
+      "creations": 1,
+      "user": Object {
+        "id": "9e1d01d6-a203-4c86-9074-ee5e05a57dcd",
+      },
+    },
+  ],
+}
+`;
+
+exports[`statistics controller GET /statistics/overview responds 200 and the expected result with an empty database 1`] = `
+Object {
+  "totalPlaybacks": 0,
+  "totalSounds": 0,
+  "totalTagged": 0,
+  "totalTags": 0,
+  "totalUnrated": 0,
+  "totalUntagged": 0,
+  "totalUsers": 1,
+}
+`;
+
+exports[`statistics controller GET /statistics/overview responds 200 and the expected result with data in the database 1`] = `
+Object {
+  "oldestSound": "2017-01-15T20:00:00.000Z",
+  "totalPlaybacks": 1000,
+  "totalSounds": 2,
+  "totalTagged": 2,
+  "totalTags": 2,
+  "totalUnrated": 1,
+  "totalUntagged": 1,
+  "totalUsers": 3,
+}
+`;
+
+exports[`statistics controller GET /statistics/playbacks-per-user responds 200 and the expected result with an empty database 1`] = `
+Object {
+  "playbacksPerUser": Array [
+    Object {
+      "playbacks": 0,
+      "user": Object {
+        "id": "bc919169-6e7a-4ad8-a5c9-7e0b4f932b1e",
+      },
+    },
+  ],
+}
+`;
+
+exports[`statistics controller GET /statistics/playbacks-per-user responds 200 and the expected result with data in the database 1`] = `
+Object {
+  "playbacksPerUser": Array [
+    Object {
+      "playbacks": 0,
+      "user": Object {
+        "id": "bc919169-6e7a-4ad8-a5c9-7e0b4f932b1e",
+      },
+    },
+    Object {
+      "playbacks": 100,
+      "user": Object {
+        "id": "2ce5e078-b52e-4d50-90cc-1703ec08ef2f",
+      },
+    },
+    Object {
+      "playbacks": 900,
+      "user": Object {
+        "id": "9e1d01d6-a203-4c86-9074-ee5e05a57dcd",
+      },
+    },
+  ],
+}
+`;
+
+exports[`statistics controller GET /statistics/recordings-per-user responds 200 and the expected result with an empty database 1`] = `
+Object {
+  "recordingsPerUser": Array [
+    Object {
+      "recordings": 0,
+      "user": Object {
+        "id": "bc919169-6e7a-4ad8-a5c9-7e0b4f932b1e",
+      },
+    },
+  ],
+}
+`;
+
+exports[`statistics controller GET /statistics/recordings-per-user responds 200 and the expected result with data in the database 1`] = `
+Object {
+  "recordingsPerUser": Array [
+    Object {
+      "recordings": 0,
+      "user": Object {
+        "id": "bc919169-6e7a-4ad8-a5c9-7e0b4f932b1e",
+      },
+    },
+    Object {
+      "recordings": 1,
+      "user": Object {
+        "id": "2ce5e078-b52e-4d50-90cc-1703ec08ef2f",
+      },
+    },
+    Object {
+      "recordings": 1,
+      "user": Object {
+        "id": "9e1d01d6-a203-4c86-9074-ee5e05a57dcd",
+      },
+    },
+  ],
+}
+`;
+
+exports[`statistics controller GET /statistics/sounds-per-month responds 200 and the expected result with an empty database 1`] = `
+Object {
+  "soundsPerMonth": Array [],
+}
+`;
+
+exports[`statistics controller GET /statistics/sounds-per-month responds 200 and the expected result with data in the database 1`] = `
+Object {
+  "soundsPerMonth": Array [
+    Object {
+      "month": "2017-01-01T00:00:00.000Z",
+      "sounds": 1,
+    },
+    Object {
+      "month": "2018-01-01T00:00:00.000Z",
+      "sounds": 1,
+    },
+  ],
+}
+`;
+
+exports[`statistics controller GET /statistics/sounds-per-source responds 200 and the expected result with an empty database 1`] = `
+Object {
+  "soundsPerSource": Array [],
+}
+`;
+
+exports[`statistics controller GET /statistics/sounds-per-source responds 200 and the expected result with data in the database 1`] = `
+Object {
+  "soundsPerSource": Array [
+    Object {
+      "sounds": 2,
+      "source": "recording",
+    },
+  ],
+}
+`;
