@@ -91,14 +91,13 @@ describe("users controller", () => {
     });
 
     describe("post /user/:id", () => {
-        let adminUser: User, adminToken: Token, otherUser: User, otherToken: Token;
+        let adminUser: User, adminToken: Token, otherUser: User;
 
         beforeEach(async () => {
             const adminUserAndToken = await createUserWithToken();
             adminToken = adminUserAndToken.token;
             adminUser = adminUserAndToken.user;
             const otherUserAndToken = await createUserWithToken();
-            otherToken = otherUserAndToken.token;
             otherUser = otherUserAndToken.user;
         });
 
