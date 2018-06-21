@@ -1,3 +1,4 @@
+import { Connection } from "typeorm";
 import { pick } from "ramda";
 import { api, createUserWithToken, createUser, startDb, stopDb } from "../../../test-utils/";
 import { User, Token } from "../..";
@@ -94,10 +95,10 @@ describe("users controller", () => {
         let adminUser: User, adminToken: Token, otherUser: User, otherToken: Token;
 
         beforeEach(async () => {
-            const adminUserAndToken = await createUserWithToken();
+            const adminUserAndToken = await createUserWithToken({ name: "user1", email: "user1@example.com" } as User);
             adminToken = adminUserAndToken.token;
             adminUser = adminUserAndToken.user;
-            const otherUserAndToken = await createUserWithToken();
+            const otherUserAndToken = await createUserWithToken({ name: "user2", email: "user2@example.com" } as User);
             otherToken = otherUserAndToken.token;
             otherUser = otherUserAndToken.user;
         });
@@ -159,6 +160,45 @@ describe("users controller", () => {
                     .send({ admin: false });
                 expect(response.body).toEqual({ message: "Can't revoke admin status from yourself." });
                 expect(response.status).toBe(400);
+            });
+
+            it("can make other users admin", async () => {
+                const response = await api().post(`/user/${otherUser.id}`)
+                    .set("authorization", `Bearer ${adminToken.id}`)
+                    .send({ admin: true });
+                expect(response.status).toBe(200);
+                const getResponse = await api().get(`/user/${otherUser.id}`)
+                    .set("authorization", `Bearer ${adminToken.id}`);
+                expect(getResponse.body.data.admin).toBe(true);
+            });
+
+            it("can revoke admin status from other users", async () => {
+                await tsdi.get(Connection).getRepository(User).update(otherUser.id, { admin: true });
+                const response = await api().post(`/user/${otherUser.id}`)
+                    .set("authorization", `Bearer ${adminToken.id}`)
+                    .send({ admin: false });
+                expect(response.status).toBe(200);
+                const getResponse = await api().get(`/user/${otherUser.id}`)
+                    .set("authorization", `Bearer ${adminToken.id}`);
+                expect(getResponse.body.data.admin).toBe(false);
+            });
+        });
+
+        describe("as not an admin", () => {
+            it("can't make a user admin", async () => {
+                const response = await api().post(`/user/${adminUser.id}`)
+                    .set("authorization", `Bearer ${otherToken.id}`)
+                    .send({ admin: true });
+                expect(response.body).toEqual({ message: "Can't update admin status without being admin." });
+                expect(response.status).toBe(403);
+            });
+
+            it("can't change foreign user", async () => {
+                const response = await api().post(`/user/${adminUser.id}`)
+                    .set("authorization", `Bearer ${otherToken.id}`)
+                    .send({ name: "Some new name" });
+                expect(response.body).toEqual({ message: "Can't update foreign user without being admin." });
+                expect(response.status).toBe(403);
             });
         });
     });
