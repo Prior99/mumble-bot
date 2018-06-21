@@ -11,6 +11,7 @@ import {
     notFound,
     created,
     noauth,
+    badRequest,
 } from "hyrest";
 import { component, inject } from "tsdi";
 import { Connection } from "typeorm";
@@ -62,21 +63,21 @@ export class Users {
     ): Promise<User> {
         const { admin: currentAdmin, id: currentId } = await ctx.currentUser();
         if (!await this.db.getRepository(User).findOne({ id })) {
-            return notFound<User>(`No sound with id "${id}"`);
+            return notFound<User>(`No user with id "${id}".`);
         }
         if (user.admin && !currentAdmin) {
             warn(`User ${id} tried to change admin status of user ${user.id}.`);
-            return forbidden<User>("Can't update admin status without being admin");
+            return forbidden<User>("Can't update admin status without being admin.");
         }
         if (id !== currentId && !currentAdmin) {
             warn(`User ${currentId} tried to change foreign user ${user.id}.`);
-            return forbidden<User>("Can't update foreign user without being admin");
+            return forbidden<User>("Can't update foreign user without being admin.");
         }
         if (id === currentId && currentAdmin && user.admin === false) {
-            return forbidden<User>("Can't revoke admin status from yourself");
+            return badRequest<User>("Can't revoke admin status from yourself.");
         }
         if (id === currentId && user.enabled === false) {
-            return forbidden<User>("Can't disable yourself");
+            return badRequest<User>("Can't disable yourself.");
         }
         await this.db.getRepository(User).update(id, user);
         return ok(await this.getUser(id));
