@@ -42,10 +42,10 @@ export class MumbleLinks {
             relations: ["user"],
         });
         if (!mumbleLink) {
-            return notFound<void>(`No mumble link with id ${id} found.`);
+            return notFound<void>(`No mumble link with id "${id}" found.`);
         }
         if (mumbleLink.user.id !== currentUser.id) {
-            return forbidden<void>("Can't link a mumble user to a foreign user.");
+            return forbidden<void>("Can't delete link of a foreign user.");
         }
         await this.db.getRepository(MumbleLink).delete({ id });
         return ok();
@@ -75,7 +75,7 @@ export class MumbleLinks {
             where: { mumbleId: mumbleLink.mumbleId },
         });
         if (existingLink) {
-            return conflict<MumbleLink>(`Mumble user with id ${mumbleLink.mumbleId} is already linked.`);
+            return conflict<MumbleLink>(`Mumble user with id "${mumbleLink.mumbleId}" is already linked.`);
         }
         verbose(`Linked user ${currentUser.id} to mumble user "${mumbleUser.name}" with id ${mumbleUser.id}`);
         await this.db.getRepository(MumbleLink).save(mumbleLink);
