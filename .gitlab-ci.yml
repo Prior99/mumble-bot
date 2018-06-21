@@ -12,7 +12,7 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH
 
-build:
+build-docker:
   stage: build
   services:
     - docker:dind
@@ -57,6 +57,21 @@ lint:
   script:
     - make lint
   stage: test
+
+build:
+  image: $DOCKER_IMAGE:$CI_BUILD_REF
+  script:
+    - make release
+  stage: test
+  artifacts:
+    paths:
+      - dist/
+      - server/
+      - src/
+      - package.json
+      - yarn.lock
+      - typings/
+      - README.md
 
 deploy:
   image: "alpine:3.7"
