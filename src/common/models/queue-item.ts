@@ -5,8 +5,11 @@ import { Playlist, User } from ".";
 import { enqueue, world, live } from "../scopes";
 
 export class QueueItem {
-    @is(DataType.float) @scope(enqueue, world, live)
+    @is(DataType.int) @scope(enqueue, world, live)
     public pitch = 0;
+
+    @is(DataType.int) @scope(enqueue, world, live)
+    public echo = 0;
 
     @is(DataType.str).validate(required, oneOf("sound", "cached audio", "playlist")) @scope(enqueue, world, live)
     public type: "sound" | "cached audio" | "playlist";
