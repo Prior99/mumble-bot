@@ -87,6 +87,20 @@ export class AppSidebar extends React.Component {
                         }}
                     />
                 </Menu.Item>
+                <Menu.Item>
+                    <p>Echo</p>
+                    <Slider
+                        color="violet"
+                        inverted
+                        value={this.sounds.echo}
+                        settings={{
+                            min: 0,
+                            max: 300,
+                            step: 10,
+                            onChange: value => this.sounds.echo = value,
+                        }}
+                    />
+                </Menu.Item>
             </Sidebar>
         );
     }
