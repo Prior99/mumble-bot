@@ -9,7 +9,7 @@ import { AudioOutput } from "../../server";
 @controller @component
 export class Utilities {
     @inject private mumble: MumbleConnection;
-    @inject private audioOutput: AudioOutput;
+    @inject("AudioOutput") private audioOutput: AudioOutput;
 
     /**
      * A recursive function which returns the sub-tree of the mumble server's channels

@@ -1,4 +1,8 @@
-import { api, createUserWithToken, startDb, stopDb } from "../../../test-utils";
+import { copy } from "fs-extra";
+import { api, createUserWithToken, startDb, stopDb, createSoundWithCreatorAndSpeaker } from "../../../test-utils";
+import { Token, User, Sound } from "../../models";
+import { AudioOutput } from "../../../server";
+import { ServerConfig } from "../../../config";
 
 describe("utilities controller", () => {
     beforeEach(startDb);
@@ -49,6 +53,43 @@ describe("utilities controller", () => {
                 ],
             });
             expect(response.status).toBe(200);
+        });
+    });
+
+    describe("POST /shut-up", () => {
+        let sound: Sound, user: User, token: Token;
+
+        beforeEach(async () => {
+            const userAndToken = await createUserWithToken();
+            token = userAndToken.token;
+            user = userAndToken.user;
+            sound = (await createSoundWithCreatorAndSpeaker({ duration: 1 } as Sound)).sound;
+            await copy(
+                `${__dirname}/../../../__fixtures__/sin-short.mp3`,
+                `${tsdi.get(ServerConfig).soundsDir}/${sound.id}`,
+            );
+            for (let i = 0; i < 10; ++i) {
+                await api().post(`/queue`)
+                    .set("authorization", `Bearer ${token.id}`)
+                    .send({
+                        type: "sound",
+                        sound: { id: sound.id },
+                        pitch: 0,
+                    });
+            }
+        });
+
+        it("responds 401 without a valid token", async () => {
+            const response = await api().post("/shut-up");
+            expect(response.body).toEqual({ message: "Unauthorized." });
+            expect(response.status).toBe(401);
+        });
+
+        it("clears the queue", async () => {
+            const response = await api().post("/shut-up")
+                .set("authorization", `Bearer ${token.id}`);
+            expect(response.status).toBe(200);
+            expect(tsdi.get(AudioOutput).queue.length).toBe(0);
         });
     });
 });

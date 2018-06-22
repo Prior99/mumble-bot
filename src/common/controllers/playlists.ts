@@ -150,7 +150,7 @@ export class Playlists {
         @context ctx?: Context,
     ): Promise<Playlist>{
         if (!await this.db.getRepository(Playlist).findOne(id)) {
-            return notFound<Playlist>(`No playlist with id "${id}"`);
+            return notFound<Playlist>(`No playlist with id "${id}".`);
         }
         await this.db.getRepository(Playlist).update(id, playlist);
 

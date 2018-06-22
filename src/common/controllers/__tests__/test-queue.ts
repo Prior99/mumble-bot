@@ -55,6 +55,28 @@ describe("queue controller", () => {
         });
 
         describe(`with type="sound"`, () => {
+            it ("responds 400 with no sound specified", async () => {
+                const requestQueueItem = { type: "sound", pitch: 50 };
+                const response = await api().post(`/queue`)
+                    .set("authorization", `Bearer ${token.id}`)
+                    .send(requestQueueItem);
+                expect(response.status).toBe(400);
+                expect(response.body).toEqual({ message: `Must specify "sound" if type is set to "sound".` });
+            });
+
+            it ("responds 400 with an unkown sound specified", async () => {
+                const requestQueueItem = {
+                    type: "sound",
+                    sound: { id: "04b6416f-812e-4424-8bf8-fe0e145af861" },
+                    pitch: 50,
+                };
+                const response = await api().post(`/queue`)
+                    .set("authorization", `Bearer ${token.id}`)
+                    .send(requestQueueItem);
+                expect(response.status).toBe(400);
+                expect(response.body).toEqual({ message: `No sound with id "04b6416f-812e-4424-8bf8-fe0e145af861".` });
+            });
+
             it("enqueues a sound", async done => {
                 const requestQueueItem = {
                     type: "sound",
@@ -82,6 +104,32 @@ describe("queue controller", () => {
         });
 
         describe(`with type="cached audio"`, () => {
+            it ("responds 400 with no cached audio specified", async () => {
+                const requestQueueItem = { type: "cached audio", pitch: 50 };
+                const response = await api().post(`/queue`)
+                    .set("authorization", `Bearer ${token.id}`)
+                    .send(requestQueueItem);
+                expect(response.status).toBe(400);
+                expect(response.body).toEqual({
+                    message: `Must specify "cachedAudio" if type is set to "cached audio".`,
+                });
+            });
+
+            it ("responds 400 with an unkown cached audio specified", async () => {
+                const requestQueueItem = {
+                    type: "cached audio",
+                    cachedAudio: { id: "04b6416f-812e-4424-8bf8-fe0e145af861" },
+                    pitch: 50,
+                };
+                const response = await api().post(`/queue`)
+                    .set("authorization", `Bearer ${token.id}`)
+                    .send(requestQueueItem);
+                expect(response.status).toBe(400);
+                expect(response.body).toEqual({
+                    message: `No cached audio with id "04b6416f-812e-4424-8bf8-fe0e145af861".`,
+                });
+            });
+
             it("enqueues a cached audio", async done => {
                 const cachedAudio = {
                     date: new Date("2018-11-15Z10:00:00"),
@@ -118,6 +166,30 @@ describe("queue controller", () => {
         });
 
         describe(`with type="playlist"`, () => {
+            it ("responds 400 with no playlist specified", async () => {
+                const requestQueueItem = { type: "playlist", pitch: 50 };
+                const response = await api().post(`/queue`)
+                    .set("authorization", `Bearer ${token.id}`)
+                    .send(requestQueueItem);
+                expect(response.status).toBe(400);
+                expect(response.body).toEqual({ message: `Must specify "playlist" if type is set to "playlist".` });
+            });
+
+            it ("responds 400 with an unkown playlist specified", async () => {
+                const requestQueueItem = {
+                    type: "playlist",
+                    playlist: { id: "04b6416f-812e-4424-8bf8-fe0e145af861" },
+                    pitch: 50,
+                };
+                const response = await api().post(`/queue`)
+                    .set("authorization", `Bearer ${token.id}`)
+                    .send(requestQueueItem);
+                expect(response.status).toBe(400);
+                expect(response.body).toEqual({
+                    message: `No playlist with id "04b6416f-812e-4424-8bf8-fe0e145af861".`,
+                });
+            });
+
             it("enqueues a playlist", async done => {
                 const playlist = await createPlaylist(user, 0, {} as Playlist, sound, sound);
                 const requestQueueItem = {

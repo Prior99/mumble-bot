@@ -213,4 +213,39 @@ describe("playlists controller", () => {
             expect(listResponse.status).toBe(200);
         });
     });
+
+    describe("POST /playlist/:id", () => {
+        it("responds 401 without a valid token", async () => {
+            const response = await api().post(`/playlist/${playlist1.id}`)
+                .send({});
+            expect(response.body).toEqual({ message: "Unauthorized." });
+            expect(response.status).toBe(401);
+        });
+
+        it("responds 401 with an unkown playlist with an invalid token", async () => {
+            const response = await api().post("/playlist/d33512a2-c0c5-4736-a908-fd90ca40af1d")
+                .send({});
+            expect(response.body).toEqual({ message: "Unauthorized." });
+            expect(response.status).toBe(401);
+        });
+
+        it("responds 404 with an unkown playlist", async () => {
+            const response = await api().post("/playlist/d33512a2-c0c5-4736-a908-fd90ca40af1d")
+                .set("authorization", `Bearer ${token.id}`)
+                .send({});
+            expect(response.body).toEqual({ message: `No playlist with id "d33512a2-c0c5-4736-a908-fd90ca40af1d".` });
+            expect(response.status).toBe(404);
+        });
+
+        it("updates the playlist", async () => {
+            const response = await api().post(`/playlist/${playlist1.id}`)
+                .set("authorization", `Bearer ${token.id}`)
+                .send({ description: "Some new description" });
+            expect(response.status).toBe(200);
+            const getResponse = await api().get(`/playlist/${playlist1.id}`)
+                .set("authorization", `Bearer ${token.id}`);
+            expect(getResponse.body.data.description).toBe("Some new description");
+            expect(getResponse.status).toBe(200);
+        });
+    });
 });

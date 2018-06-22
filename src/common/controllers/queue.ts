@@ -37,7 +37,7 @@ export class Queue {
                 break;
             case "cached audio":
                 if (!queueItem.cachedAudio) {
-                    return badRequest<QueueItem>(`Must specify "CachedAudio" if type is set to "cached audio".`);
+                    return badRequest<QueueItem>(`Must specify "cachedAudio" if type is set to "cached audio".`);
                 }
                 if (!this.audioCache.hasId(queueItem.cachedAudio.id)) {
                     return badRequest<QueueItem>(`No cached audio with id "${queueItem.cachedAudio.id}".`);
@@ -54,8 +54,6 @@ export class Queue {
                 playlist.used++;
                 await this.db.getRepository(Playlist).save(playlist);
                 break;
-            default:
-                return internalServerError<QueueItem>();
         }
         const currentUser = await ctx.currentUser();
         queueItem.created = new Date();
