@@ -1,6 +1,6 @@
 import { copy } from "fs-extra";
 import { api, createUserWithToken, startDb, stopDb, createSoundWithCreatorAndSpeaker } from "../../../test-utils";
-import { Token, User, Sound } from "../../models";
+import { Token, Sound } from "../../models";
 import { AudioOutput } from "../../../server";
 import { ServerConfig } from "../../../config";
 
@@ -57,12 +57,11 @@ describe("utilities controller", () => {
     });
 
     describe("POST /shut-up", () => {
-        let sound: Sound, user: User, token: Token;
+        let sound: Sound, token: Token;
 
         beforeEach(async () => {
             const userAndToken = await createUserWithToken();
             token = userAndToken.token;
-            user = userAndToken.user;
             sound = (await createSoundWithCreatorAndSpeaker({ duration: 1 } as Sound)).sound;
             await copy(
                 `${__dirname}/../../../__fixtures__/sin-short.mp3`,

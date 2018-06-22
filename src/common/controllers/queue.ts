@@ -4,7 +4,6 @@ import {
     controller,
     route,
     created,
-    internalServerError,
     badRequest,
 } from "hyrest";
 import { component, inject } from "tsdi";

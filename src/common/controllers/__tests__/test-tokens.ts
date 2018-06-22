@@ -1,12 +1,11 @@
-import { Connection } from "typeorm";
 import { api, createUser, startDb, stopDb } from "../../../test-utils/";
-import { User, Token } from "../..";
+import { User } from "../..";
 
 describe("tokens controller", () => {
     beforeEach(startDb);
     afterEach(stopDb);
 
-    let user: User, disabledUser;
+    let user: User;
 
     beforeEach(async () => {
         user = await createUser({
@@ -14,7 +13,7 @@ describe("tokens controller", () => {
             email: "someone@example.com",
             password: "somepassword",
         } as User);
-        disabledUser = await createUser({
+        await createUser({
             name: "disabled",
             email: "disabled@example.com",
             password: "somepassword",
