@@ -11,7 +11,7 @@ import {
     stopDb,
 } from "../../../test-utils";
 import { world } from "../../scopes";
-import { Token, User, Sound, CachedAudio } from "../../models";
+import { Playlist, Token, User, Sound, CachedAudio } from "../../models";
 import { AudioOutput, AudioCache } from "../../../server";
 import { ServerConfig } from "../../../config";
 
@@ -119,7 +119,7 @@ describe("queue controller", () => {
 
         describe(`with type="playlist"`, () => {
             it("enqueues a playlist", async done => {
-                const playlist = await createPlaylist(user, 0, sound, sound);
+                const playlist = await createPlaylist(user, 0, {} as Playlist, sound, sound);
                 const requestQueueItem = {
                     type: "playlist",
                     playlist: { id: playlist.id },
@@ -143,7 +143,7 @@ describe("queue controller", () => {
 
             [-200, 600].forEach(pitch => {
                 it(`enqueues a playlist with pitch ${pitch}`, async done => {
-                    const playlist = await createPlaylist(user, pitch, sound, sound);
+                    const playlist = await createPlaylist(user, pitch, {} as Playlist, sound, sound);
                     const requestQueueItem = {
                         type: "playlist",
                         playlist: { id: playlist.id },

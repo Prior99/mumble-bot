@@ -33,11 +33,7 @@ export class ChartSoundsPerSource extends React.Component {
                 value: sounds,
                 fill: chartColors[index % chartColors.length],
             }))
-            .sort((a, b) => {
-                if (a.value > b.value) { return 1; }
-                if (a.value < b.value) { return -1; }
-                return 0;
-            });
+            .sort((a, b) => a.value - b.value);
     }
 
     @bind @action
