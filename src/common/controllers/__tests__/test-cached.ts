@@ -75,6 +75,15 @@ describe("cached controller", () => {
             expect(response.status).toBe(401);
         });
 
+        it("responds 404 with a valid token with unkown id", async () => {
+            const response = await api().delete(`/cached/89c11873-8691-4196-9d18-be9df458b5f2`)
+                .set("authorization", `Bearer ${token.id}`);
+            expect(response.body).toEqual({
+                message: `No cached sound with id "89c11873-8691-4196-9d18-be9df458b5f2" found.`,
+            });
+            expect(response.status).toBe(404);
+        });
+
         it("deletes the cached audio", async () => {
             const responseDelete = await api().delete(`/cached/${cachedAudio1.id}`)
                 .set("authorization", `Bearer ${token.id}`);

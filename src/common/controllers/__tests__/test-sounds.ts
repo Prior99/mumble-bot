@@ -392,6 +392,10 @@ describe("sounds controller", () => {
                     admin: sound.user.id === userA.user.id,
                 },
             }));
+            await rateSound(sounds[0].id, userA.token.id, 2);
+            await rateSound(sounds[0].id, userB.token.id, 4);
+            await rateSound(sounds[1].id, userA.token.id, 1);
+            await rateSound(sounds[2].id, userA.token.id, 2);
         });
 
         it("returns 401 without a valid token", async () => {
@@ -560,6 +564,26 @@ describe("sounds controller", () => {
             expect(response.body.data).toMatchObject({
                 totalSounds: 3,
                 sounds: [ responseSounds[0], responseSounds[2], responseSounds[1] ],
+            });
+            expect(response.status).toBe(200);
+        });
+
+        it("sorts the sounds by rating descending", async () => {
+            const response = await api().get("/sounds?sort=rating&sortDirection=desc")
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject({
+                totalSounds: 3,
+                sounds: [ responseSounds[0], responseSounds[2], responseSounds[1] ],
+            });
+            expect(response.status).toBe(200);
+        });
+
+        it("sorts the sounds by rating ascending", async () => {
+            const response = await api().get("/sounds?sort=rating&sortDirection=asc")
+                .set("authorization", `Bearer ${userA.token.id}`);
+            expect(response.body.data).toMatchObject({
+                totalSounds: 3,
+                sounds: [ responseSounds[1], responseSounds[2], responseSounds[0] ],
             });
             expect(response.status).toBe(200);
         });
