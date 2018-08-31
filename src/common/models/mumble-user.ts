@@ -10,4 +10,10 @@ export class MumbleUser {
 
     @is(DataType.int) @scope(world)
     public session?: number;
+
+    @is() @scope(world)
+    public selfMute?: boolean;
+
+    @is() @scope(world)
+    public selfDeaf?: boolean;
 }

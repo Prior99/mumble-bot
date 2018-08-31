@@ -1,7 +1,7 @@
 import { controller, route, ok, populate } from "hyrest";
 import { component, inject } from "tsdi";
 import { bind } from "decko";
-import { Connection as MumbleConnection } from "mumble";
+import { Connection as MumbleConnection, Channel as MumbleChannel } from "mumble";
 import { Channel, MumbleUser } from "../models";
 import { world } from "../scopes";
 import { AudioOutput } from "../../server";
@@ -19,12 +19,14 @@ export class Utilities {
      *
      * @return The sub-tree below the given channel including that channel.
      */
-    @bind private buildChannelTree(channel: Channel) {
+    @bind private buildChannelTree(channel: MumbleChannel) {
         const { name, position } = channel;
         const users = channel.users.map(user => ({
             name: user.name,
             id: user.id,
             session: user.session,
+            selfMute: Boolean(user.selfMute),
+            selfDeaf: Boolean(user.selfDeaf),
         }));
         const children = channel.children
             .sort((a, b) => a.position - b.position)
