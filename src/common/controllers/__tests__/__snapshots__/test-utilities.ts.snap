@@ -14,11 +14,15 @@ Object {
               Object {
                 "id": 4,
                 "name": "Stranger one",
+                "selfDeaf": false,
+                "selfMute": false,
                 "session": 84,
               },
               Object {
                 "id": 7,
                 "name": "Stranger two",
+                "selfDeaf": false,
+                "selfMute": false,
                 "session": 171,
               },
             ],
@@ -36,6 +40,8 @@ Object {
           Object {
             "id": 23,
             "name": "Stranger three",
+            "selfDeaf": false,
+            "selfMute": false,
             "session": 2134,
           },
         ],
@@ -46,6 +52,8 @@ Object {
     "users": Array [
       Object {
         "name": "Unregistered Stranger",
+        "selfDeaf": false,
+        "selfMute": false,
         "session": 2134,
       },
     ],
