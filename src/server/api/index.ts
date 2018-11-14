@@ -9,7 +9,7 @@ import { component, inject, initialize, TSDI, destroy } from "tsdi";
 import { info, error } from "winston";
 import { bind } from "decko";
 import { createReadStream, existsSync } from "fs-extra";
-import { hyrest } from "hyrest/middleware";
+import { hyrest } from "hyrest-express";
 import { AuthorizationMode, configureController, ControllerMode } from "hyrest";
 import * as morgan from "morgan";
 import { ServerConfig } from "../../config";
