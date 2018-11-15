@@ -80,9 +80,9 @@ export class AppSidebar extends React.Component {
                         inverted
                         value={this.sounds.pitch}
                         settings={{
-                            min: -600,
-                            max: 600,
-                            step: 10,
+                            min: -5000,
+                            max: 3000,
+                            step: 100,
                             onChange: value => this.sounds.pitch = value,
                         }}
                     />
