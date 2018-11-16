@@ -43,7 +43,7 @@ export class PageUpload extends React.Component {
             reader.addEventListener("load", async () => {
                 try {
                     await this.sounds.upload({
-                        content: btoa(reader.result),
+                        content: btoa(reader.result as string),
                         filename: file.file.name,
                     });
                     this.files.set(file.id, {

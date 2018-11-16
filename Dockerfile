@@ -1,4 +1,4 @@
-FROM node:9-stretch
+FROM node:10-stretch
 
 WORKDIR /mumble-bot
 

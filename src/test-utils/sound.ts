@@ -17,7 +17,7 @@ export async function createSound(sound?: Sound) {
 export async function createSoundWithCreatorAndSpeaker(data?: Sound) {
     const user = await createUser({ name: "Speaker", email: "speaker@example.com" } as User);
     const creator = await createUser({ name: "Creator", email: "creator@example.com" } as User);
-    const sound = await createSound({ ...data, user, creator });
+    const sound = await createSound({ ...data, user, creator } as Sound);
     return { sound, creator, speaker: user };
 }
 
