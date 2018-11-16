@@ -117,6 +117,7 @@
     "webpack-dev-server": "^3.1.10"
   },
   "resolutions": {
-    "@types/recharts/@types/react": "^16.3.13"
+    "@types/recharts/@types/react": "^16.7.6",
+    "@types/recharts/@types/d3-shape": "^1.2.6"
   }
 }

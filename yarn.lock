@@ -212,10 +212,10 @@
   resolved "https://registry.yarnpkg.com/@types/d3-path/-/d3-path-1.0.7.tgz#a0736fceed688a695f48265a82ff7a3369414b81"
   integrity sha512-U8dFRG+8WhkLJr2sxZ9Cw/5WeRgBnNqMxGdA1+Z0+ZG6tK0s75OQ4OXnxeyfKuh6E4wQPY8OAKr1+iNDx01BEQ==
 
-"@types/d3-shape@*":
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/@types/d3-shape/-/d3-shape-1.2.3.tgz#cadc9f93a626db9190f306048a650df4ffa4e500"
-  integrity sha512-iP9TcX0EVi+LlX+jK9ceS+yhEz5abTitF+JaO2ugpRE/J+bccaYLe/0/3LETMmdaEkYarIyboZW8OF67Mpnj1w==
+"@types/d3-shape@*", "@types/d3-shape@^1.2.6":
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/@types/d3-shape/-/d3-shape-1.2.6.tgz#5badbbf4f29f9ca91e847506aa2241db757adccb"
+  integrity sha512-BdewMqqinhNNV8rrnjr6tIdm6WCl/eVaePDs1dl52Le/c0m1ML/LaZc2S/Sht3VjPbAqeDFXhTgRgeDkrvzt/w==
   dependencies:
     "@types/d3-path" "*"
 
@@ -334,14 +334,7 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.2.tgz#fa8e1ad1d474688a757140c91de6dace6f4abc8d"
   integrity sha512-HtKGu+qG1NPvYe1z7ezLsyIaXYyi8SoAVqWDZgDQ8dLrsZvSzUNCwZyfX33uhWxL/SU0ZDQZ3nwZ0nimt507Kw==
 
-"@types/react@*", "@types/react@^16.3.13":
-  version "16.4.0"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.4.0.tgz#f7f639837bf1f8635f57616b12a1b0d193b6343a"
-  integrity sha512-26vjjwdnRoMsLtOGTMD3PzWCDJo3taC8MhpW9eNwviAUB/BHm6o7FUAhrxabJHSKFqJcMVLx8knCL1uFxiBcHg==
-  dependencies:
-    csstype "^2.2.0"
-
-"@types/react@^16.7.6":
+"@types/react@*", "@types/react@^16.7.6":
   version "16.7.6"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-16.7.6.tgz#80e4bab0d0731ad3ae51f320c4b08bdca5f03040"
   integrity sha512-QBUfzftr/8eg/q3ZRgf/GaDP6rTYc7ZNem+g4oZM38C9vXyV8AWRWaTQuW5yCoZTsfHrN7b3DeEiUnqH9SrnpA==
