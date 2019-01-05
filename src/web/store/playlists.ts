@@ -37,6 +37,9 @@ export class PlaylistsStore {
         if (this.playlists.has(id)) {
             return this.playlists.get(id);
         }
+        const playlist = await this.playlistsController.getPlaylist(id);
+        this.playlists.set(id, playlist);
+        return playlist;
     }
 
     @bind @action public async play(playlist: Playlist) {
