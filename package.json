@@ -11,7 +11,7 @@
     "start:server": "TZ=UTC nodemon",
     "start:worker": "TZ=UTC node server worker --config-file config.yml",
     "lint:src": "tslint --format stylish --project tsconfig.json",
-    "lint:style": "stylelint --allow-empty-input src/**/*.scss",
+    "lint:style": "stylelint src/**/*.scss",
     "test": "TZ=UTC jest --runInBand --config jest/jest-unit-config.json",
     "test:integration": "TZ=UTC jest --config jest/jest-integration-config.json"
   },
