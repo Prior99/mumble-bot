@@ -31,7 +31,7 @@ Some requirements need to be installed:
 
  - FFmpeg
  - Sox
- - Cairo
+ - Cairo, libjpeg, libjpeg-dev
  - Node JS, NPM and Yarn
  - Make
  - PostgreSQL
@@ -43,7 +43,7 @@ apt-get -qq update
 apt-get -qq install -y gconf-service libasound2 libgconf-2-4 libgtk-3-0 libnspr4 libx11-xcb1 \
   libxss1 libxtst6 fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
   fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils libpango1.0-dev libgif-dev \
-  build-essential ffmpeg sox nodejs npm postgresql
+  build-essential ffmpeg sox nodejs npm postgresql libjpeg-dev
 ```
 
 In order to install yarn [please follow the official installation way](https://yarnpkg.com/lang/en/docs/install/#debian-stable).
@@ -106,7 +106,7 @@ node server migrate -c config.yml
 ### 6. Start the backend
 
 ```
-node server serve
+node server serve -c config.yml
 ```
 
 You can make the bot run as systemd service:
